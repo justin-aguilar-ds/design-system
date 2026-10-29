@@ -136,7 +136,6 @@ const collect = (tier) => {
       css: file(`${name}.css`),
       js: file(`${name}.js`),
       demo: file('demo.html'),
-      preview: file('preview.html'),
     };
   });
 };
@@ -225,36 +224,12 @@ const list = (items) => `<ul class="component-list">
 ${items.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span class="t-label">${inline(c.title)}</span><span class="t-body component-summary">${inline(c.summary)}</span></a></li>`).join('\n')}
 </ul>`;
 
-// The grid view: every piece as a still, centred in a fixed-size rounded
-// tile, the name under it. The still is inert and hidden from assistive
-// tech — the link under it carries the name — and the link stretches over
-// the whole tile.
-const grid = (items) => `<ul class="tile-grid">
-${items.filter((c) => c.preview).map((c) => `  <li class="tile">
-    <div class="tile-stage" inert aria-hidden="true">${c.preview}</div>
-    <a class="tile-link t-label" href="${c.name}.html">${inline(c.title)}</a>
-  </li>`).join('\n')}
-</ul>`;
-
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
 
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
 ${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange components; components are single controls.')}
-<div class="library-toolbar">
-  <div class="segmented" role="group" aria-label="View" id="library-view">
-    <span class="segmented-indicator" aria-hidden="true"></span>
-    <button class="segmented-option is-active t-control" type="button" aria-pressed="true">Grid</button>
-    <button class="segmented-option t-control" type="button" aria-pressed="false">List</button>
-  </div>
-</div>
-<div class="library-view" data-view="grid">
-${section('Patterns', grid(patterns))}
-${section('Components', grid(components))}
-</div>
-<div class="library-view" data-view="list" hidden>
 ${section('Patterns', list(patterns))}
-${section('Components', list(components))}
-</div>`));
+${section('Components', list(components))}`));
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 const toc = [];
