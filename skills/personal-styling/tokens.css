@@ -42,8 +42,10 @@ img, video, svg { display: block; max-width: 100%; }
 
   /* RANGE SLIDER */
   --color-range-track: rgba(0, 0, 0, 0.12);
-  --color-range-progress: #000000;
-  --color-range-thumb: #ffffff;
+  /* CHANGED (v0.5): the fill is full ink and the thumb is the ground, so
+     both flip with the theme and the thumb always reads as nested in the fill. */
+  --color-range-progress: var(--color-text);
+  --color-range-thumb: var(--color-bg);
   --shadow-range-thumb: 0 1px 4px rgba(0, 0, 0, 0.24), 0 1px 1px rgba(0, 0, 0, 0.12);
 
   /* ACCENT — spend it on ATTENTION, not state. The whole budget:

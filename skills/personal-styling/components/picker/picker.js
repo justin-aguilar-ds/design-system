@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.1.0 */
+/* personal-styling · picker · v0.2.0 */
 
 // A button that opens a listbox (the "select-only combobox" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.
@@ -40,6 +40,24 @@ document.querySelectorAll('.picker').forEach((picker) => {
 
   if (!selected()) picker.classList.add('is-placeholder');
 
+  // A stable width: the trigger is as wide as its widest label, placeholder
+  // included, so choosing an option never moves the chevron or the layout.
+  // Measured on the trigger itself, so padding, chevron and type all count.
+  const fitWidth = () => {
+    if (!valueEl || !options.length) return;
+    const current = valueEl.textContent;
+    trigger.style.minWidth = '';
+    let widest = 0;
+    for (const label of [current, ...options.map((o) => o.textContent.trim())]) {
+      valueEl.textContent = label;
+      widest = Math.max(widest, trigger.offsetWidth);
+    }
+    valueEl.textContent = current;
+    if (widest) trigger.style.minWidth = `${widest}px`; // 0 means hidden; measured again on open
+  };
+  fitWidth();
+  document.fonts?.ready.then(fitWidth);
+
   // offsetLeft/Top ignore transforms, so the fill lands correctly even
   // while the menu is still scaling in. Options measure from the list
   // (it's positioned), so add the list's own offset inside the menu.
@@ -77,6 +95,7 @@ document.querySelectorAll('.picker').forEach((picker) => {
   const open = () => {
     if (isOpen()) return;
     clearTimeout(closeTimer);
+    if (!trigger.style.minWidth) fitWidth();
     menu.hidden = false;
     // Open below, or above when there isn't room below the trigger.
     const roomBelow = innerHeight - trigger.getBoundingClientRect().bottom;

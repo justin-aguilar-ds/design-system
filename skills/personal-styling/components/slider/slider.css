@@ -1,4 +1,4 @@
-/* personal-styling · slider · v0.1.0 */
+/* personal-styling · slider · v0.2.0 */
 
 .slider-field {
   display: grid;
@@ -13,11 +13,15 @@
 /* A meaningful value at mono size takes full ink (see the contrast floor). */
 .slider-value { color: var(--color-text); }
 
-/* The wrapper is the 44px touch target; the visual track inside is 16px. */
+/* The wrapper is the 44px touch target; the visual track inside is 16px.
+   The negative margin hangs the extra 14px above and below outside the
+   layout box, so spacing around the slider is measured from the visible
+   track and lands on the scale: 8px from its label, not 22px. */
 .slider {
   position: relative;
   display: block;
   height: 44px;
+  margin: calc((16px - 44px) / 2) 0;
   touch-action: none;           /* don't fight OS swipe gestures */
   overscroll-behavior-x: contain;
 }
@@ -36,7 +40,16 @@
 /* Thumb centre travels from 8px to (100% - 8px): a 2px inset plus half of
    the 12px thumb. The fill runs 8px past the centre, so its width is
    16px + pct × (100% - 16px). --slider-pct (0–1) is set by slider.js.
-   Only opacity transitions; width tracks the value immediately. */
+   Width tracks the value immediately; only opacity transitions.
+
+   The fill deepens in two steps, like a segmented control's label:
+     rest              0     the grey track stays quiet
+     hover / focus     30%   a preview of the value — the hover response
+     dragging / keys   100%  full ink, the thumb nested inside it
+   It comes in on --duration-fast (it's feedback to a hand) and goes out
+   on --duration-base, both plain ease — it is a colour change, not
+   something entering. The destination state's transition wins, which is
+   what gives the two speeds. */
 .slider-progress {
   position: absolute;
   top: 0;
@@ -48,7 +61,22 @@
   opacity: 0;
   transition: opacity var(--duration-base) ease;
 }
-.slider.is-active .slider-progress { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .slider:hover .slider-progress {
+    opacity: var(--opacity-label-inactive);
+    transition-duration: var(--duration-fast);
+  }
+}
+.slider:has(.slider-input:focus-visible) .slider-progress {
+  opacity: var(--opacity-label-inactive);
+  transition-duration: var(--duration-fast);
+}
+/* Five classes deep so dragging wins over hover and focus. */
+.slider.is-active .slider-track .slider-progress.slider-progress {
+  opacity: 1;
+  transition-duration: var(--duration-fast);
+}
+.slider:has(.slider-input:disabled) .slider-progress { opacity: 0; }
 
 /* The native input stays for semantics and keyboard support. It fills the
    hit area, inset 2px each side for the thumb's inset. */

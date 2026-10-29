@@ -1,4 +1,4 @@
-/* personal-styling · slider · v0.1.0 */
+/* personal-styling · slider · v0.2.0 */
 
 // Keys that change a range input's value. Holding one shows the progress fill.
 const SLIDER_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End']);
