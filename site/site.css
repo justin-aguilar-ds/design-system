@@ -1,0 +1,117 @@
+/* Sandbox chrome. Built from the same tokens as everything else, and linted
+   like a component. */
+
+h1, h2, h3, p, ul, ol, pre { margin: 0; }
+body { min-height: 100vh; }
+
+/* A reading surface: centred at --container, with the page inset. */
+.site { padding: var(--space-page); }
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-16);
+}
+.site-nav {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-24);
+}
+.site-name { color: var(--color-text); }
+
+.site-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-48);
+  padding-top: var(--space-48);
+}
+.site-intro,
+.site-section,
+.source {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+/* Component index: a list, so it sits on the page with dividers. */
+.component-list { list-style: none; padding: 0; }
+.component-list li { border-top: 1px solid var(--color-divider); }
+.component-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-24);
+  padding: var(--space-16) 0;
+}
+.component-summary { transition: color var(--duration-fast) ease; }
+@media (hover: hover) and (pointer: fine) {
+  .component-row:hover .component-summary { color: var(--color-text); }
+}
+
+/* A demo is content, so it earns the one surface. */
+.demo { padding: var(--space-24); min-width: 0; }
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-24);
+}
+.demo-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+  min-width: 0;
+}
+.demo-cell--stretch { align-items: stretch; }
+.demo-cell--wide { grid-column: 1 / -1; }
+
+/* Source code. Not a role in the system: mono family at Caption metrics,
+   no uppercase, because code is read character by character. */
+.code {
+  padding: var(--space-16);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Rendered markdown. Sections are divided, not boxed. */
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+.prose h2 { padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
+.prose ul, .prose ol { padding-left: var(--space-24); display: flex; flex-direction: column; gap: var(--space-8); }
+.prose strong { font-weight: 600; color: var(--color-text); }
+.prose code { font-family: var(--font-mono); font-weight: 500; color: var(--color-text); }
+.prose-link { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) {
+  .prose-link:hover { text-decoration: underline; }
+}
+
+/* Tables follow the Tables rules: Label headers, 10.5 mono cells. */
+.table-wrap { overflow-x: auto; }
+.prose table { border-collapse: collapse; width: 100%; }
+.prose th {
+  text-align: left;
+  padding: 0 var(--space-24) var(--space-16) 0;
+  font-size: 16px; line-height: 19px; font-weight: 600; color: var(--color-text);
+}
+.prose td {
+  padding: var(--space-16) var(--space-24) var(--space-16) 0;
+  border-top: 1px solid var(--color-divider);
+  vertical-align: top;
+  font-family: var(--font-mono); font-size: 10.5px; line-height: 1.5;
+  letter-spacing: 0.3px; font-weight: 500; text-transform: uppercase;
+}
+.prose td:first-child { color: var(--color-text); }
+.prose td code { text-transform: none; }
+
+@media (max-width: 630px) {
+  .component-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
+}

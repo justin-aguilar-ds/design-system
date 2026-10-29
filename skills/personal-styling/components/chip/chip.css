@@ -1,0 +1,49 @@
+/* personal-styling · chip · v0.1.0 */
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);          /* dot to label */
+  padding: var(--space-4) var(--space-8);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+/* The dot carries the state without colour: a ring when off, solid when on.
+   currentColor keeps it in step with the label's ink. */
+.chip-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--color-fill-subtle);
+  color: var(--color-text);
+}
+.chip[aria-pressed="true"] .chip-dot { background: currentColor; }
+
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover:not(:disabled) { color: var(--color-text); }
+  /* Fill-deepening: --color-divider (8%) is the next step up from the
+     4% selected fill. */
+  .chip[aria-pressed="true"]:hover:not(:disabled) { background: var(--color-divider); }
+}
+
+/* Disabled: 30% ink and a 30% ring, in either theme. */
+.chip:disabled {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}

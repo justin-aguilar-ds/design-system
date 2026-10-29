@@ -1,0 +1,103 @@
+/* personal-styling · slider · v0.1.0 */
+
+.slider-field {
+  display: grid;
+  gap: var(--space-8);
+}
+.slider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-8);
+}
+/* A meaningful value at mono size takes full ink (see the contrast floor). */
+.slider-value { color: var(--color-text); }
+
+/* The wrapper is the 44px touch target; the visual track inside is 16px. */
+.slider {
+  position: relative;
+  display: block;
+  height: 44px;
+  touch-action: none;           /* don't fight OS swipe gestures */
+  overscroll-behavior-x: contain;
+}
+
+.slider-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 8px);         /* 16px track centred in the 44px hit area */
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-range-track);
+  overflow: hidden;
+}
+
+/* Thumb centre travels from 8px to (100% - 8px): a 2px inset plus half of
+   the 12px thumb. The fill runs 8px past the centre, so its width is
+   16px + pct × (100% - 16px). --slider-pct (0–1) is set by slider.js.
+   Only opacity transitions; width tracks the value immediately. */
+.slider-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(16px + var(--slider-pct, 0) * (100% - 16px));
+  border-radius: var(--radius-pill);
+  background: var(--color-range-progress);
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+.slider.is-active .slider-progress { opacity: 1; }
+
+/* The native input stays for semantics and keyboard support. It fills the
+   hit area, inset 2px each side for the thumb's inset. */
+.slider-input {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: calc(100% - 4px);      /* 2px inset each side */
+  height: 100%;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.slider-input:disabled { cursor: not-allowed; }
+.slider:has(.slider-input:disabled) { opacity: var(--opacity-label-inactive); }
+
+/* The track carries the focus outline, not the invisible input. */
+.slider-input:focus-visible { outline: none; }
+.slider:has(.slider-input:focus-visible) .slider-track {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+.slider-input::-webkit-slider-runnable-track {
+  height: 44px;
+  background: transparent;
+}
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: calc((44px - 12px) / 2); /* centre the thumb on the 44px track */
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-range-thumb);
+  box-shadow: var(--shadow-range-thumb);
+}
+.slider-input::-moz-range-track {
+  height: 44px;
+  background: transparent;
+}
+.slider-input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-range-thumb);
+  box-shadow: var(--shadow-range-thumb);
+}

@@ -1,0 +1,250 @@
+/* ============================================================
+   Personal styling tokens — v0.4
+   Extracted from Projects/portfolio, then deliberately tightened.
+   Drop this block in verbatim, then build with the tokens.
+   Divergences from the source are marked CHANGED / NEW.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
+img, video, svg { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+
+:root {
+  /* SPACE — five steps, and nothing between them.
+     CHANGED: the source uses ten values; this cuts to five.
+     4 is the inner padding of a small control ONLY — a pill, a chip, a
+     segment button. It is never a gap between blocks. */
+  --space-4: 4px;    /* inner padding of small controls */
+  --space-8: 8px;    /* label to value, icon to text */
+  --space-16: 16px;  /* inside a card, between fields */
+  --space-24: 24px;  /* page inset, card to card */
+  --space-48: 48px;  /* section to section */
+  --space-page: var(--space-24);
+
+  /* WIDTH — NEW. The source never needed one (every page is a fixed
+     viewport with no scrolling body). 1280px is the industry-standard
+     ceiling; 890px is the source's prose measure, kept. */
+  --container: 1280px;
+  --measure: 890px;
+
+  /* COLOUR */
+  --color-text: #000000;
+  --color-text-secondary: rgba(0, 0, 0, 0.5);   /* the DEFAULT text colour */
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-hairline: #ececec;                    /* CHANGED from #f8f8f8 */
+  --color-hairline-strong: rgba(0, 0, 0, 0.12);
+  --color-fill-subtle: rgba(0, 0, 0, 0.04);   /* SELECTED STATE ONLY — never a container */
+  --color-divider: rgba(0, 0, 0, 0.08);
+  --color-overlay-backdrop: rgba(255, 255, 255, 0.8);  /* declared, unused */
+
+  /* RANGE SLIDER */
+  --color-range-track: rgba(0, 0, 0, 0.12);
+  --color-range-progress: #000000;
+  --color-range-thumb: #ffffff;
+  --shadow-range-thumb: 0 1px 4px rgba(0, 0, 0, 0.24), 0 1px 1px rgba(0, 0, 0, 0.12);
+
+  /* ACCENT — spend it on ATTENTION, not state. The whole budget:
+       1. a value that needs the reader's eye   (.flag)
+       2. the text they have selected           (::selection)
+       3. the single point under the pointer    (chart hover)
+     A selected tab, a current nav item, a pressed segment are STATE — they
+     take --color-fill-subtle. Always a fill under black text; never a text
+     colour on the ground, never a data series, never decoration. If two
+     things are accented at once, the rule is already broken. */
+  --color-accent: #FCFF28;
+  --color-accent-ink: #000000;
+  --color-accent-soft: rgba(252, 255, 40, 0.42);
+
+  /* TYPE — two families */
+  --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* MOTION — two curves, no more */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);     /* enter/exit only */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* available, unused */
+  /* hover and colour changes use plain `ease`, never --ease-out */
+
+  --duration-fast: 160ms;       /* hover, colour */
+  --duration-base: 250ms;       /* small UI scaling in/out */
+  --duration-deliberate: 450ms; /* nav */
+  --duration-entrance: 500ms;
+  --duration-slow: 800ms;       /* full-surface takeovers */
+
+  /* SURFACES */
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);   /* only if it lifts */
+  --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
+  --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */
+  --blur-surface: 20px;
+
+  /* DE-EMPHASIS */
+  --opacity-inactive: 0.2;
+  --opacity-label-inactive: 0.3;
+  --scale-inactive: 0.8;
+  --scale-enter: 0.95;
+}
+
+:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+body {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Type roles. A card gets THREE of these at most: a title, body,
+   and one emphasis (display OR mono — never both). ---- */
+/* Tracking is negative only where the size earns it. Everything 16px and
+   under shares -0.1px: the source's -0.25px on labels read cramped at
+   interface sizes, and a label tighter than the body text beside it is
+   just a defect. Display sizes keep their heavier negative tracking. */
+.t-display { font-size: 56px; line-height: 64px; letter-spacing: -1px;   font-weight: 500; color: var(--color-text); }
+.t-title   { font-size: 32px; line-height: 38px; letter-spacing: -0.6px; font-weight: 500; color: var(--color-text); }
+.t-label   { font-size: 16px; line-height: 19px; letter-spacing: -0.1px; font-weight: 600; color: var(--color-text); }
+.t-body    { font-size: 16px; line-height: 19px; letter-spacing: -0.1px; font-weight: 500; }
+.t-caption { font-size: 14px; line-height: 18px; letter-spacing: -0.1px; font-weight: 500; }
+
+/* INTERACTIVE — NEW. Buttons, segments, tabs. Display family, not mono:
+   a control is read at a glance, and mono's caps + tracking slow that down.
+   .t-label is the primary-action size; this is the compact one. */
+.t-control { font-family: var(--font-display); font-size: 14px; line-height: 18px;
+             letter-spacing: -0.1px; font-weight: 600; text-transform: none;
+             color: var(--color-text); }
+
+/* DETAIL — values and identifiers only: figures, units, timestamps, IDs,
+   hex codes, axis ticks, a year range. Rule of thumb: a number is often
+   mono, a word almost never is. Never a subtitle, a control label, a
+   section header, or a table column header — those are all Label.
+   CHANGED (v0.4): table content defaults to 10.5 mono — tables do
+   not inherit font sizes for mono. Supersedes the v0.3 slot-size language. */
+.t-mono    { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.5;
+             letter-spacing: 0.3px; font-weight: 500; text-transform: uppercase;
+             color: var(--color-text-secondary); }
+
+@media (max-width: 630px) {
+  .t-display { font-size: 32px; line-height: 1.2; }
+  .t-title   { font-size: 24px; line-height: 1.2; }
+}
+
+/* ---- Width. Container is the default; full-bleed suits a single
+   centred object. ---- */
+.container { max-width: var(--container); margin-left: auto; margin-right: auto; }
+.measure   { max-width: var(--measure); }
+
+/* ---- There is exactly ONE surface style, and a surface is for CONTENT:
+   an image, a chart, a live demo, a real card. A list is not content —
+   it belongs on the page, with dividers carrying the structure. There is
+   no second, fill-based container: a box of --color-fill-subtle is not a
+   quieter card, it's a second card style.
+
+   .block         — a page-level section: dividers, no background
+   .surface       — a content card (hairline, no shadow)
+   .surface--rest — add the soft shadow only when the thing lifts on hover
+   ---- */
+.block { padding: var(--space-24) 0; border-top: 1px solid var(--color-divider); }
+
+/* The comparison row: the default way to state a rule. Generic on the left,
+   house style on the right. Needs no card of its own. */
+.compare {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-48);
+  padding: var(--space-24) 0; border-top: 1px solid var(--color-divider);
+}
+.compare-col { display: flex; flex-direction: column; gap: var(--space-16); }
+@media (max-width: 630px) { .compare { grid-template-columns: minmax(0, 1fr); } }
+
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+}
+.surface--rest { box-shadow: var(--shadow-rest); }
+.surface--pill { border-radius: var(--radius-pill); }
+
+/* Hover = lift or brighten, never a colour change */
+@media (hover: hover) and (pointer: fine) {
+  .surface--rest:hover { box-shadow: var(--shadow-lift); }
+  .link-quiet:hover { color: var(--color-text); }
+}
+.surface--rest, .link-quiet {
+  transition: box-shadow var(--duration-deliberate) ease, color var(--duration-fast) ease;
+}
+
+/* ---- The selected state is quiet: a subtle fill, not the accent. ---- */
+.is-selected {
+  background: var(--color-fill-subtle);
+  color: var(--color-text);
+}
+
+/* ---- The accent's entire surface area. ---- */
+.flag {                     /* a value that needs the eye */
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+
+/* ---- Masking content ends: a fade, not a scrollbar ---- */
+.bottom-fade {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 384px; z-index: 4;
+  background: linear-gradient(to top, var(--color-bg) 50%, transparent 100%);
+  pointer-events: none;
+}
+.scroll-hidden { scrollbar-width: none; -ms-overflow-style: none; }
+.scroll-hidden::-webkit-scrollbar { display: none; }
+
+/* ---- Reduced motion: always ship this ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+
+/* ============================================================
+   DARK — NEW, extrapolated: the source is light-only. Same structure,
+   a pure ground, 50% secondary text, the same accent (which reads better
+   on black than on white). Both blocks are required so an explicit
+   toggle wins in either direction.
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-text: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.5);
+    --color-bg: #000000;
+    --color-surface: #0a0a0a;
+    --color-hairline: rgba(255, 255, 255, 0.16);
+    --color-hairline-strong: rgba(255, 255, 255, 0.24);
+    --color-fill-subtle: rgba(255, 255, 255, 0.06);
+    --color-divider: rgba(255, 255, 255, 0.1);
+    --color-accent-soft: rgba(252, 255, 40, 0.28);
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+    --color-range-track: rgba(255, 255, 255, 0.24);
+    --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
+    --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
+    --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-text: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.5);
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-hairline: rgba(255, 255, 255, 0.16);
+  --color-hairline-strong: rgba(255, 255, 255, 0.24);
+  --color-fill-subtle: rgba(255, 255, 255, 0.06);
+  --color-divider: rgba(255, 255, 255, 0.1);
+  --color-accent-soft: rgba(252, 255, 40, 0.28);
+  --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+  --color-range-track: rgba(255, 255, 255, 0.24);
+  --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
+  --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
+}

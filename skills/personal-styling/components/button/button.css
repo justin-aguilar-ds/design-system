@@ -1,0 +1,45 @@
+/* personal-styling · button · v0.1.0 */
+
+/* The pill. Fill, hairline, rest shadow and hover lift all come from
+   .surface .surface--rest .surface--pill in tokens.css; this file adds
+   only the metrics. Type is .t-label (primary) or .t-control (compact). */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);          /* icon to text */
+  padding: var(--space-8) var(--space-16);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+/* The text treatment, for infrequent actions. Pair with .link-quiet for
+   the hover. Same box as the pill — transparent border included — so it
+   takes the same room in a cluster. */
+.button-text {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-8) var(--space-16);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* A cluster aligns on the label baseline, so a Label pill (19px line)
+   and an Interactive one (18px line) still share one line of text. */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-8);
+}
+
+/* Disabled: 30% ink in either theme, no hover, no shadow. */
+.button:disabled,
+.button-text:disabled {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}
+/* Three classes deep so it beats .surface--rest:hover in tokens.css. */
+.button.surface--rest:disabled { box-shadow: none; }
