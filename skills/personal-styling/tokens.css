@@ -85,6 +85,10 @@ img, video, svg { display: block; max-width: 100%; }
      at or above it, a card. 60 = 20 + 20 + 20: the least height at which the
      straight side is as long as a card corner. Scripts read it from here. */
   --pill-below: 60px;
+  /* NEW (v0.5): fully round for any one-row surface, but a finite value,
+     so a corner can animate to it from --radius-card. 999px can't be
+     animated to — it passes the half-height cap at once and snaps. */
+  --radius-row: calc(var(--pill-below) / 2);
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);   /* only if it lifts */
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */

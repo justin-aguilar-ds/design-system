@@ -19,4 +19,4 @@ Sections that open and close under a heading row, for content worth having but n
 - Start an item open with `.is-open` and `aria-expanded="true"`; start it closed with `aria-expanded="false"` and `inert` on the panel.
 - Give every trigger and panel a unique `id` pair.
 - `accordion.js` fires a bubbling `accordion-toggle` event with `detail.open`.
-- Once a panel has finished opening it stops clipping (`.is-settled`), so a picker menu or tooltip inside it isn't cut off. Once it has finished closing the item gets `.is-collapsed`, so a container can change shape at a moment its height is final — the control panel uses it to become a pill.
+- Once a panel has finished opening it stops clipping (`.is-settled`), so a picker menu or tooltip inside it isn't cut off. Once it has finished closing the item gets `.is-collapsed`, so a container can change shape at a moment its height is final.

@@ -7,7 +7,7 @@ Requires: accordion, segmented, picker, chip, slider, button
 ## Rules
 
 - **Second in the page hierarchy.** It sits `24px` under the artifact intro, before the content it changes.
-- **A card when open, a pill when collapsed.** Collapsed, the panel is one row — just its heading — so it takes the pill shape of the buttons and pickers inside it. It becomes a pill once it has finished collapsing and a card the instant it starts to open, so the switch happens at ~50px tall, where the two shapes nearly agree.
+- **A card when open, a pill when collapsed, morphing between.** Collapsed, the panel is one row — just its heading — so it takes the pill shape of the buttons and pickers inside it. The corner animates with the height, from `--radius-card` (20px) to `--radius-row` (30px, half of `--pill-below`), on the accordion's `--duration-entrance` and `--ease-out`, so the shape changes continuously as it opens and closes.
 - **One accordion item in the one surface style.** The whole heading row is the trigger, the chevron is at the far edge, and collapsing hides the body without removing the heading.
 - **The persistent shadow is the exception.** The panel carries `--shadow-rest` at rest and keeps it, to put the controls on a layer above the content. It's the only surface whose shadow doesn't mean "this lifts", so it never lifts on hover.
 - **The title is mono — the one documented exception** to the rule against mono labels. It reads as a quiet container label rather than a primary action. Keep it terse and singular: "Controls", "Filters".
@@ -21,3 +21,7 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.3.0
+
+- The corner animates between card and pill as the panel opens and closes, instead of switching when the collapse finishes.

@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.2.0 */
+/* personal-styling · control-panel · v0.3.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -7,11 +7,21 @@
 .control-panel { box-shadow: var(--shadow-rest); }
 
 /* Collapsed, it's one row — the heading — so it's a pill, matching the
-   buttons and pickers it holds. It switches only once fully collapsed
-   (accordion's .is-collapsed) and switches back the instant it opens, so
-   the change always happens at ~50px, where the two shapes nearly agree. */
-.control-panel:has(> .accordion-item.is-collapsed),
-.control-panel:has(> .accordion-item.is-collapsed) .accordion-trigger { border-radius: var(--radius-pill); }
+   buttons and pickers it holds. The corner animates with the height, on
+   the accordion's duration and curve, from --radius-card to --radius-row
+   (30px, half of --pill-below). A one-row panel is under 60px tall, so a 30px corner always
+   renders fully round; and because the browser draws the smaller of the
+   corner and half the height, the shape changes continuously. Animating
+   toward 999px wouldn't: it passes the half-height cap in the first few
+   frames and snaps. */
+.control-panel,
+.control-panel .accordion-trigger {
+  transition: border-radius var(--duration-entrance) var(--ease-out);
+}
+.control-panel:has(> .accordion-item:not(.is-open)),
+.control-panel:has(> .accordion-item:not(.is-open)) .accordion-trigger {
+  border-radius: var(--radius-row);
+}
 
 /* Inside a card, 16px. The trigger takes the card's radius so its focus
    outline follows the panel's corners. */
