@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.2.0 */
+/* personal-styling · tooltip · v0.3.0 */
 
 /* ---- Inline information: the value itself is the trigger. ---- */
 .tooltip-trigger {
@@ -45,8 +45,6 @@
   position: absolute;
   pointer-events: auto;
 }
-/* Prose rather than a value: Body type in a wider box. */
-.tooltip--prose { max-width: 360px; }
 
 /* ---- Click-to-drop target. ---- */
 .tooltip-frame { display: block; width: 100%; }

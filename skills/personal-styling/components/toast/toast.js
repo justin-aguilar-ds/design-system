@@ -1,4 +1,4 @@
-/* personal-styling · toast · v0.1.0 */
+/* personal-styling · toast · v0.2.0 */
 
 // A click on [data-toast] shows that message in the .toast beside it, in the
 // same .toast-anchor. Add data-copy to copy text to the clipboard first.

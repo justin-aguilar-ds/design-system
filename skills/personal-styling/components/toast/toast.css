@@ -1,4 +1,4 @@
-/* personal-styling · toast · v0.1.0 */
+/* personal-styling · toast · v0.2.0 */
 
 /* The toast belongs to the control it confirms, so it lives inside an
    anchor with that control and grows from it. */
@@ -19,6 +19,7 @@
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
   white-space: nowrap;
+  color: var(--color-text);     /* a status at 10.5px takes full ink (contrast floor) */
   pointer-events: none;
   transform-origin: bottom center;
   transform: translateX(-50%) scale(0);
