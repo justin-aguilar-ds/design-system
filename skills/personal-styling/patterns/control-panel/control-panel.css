@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.3.0 */
+/* personal-styling · control-panel · v0.4.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -18,8 +18,8 @@
 .control-panel .accordion-trigger {
   transition: border-radius var(--duration-entrance) var(--ease-out);
 }
-.control-panel:has(> .accordion-item:not(.is-open)),
-.control-panel:has(> .accordion-item:not(.is-open)) .accordion-trigger {
+.control-panel:not(.control-panel--docked):has(> .accordion-item:not(.is-open)),
+.control-panel:not(.control-panel--docked):has(> .accordion-item:not(.is-open)) .accordion-trigger {
   border-radius: var(--radius-row);
 }
 
@@ -47,4 +47,89 @@
   justify-items: start;
   gap: var(--space-8);
   min-width: 0;
+}
+
+/* ================================================================
+   Docked: the panel beside the content instead of above it — for a
+   tool whose controls stay in use while the content scrolls, or a long
+   page's contents list. Wrap the content and the panel in .control-dock.
+   ================================================================ */
+
+/* The panel takes a 280px column — the tooltip's width, the system's
+   narrow measure — and the content takes the rest. */
+.control-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--space-16);
+  align-items: start;
+}
+.control-dock > * { min-width: 0; }
+
+/* On the page: no card, a divider on its content side, and it stays in
+   view while the page scrolls, the page inset from the top. */
+.control-panel.control-panel--docked {
+  position: sticky;
+  top: var(--space-page);
+  max-height: calc(100vh - 2 * var(--space-page)); /* the inset above and below */
+  overflow-y: auto;
+  padding-left: var(--space-16);
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--color-divider);
+  border-radius: 0;
+  box-shadow: none;
+  scrollbar-width: none;
+}
+.control-panel--docked .accordion-trigger { padding: 0 0 var(--space-16); }
+.control-panel--docked .accordion-body { padding: 0 0 var(--space-16); }
+/* One column: fields stack. */
+.control-panel--docked .control-panel-fields { grid-template-columns: minmax(0, 1fr); }
+/* A segmented list fills its field, so every option's fill is the same width. */
+.control-field:has(> .segmented--list) { justify-items: stretch; }
+
+/* Narrow screens: a floating pill, bottom right, the page inset from both
+   edges, only as wide as its label. Tapping it grows it upward into a
+   card — the box is anchored at the bottom, so its top rises — with the
+   control panel's surface, persistent shadow and pill-to-card corner. */
+@media (max-width: 630px) {
+  .control-dock { grid-template-columns: minmax(0, 1fr); }
+  .control-panel.control-panel--docked {
+    position: fixed;
+    top: auto;
+    right: var(--space-page);
+    bottom: var(--space-page);
+    z-index: 30;
+    width: min(280px, calc(100vw - 2 * var(--space-page))); /* open: the docked column's width */
+    max-width: calc(100vw - 2 * var(--space-page));
+    /* Width is a layout property; it animates here because the pill and
+       the card are one shape changing — label-wide to column-wide — on the
+       same duration and curve as the height and the corner. Browsers
+       without interpolate-size snap the width and still morph the rest. */
+    interpolate-size: allow-keywords;
+    transition:
+      border-radius var(--duration-entrance) var(--ease-out),
+      width var(--duration-entrance) var(--ease-out);
+    max-height: calc(100vh - 2 * var(--space-page));
+    padding-left: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-rest);
+  }
+  .control-panel--docked .accordion-trigger { padding: var(--space-16); border-radius: var(--radius-card); }
+  .control-panel--docked .accordion-body { padding: 0 var(--space-16) var(--space-16); }
+  .control-panel.control-panel--docked:has(> .accordion-item:not(.is-open)),
+  .control-panel.control-panel--docked:has(> .accordion-item:not(.is-open)) .accordion-trigger {
+    border-radius: var(--radius-row);
+  }
+  /* Closed, the pill is only as wide as its label: the list inside is kept
+     out of the width calculation, so the heading row alone sizes it. */
+  .control-panel.control-panel--docked:has(> .accordion-item:not(.is-open)) { width: max-content; }
+  .control-panel--docked .accordion-content { contain: inline-size; }
+  /* It opens upward, so the chevron points up while closed. */
+  .control-panel--docked .accordion-chevron { transform: rotate(180deg); }
+  .control-panel--docked .accordion-item.is-open .accordion-chevron { transform: none; }
+  /* The open card scrolls inside itself rather than running off the top. */
+  .control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
+  .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - 50px); } /* minus the 50px heading row */
 }

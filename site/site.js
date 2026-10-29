@@ -14,26 +14,32 @@ toggle.addEventListener('click', () => {
 });
 renderToggle();
 
-// Rules contents: the section being read is full ink. On a narrow screen
-// the list sits above the rules and starts collapsed (setAccordion is
-// accordion.js's — site.js loads last, so it's defined), so it doesn't push
-// the rules a screen down.
+// Rules contents: the section being read is the segmented list's selection,
+// moved with segmented-set as the page scrolls. On a narrow screen the
+// panel is a floating pill; choosing a section closes it again
+// (setAccordion is accordion.js's — site.js loads last, so it's defined).
 (() => {
-  const links = [...document.querySelectorAll('.toc-link')];
-  if (!links.length) return;
-  const tocItem = document.querySelector('.rules-toc .accordion-item');
-  if (tocItem && matchMedia('(max-width: 630px)').matches && typeof setAccordion === 'function') {
-    setAccordion(tocItem, false);
-    tocItem.classList.add('is-collapsed');
-  }
+  const list = document.querySelector('.rules-contents .segmented--list');
+  if (!list) return;
+  const links = [...list.querySelectorAll('.segmented-option')];
   const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
   const headings = [...document.querySelectorAll('.prose--page > h2[id]')];
+  let current = null;
   const mark = () => {
     // The last heading above the top quarter of the screen is the one being read.
-    let current = headings[0];
-    for (const h of headings) if (h.getBoundingClientRect().top < innerHeight / 4) current = h;
-    links.forEach((a) => a.classList.toggle('is-current', a === byId.get(current?.id)));
+    let heading = headings[0];
+    for (const h of headings) if (h.getBoundingClientRect().top < innerHeight / 4) heading = h;
+    const link = byId.get(heading?.id);
+    if (link && link !== current) {
+      current = link;
+      list.dispatchEvent(new CustomEvent('segmented-set', { detail: { option: link } }));
+    }
   };
   addEventListener('scroll', mark, { passive: true });
   mark();
+
+  const item = list.closest('.accordion-item');
+  list.addEventListener('click', (event) => {
+    if (event.target.closest('a') && matchMedia('(max-width: 630px)').matches) setAccordion(item, false);
+  });
 })();

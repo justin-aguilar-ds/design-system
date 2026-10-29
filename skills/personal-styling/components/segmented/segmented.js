@@ -1,9 +1,11 @@
-/* personal-styling · segmented · v0.1.0 */
+/* personal-styling · segmented · v0.2.0 */
 
 // The indicator is placed on the "indicated" option: the active one, or the
 // one under a mouse as a preview of where a click would land. Buttons switch
 // in place and fire `segmented-change`; links navigate, and the page marks
-// the active one with .is-active.
+// the active one with .is-active. To move the selection from script — a
+// contents list following the scroll — dispatch `segmented-set` on the
+// control with { detail: { option } }.
 document.querySelectorAll('.segmented').forEach((control) => {
   const indicator = control.querySelector('.segmented-indicator');
   const options = [...control.querySelectorAll('.segmented-option')];
@@ -32,10 +34,12 @@ document.querySelectorAll('.segmented').forEach((control) => {
 
   const select = (option) => {
     if (option === active) return;
+    // Buttons are pressed; links are the current location.
+    const state = option.tagName === 'A' ? 'aria-current' : 'aria-pressed';
     active.classList.remove('is-active');
-    active.setAttribute('aria-pressed', 'false');
+    if (state === 'aria-current') active.removeAttribute(state); else active.setAttribute(state, 'false');
     option.classList.add('is-active');
-    option.setAttribute('aria-pressed', 'true');
+    option.setAttribute(state, 'true');
     active = option;
     indicate(option);
     control.dispatchEvent(new CustomEvent('segmented-change', {
@@ -57,6 +61,10 @@ document.querySelectorAll('.segmented').forEach((control) => {
       indicate(option);
     });
     if (option.tagName === 'BUTTON') option.addEventListener('click', () => select(option));
+  });
+
+  control.addEventListener('segmented-set', (event) => {
+    if (options.includes(event.detail?.option)) select(event.detail.option);
   });
 
   control.addEventListener('pointerleave', (event) => {

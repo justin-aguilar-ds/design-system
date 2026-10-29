@@ -1,4 +1,4 @@
-/* personal-styling · accordion · v0.2.0 */
+/* personal-styling · accordion · v0.3.0 */
 
 // Each trigger owns one panel. A closed panel is inert, so its controls
 // leave the tab order and the accessibility tree while collapsed.
@@ -22,7 +22,9 @@ document.querySelectorAll('.accordion-item').forEach((item) => {
   const panel = item.querySelector('.accordion-panel');
   if (!trigger || !panel) return;
 
-  const open = trigger.getAttribute('aria-expanded') === 'true';
+  // data-closed-below="630" starts the item closed on screens that narrow.
+  const narrow = item.dataset.closedBelow && matchMedia(`(max-width: ${item.dataset.closedBelow}px)`).matches;
+  const open = trigger.getAttribute('aria-expanded') === 'true' && !narrow;
   setAccordion(item, open);
   item.classList.toggle('is-settled', open);
   item.classList.toggle('is-collapsed', !open);

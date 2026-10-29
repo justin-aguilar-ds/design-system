@@ -18,6 +18,7 @@ From the source site's nav pill, which switched between its two top-level pages.
 
 - **In-page switch:** `<button>` options with `aria-pressed`, in a `role="group"` with an `aria-label`. `segmented.js` switches in place and fires a bubbling `segmented-change` event with `detail.value`.
 - **Page nav:** `<a>` options in a `<nav class="segmented segmented--nav">`. Mark the current page's link `.is-active` and `aria-current="page"`. A site-wide nav is often pinned bottom-centre: `position: fixed; left: 50%; bottom: var(--space-page); transform: translateX(-50%)`.
+- **List:** `.segmented--list` stacks the options down a column, on the page with no frame — a contents list, a list of views. Options rest at secondary ink rather than 30% (a long list at 30% can't be read), the fill is a pill, and it glides on `--duration-base` because a list is dense. Move the selection from script by dispatching `segmented-set` on the control with `{ detail: { option } }`.
 - **Gliding across pages:** add `view-transition-name: segmented-indicator` to the indicator and `@view-transition { navigation: auto; }` to both pages, and the fill glides from one page's option to the next.
 - Type: `.t-control` in-page, `.t-label` in the nav.
 
@@ -28,3 +29,8 @@ From the source site's nav pill, which switched between its two top-level pages.
 - The 2px gap between options is gone. It was off the scale, and the fill covers the whole option anyway.
 - Labels use the system's −0.1px tracking, not −0.25px.
 - Keyboard focus brings a label to full ink, so the focus outline isn't drawn at 30%.
+
+## Changes in v0.2.0
+
+- `.segmented--list`: the control as a vertical list on the page.
+- `segmented-set` event to move the selection from script. Links take `aria-current`; buttons keep `aria-pressed`.

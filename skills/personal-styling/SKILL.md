@@ -153,30 +153,9 @@ mono's 10.5px. When in doubt, raise the ink, not the size.
 - **Derived positions are written as `calc()` with a comment explaining the arithmetic**, never as a hardcoded magic number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
 - Layout is **fixed-position chrome over a full-viewport content layer**, not a document that scrolls. `height: 100vh; overflow: hidden` on the page, content pinned to the edges, the middle given over to the main object.
 - **One breakpoint: `630px`.** Don't build a four-tier responsive system.
+- Every grid and flex item that can hold a chart, a table or a long string needs `min-width: 0`, or its content will widen the column instead of scrolling inside it.
+- A floating detail card over a canvas (a map, a diagram) is `position: absolute` within a positioned parent, `max-height: calc(100% - 48px)`, with its own `overflow-y: auto`.
 - Content ends are masked with a **gradient fade to the ground colour**; scrollbars are hidden (`scrollbar-width: none` + the webkit pseudo-element).
-
-### Two panels, and anything wider than one object
-
-The "fixed chrome over one centred object" pattern breaks the moment there
-are two things. Don't reach for inset arithmetic like
-`calc(24px + 360px + 16px)`.
-
-- **Use a grid.** `grid-template-columns: minmax(0, 1fr) 360px` with a
-  `16px` gap, inside the `24px` page inset. The panel is a column, not a
-  floating box positioned against a number.
-- **A side panel is usually not a card either.** If it holds a list, give it
-  a heading and a `1px` left divider and let it sit on the page. Make it a
-  surface only when it holds content — a preview image, a chart, a map inset.
-- `360px` is the default panel width; `--container` still caps the pair.
-- Every grid and flex item that can hold a chart, a table or a long string
-  needs `min-width: 0`, or its content will widen the column instead of
-  scrolling inside it.
-- A floating detail card over a canvas (a map, a diagram) is the exception:
-  that one is `position: absolute` within a positioned parent, `max-height:
-  calc(100% - 48px)`, with its own `overflow-y: auto`.
-- **At `630px` fixed layouts become normal flow** and the panel stacks under
-  the content. Display type drops 56 → 32px. This is the source's own
-  breakpoint behaviour; keep it rather than inventing a second one.
 
 ## Surfaces
 
@@ -253,7 +232,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Pattern | Reach for it when | Folder |
 |---|---|---|
 | Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
-| Control panel | a tool has controls that change the content below them | `patterns/control-panel/` |
+| Control panel | a tool has controls that change the content beside or below them — or a long page needs a contents list | `patterns/control-panel/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the

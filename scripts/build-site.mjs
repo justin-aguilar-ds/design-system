@@ -234,14 +234,23 @@ ${section('Components', list(components))}`));
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 const toc = [];
 const rulesHtml = markdown(skillBody, { shift: 0, toc });
-// Two panels: the rules, and a contents list in a 360px side panel with a
-// divider — a list, so no card. It stays in view while the rules scroll.
-const contents = `<ol class="toc-list">${toc.map((h) => `<li><a class="toc-link t-caption link-quiet" href="#${h.id}">${h.text}</a></li>`).join('')}</ol>`;
+// The contents are a docked control panel holding a segmented list: one
+// section is current at a time, so it takes the gliding fill. Beside the
+// rules on wide screens; a pill bottom right on narrow ones.
+const contents = `<nav class="segmented segmented--list" aria-label="Sections">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${toc.map((h, i) => `<a class="segmented-option t-control${i === 0 ? ' is-active' : ''}" href="#${h.id}"${i === 0 ? ' aria-current="true"' : ''}>${h.text}</a>`).join('\n      ')}
+    </nav>`;
 writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
 ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes of patterns and components, motion and voice.')}
-<div class="rules-layout">
-  <aside class="rules-toc" aria-label="On this page"><div class="accordion">${accordionItem('toc', 'On this page', contents, { open: true, level: 2 })}</div></aside>
+<div class="control-dock">
   <div class="prose prose--page">${rulesHtml}</div>
+  <section class="control-panel control-panel--docked surface accordion rules-contents" aria-label="Contents">
+    <div class="accordion-item is-open" data-closed-below="630">
+      <h2 class="accordion-heading"><button class="accordion-trigger" type="button" id="toc-trigger" aria-expanded="true" aria-controls="toc"><span class="t-mono">Contents</span>${CHEVRON}</button></h2>
+      <div class="accordion-panel" id="toc" role="region" aria-labelledby="toc-trigger"><div class="accordion-content"><div class="accordion-body">${contents}</div></div></div>
+    </div>
+  </section>
 </div>`, 'rules'));
 
 // A pattern is page-sized, so it renders on the page between dividers

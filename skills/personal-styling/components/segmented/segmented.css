@@ -1,4 +1,4 @@
-/* personal-styling · segmented · v0.1.0 */
+/* personal-styling · segmented · v0.2.0 */
 
 /* One truth at a time. The frame is the one surface style plus the rest
    shadow, and lifts on hover like a button. Default metrics land on the
@@ -56,3 +56,33 @@
 
 /* The page nav — a site's top-level pages: the same control at nav size. */
 .segmented--nav .segmented-option { padding: var(--space-16) var(--space-24); }
+
+/* The list: one truth at a time down a column — the section you're
+   reading, the item you're viewing. It sits on the page, so no frame and
+   no shadow. Options are a compact button's height, like the picker's,
+   and the fill is a pill. Two changes from the row: options rest at
+   secondary ink, not 30% — a long list at 30% can't be read — and the
+   fill glides on --duration-base, because a list is dense. */
+.segmented.segmented--list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .segmented.segmented--list:hover { box-shadow: none; }
+}
+.segmented--list .segmented-option {
+  padding: var(--space-8) var(--space-16);
+  color: var(--color-text-secondary);
+  white-space: normal;          /* a long label wraps inside its column rather than widening it */
+  opacity: 1;
+  transition: color var(--duration-base) ease;
+}
+.segmented--list .segmented-option.is-indicated,
+.segmented--list .segmented-option:focus-visible { color: var(--color-text); }
+.segmented--list .segmented-indicator { transition-duration: var(--duration-base); }
