@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.3.0 */
+/* personal-styling · tooltip · v0.4.0 */
 
 /* ---- Inline information: the value itself is the trigger. ---- */
 .tooltip-trigger {
@@ -26,6 +26,8 @@
   transition: transform var(--duration-pop) var(--ease-out);
 }
 .tooltip.is-below { transform-origin: top left; }
+/* One row of text: a pill, like the cursor pill (tooltip.js measures). */
+.tooltip.is-pill { border-radius: var(--radius-pill); }
 .tooltip.is-visible { transform: scale(1); }
 
 /* Text starts clipped and wipes left to right once the box has scaled in.

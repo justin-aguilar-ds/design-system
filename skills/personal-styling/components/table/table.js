@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.3.0 */
+/* personal-styling · table · v0.4.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
@@ -15,6 +15,7 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
 
   let indicated = null;
   const selected = () => table.querySelector('tbody tr.is-selected');
+  const pillBelow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pill-below')) || 60;
 
   // The fill lives inside the scroll container, so add its scroll offset;
   // absolute left/top resolve against the padding edge, so subtract its border.
@@ -25,6 +26,7 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
     fill.style.top = `${box.top - frame.top - wrap.clientTop + wrap.scrollTop}px`;
     fill.style.width = `${box.width}px`;
     fill.style.height = `${box.height}px`;
+    fill.classList.toggle('is-pill', box.height < pillBelow); // one row is a pill
   };
 
   const indicate = (row) => {

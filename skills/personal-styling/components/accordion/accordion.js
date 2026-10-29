@@ -1,16 +1,18 @@
-/* personal-styling · accordion · v0.1.0 */
+/* personal-styling · accordion · v0.2.0 */
 
 // Each trigger owns one panel. A closed panel is inert, so its controls
 // leave the tab order and the accessibility tree while collapsed.
 // data-accordion="single" on the group keeps one item open at a time.
 // .is-settled marks a panel that has finished opening, so the CSS can stop
-// clipping it.
+// clipping it; .is-collapsed marks one that has finished closing, so a
+// container can change shape once its height is final.
 
 function setAccordion(item, open) {
   const trigger = item.querySelector('.accordion-trigger');
   const panel = item.querySelector('.accordion-panel');
   item.classList.toggle('is-open', open);
   if (!open) item.classList.remove('is-settled');
+  if (open) item.classList.remove('is-collapsed');
   trigger.setAttribute('aria-expanded', String(open));
   panel.inert = !open;
 }
@@ -23,11 +25,11 @@ document.querySelectorAll('.accordion-item').forEach((item) => {
   const open = trigger.getAttribute('aria-expanded') === 'true';
   setAccordion(item, open);
   item.classList.toggle('is-settled', open);
+  item.classList.toggle('is-collapsed', !open);
 
   panel.addEventListener('transitionend', (event) => {
-    if (event.target === panel && event.propertyName === 'grid-template-rows' && item.classList.contains('is-open')) {
-      item.classList.add('is-settled');
-    }
+    if (event.target !== panel || event.propertyName !== 'grid-template-rows') return;
+    item.classList.add(item.classList.contains('is-open') ? 'is-settled' : 'is-collapsed');
   });
 
   trigger.addEventListener('click', () => {

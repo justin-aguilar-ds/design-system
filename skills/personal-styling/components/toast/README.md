@@ -10,7 +10,7 @@ From the portfolio's "Copy email to clipboard" button (`.about-email-button`, `.
 - **Scale from 0.** `scale(0)` → `scale(1)` over `--duration-base` on `--ease-out` — a small thing that pops. It leaves the same way after 1.5s.
 - **It is a value, not a sentence.** `.t-mono`, one or two words: "Copied", "Saved", "Sent". No exclamation mark.
 - **Full ink, not secondary.** It's a status at 10.5px, and the contrast floor puts a meaningful small value at full ink — 50% black at that size is for decoration only.
-- **One surface, hairline only.** It can't be hovered, so no shadow, and a `20px` radius.
+- **One surface, hairline only, fully round.** It can't be hovered, so no shadow. It's always one row, so it's always a pill.
 - **Not for errors that need action.** A toast disappears. If the person has to do something, put it on the page as glyph + word at full ink.
 
 ## Use

@@ -81,6 +81,10 @@ img, video, svg { display: block; max-width: 100%; }
   /* SURFACES */
   --radius-card: 20px;
   --radius-pill: 999px;
+  /* NEW (v0.5): a surface shorter than this holds one row, so it's a pill;
+     at or above it, a card. 60 = 20 + 20 + 20: the least height at which the
+     straight side is as long as a card corner. Scripts read it from here. */
+  --pill-below: 60px;
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);   /* only if it lifts */
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */

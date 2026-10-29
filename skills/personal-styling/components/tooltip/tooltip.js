@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.3.0 */
+/* personal-styling · tooltip · v0.4.0 */
 
 // Four declarative pieces:
 //   [data-tooltip="…"]         inline information — grows from the trigger on
@@ -16,6 +16,14 @@ const TOOLTIP_POP_MS = 350;
 const TOOLTIP_GAP = 8; // px between a trigger and its tooltip
 
 let openTooltip = null; // { el, owner, reveal, authored }
+
+// One row of text is a pill, two or more a card: under --pill-below
+// (tokens.css) tall, the box gets .is-pill. Measured once the text is in,
+// since a tooltip's length isn't known until then.
+function shapeTooltip(el) {
+  const pillBelow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pill-below')) || 60;
+  el.classList.toggle('is-pill', el.offsetHeight < pillBelow);
+}
 let tooltipCount = 0;
 
 // Anchor the tooltip's corner at x, above `top` — or below `bottom` if there
@@ -32,6 +40,7 @@ function showTooltip(text, owner, x, top, bottom) {
   p.textContent = text;
   el.append(p);
   document.body.append(el);
+  shapeTooltip(el);
 
   let y = top - el.offsetHeight;
   if (y < TOOLTIP_GAP) {
@@ -76,7 +85,7 @@ function openAuthored(owner) {
   if (!el) return;
   hideTooltip();
   el.hidden = false;
-  void el.offsetWidth; // commit the scale(0) start before it grows
+  shapeTooltip(el); // also commits the scale(0) start before it grows
   owner.setAttribute('aria-expanded', 'true');
   requestAnimationFrame(() => el.classList.add('is-visible'));
   const reveal = setTimeout(() => el.classList.add('is-text-visible'), TOOLTIP_POP_MS);

@@ -7,6 +7,7 @@ Requires: accordion, segmented, picker, chip, slider, button
 ## Rules
 
 - **Second in the page hierarchy.** It sits `24px` under the artifact intro, before the content it changes.
+- **A card when open, a pill when collapsed.** Collapsed, the panel is one row — just its heading — so it takes the pill shape of the buttons and pickers inside it. It becomes a pill once it has finished collapsing and a card the instant it starts to open, so the switch happens at ~50px tall, where the two shapes nearly agree.
 - **One accordion item in the one surface style.** The whole heading row is the trigger, the chevron is at the far edge, and collapsing hides the body without removing the heading.
 - **The persistent shadow is the exception.** The panel carries `--shadow-rest` at rest and keeps it, to put the controls on a layer above the content. It's the only surface whose shadow doesn't mean "this lifts", so it never lifts on hover.
 - **The title is mono — the one documented exception** to the rule against mono labels. It reads as a quiet container label rather than a primary action. Keep it terse and singular: "Controls", "Filters".

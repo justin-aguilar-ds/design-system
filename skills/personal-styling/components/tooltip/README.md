@@ -8,6 +8,7 @@ From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `
 
 - **Default to a hover reveal over permanent secondary text.** A precise figure behind a rounded one, a full timestamp behind "Yest.", a definition, the arithmetic behind a total.
 - **Hover for a glance, click for a sentence.** Inline information opens on hover because it's a glance. A toggled tooltip holds a sentence or two, so it opens on click and stays until dismissed — reading shouldn't depend on holding the pointer still.
+- **One row is a pill, more is a card.** `tooltip.js` measures the box once its text is in: under `--pill-below` (60px) it takes `.is-pill`, so a one-line value reads like the cursor pill and a wrapped sentence keeps 20px corners.
 - **The tooltip is the one place mono is unreservedly right** — every tooltip, toggled ones included, is `.t-mono`. `.t-mono` on one surface with the hairline and a `20px` radius. No shadow — nothing hovers it.
 - **It grows from the point it explains.** `scale(0)` → `scale(1)` over `--duration-pop` (350ms) on `--ease-out`, with `transform-origin` on the anchored corner: the click point for a dropped tooltip, the trigger for inline information.
 - **Then the text wipes in.** `clip-path: inset(0 100% 0 0)` → `inset(0)` over `--duration-reveal` (550ms), starting once the box has finished scaling.

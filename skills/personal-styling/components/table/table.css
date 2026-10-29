@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.3.0 */
+/* personal-styling · table · v0.4.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It fills its container and scrolls sideways rather than shrinking
@@ -90,6 +90,9 @@
     opacity var(--duration-base) ease;
 }
 .table-wrap.has-fill .table-fill { opacity: 1; }
+/* A one-line row is under --pill-below, so its fill is a pill; a row that
+   wraps keeps 20px corners. table.js decides per row. */
+.table-fill.is-pill { border-radius: var(--radius-pill); }
 
 /* .is-selected from tokens.css paints the row's own square fill. Once
    table.js is drawing the rounded fill, that would show as a second
