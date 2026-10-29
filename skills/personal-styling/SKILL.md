@@ -361,7 +361,7 @@ indicator's hover preview all exist so the resting page can stay quiet.
 - **Then reveal the text.** `clip-path: inset(0 100% 0 0)` → `inset(0)` over
   `--duration-reveal` (550ms), starting once the box has finished scaling. Wiping beats fading
   and survives wrapped lines, which a width transition doesn't.
-- **Hover is mandatory, and the bias is toward more of it.** Every interactive element — buttons, pills, selects, segments, chips, table rows, links, toggles — responds on hover: lift for buttons and surfaces, ink-brighten for text and rows, fill-deepening for chips and segments. A control with no hover response is a defect, not a minimalism choice. A hidden layer crossfades through a 6px blur.
+- **Hover is mandatory, and the bias is toward more of it.** Every interactive element — buttons, pills, selects, segments, chips, table rows, links, toggles — responds on hover: lift for buttons and surfaces, ink-brighten for text, a gliding fill for table rows (see `components/table/`), fill-deepening for chips and segments. A control with no hover response is a defect, not a minimalism choice. A hidden layer crossfades through a 6px blur.
 - Hover-only information still needs a non-hover path: a tooltip on a chart
   point needs the table view; a tooltip carrying a definition needs the
   definition somewhere reachable. Hover is an upgrade, never the only route.
@@ -371,7 +371,7 @@ indicator's hover preview all exist so the resting page can stay quiet.
 These are the recognisable moves. Reach for them when the context fits; don't force all of them in.
 
 - **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Listen") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
-- **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change.
+- **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except the one moving fill: a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer.
 - **Opaque full-bleed takeover** instead of a dimmed modal. No click-outside-to-close — an explicit Close link and Escape.
 - **Moving indicator as its own element**, absolutely positioned behind the links rather than a background on the active link, so it can glide between tabs. Hovering a sibling tab retargets it as a preview of where you'd land.
 - **Drag-first input.** Grab cursors, `touch-action: none`, pointer-tracked 1:1 with no transition mid-drag, then snap on release past a distance *or* velocity threshold.
