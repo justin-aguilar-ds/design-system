@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.2.0 */
+/* personal-styling · table · v0.3.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
@@ -11,6 +11,7 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
   fill.className = 'table-fill';
   fill.setAttribute('aria-hidden', 'true');
   wrap.prepend(fill);
+  wrap.classList.add('table-wrap--fill');
 
   let indicated = null;
   const selected = () => table.querySelector('tbody tr.is-selected');

@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.2.0 */
+/* personal-styling · table · v0.3.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It fills its container and scrolls sideways rather than shrinking
@@ -40,7 +40,7 @@
   font-weight: 500;
   text-transform: uppercase;
   color: var(--color-text-secondary);
-  transition: color var(--duration-deliberate) ease; /* moves with the fill */
+  transition: color var(--duration-base) ease; /* moves with the fill */
 }
 /* 16px at the outer edges, so text sits inside the rounded row fill
    the way a segmented option's label sits inside its fill. */
@@ -53,7 +53,7 @@
    the last row, no vertical rules, no zebra. */
 .table tbody tr {
   border-top: 1px solid var(--color-divider);
-  transition: border-top-color var(--duration-deliberate) ease;
+  transition: border-top-color var(--duration-base) ease;
 }
 
 /* The identifying column, and any value that must be read, take full ink.
@@ -66,9 +66,11 @@
 .table .table-num { text-align: right; }
 
 /* ---- Row fill. Hover, focus and selection share one fill: its own
-   element (added by table.js), gliding from row to row exactly like the
-   segmented control's indicator — --color-fill-subtle, --duration-
-   deliberate on --ease-out, and the row's ink brightening alongside it.
+   element (added by table.js), gliding from row to row like the
+   segmented control's indicator — --color-fill-subtle on --ease-out,
+   with the row's ink brightening alongside it. Rows are dense, repeated
+   targets, so the fill steps down from the nav's --duration-deliberate
+   to --duration-base (see "Duration follows density" in SKILL.md).
    Layout properties, not transform, for the same reason as the
    segmented indicator: a non-uniform scale would distort the radius.
    It sits above the cells (they keep their own background for the
@@ -81,13 +83,19 @@
   pointer-events: none;
   opacity: 0;
   transition:
-    left var(--duration-deliberate) var(--ease-out),
-    top var(--duration-deliberate) var(--ease-out),
-    width var(--duration-deliberate) var(--ease-out),
-    height var(--duration-deliberate) var(--ease-out),
-    opacity var(--duration-deliberate) ease;
+    left var(--duration-base) var(--ease-out),
+    top var(--duration-base) var(--ease-out),
+    width var(--duration-base) var(--ease-out),
+    height var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) ease;
 }
 .table-wrap.has-fill .table-fill { opacity: 1; }
+
+/* .is-selected from tokens.css paints the row's own square fill. Once
+   table.js is drawing the rounded fill, that would show as a second
+   shape behind it, so it steps aside. Without JS it stays as the
+   fallback selection. */
+.table-wrap--fill .table tbody tr.is-selected { background: transparent; }
 
 /* The indicated row goes to full ink, and the dividers either side of
    it fade so the fill reads as one shape. */

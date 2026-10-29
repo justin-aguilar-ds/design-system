@@ -314,11 +314,13 @@ the values and leave the vocabulary alone.
 | Token | Value | Use |
 |---|---|---|
 | fast | `160ms` | hover, colour, fades that should feel instant |
-| base | `250ms` | small UI scaling in/out, text swaps |
-| deliberate | `450ms` | nav — meant to read as considered, not snappy |
+| base | `250ms` | small UI scaling in/out, text swaps, a moving fill over dense targets |
+| deliberate | `450ms` | nav, and a moving fill over a few large targets — meant to read as considered, not snappy |
 | entrance | `500ms` | a container appearing |
 | slow | `800ms` | full-surface takeovers, cross-page transitions |
 | carousel | `1200ms` | the main draggable object settling |
+
+**Duration follows density, not component.** The same motion runs at different speeds depending on how often the pointer crosses its targets. A fill gliding between two or three large options — the page nav, a segmented control — takes `deliberate`: it moves rarely, and the pause reads as care. The same fill gliding between dense, repeated targets — table rows, list items — steps down to `base`, because at 450ms it trails a pointer sweeping down a column. Step down one token; never invent a value in between.
 
 **Easing — the rule is strict**
 
