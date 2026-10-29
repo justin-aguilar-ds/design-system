@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.4.0 */
+/* personal-styling · table · v0.5.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
@@ -17,16 +17,15 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
   const selected = () => table.querySelector('tbody tr.is-selected');
   const pillBelow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pill-below')) || 60;
 
-  // The fill lives inside the scroll container, so add its scroll offset;
-  // absolute left/top resolve against the padding edge, so subtract its border.
+  // Layout offsets, not on-screen rects: a row measures from the table, the
+  // table from the wrap — the fill's own reference — and offsets ignore
+  // scrolling, transforms and zoom, so the fill lands correctly anywhere.
   const place = (row) => {
-    const frame = wrap.getBoundingClientRect();
-    const box = row.getBoundingClientRect();
-    fill.style.left = `${box.left - frame.left - wrap.clientLeft + wrap.scrollLeft}px`;
-    fill.style.top = `${box.top - frame.top - wrap.clientTop + wrap.scrollTop}px`;
-    fill.style.width = `${box.width}px`;
-    fill.style.height = `${box.height}px`;
-    fill.classList.toggle('is-pill', box.height < pillBelow); // one row is a pill
+    fill.style.left = `${table.offsetLeft + row.offsetLeft}px`;
+    fill.style.top = `${table.offsetTop + row.offsetTop}px`;
+    fill.style.width = `${row.offsetWidth}px`;
+    fill.style.height = `${row.offsetHeight}px`;
+    fill.classList.toggle('is-pill', row.offsetHeight < pillBelow); // one row is a pill
   };
 
   const indicate = (row) => {

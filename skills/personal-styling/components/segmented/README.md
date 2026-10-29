@@ -30,6 +30,10 @@ From the source site's nav pill, which switched between its two top-level pages.
 - Labels use the system's −0.1px tracking, not −0.25px.
 - Keyboard focus brings a label to full ink, so the focus outline isn't drawn at 30%.
 
+## Changes in v0.3.0
+
+- The indicator is placed from layout offsets, so it lines up inside a scaled or zoomed container.
+
 ## Changes in v0.2.0
 
 - `.segmented--list`: the control as a vertical list on the page.

@@ -35,5 +35,6 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 - Hover now brightens the **whole row**. The old rule said "brighten the row label", but the label column is already full ink, so that hover changed nothing.
 - v0.2.0: rows take a gliding background fill on hover, modelled on the segmented control. The old rule was "no background change". The table's outer edges gain `16px` of padding to make room for the fill's radius.
+- v0.5.0: the fill is placed from layout offsets, so it lines up inside a scaled or zoomed container.
 - v0.3.0: the fill moves on `--duration-base`, not `--duration-deliberate` — rows are dense. A selected row no longer shows a square background behind the rounded fill.
 - Right-aligned figures (`.table-num`), row links and the column gap are new decisions.

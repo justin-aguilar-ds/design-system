@@ -14,6 +14,7 @@ skills/personal-styling/     the skill — everything an agent needs
     <name>.js                if it behaves ┘
     README.md                states, rules, usage
     demo.html                sandbox only: every state, side by side
+    preview.html             sandbox only: one still for the Library grid
 site/                        sandbox chrome (site.css, site.js)
 scripts/
   lint.mjs                   enforces the rules that can be checked mechanically
@@ -36,7 +37,7 @@ No dependencies — Node 18 or later is all it needs.
 1. Make `skills/personal-styling/components/<name>/` with `<name>.html`, `<name>.css`, `README.md`, and `<name>.js` if it has behaviour.
 2. Start every shipped file with the header `personal-styling · <name> · v0.1.0` in a comment.
 3. Write `README.md` as `# Title`, then a one-sentence summary (the sandbox index uses it), then the rules.
-4. Add `demo.html` showing every state. Put `force-hover` or `force-focus` on an element to show that state at rest.
+4. Add `demo.html` showing every state, and `preview.html` — a small still of the component for the Library grid. Put `force-hover` or `force-focus` on an element to show that state at rest.
 5. Add a row to the component index in `SKILL.md`. If the component's rules were in `SKILL.md`, move them into its README.
 6. `npm run check`.
 

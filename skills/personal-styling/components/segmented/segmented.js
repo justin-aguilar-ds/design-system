@@ -1,4 +1,4 @@
-/* personal-styling · segmented · v0.2.0 */
+/* personal-styling · segmented · v0.3.0 */
 
 // The indicator is placed on the "indicated" option: the active one, or the
 // one under a mouse as a preview of where a click would land. Buttons switch
@@ -14,16 +14,15 @@ document.querySelectorAll('.segmented').forEach((control) => {
   let active = control.querySelector('.segmented-option.is-active') || options[0];
   let indicated = null;
 
-  // getBoundingClientRect deltas are border-box to border-box, but absolute
-  // left/top resolve against the padding edge, so subtract the frame's own
-  // border (clientLeft / clientTop).
+  // Layout offsets, not on-screen rects: an option's offsetLeft/Top are
+  // measured from the control's padding edge — exactly where the absolutely
+  // positioned indicator measures from — and they ignore transforms and
+  // zoom, so the fill lands correctly inside anything scaled.
   const place = (option) => {
-    const frame = control.getBoundingClientRect();
-    const box = option.getBoundingClientRect();
-    indicator.style.left = `${box.left - frame.left - control.clientLeft}px`;
-    indicator.style.top = `${box.top - frame.top - control.clientTop}px`;
-    indicator.style.width = `${box.width}px`;
-    indicator.style.height = `${box.height}px`;
+    indicator.style.left = `${option.offsetLeft}px`;
+    indicator.style.top = `${option.offsetTop}px`;
+    indicator.style.width = `${option.offsetWidth}px`;
+    indicator.style.height = `${option.offsetHeight}px`;
   };
 
   const indicate = (option) => {

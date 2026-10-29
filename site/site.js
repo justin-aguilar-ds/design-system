@@ -43,3 +43,22 @@ renderToggle();
     if (event.target.closest('a') && matchMedia('(max-width: 630px)').matches) setAccordion(item, false);
   });
 })();
+
+// Library view: grid or list, a per-viewer convenience remembered in
+// storage. The switch is a segmented control; its change event shows one
+// view and hides the other.
+(() => {
+  const control = document.getElementById('library-view');
+  if (!control) return;
+  const views = [...document.querySelectorAll('.library-view')];
+  const show = (name) => views.forEach((v) => { v.hidden = v.dataset.view !== name; });
+  control.addEventListener('segmented-change', (event) => {
+    const name = event.detail.value.toLowerCase();
+    show(name);
+    try { localStorage.setItem('ps-library-view', name); } catch {}
+  });
+  let saved = null;
+  try { saved = localStorage.getItem('ps-library-view'); } catch {}
+  const option = [...control.querySelectorAll('.segmented-option')].find((o) => o.textContent.trim().toLowerCase() === saved);
+  if (option) control.dispatchEvent(new CustomEvent('segmented-set', { detail: { option } }));
+})();
