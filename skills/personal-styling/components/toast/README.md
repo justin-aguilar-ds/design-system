@@ -2,7 +2,7 @@
 
 A short confirmation that grows from the control that caused it, for when an action finishes somewhere the result can't be seen.
 
-From the portfolio's "Copy email to clipboard" button (`.about-email-button`, `.about-copy-feedback`, `initAboutEmailButton` in `js/about.js`).
+From the source site's copy-to-clipboard button.
 
 ## Rules
 
@@ -23,7 +23,7 @@ From the portfolio's "Copy email to clipboard" button (`.about-email-button`, `.
 
 - Text is full ink, not secondary, per the contrast floor.
 
-## Changes from the portfolio
+## Changes from the source
 
 - "Copied!" is now "Copied". The voice has no exclamation marks.
 - The gap above the button is 8px, not 12px, and padding is 8 / 16px, not 12 / 16px, to stay on the scale.

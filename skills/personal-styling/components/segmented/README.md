@@ -2,7 +2,7 @@
 
 One choice out of a few, always visible, with a fill that glides to the choice and previews where a click will land.
 
-From the portfolio's Design / Music pill nav (`.pill-nav`, `js/pill-nav.js`).
+From the source site's nav pill, which switched between its two top-level pages.
 
 ## Rules
 
@@ -17,11 +17,11 @@ From the portfolio's Design / Music pill nav (`.pill-nav`, `js/pill-nav.js`).
 ## Use
 
 - **In-page switch:** `<button>` options with `aria-pressed`, in a `role="group"` with an `aria-label`. `segmented.js` switches in place and fires a bubbling `segmented-change` event with `detail.value`.
-- **Page nav:** `<a>` options in a `<nav class="segmented segmented--nav">`. Mark the current page's link `.is-active` and `aria-current="page"`. The portfolio pins it with `position: fixed; left: 50%; bottom: var(--space-page); transform: translateX(-50%)`.
+- **Page nav:** `<a>` options in a `<nav class="segmented segmented--nav">`. Mark the current page's link `.is-active` and `aria-current="page"`. A site-wide nav is often pinned bottom-centre: `position: fixed; left: 50%; bottom: var(--space-page); transform: translateX(-50%)`.
 - **Gliding across pages:** add `view-transition-name: segmented-indicator` to the indicator and `@view-transition { navigation: auto; }` to both pages, and the fill glides from one page's option to the next.
 - Type: `.t-control` in-page, `.t-label` in the nav.
 
-## Changes from the portfolio
+## Changes from the source
 
 - Frame hairline is `--color-hairline` (`#ececec`), not `#f8f8f8`.
 - Nav option padding is 16 / 24px, not 20 / 24px, to stay on the scale. The nav is 8px shorter.

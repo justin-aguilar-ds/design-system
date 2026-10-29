@@ -5,7 +5,7 @@ description: House style for personal software — monochrome with one accent, f
 
 # Personal Styling
 
-A distilled house style, extracted from the author's portfolio and then deliberately tightened. The aesthetic is **monochrome with one accent, typographically flat, heavily motion-tuned**: five spacing steps, three type styles to a card, and the entire personality carried by timing and easing rather than decoration.
+A distilled house style, extracted from a personal portfolio site and then deliberately tightened. The aesthetic is **monochrome with one accent, typographically flat, heavily motion-tuned**: five spacing steps, three type styles to a card, and the entire personality carried by timing and easing rather than decoration.
 
 Everything this skill needs sits next to this file: `tokens.css`, the `components/` library and the `patterns/` that arrange them. The repository this skill lives in also builds a sandbox site that renders every component and its states.
 
@@ -54,7 +54,7 @@ Effectively monochrome. The palette is a ground, a text colour, a half-strength 
 |---|---|---|
 | Ground | `#ffffff` | page, every surface |
 | Primary text | `#000000` | display type, button/nav labels only |
-| Secondary text | `rgba(0,0,0,0.5)` | **the default** — chrome, bio, captions, all metadata |
+| Secondary text | `rgba(0,0,0,0.5)` | **the default** — chrome, intro copy, captions, all metadata |
 | Hairline | `#ececec` | border on every floating surface |
 | Subtle fill | `rgba(0,0,0,0.04)` | a quiet filled row or track |
 | Accent | `#FCFF28` | one mark that needs the eye, under black text |
@@ -72,9 +72,9 @@ Effectively monochrome. The palette is a ground, a text colour, a half-strength 
 ### Polarity — the one colour exception
 
 Red and green are allowed for exactly one job: **positive vs negative
-impact**. The fantasy tracker heatmap is the reference: a player's
-contribution helps or hurts the team total, and the fill says which way,
-at a glance.
+impact**. A contribution heatmap is the reference: each item's share
+either helps or hurts a running total, and the fill says which way, at a
+glance.
 
 - Only when the user explicitly asks for it, or when the data itself is a
   good/bad signal (impact on a total, a gain vs a loss). Never decoration,
@@ -185,7 +185,7 @@ are two things. Don't reach for inset arithmetic like
 - **There is exactly one surface style.** `background: #fff` + `1px solid #ececec`. No second, quieter container — a box of `--color-fill-subtle` is not a softer card, it is a *second card style*, and two is one too many.
 - `--color-fill-subtle` has one job: the **selected state** (a pressed segment, the current nav item, a chip that's on). It is not a background, not a well, not a panel, not a demo stage. If you are filling an area to group it, use a divider or nothing.
 - The hairline is the constant.
-- **The shadow is conditional, not part of the recipe.** `0 2px 14px rgba(0,0,0,.04)` goes on things that lift on hover — the pill nav, the email button. Buttons are excepted: every button-shaped control carries the rest shadow at rest (see Buttons). The one persistent-elevation exception is the collapsible control panel near the top of an artifact; its shadow establishes the control layer above the content. The tooltip, the toast and the cursor pill carry the hairline alone. Shipping a shadow on any other surface that can't be hovered is the mistake, not shipping one without a shadow.
+- **The shadow is conditional, not part of the recipe.** `0 2px 14px rgba(0,0,0,.04)` goes on things that lift on hover — the nav pill, a floating call to action. Buttons are excepted: every button-shaped control carries the rest shadow at rest (see Buttons). The one persistent-elevation exception is the collapsible control panel near the top of an artifact; its shadow establishes the control layer above the content. The tooltip, the toast and the cursor pill carry the hairline alone. Shipping a shadow on any other surface that can't be hovered is the mistake, not shipping one without a shadow.
 - **Radius reads binary**: `20px` for cards and media; fully round for pills and buttons. Nothing in the 4–12px range.
 - **Rows decide the radius; 60px is the test.** A surface that holds one row — one line of text, or one row of controls — is a pill. Two rows or more, it's a card. When unsure, measure: under `--pill-below` (60px) is one row. The number is `20 + 20 + 20`, the least height where the straight side is as long as a card corner; between 40 and 60px a 20px radius makes a near-pill that matches nothing else in the system.
   - Fixed surfaces are decided in the markup: a toast is always one row, so always a pill; a picker menu is always several, so always a card.
@@ -209,9 +209,9 @@ The constraint that does the most work in practice.
 
 ## Components
 
-The things the portfolio never had. It is five fixed elements over one
-draggable object, so anything with filters, tables, panels or status had to
-be invented. These are the decisions, so they stop being a fresh guess each
+The things the source site never needed. It was a handful of fixed elements
+over one draggable object, so anything with filters, tables, panels or
+status had to be invented. These are the decisions, so they stop being a fresh guess each
 time. Change them freely — but change them here.
 
 ### The component library
@@ -334,10 +334,11 @@ the values and leave the vocabulary alone.
 
 ## Hover states and tooltips — lean in
 
-The portfolio puts an unusual amount of its information *behind* a hover, and
-that is a feature worth copying, not a quirk to tolerate. The custom cursor
-pill, the click-to-drop tooltip, the cover-to-tracklist reveal and the nav
-indicator's hover preview all exist so the resting page can stay quiet.
+The source site puts an unusual amount of its information *behind* a hover,
+and that is a feature worth copying, not a quirk to tolerate. The custom
+cursor pill, the click-to-drop tooltip, an image that reveals its details on
+hover and the nav indicator's hover preview all exist so the resting page can
+stay quiet.
 
 - **Default to a hover reveal rather than permanent secondary text.** If a
   value is useful but not load-bearing — a precise figure behind a rounded
@@ -365,7 +366,7 @@ indicator's hover preview all exist so the resting page can stay quiet.
 
 These are the recognisable moves. Reach for them when the context fits; don't force all of them in.
 
-- **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Listen") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
+- **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Open", "Play") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
 - **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except the one moving fill: a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer.
 - **Opaque full-bleed takeover** instead of a dimmed modal. No click-outside-to-close — an explicit Close link and Escape.
 - **Moving indicator as its own element**, absolutely positioned behind the links rather than a background on the active link, so it can glide between tabs. Hovering a sibling tab retargets it as a preview of where you'd land.
@@ -374,7 +375,7 @@ These are the recognisable moves. Reach for them when the context fits; don't fo
 
 ## Voice
 
-Sentence case. Em dashes with spaces. Short, flat, unsold: "Principal product designer at Wealthsimple", "Having fun making prototypes.", "Previously — NBA Top Shot, Shopify, Instagram". No exclamation marks, no "Unlock", no "Seamlessly". Mono microcopy is uppercase.
+Sentence case. Em dashes with spaces. Short, flat, unsold: "Designer at a small software company", "Built for checking quickly.", "Previously — a spreadsheet, then a script". No exclamation marks, no "Unlock", no "Seamlessly". Mono microcopy is uppercase.
 
 ## Avoid these defaults
 
@@ -393,7 +394,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | Three-column feature grid with icon circles | One object, centred, with chrome pinned to the edges |
 | Emoji in headings or labels | Nothing, or uppercase mono |
 | Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black — polarity fills excepted (see Colour) |
-| Centred hero: big title, subtitle, two CTAs | A bio block in the top-left corner and one nav pill |
+| Centred hero: big title, subtitle, two CTAs | A short name block in the top-left corner and one nav pill |
 | Glassmorphism throughout | One blurred element, at most |
 | Tailwind utility soup with arbitrary values | The tokens in `tokens.css` |
 | Mono as a subtitle, section header, column header or button label | Label for subtitles and headers, Interactive for controls |

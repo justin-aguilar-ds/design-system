@@ -30,7 +30,17 @@ function forceStates(css) {
 
 // ---- Markdown ------------------------------------------------------------
 // Just enough for READMEs and SKILL.md: headings, paragraphs, lists, tables,
-// fenced code, and inline code / bold / italic / links.
+// fenced code, and inline code / bold / italic / links. A library path in
+// inline code — `components/table/` — becomes a link to that page.
+const pageNames = new Set();
+const codeSpan = (code) => {
+  const page = code.match(/^(?:components|patterns)\/([a-z-]+)\/$/);
+  return page && pageNames.has(page[1])
+    ? `<a class="prose-link" href="${page[1]}.html"><code>${code}</code></a>`
+    : `<code>${code}</code>`;
+};
+const slug = (text) => text.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 function inline(text) {
   const codes = [];
   return escapeHtml(text)
@@ -38,13 +48,15 @@ function inline(text) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/(^|[^*\w])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a class="prose-link" href="$2">$1</a>')
-    .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
+    .replace(/\u0000(\d+)\u0000/g, (_, i) => codeSpan(codes[i]));
 }
 
 const LIST_ITEM = /^\s*(-|\d+\.)\s+/;
 const BLOCK_START = /^(```|#{1,6}\s|\|)|^\s*(-|\d+\.)\s/;
 
-function markdown(src) {
+// shift: how many levels a "#" heading drops (1 inside a page section, 0
+// when the markdown is the page). toc: collects top-level headings.
+function markdown(src, { shift = 1, toc = null } = {}) {
   const lines = src.replace(/\r/g, '').split('\n');
   const html = [];
   let i = 0;
@@ -62,8 +74,11 @@ function markdown(src) {
 
     const heading = line.match(/^(#{1,6})\s+(.*)$/);
     if (heading) {
-      const level = Math.min(heading[1].length + 1, 4);
-      html.push(`<h${level} class="t-label">${inline(heading[2])}</h${level}>`);
+      const level = Math.min(heading[1].length - 1 + shift + 1, 4);
+      const text = inline(heading[2]);
+      const id = slug(heading[2]);
+      if (toc && level === 2) toc.push({ id, text });
+      html.push(`<h${level} class="t-label" id="${id}">${text}</h${level}>`);
       i++;
       continue;
     }
@@ -127,6 +142,8 @@ const collect = (tier) => {
 const components = collect('components');
 const patterns = collect('patterns');
 const all = [...components, ...patterns];
+all.forEach((c) => pageNames.add(c.name));
+const titleOf = Object.fromEntries(all.map((c) => [c.name, c.title]));
 
 // ---- Emit ----------------------------------------------------------------
 rmSync(out, { recursive: true, force: true });
@@ -146,7 +163,34 @@ for (const c of all) {
 const styles = all.filter((c) => c.css).map((c) => `<link rel="stylesheet" href="${c.tier}/${c.name}/${c.name}.css">`).join('\n');
 const scripts = all.filter((c) => c.js).map((c) => `<script src="${c.tier}/${c.name}/${c.name}.js"></script>`).join('\n');
 
-const page = (title, body) => `<!doctype html>
+// ---- Chrome, built from the library itself -------------------------------
+const CHEVRON = '<svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const INFO = '<svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>';
+
+// The nav is the segmented control at its default size: one truth at a time.
+const navOption = (label, href, on) => `<a class="segmented-option t-control${on ? ' is-active' : ''}" href="${href}"${on ? ' aria-current="page"' : ''}>${label}</a>`;
+const nav = (active) => `<nav class="segmented" aria-label="Site">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${navOption('Library', 'index.html', active === 'library')}
+      ${navOption('Rules', 'rules.html', active === 'rules')}
+    </nav>`;
+
+// Every page opens with the artifact intro pattern.
+const intro = (title, description) => `<header class="intro">
+  <div class="intro-title-row">
+    <h1 class="t-display">${title}</h1>
+    <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="page-about" data-tooltip-toggle="page-about">${INFO}</button>
+    <div class="intro-about tooltip tooltip--anchored" id="page-about" hidden><p class="tooltip-text t-mono">${description}</p></div>
+  </div>
+</header>`;
+
+// One accordion item. Used for source files and the rules contents.
+const accordionItem = (id, title, body, { open = false, level = 3 } = {}) => `<div class="accordion-item${open ? ' is-open' : ''}">
+  <h${level} class="accordion-heading"><button class="accordion-trigger" type="button" id="${id}-trigger" aria-expanded="${open}" aria-controls="${id}"><span class="t-label">${title}</span>${CHEVRON}</button></h${level}>
+  <div class="accordion-panel" id="${id}" role="region" aria-labelledby="${id}-trigger"${open ? '' : ' inert'}><div class="accordion-content"><div class="accordion-body">${body}</div></div></div>
+</div>`;
+
+const page = (title, body, active = 'library') => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -160,11 +204,11 @@ ${styles}
 <body>
 <div class="site container">
   <header class="site-header">
-    <nav class="site-nav">
-      <a class="t-label site-name" href="index.html">Personal styling</a>
-      <a class="link-quiet t-control" href="rules.html">Rules</a>
-    </nav>
-    <button class="button surface surface--rest surface--pill t-control" type="button" id="theme-toggle">Dark</button>
+    <a class="t-body link-quiet" href="index.html">Personal styling</a>
+    <div class="site-actions">
+    ${nav(active)}
+    <button class="button-text link-quiet t-control" type="button" id="theme-toggle">Dark</button>
+    </div>
   </header>
   <main class="site-main">
 ${body}
@@ -183,20 +227,22 @@ ${items.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span c
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
 
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
-<div class="site-intro">
-  <h1 class="t-display">Personal styling</h1>
-  <p class="t-body">Every pattern and component in the library, rendered from the files the skill ships. Patterns arrange components into the pieces of a page; components are the single controls inside them.</p>
-</div>
+${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange components; components are single controls.')}
 ${section('Patterns', list(patterns))}
 ${section('Components', list(components))}`));
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
+const toc = [];
+const rulesHtml = markdown(skillBody, { shift: 0, toc });
+// Two panels: the rules, and a contents list in a 360px side panel with a
+// divider — a list, so no card. It stays in view while the rules scroll.
+const contents = `<ol class="toc-list">${toc.map((h) => `<li><a class="toc-link t-caption link-quiet" href="#${h.id}">${h.text}</a></li>`).join('')}</ol>`;
 writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
-<div class="site-intro">
-  <h1 class="t-display">Rules</h1>
-  <p class="t-body">The full skill, as an agent reads it.</p>
-</div>
-<div class="prose">${markdown(skillBody)}</div>`));
+${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes of patterns and components, motion and voice.')}
+<div class="rules-layout">
+  <aside class="rules-toc" aria-label="On this page"><div class="accordion">${accordionItem('toc', 'On this page', contents, { open: true, level: 2 })}</div></aside>
+  <div class="prose prose--page">${rulesHtml}</div>
+</div>`, 'rules'));
 
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card
@@ -207,15 +253,14 @@ const stage = (c, html) => (c.tier === 'patterns'
 
 for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
+  // "Requires: a, b" links to each component's page.
+  const rest = c.rest.replace(/^Requires: (.+)$/m, (_, names) => `Requires: ${names.split(',').map((n) => n.trim()).map((n) => `[${titleOf[n] || n}](${n}.html)`).join(', ')}`);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
-<div class="site-intro">
-  <h1 class="t-display">${inline(c.title)}</h1>
-  <p class="t-body">${inline(c.summary)}</p>
-</div>
+${intro(inline(c.title), inline(c.summary))}
 ${c.html ? section('As shipped', stage(c, c.html)) : ''}
 ${c.demo ? section('States', stage(c, c.demo)) : ''}
-${c.rest ? section('Guidance', `<div class="prose">${markdown(c.rest)}</div>`) : ''}
-${section('Source', sources.map(([name, src]) => `<div class="source"><h3 class="t-caption">${name}</h3><pre class="surface code"><code>${escapeHtml(src)}</code></pre></div>`).join(''))}`));
+${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
+${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));
 }
 
 console.log(`build: ${components.length} components, ${patterns.length} patterns → ${out}`);

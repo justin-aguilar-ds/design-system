@@ -1,6 +1,6 @@
 /* ============================================================
    Personal styling tokens — v0.5
-   Extracted from Projects/portfolio, then deliberately tightened.
+   Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
    ============================================================ */
@@ -74,7 +74,7 @@ img, video, svg { display: block; max-width: 100%; }
   --duration-deliberate: 450ms; /* nav */
   --duration-entrance: 500ms;
   --duration-slow: 800ms;       /* full-surface takeovers */
-  /* NEW (v0.5): the tooltip's two beats, from the portfolio's design.css. */
+  /* NEW (v0.5): the tooltip's two beats, from the source site. */
   --duration-pop: 350ms;        /* a small surface scaling in from its origin */
   --duration-reveal: 550ms;     /* clip-path text wipe, after the pop */
 

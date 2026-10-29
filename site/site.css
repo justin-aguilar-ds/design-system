@@ -7,18 +7,20 @@ body { min-height: 100vh; }
 /* A reading surface: centred at --container, with the page inset. */
 .site { padding: var(--space-page); }
 
+/* The header: the name top-left in secondary ink, like a short
+   name block; the nav pill and the quiet theme action on the right. */
 .site-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-16);
 }
-.site-nav {
+.site-actions {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-24);
+  align-items: center;
+  gap: var(--space-8);
 }
-.site-name { color: var(--color-text); }
 
 .site-main {
   display: flex;
@@ -26,9 +28,7 @@ body { min-height: 100vh; }
   gap: var(--space-48);
   padding-top: var(--space-48);
 }
-.site-intro,
-.site-section,
-.source {
+.site-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
@@ -85,10 +85,16 @@ body { min-height: 100vh; }
   gap: var(--space-16);
   min-width: 0;
 }
-.prose h2 { padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
+.prose h2 {
+  padding-top: var(--space-24);
+  border-top: 1px solid var(--color-divider);
+  scroll-margin-top: var(--space-24);
+}
 .prose ul, .prose ol { padding-left: var(--space-24); display: flex; flex-direction: column; gap: var(--space-8); }
-.prose strong { font-weight: 600; color: var(--color-text); }
-.prose code { font-family: var(--font-mono); font-weight: 500; color: var(--color-text); }
+/* Emphasis is ink, never weight: 600 belongs to interactive things. */
+.prose strong { font-weight: inherit; color: var(--color-text); }
+/* Inline code takes the same site-only code role as the blocks. */
+.prose code { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--color-text); }
 .prose-link { text-decoration: none; }
 @media (hover: hover) and (pointer: fine) {
   .prose-link:hover { text-decoration: underline; }
@@ -123,3 +129,54 @@ body { min-height: 100vh; }
 /* Room under an open intro description. */
 .pattern-demo-room { min-height: 96px; }
 .pattern-demo .tool-stack { display: flex; flex-direction: column; gap: var(--space-24); }
+
+/* Source files sit in an accordion, closed: the code is there when wanted. */
+.site-section .accordion-body .code { margin: 0; }
+
+/* Rules: two panels. The rules take the room; the contents list is a
+   360px side panel with a divider — a list, so no card — and stays in
+   view while the rules scroll. */
+.rules-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-16);
+  align-items: start;
+}
+.rules-layout .prose { grid-row: 1; grid-column: 1; }
+.rules-toc {
+  grid-row: 1;
+  grid-column: 2;
+  position: sticky;
+  top: var(--space-24);
+  max-height: calc(100vh - var(--space-48)); /* the page inset above and below */
+  overflow-y: auto;
+  padding-left: var(--space-16);
+  border-left: 1px solid var(--color-divider);
+  scrollbar-width: none;
+}
+.rules-toc .accordion-trigger { padding-top: 0; }
+.toc-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+.toc-link.is-current { color: var(--color-text); }
+.prose--page > h2:first-child { padding-top: 0; border-top: 0; }
+
+@media (max-width: 630px) {
+  /* The contents list moves above the rules rather than under 11,000px of
+     them, and starts collapsed (site.js). */
+  .rules-layout { grid-template-columns: minmax(0, 1fr); }
+  .rules-layout .prose { grid-row: 2; }
+  .rules-toc {
+    grid-row: 1;
+    grid-column: 1;
+    position: static;
+    max-height: none;
+    padding-left: 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--color-divider);
+  }
+}

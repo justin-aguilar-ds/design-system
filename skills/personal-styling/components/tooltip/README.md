@@ -2,7 +2,7 @@
 
 A detail worth having but not worth printing: inline information on a value, a tooltip dropped where you click, and the cursor pill that invites the click.
 
-From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `js/hover-cursor.js`, `js/carousel.js`).
+From the source site's media carousel, where a "Learn more" pill invited a click and the click explained the item.
 
 ## Rules
 
@@ -22,7 +22,7 @@ From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `
 - **Inline:** `<button class="tooltip-trigger" type="button" data-tooltip="…">value</button>`. It inherits the surrounding text and brightens to full ink on hover. It opens on hover, focus or tap, and appears above the trigger, or below if there's no room.
 - **Dropped:** `data-tooltip-drop="…"` on a `<button>` wrapping the media. A click drops the tooltip with its bottom-left corner at the pointer, and the next click anywhere closes it. From the keyboard it drops at the centre.
 - **Toggled:** `data-tooltip-toggle="<id>"` on a button, `aria-expanded` and `aria-controls` on it too, and the tooltip itself in the markup: `<div class="tooltip tooltip--anchored" id="<id>" hidden><p class="tooltip-text …">…</p></div>`. Click opens it, a second click, a click outside or Escape closes it (Escape returns focus to the button). Its container's CSS places it — `top`, `left` or `right`, and `transform-origin` on the corner nearest the button. Used by `patterns/artifact-intro/`.
-- **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the portfolio pattern. The pill hides while that element's tooltip is open.
+- **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the carousel pattern: the pill invites the click, the click explains. The pill hides while that element's tooltip is open.
 - Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
 
 ## Changes in v0.3.0
@@ -33,9 +33,9 @@ From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `
 
 - Toggled tooltips (`data-tooltip-toggle`): authored in the markup, opened and closed by a button, for prose.
 
-## Changes from the portfolio
+## Changes from the source
 
 - Hairline is `--color-hairline` (`#ececec`), not `#f8f8f8`.
 - Cursor pill padding is 8 / 16px, not 8 / 12px, to stay on the scale.
-- Inline information is new. The portfolio only had the dropped tooltip. It uses the same surface and motion, anchored to the trigger.
-- Keyboard and touch paths are new. The portfolio's tooltip was mouse and tap on the carousel only.
+- Inline information is new. The source only had the dropped tooltip. It uses the same surface and motion, anchored to the trigger.
+- Keyboard and touch paths are new. The source's tooltip was mouse and tap on the carousel only.

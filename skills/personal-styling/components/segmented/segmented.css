@@ -54,5 +54,5 @@
 .segmented-option.is-indicated,
 .segmented-option:focus-visible { opacity: 1; }
 
-/* The page nav (Design / Music): the same control at nav size. */
+/* The page nav — a site's top-level pages: the same control at nav size. */
 .segmented--nav .segmented-option { padding: var(--space-16) var(--space-24); }
