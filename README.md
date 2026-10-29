@@ -4,8 +4,10 @@ A personal design system: the rules, the tokens, and a library of components tha
 
 ```
 skills/personal-styling/     the skill — everything an agent needs
-  SKILL.md                   rules, judgment calls, component index
+  SKILL.md                   rules, judgment calls, pattern and component index
   tokens.css                 the token block, copied into every project verbatim
+  patterns/<name>/           page pieces built from components — same files as below,
+                             plus a "Requires:" line naming the components they use
   components/<name>/
     <name>.html              markup        ┐
     <name>.css               tokens only   ├ shipped: copied into projects

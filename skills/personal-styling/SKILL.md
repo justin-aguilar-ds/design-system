@@ -7,7 +7,7 @@ description: House style for personal software — monochrome with one accent, f
 
 A distilled house style, extracted from the author's portfolio and then deliberately tightened. The aesthetic is **monochrome with one accent, typographically flat, heavily motion-tuned**: five spacing steps, three type styles to a card, and the entire personality carried by timing and easing rather than decoration.
 
-Everything this skill needs sits next to this file: `tokens.css` and the `components/` library. The repository this skill lives in also builds a sandbox site that renders every component and its states.
+Everything this skill needs sits next to this file: `tokens.css`, the `components/` library and the `patterns/` that arrange them. The repository this skill lives in also builds a sandbox site that renders every component and its states.
 
 **Start by copying `tokens.css` into the project verbatim**, then build with its tokens and type-role classes. Read on for the judgment calls the tokens can't encode.
 
@@ -236,21 +236,24 @@ rules.
 | Toast | an action finished somewhere the result can't be seen — copied, saved, sent | `components/toast/` |
 | Table | rows of records — any list with more than one value per row | `components/table/` |
 | Picker | one choice from a list too long to show at once — a select menu | `components/picker/` |
+| Accordion | sections worth having but not worth showing all at once | `components/accordion/` |
+
+### Patterns
+
+A pattern arranges components into a piece of a page: the answer to "how does this page open?" rather than "how do I build this control?". The test is whether it contains other components. Patterns live in `patterns/`, in the same shape as components, and each README starts with the components it needs (`Requires: …`) — copy those too.
+
+Patterns add layout and nothing else. Every colour, type style and surface inside one comes from the tokens and the components; a pattern that sets its own type is forking the system.
+
+For a tool, reach for the patterns first, then fill them with components.
+
+| Pattern | Reach for it when | Folder |
+|---|---|---|
+| Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
+| Control panel | a tool has controls that change the content below them | `patterns/control-panel/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
 index.
-
-### Artifact intro and control panel
-
-For tools and data artifacts that open with a large title and a short explanation:
-
-- Keep the title as the only visible intro copy. Collapse the artifact description behind a circular info button fixed to the right edge of the title container.
-- Vertically centre the info button against the title container itself, not the viewport or the broader intro section. Let the title container derive its height from the heading so wrapping stays aligned at the mobile breakpoint.
-- Use a real button with `aria-expanded` and `aria-controls`; the revealed description stays directly below the title and uses Body type. A `40px` circular control is the visual and touch target.
-- Put the primary control UI immediately below the intro, second in the page hierarchy. Wrap the controls in the one rounded surface style and add the rest shadow for persistent elevation; this control panel is the exception to the hover-only shadow rule.
-- Make the entire control-panel heading row the accordion trigger. Keep the chevron at the far edge, preserve `aria-expanded` / `aria-controls`, and collapse the body without removing the heading.
-- The control-panel title uses `.t-mono` as a deliberate exception to the rule against mono control labels. Keep it terse and singular; field labels and control names inside the panel remain Label or Interactive.
 
 ### Links, focus, disabled
 

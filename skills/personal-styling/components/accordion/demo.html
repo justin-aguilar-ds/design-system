@@ -1,0 +1,61 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Closed, hover</p>
+    <div class="accordion">
+      <div class="accordion-item">
+        <h3 class="accordion-heading">
+          <button class="accordion-trigger force-hover" type="button" id="demo-acc-1-trigger" aria-expanded="false" aria-controls="demo-acc-1">
+            <span class="t-label">Retry schedule</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h3>
+        <div class="accordion-panel" id="demo-acc-1" role="region" aria-labelledby="demo-acc-1-trigger" inert>
+          <div class="accordion-content"><div class="accordion-body"><p class="t-body">30s, 2m, 10m, 30m, 1h.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Focus</p>
+    <div class="accordion">
+      <div class="accordion-item">
+        <h3 class="accordion-heading">
+          <button class="accordion-trigger force-focus" type="button" id="demo-acc-2-trigger" aria-expanded="false" aria-controls="demo-acc-2">
+            <span class="t-label">Retry schedule</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h3>
+        <div class="accordion-panel" id="demo-acc-2" role="region" aria-labelledby="demo-acc-2-trigger" inert>
+          <div class="accordion-content"><div class="accordion-body"><p class="t-body">30s, 2m, 10m, 30m, 1h.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">One open at a time — data-accordion="single"</p>
+    <div class="accordion" data-accordion="single">
+      <div class="accordion-item is-open">
+        <h3 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="demo-acc-3-trigger" aria-expanded="true" aria-controls="demo-acc-3">
+            <span class="t-label">Monthly</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h3>
+        <div class="accordion-panel" id="demo-acc-3" role="region" aria-labelledby="demo-acc-3-trigger">
+          <div class="accordion-content"><div class="accordion-body"><p class="t-body">Billed on the first. Cancel any time.</p></div></div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h3 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="demo-acc-4-trigger" aria-expanded="false" aria-controls="demo-acc-4">
+            <span class="t-label">Yearly</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h3>
+        <div class="accordion-panel" id="demo-acc-4" role="region" aria-labelledby="demo-acc-4-trigger" inert>
+          <div class="accordion-content"><div class="accordion-body"><p class="t-body">Billed once. Two months free.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

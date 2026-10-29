@@ -1,0 +1,161 @@
+<div class="pattern-demo-stack">
+  <div class="pattern-demo">
+    <p class="t-caption">Collapsed, hover</p>
+    <section class="control-panel surface accordion" aria-label="Filters">
+      <div class="accordion-item">
+        <h2 class="accordion-heading">
+          <button class="accordion-trigger force-hover" type="button" id="demo-cp-trigger" aria-expanded="false" aria-controls="demo-cp-body">
+            <span class="t-mono">Filters</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h2>
+        <div class="accordion-panel" id="demo-cp-body" role="region" aria-labelledby="demo-cp-trigger" inert>
+          <div class="accordion-content"><div class="accordion-body">
+            <div class="control-panel-fields">
+              <div class="control-field">
+                <span class="t-label" id="demo-cp-league">League</span>
+                <div class="segmented" role="group" aria-labelledby="demo-cp-league">
+                  <span class="segmented-indicator" aria-hidden="true"></span>
+                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true">NBA</button>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false">WNBA</button>
+                </div>
+              </div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="pattern-demo">
+    <p class="t-caption">Assembled — intro, then controls, then the content they change</p>
+    <div class="tool-stack">
+<header class="intro">
+  <div class="intro-title-row">
+    <h1 class="t-display">Delivery monitor</h1>
+    <button class="intro-info surface surface--rest surface--pill" type="button"
+            aria-label="About this tool" aria-expanded="false" aria-controls="tool-intro-about"
+            data-tooltip-toggle="tool-intro-about">
+      <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+    </button>
+    <div class="tool-intro-about tooltip tooltip--anchored tooltip--prose" id="tool-intro-about" hidden>
+      <p class="tooltip-text t-body">Every webhook delivery from the last 30 days, with its status and latency. Retrying and failed deliveries stay at the top until they clear.</p>
+    </div>
+  </div>
+</header>
+<section class="control-panel surface accordion" aria-label="Controls">
+  <div class="accordion-item is-open">
+    <h2 class="accordion-heading">
+      <button class="accordion-trigger" type="button" id="tool-controls-trigger" aria-expanded="true" aria-controls="tool-controls-body">
+        <span class="t-mono">Controls</span>
+        <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </h2>
+    <div class="accordion-panel" id="tool-controls-body" role="region" aria-labelledby="tool-controls-trigger">
+      <div class="accordion-content"><div class="accordion-body">
+        <div class="control-panel-fields">
+
+          <div class="control-field">
+            <span class="t-label" id="tool-cp-view-label">View</span>
+            <div class="segmented" role="group" aria-labelledby="tool-cp-view-label">
+              <span class="segmented-indicator" aria-hidden="true"></span>
+              <button class="segmented-option is-active t-control" type="button" aria-pressed="true">Deliveries</button>
+              <button class="segmented-option t-control" type="button" aria-pressed="false">Endpoints</button>
+            </div>
+          </div>
+
+          <div class="picker-field">
+            <span class="t-label" id="tool-cp-range-label">Range</span>
+            <div class="picker">
+              <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
+                      aria-haspopup="listbox" aria-expanded="false" aria-controls="tool-cp-range-list"
+                      aria-labelledby="tool-cp-range-label tool-cp-range-value">
+                <span class="picker-value" id="tool-cp-range-value">Last 7 days</span>
+                <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="picker-menu" hidden>
+                <ul class="picker-list" id="tool-cp-range-list" role="listbox" tabindex="-1" aria-labelledby="tool-cp-range-label">
+                  <li class="picker-option t-control" role="option" aria-selected="false" data-value="1d">Today</li>
+                  <li class="picker-option t-control" role="option" aria-selected="true" data-value="7d">Last 7 days</li>
+                  <li class="picker-option t-control" role="option" aria-selected="false" data-value="30d">Last 30 days</li>
+                </ul>
+              </div>
+              <input type="hidden" name="range" value="7d">
+            </div>
+          </div>
+
+          <div class="control-field">
+            <span class="t-label" id="tool-cp-status-label">Status</span>
+            <div class="chip-row" role="group" aria-labelledby="tool-cp-status-label">
+              <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Delivered</button>
+              <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Retrying</button>
+              <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Failed</button>
+            </div>
+          </div>
+
+          <div class="slider-field">
+            <div class="slider-head">
+              <label class="t-label" for="tool-cp-latency">Slower than</label>
+              <output class="slider-value t-mono" for="tool-cp-latency">200</output>
+            </div>
+            <span class="slider">
+              <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+              <input class="slider-input" id="tool-cp-latency" type="range" min="0" max="2000" step="50" value="200">
+            </span>
+          </div>
+
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Delivery</th>
+        <th scope="col">Endpoint</th>
+        <th scope="col">Status</th>
+        <th scope="col" class="table-num">Attempts</th>
+        <th scope="col" class="table-num">Latency</th>
+        <th scope="col">Last attempt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>DLV-20931</td>
+        <td>api.acme.dev/hooks</td>
+        <td>✓ Delivered</td>
+        <td class="table-num">1</td>
+        <td class="table-num">182 ms</td>
+        <td>Oct 29, 14:02</td>
+      </tr>
+      <tr>
+        <td>DLV-20930</td>
+        <td>hooks.northwind.io</td>
+        <td class="table-ink">! Retrying</td>
+        <td class="table-num">3</td>
+        <td class="table-num">4,210 ms</td>
+        <td>Oct 29, 13:58</td>
+      </tr>
+      <tr>
+        <td>DLV-20929</td>
+        <td>ingest.globex.com</td>
+        <td class="table-ink">✗ Failed</td>
+        <td class="table-num">5</td>
+        <td class="table-num">–</td>
+        <td>Oct 29, 13:41</td>
+      </tr>
+      <tr>
+        <td>DLV-20928</td>
+        <td>api.acme.dev/hooks</td>
+        <td>✓ Delivered</td>
+        <td class="table-num">1</td>
+        <td class="table-num">164 ms</td>
+        <td>Oct 29, 13:40</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    </div>
+  </div>
+</div>

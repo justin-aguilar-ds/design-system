@@ -1,0 +1,33 @@
+/* personal-styling · control-panel · v0.1.0 */
+
+/* One accordion item in the one surface style. The persistent rest
+   shadow is the deliberate exception to "a shadow means it lifts": it
+   puts the controls on a layer above the content they change. It never
+   lifts on hover — the panel as a whole isn't a control. */
+.control-panel { box-shadow: var(--shadow-rest); }
+
+/* Inside a card, 16px. The trigger takes the card's radius so its focus
+   outline follows the panel's corners. */
+.control-panel .accordion-trigger {
+  padding: var(--space-16);
+  border-radius: var(--radius-card);
+}
+.control-panel .accordion-body { padding: 0 var(--space-16) var(--space-16); }
+
+/* Fields flow in columns of at least 240px — wide enough for a slider and
+   the widest picker — 16px apart both ways, wrapping as the panel narrows. */
+.control-panel-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: start;
+  gap: var(--space-16);
+}
+
+/* A field is its label, 8px, then its control. The picker and slider bring
+   their own field wrappers; this is the one for everything else. */
+.control-field {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+  min-width: 0;
+}

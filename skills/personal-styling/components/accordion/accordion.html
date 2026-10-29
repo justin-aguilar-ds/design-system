@@ -1,0 +1,42 @@
+<!-- personal-styling · accordion · v0.1.0 -->
+<div class="accordion">
+  <div class="accordion-item is-open">
+    <h3 class="accordion-heading">
+      <button class="accordion-trigger" type="button" id="faq-1-trigger" aria-expanded="true" aria-controls="faq-1">
+        <span class="t-label">What counts as a failed delivery</span>
+        <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </h3>
+    <div class="accordion-panel" id="faq-1" role="region" aria-labelledby="faq-1-trigger">
+      <div class="accordion-content"><div class="accordion-body">
+        <p class="t-body">Five attempts without a 2xx response. Retries back off from 30 seconds to an hour.</p>
+      </div></div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h3 class="accordion-heading">
+      <button class="accordion-trigger" type="button" id="faq-2-trigger" aria-expanded="false" aria-controls="faq-2">
+        <span class="t-label">How latency is measured</span>
+        <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </h3>
+    <div class="accordion-panel" id="faq-2" role="region" aria-labelledby="faq-2-trigger" inert>
+      <div class="accordion-content"><div class="accordion-body">
+        <p class="t-body">From the moment the request leaves to the last byte of the response, on the final attempt.</p>
+      </div></div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h3 class="accordion-heading">
+      <button class="accordion-trigger" type="button" id="faq-3-trigger" aria-expanded="false" aria-controls="faq-3">
+        <span class="t-label">How long deliveries are kept</span>
+        <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </h3>
+    <div class="accordion-panel" id="faq-3" role="region" aria-labelledby="faq-3-trigger" inert>
+      <div class="accordion-content"><div class="accordion-body">
+        <p class="t-body">Thirty days, then the payloads are dropped and only the counts remain.</p>
+      </div></div>
+    </div>
+  </div>
+</div>

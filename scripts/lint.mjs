@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const skill = join(root, 'skills/personal-styling');
-const componentsDir = join(skill, 'components');
 
 const SPACE_STEPS = new Set([0, 4, 8, 16, 24, 48]);
 const RADII = /^(0|20px|999px|50%|var\(--radius-[a-z]+\))$/;
@@ -20,7 +19,11 @@ const report = (file, line, message) => problems.push(`${relative(root, file)}:$
 // Blank out comments but keep line numbers, so findings point at real lines.
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
 
-function lintCss(file) {
+// Patterns arrange components; type comes from the type roles, never from
+// a pattern's own CSS.
+const PATTERN_BANNED = /^\s*(font(-[a-z]+)?|letter-spacing|line-height|text-transform)\s*:/;
+
+function lintCss(file, { pattern = false } = {}) {
   const lines = stripComments(readFileSync(file, 'utf8')).split('\n');
   lines.forEach((line, i) => {
     const n = i + 1;
@@ -39,6 +42,8 @@ function lintCss(file) {
       }
     }
 
+    if (pattern && PATTERN_BANNED.test(line)) report(file, n, 'patterns take type from the type roles, not their own CSS');
+
     const radius = line.match(/border(-[a-z-]+)?-radius\s*:\s*([^;]+)/);
     if (radius && !radius[2].trim().split(/\s+/).every((v) => RADII.test(v))) report(file, n, `radius ${radius[2].trim()} — 20px or fully round`);
   });
@@ -46,7 +51,7 @@ function lintCss(file) {
 
 // Every shipped file opens with "personal-styling · <name> · v<version>",
 // and all files in one component agree on the version.
-function lintHeaders(name, files) {
+function lintHeaders(dir, name, files) {
   const versions = new Set();
   for (const file of files) {
     const first = readFileSync(file, 'utf8').split('\n')[0];
@@ -54,21 +59,36 @@ function lintHeaders(name, files) {
     if (!m) report(file, 1, `first line must be the header "personal-styling · ${name} · v0.0.0"`);
     else versions.add(m[1]);
   }
-  if (versions.size > 1) report(join(componentsDir, name), 0, `files disagree on version: ${[...versions].join(', ')}`);
+  if (versions.size > 1) report(dir, 0, `files disagree on version: ${[...versions].join(', ')}`);
 }
 
 const skillText = readFileSync(join(skill, 'SKILL.md'), 'utf8');
-const components = readdirSync(componentsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+const folders = (tier) => {
+  const dir = join(skill, tier);
+  return existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name) : [];
+};
+const components = folders('components');
+const patterns = folders('patterns');
 
-for (const name of components) {
-  const dir = join(componentsDir, name);
-  for (const required of ['README.md', `${name}.html`, `${name}.css`]) {
-    if (!existsSync(join(dir, required))) report(dir, 0, `missing ${required}`);
+for (const [tier, names] of [['components', components], ['patterns', patterns]]) {
+  for (const name of names) {
+    const dir = join(skill, tier, name);
+    for (const required of ['README.md', `${name}.html`, `${name}.css`]) {
+      if (!existsSync(join(dir, required))) report(dir, 0, `missing ${required}`);
+    }
+    const shipped = readdirSync(dir).filter((f) => f.startsWith(`${name}.`)).map((f) => join(dir, f));
+    lintHeaders(dir, name, shipped);
+    shipped.filter((f) => extname(f) === '.css').forEach((f) => lintCss(f, { pattern: tier === 'patterns' }));
+    if (!skillText.includes(`${tier}/${name}/`)) report(join(skill, 'SKILL.md'), 0, `${tier.slice(0, -1)} "${name}" is missing from the index`);
+
+    // A pattern names the components it's built from, and they must exist.
+    if (tier === 'patterns' && existsSync(join(dir, 'README.md'))) {
+      const requires = readFileSync(join(dir, 'README.md'), 'utf8').match(/^Requires: (.+)$/m);
+      if (!requires) report(join(dir, 'README.md'), 0, 'missing a "Requires: …" line');
+      else requires[1].split(',').map((s) => s.trim()).filter((c) => !components.includes(c))
+        .forEach((c) => report(join(dir, 'README.md'), 0, `requires unknown component "${c}"`));
+    }
   }
-  const shipped = readdirSync(dir).filter((f) => f.startsWith(`${name}.`)).map((f) => join(dir, f));
-  lintHeaders(name, shipped);
-  shipped.filter((f) => extname(f) === '.css').forEach(lintCss);
-  if (!skillText.includes(`components/${name}/`)) report(join(skill, 'SKILL.md'), 0, `component "${name}" is missing from the index`);
 }
 
 readdirSync(join(root, 'site')).filter((f) => f.endsWith('.css')).forEach((f) => lintCss(join(root, 'site', f)));
@@ -78,4 +98,4 @@ if (problems.length) {
   console.error(`\n${problems.length} problem${problems.length === 1 ? '' : 's'}`);
   process.exit(1);
 }
-console.log(`lint: ${components.length} components clean`);
+console.log(`lint: ${components.length} components, ${patterns.length} patterns clean`);

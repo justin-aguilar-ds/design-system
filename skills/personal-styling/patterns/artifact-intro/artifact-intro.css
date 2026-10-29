@@ -1,0 +1,43 @@
+/* personal-styling · artifact-intro · v0.1.0 */
+
+/* The title is the only visible intro copy. The title row is a two-column
+   grid: the heading takes the room, the info button sits in its own
+   column fixed to the right edge. The row's height comes from the heading,
+   so when the title wraps — or drops to 32px under 630px — the button
+   stays centred against it, not against the viewport or the page. */
+.intro-title-row {
+  position: relative;           /* anchors the description */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-16);
+}
+.intro-title-row > h1 { margin: 0; }
+
+/* The info button: a 40px circle, the visual and the touch target. It is
+   button-shaped, so it carries the rest shadow and lifts on hover. While
+   the description is open it holds the selected fill — state, not the
+   accent. */
+.intro-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-text);
+}
+.intro-info[aria-expanded="true"] { background: var(--color-fill-subtle); }
+.intro-info-glyph {
+  width: 16px;
+  height: 16px;
+}
+
+/* The description is a toggled tooltip. It hangs 8px below the title row,
+   aligned to its right edge, and grows from the top-right corner — the
+   corner under the button that opened it. */
+.intro-about {
+  top: calc(100% + var(--space-8));
+  right: 0;
+  width: max-content;
+  transform-origin: top right;
+}

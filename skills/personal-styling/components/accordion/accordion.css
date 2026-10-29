@@ -1,0 +1,67 @@
+/* personal-styling · accordion · v0.1.0 */
+
+/* A set of sections is a list, so it sits on the page with dividers.
+   Wrap it in a surface only when it is the control panel (see
+   patterns/control-panel/). */
+.accordion-item + .accordion-item { border-top: 1px solid var(--color-divider); }
+.accordion-heading { margin: 0; }
+
+/* The whole heading row is the trigger. Title on the left in whatever
+   type role the context needs (Label on the page, mono in a control
+   panel), chevron at the far edge. */
+.accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  width: 100%;
+  padding: var(--space-16) 0;
+  text-align: left;
+}
+.accordion-trigger > * { transition: color var(--duration-fast) ease; }
+
+/* The chevron turns with the panel, on the enter/exit curve — the
+   picker's chevron. It sits at secondary ink until hovered. */
+.accordion-chevron {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  color: var(--color-text-secondary);
+  transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
+}
+.accordion-item.is-open .accordion-chevron { transform: rotate(180deg); }
+
+/* Hover brightens everything in the row to full ink. */
+@media (hover: hover) and (pointer: fine) {
+  .accordion-trigger:hover > * { color: var(--color-text); }
+}
+
+/* The panel collapses to nothing and opens to its content's real
+   height. grid-template-rows 0fr → 1fr is a layout property: it's the
+   one way to reach the content's own height without measuring it, and
+   the reflow is a single container on a click. --duration-entrance,
+   because a container is appearing; --ease-out, because it enters. */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--duration-entrance) var(--ease-out),
+    opacity var(--duration-entrance) var(--ease-out);
+}
+.accordion-item.is-open .accordion-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* Clipped while it moves; once open and settled, overflow is released so
+   a picker menu or tooltip inside isn't cut off at the panel's edge. */
+.accordion-content {
+  min-height: 0;
+  overflow: hidden;
+}
+.accordion-item.is-settled .accordion-content { overflow: visible; }
+
+/* Padding lives one level down: on the clipped element it would hold the
+   collapsed panel open. */
+.accordion-body { padding-bottom: var(--space-16); }

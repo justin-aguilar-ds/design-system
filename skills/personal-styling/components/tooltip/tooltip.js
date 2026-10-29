@@ -1,11 +1,13 @@
-/* personal-styling · tooltip · v0.1.0 */
+/* personal-styling · tooltip · v0.2.0 */
 
-// Three declarative pieces:
-//   [data-tooltip="…"]       inline information — grows from the trigger on
-//                            hover, focus or tap
-//   [data-tooltip-drop="…"]  a click drops a tooltip where it landed; the next
-//                            click anywhere closes it
-//   [data-cursor="…"]        a pill replaces the cursor over the element
+// Four declarative pieces:
+//   [data-tooltip="…"]         inline information — grows from the trigger on
+//                              hover, focus or tap
+//   [data-tooltip-toggle="id"] a button opens and closes the authored tooltip
+//                              with that id — for prose that has to stay put
+//   [data-tooltip-drop="…"]    a click drops a tooltip where it landed; the
+//                              next click anywhere closes it
+//   [data-cursor="…"]          a pill replaces the cursor over the element
 // One tooltip is open at a time.
 
 // Mirrors --duration-pop in tokens.css: the text starts its wipe as the box
@@ -13,7 +15,7 @@
 const TOOLTIP_POP_MS = 350;
 const TOOLTIP_GAP = 8; // px between a trigger and its tooltip
 
-let openTooltip = null; // { el, owner, reveal }
+let openTooltip = null; // { el, owner, reveal, authored }
 let tooltipCount = 0;
 
 // Anchor the tooltip's corner at x, above `top` — or below `bottom` if there
@@ -46,15 +48,39 @@ function showTooltip(text, owner, x, top, bottom) {
 }
 
 // Only the scale reverses — the text stays revealed until the box is gone.
+// An authored tooltip is hidden rather than removed, and re-clipped once
+// it's out of sight so the next open wipes in again.
 function hideTooltip() {
   if (!openTooltip) return;
-  const { el, owner, reveal } = openTooltip;
+  const { el, owner, reveal, authored } = openTooltip;
   openTooltip = null;
   clearTimeout(reveal);
   owner.removeAttribute('aria-describedby');
   owner.classList.remove('has-tooltip');
   el.classList.remove('is-visible');
-  setTimeout(() => el.remove(), TOOLTIP_POP_MS);
+  if (!authored) {
+    setTimeout(() => el.remove(), TOOLTIP_POP_MS);
+    return;
+  }
+  owner.setAttribute('aria-expanded', 'false');
+  setTimeout(() => {
+    if (openTooltip?.el === el) return; // reopened while closing
+    el.hidden = true;
+    el.classList.remove('is-text-visible');
+  }, TOOLTIP_POP_MS);
+}
+
+// ---- Toggled ----
+function openAuthored(owner) {
+  const el = document.getElementById(owner.dataset.tooltipToggle);
+  if (!el) return;
+  hideTooltip();
+  el.hidden = false;
+  void el.offsetWidth; // commit the scale(0) start before it grows
+  owner.setAttribute('aria-expanded', 'true');
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  const reveal = setTimeout(() => el.classList.add('is-text-visible'), TOOLTIP_POP_MS);
+  openTooltip = { el, owner, reveal, authored: true };
 }
 
 // ---- Inline ----
@@ -86,6 +112,16 @@ document.addEventListener('focusout', (event) => {
 
 // ---- Clicks: tap an inline trigger, drop on a frame, or close ----
 document.addEventListener('click', (event) => {
+  // Reading or following a link inside an open authored tooltip keeps it open.
+  if (openTooltip?.authored && openTooltip.el.contains(event.target)) return;
+
+  const toggle = event.target.closest('[data-tooltip-toggle]');
+  if (toggle) {
+    if (openTooltip?.owner === toggle) hideTooltip();
+    else openAuthored(toggle);
+    return;
+  }
+
   const inline = inlineTrigger(event.target);
   if (inline) { showInline(inline); return; }
 
@@ -108,7 +144,9 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') hideTooltip();
+  if (event.key !== 'Escape' || !openTooltip) return;
+  if (openTooltip.authored) openTooltip.owner.focus();
+  hideTooltip();
 });
 
 // ---- Cursor pill ----

@@ -7,7 +7,8 @@ From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `
 ## Rules
 
 - **Default to a hover reveal over permanent secondary text.** A precise figure behind a rounded one, a full timestamp behind "Yest.", a definition, the arithmetic behind a total.
-- **The tooltip is the one place mono is unreservedly right.** `.t-mono` on one surface with the hairline and a `20px` radius. No shadow — nothing hovers it.
+- **Hover for a value, click for prose.** Inline information opens on hover because it's a glance. A toggled tooltip holds a sentence or two, so it opens on click and stays until dismissed — reading shouldn't depend on holding the pointer still.
+- **The tooltip is the one place mono is unreservedly right** — for values and terse glosses. Prose in a toggled tooltip takes Body. `.t-mono` on one surface with the hairline and a `20px` radius. No shadow — nothing hovers it.
 - **It grows from the point it explains.** `scale(0)` → `scale(1)` over `--duration-pop` (350ms) on `--ease-out`, with `transform-origin` on the anchored corner: the click point for a dropped tooltip, the trigger for inline information.
 - **Then the text wipes in.** `clip-path: inset(0 100% 0 0)` → `inset(0)` over `--duration-reveal` (550ms), starting once the box has finished scaling.
 - **Closing reverses only the scale.** The text stays revealed until the box has shrunk away.
@@ -19,8 +20,13 @@ From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `
 
 - **Inline:** `<button class="tooltip-trigger" type="button" data-tooltip="…">value</button>`. It inherits the surrounding text and brightens to full ink on hover. It opens on hover, focus or tap, and appears above the trigger, or below if there's no room.
 - **Dropped:** `data-tooltip-drop="…"` on a `<button>` wrapping the media. A click drops the tooltip with its bottom-left corner at the pointer, and the next click anywhere closes it. From the keyboard it drops at the centre.
+- **Toggled:** `data-tooltip-toggle="<id>"` on a button, `aria-expanded` and `aria-controls` on it too, and the tooltip itself in the markup: `<div class="tooltip tooltip--anchored" id="<id>" hidden><p class="tooltip-text …">…</p></div>`. Click opens it, a second click, a click outside or Escape closes it (Escape returns focus to the button). Its container's CSS places it — `top`, `left` or `right`, and `transform-origin` on the corner nearest the button. Add `.tooltip--prose` and `.t-body` for a sentence or two rather than a value. Used by `patterns/artifact-intro/`.
 - **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the portfolio pattern. The pill hides while that element's tooltip is open.
 - Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
+
+## Changes in v0.2.0
+
+- Toggled tooltips (`data-tooltip-toggle`): authored in the markup, opened and closed by a button, for prose.
 
 ## Changes from the portfolio
 

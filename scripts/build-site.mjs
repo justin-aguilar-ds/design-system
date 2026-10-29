@@ -105,14 +105,17 @@ function splitReadme(src) {
 }
 
 // ---- Collect -------------------------------------------------------------
-const componentsDir = join(skill, 'components');
-const components = readdirSync(componentsDir, { withFileTypes: true })
+const collect = (tier) => {
+  const tierDir = join(skill, tier);
+  if (!existsSync(tierDir)) return [];
+  return readdirSync(tierDir, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map(({ name }) => {
-    const dir = join(componentsDir, name);
+    const dir = join(tierDir, name);
     const file = (f) => (existsSync(join(dir, f)) ? read(join(dir, f)) : null);
     return {
       name,
+      tier,
       ...splitReadme(file('README.md') || `# ${name}\n`),
       html: file(`${name}.html`),
       css: file(`${name}.css`),
@@ -120,6 +123,10 @@ const components = readdirSync(componentsDir, { withFileTypes: true })
       demo: file('demo.html'),
     };
   });
+};
+const components = collect('components');
+const patterns = collect('patterns');
+const all = [...components, ...patterns];
 
 // ---- Emit ----------------------------------------------------------------
 rmSync(out, { recursive: true, force: true });
@@ -128,15 +135,16 @@ mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'tokens.css'), forceStates(read(join(skill, 'tokens.css'))));
 copyFileSync(join(root, 'site/site.css'), join(out, 'site.css'));
 copyFileSync(join(root, 'site/site.js'), join(out, 'site.js'));
-for (const c of components) {
-  mkdirSync(join(out, 'components', c.name), { recursive: true });
-  if (c.css) writeFileSync(join(out, 'components', c.name, `${c.name}.css`), forceStates(c.css));
-  if (c.js) writeFileSync(join(out, 'components', c.name, `${c.name}.js`), c.js);
+for (const c of all) {
+  mkdirSync(join(out, c.tier, c.name), { recursive: true });
+  if (c.css) writeFileSync(join(out, c.tier, c.name, `${c.name}.css`), forceStates(c.css));
+  if (c.js) writeFileSync(join(out, c.tier, c.name, `${c.name}.js`), c.js);
 }
 
-// Every page loads every component, so demos can compose them.
-const styles = components.filter((c) => c.css).map((c) => `<link rel="stylesheet" href="components/${c.name}/${c.name}.css">`).join('\n');
-const scripts = components.filter((c) => c.js).map((c) => `<script src="components/${c.name}/${c.name}.js"></script>`).join('\n');
+// Every page loads every component and pattern, so demos can compose them.
+// Pattern CSS comes after component CSS, so a pattern can arrange them.
+const styles = all.filter((c) => c.css).map((c) => `<link rel="stylesheet" href="${c.tier}/${c.name}/${c.name}.css">`).join('\n');
+const scripts = all.filter((c) => c.js).map((c) => `<script src="${c.tier}/${c.name}/${c.name}.js"></script>`).join('\n');
 
 const page = (title, body) => `<!doctype html>
 <html lang="en">
@@ -168,16 +176,19 @@ ${scripts}
 </html>
 `;
 
+const list = (items) => `<ul class="component-list">
+${items.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span class="t-label">${inline(c.title)}</span><span class="t-body component-summary">${inline(c.summary)}</span></a></li>`).join('\n')}
+</ul>`;
+
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
 
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
 <div class="site-intro">
   <h1 class="t-display">Personal styling</h1>
-  <p class="t-body">Every component in the library, rendered from the files the skill ships. Change a component in the skill, rebuild, and it changes here.</p>
+  <p class="t-body">Every pattern and component in the library, rendered from the files the skill ships. Patterns arrange components into the pieces of a page; components are the single controls inside them.</p>
 </div>
-<ul class="component-list">
-${components.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span class="t-label">${inline(c.title)}</span><span class="t-body component-summary">${inline(c.summary)}</span></a></li>`).join('\n')}
-</ul>`));
+${section('Patterns', list(patterns))}
+${section('Components', list(components))}`));
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
@@ -187,17 +198,24 @@ writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
 </div>
 <div class="prose">${markdown(skillBody)}</div>`));
 
-for (const c of components) {
+// A pattern is page-sized, so it renders on the page between dividers
+// rather than inside a demo surface — a control panel in a card in a card
+// would be the defect the rules warn about.
+const stage = (c, html) => (c.tier === 'patterns'
+  ? `<div class="pattern-stage">${html}</div>`
+  : `<div class="surface demo">${html}</div>`);
+
+for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 <div class="site-intro">
   <h1 class="t-display">${inline(c.title)}</h1>
   <p class="t-body">${inline(c.summary)}</p>
 </div>
-${c.html ? section('As shipped', `<div class="surface demo">${c.html}</div>`) : ''}
-${c.demo ? section('States', `<div class="surface demo">${c.demo}</div>`) : ''}
+${c.html ? section('As shipped', stage(c, c.html)) : ''}
+${c.demo ? section('States', stage(c, c.demo)) : ''}
 ${c.rest ? section('Guidance', `<div class="prose">${markdown(c.rest)}</div>`) : ''}
 ${section('Source', sources.map(([name, src]) => `<div class="source"><h3 class="t-caption">${name}</h3><pre class="surface code"><code>${escapeHtml(src)}</code></pre></div>`).join(''))}`));
 }
 
-console.log(`build: ${components.length} components → ${out}`);
+console.log(`build: ${components.length} components, ${patterns.length} patterns → ${out}`);
