@@ -232,6 +232,9 @@ rules.
 | Button | an action needs a control — the pill, or the quiet text treatment for infrequent actions | `components/button/` |
 | Toggle chip | several filters can be on at once | `components/chip/` |
 | Range slider | a continuous value, set by drag or keyboard | `components/slider/` |
+| Segmented control | one choice out of a few, always visible — a view switch, a denominator, the page nav | `components/segmented/` |
+| Tooltip | a detail worth having but not worth printing — inline, dropped on click, or announced by the cursor pill | `components/tooltip/` |
+| Toast | an action finished somewhere the result can't be seen — copied, saved, sent | `components/toast/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
@@ -372,12 +375,12 @@ indicator's hover preview all exist so the resting page can stay quiet.
   Expanding tooltip use is the cheapest way to cut mono out of the resting
   page without losing it from the system.
 - **Grow it from where it belongs.** `transform: scale(0)` → `scale(1)` over
-  `350ms` with the ease-out curve, and set `transform-origin` to the thing it
+  `--duration-pop` (350ms) with the ease-out curve, and set `transform-origin` to the thing it
   explains — the click point, the button it confirms, the mark it labels.
   A tooltip that fades in place reads as a layer; one that grows from a point
   reads as that point speaking.
 - **Then reveal the text.** `clip-path: inset(0 100% 0 0)` → `inset(0)` over
-  `550ms`, starting once the box has finished scaling. Wiping beats fading
+  `--duration-reveal` (550ms), starting once the box has finished scaling. Wiping beats fading
   and survives wrapped lines, which a width transition doesn't.
 - **Hover is mandatory, and the bias is toward more of it.** Every interactive element — buttons, pills, selects, segments, chips, table rows, links, toggles — responds on hover: lift for buttons and surfaces, ink-brighten for text and rows, fill-deepening for chips and segments. A control with no hover response is a defect, not a minimalism choice. A hidden layer crossfades through a 6px blur.
 - Hover-only information still needs a non-hover path: a tooltip on a chart

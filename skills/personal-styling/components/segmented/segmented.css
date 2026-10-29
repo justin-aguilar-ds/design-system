@@ -1,0 +1,58 @@
+/* personal-styling · segmented · v0.1.0 */
+
+/* One truth at a time. The frame is the one surface style plus the rest
+   shadow, and lifts on hover like a button. Default metrics land on the
+   height of a button in the same type: 4px frame padding + option
+   (line-height + 2 × 4px) + 4px + 2px border. With .t-control that is
+   18 + 18 = 36px, the same as a compact pill; with .t-label, 37px. */
+.segmented {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-rest);
+  transition: box-shadow var(--duration-deliberate) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .segmented:hover { box-shadow: var(--shadow-lift); }
+}
+
+/* The selected fill is its own element behind the options, positioned by
+   segmented.js, so it can glide between them and preview on hover.
+   Layout properties, not transform: the box is tiny and moves only on an
+   occasional hover, and a non-uniform scaleX would distort its radius
+   when the options differ in width. */
+.segmented-indicator {
+  position: absolute;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-subtle);
+  pointer-events: none;
+  transition:
+    left var(--duration-deliberate) var(--ease-out),
+    top var(--duration-deliberate) var(--ease-out),
+    width var(--duration-deliberate) var(--ease-out),
+    height var(--duration-deliberate) var(--ease-out);
+}
+
+/* Options sit at 30% until indicated — the de-emphasis opacity for an
+   inactive label beside an active one. Full ink, never the accent. */
+.segmented-option {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-16);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  white-space: nowrap;
+  opacity: var(--opacity-label-inactive);
+  transition: opacity var(--duration-deliberate) ease;
+}
+.segmented-option.is-indicated,
+.segmented-option:focus-visible { opacity: 1; }
+
+/* The page nav (Design / Music): the same control at nav size. */
+.segmented--nav .segmented-option { padding: var(--space-16) var(--space-24); }

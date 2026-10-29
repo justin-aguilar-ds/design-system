@@ -1,0 +1,81 @@
+/* personal-styling · tooltip · v0.1.0 */
+
+/* ---- Inline information: the value itself is the trigger. ---- */
+.tooltip-trigger {
+  color: inherit;
+  transition: color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tooltip-trigger:hover { color: var(--color-text); }
+}
+
+/* ---- The tooltip. One surface style, hairline only — it can't be
+   hovered, so no shadow. It grows from the point it explains:
+   transform-origin is the corner anchored to that point. ---- */
+.tooltip {
+  position: fixed;
+  z-index: 60;
+  max-width: 280px;             /* long copy wraps instead of running edge to edge */
+  padding: var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  pointer-events: none;
+  transform-origin: bottom left;
+  transform: scale(0);
+  transition: transform var(--duration-pop) var(--ease-out);
+}
+.tooltip.is-below { transform-origin: top left; }
+.tooltip.is-visible { transform: scale(1); }
+
+/* Text starts clipped and wipes left to right once the box has scaled in.
+   clip-path, not width, so it survives wrapped lines. */
+.tooltip-text {
+  margin: 0;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--duration-reveal) var(--ease-out);
+}
+.tooltip.is-text-visible .tooltip-text { clip-path: inset(0); }
+
+/* ---- Click-to-drop target. ---- */
+.tooltip-frame { display: block; width: 100%; }
+
+/* ---- Cursor pill: replaces the native cursor over [data-cursor].
+   The outer box follows the pointer with no transition; only the inner
+   pill's scale animates. ---- */
+.cursor-pill {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  pointer-events: none;
+  will-change: transform;
+}
+/* The one documented exception to mono tracking: −0.25px and full ink,
+   because it has to read at pointer speed. The one blurred element. */
+.cursor-pill-inner {
+  display: flex;
+  padding: var(--space-8) var(--space-16);
+  background: var(--color-glass);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  -webkit-backdrop-filter: blur(var(--blur-surface));
+  backdrop-filter: blur(var(--blur-surface));
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: -0.25px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--color-text);
+  white-space: nowrap;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.cursor-pill.is-visible .cursor-pill-inner { transform: translate(-50%, -50%) scale(1); }
+
+@media (hover: hover) and (pointer: fine) {
+  [data-cursor] { cursor: none; }
+  /* A tooltip is open: the next click closes it, so drop the invitation. */
+  [data-cursor].has-tooltip { cursor: default; }
+}

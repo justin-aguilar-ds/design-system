@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.4
+   Personal styling tokens — v0.5
    Extracted from Projects/portfolio, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -73,6 +73,9 @@ img, video, svg { display: block; max-width: 100%; }
   --duration-deliberate: 450ms; /* nav */
   --duration-entrance: 500ms;
   --duration-slow: 800ms;       /* full-surface takeovers */
+  /* NEW (v0.5): the tooltip's two beats, from the portfolio's design.css. */
+  --duration-pop: 350ms;        /* a small surface scaling in from its origin */
+  --duration-reveal: 550ms;     /* clip-path text wipe, after the pop */
 
   /* SURFACES */
   --radius-card: 20px;
@@ -81,6 +84,9 @@ img, video, svg { display: block; max-width: 100%; }
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */
   --blur-surface: 20px;
+  /* NEW (v0.5): the 50% fill under --blur-surface. Used once, on the
+     cursor pill — a garnish, not a theme. */
+  --color-glass: rgba(255, 255, 255, 0.5);
 
   /* DE-EMPHASIS */
   --opacity-inactive: 0.2;
@@ -225,6 +231,7 @@ body {
     --color-divider: rgba(255, 255, 255, 0.1);
     --color-accent-soft: rgba(252, 255, 40, 0.28);
     --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+    --color-glass: rgba(0, 0, 0, 0.5);
     --color-range-track: rgba(255, 255, 255, 0.24);
     --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
     --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
@@ -243,6 +250,7 @@ body {
   --color-divider: rgba(255, 255, 255, 0.1);
   --color-accent-soft: rgba(252, 255, 40, 0.28);
   --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+  --color-glass: rgba(0, 0, 0, 0.5);
   --color-range-track: rgba(255, 255, 255, 0.24);
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);

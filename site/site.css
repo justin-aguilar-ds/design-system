@@ -115,3 +115,10 @@ body { min-height: 100vh; }
 @media (max-width: 630px) {
   .component-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
 }
+
+/* Toast demos: room above the control for the toast to grow into. */
+.demo-toast-room { padding-top: var(--space-48); }
+
+/* Several examples in one shipped file stack with field spacing. */
+.demo > * + * { margin-top: var(--space-16); }
+.demo:has(> .toast-anchor) { padding-top: var(--space-48); }

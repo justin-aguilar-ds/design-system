@@ -1,0 +1,30 @@
+# Tooltip
+
+A detail worth having but not worth printing: inline information on a value, a tooltip dropped where you click, and the cursor pill that invites the click.
+
+From the portfolio's "Learn more" carousel (`.frame-tooltip`, `.hover-cursor`, `js/hover-cursor.js`, `js/carousel.js`).
+
+## Rules
+
+- **Default to a hover reveal over permanent secondary text.** A precise figure behind a rounded one, a full timestamp behind "Yest.", a definition, the arithmetic behind a total.
+- **The tooltip is the one place mono is unreservedly right.** `.t-mono` on one surface with the hairline and a `20px` radius. No shadow — nothing hovers it.
+- **It grows from the point it explains.** `scale(0)` → `scale(1)` over `--duration-pop` (350ms) on `--ease-out`, with `transform-origin` on the anchored corner: the click point for a dropped tooltip, the trigger for inline information.
+- **Then the text wipes in.** `clip-path: inset(0 100% 0 0)` → `inset(0)` over `--duration-reveal` (550ms), starting once the box has finished scaling.
+- **Closing reverses only the scale.** The text stays revealed until the box has shrunk away.
+- **The cursor pill:** uppercase mono at −0.25px and full ink, over a 50% fill with a 20px backdrop blur. It's the only blurred element on a page. Its position tracks the pointer instantly; only its scale animates.
+- **Hover is an upgrade, never the only route.** Inline triggers open on focus and on tap. Dropped tooltips open from the keyboard. Escape closes either.
+- One tooltip at a time.
+
+## Use
+
+- **Inline:** `<button class="tooltip-trigger" type="button" data-tooltip="…">value</button>`. It inherits the surrounding text and brightens to full ink on hover. It opens on hover, focus or tap, and appears above the trigger, or below if there's no room.
+- **Dropped:** `data-tooltip-drop="…"` on a `<button>` wrapping the media. A click drops the tooltip with its bottom-left corner at the pointer, and the next click anywhere closes it. From the keyboard it drops at the centre.
+- **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the portfolio pattern. The pill hides while that element's tooltip is open.
+- Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
+
+## Changes from the portfolio
+
+- Hairline is `--color-hairline` (`#ececec`), not `#f8f8f8`.
+- Cursor pill padding is 8 / 16px, not 8 / 12px, to stay on the scale.
+- Inline information is new. The portfolio only had the dropped tooltip. It uses the same surface and motion, anchored to the trigger.
+- Keyboard and touch paths are new. The portfolio's tooltip was mouse and tap on the carousel only.
