@@ -1,0 +1,115 @@
+/* personal-styling · picker · v0.1.0 */
+
+/* A select is a button with a chevron — nothing else distinguishes it.
+   The trigger is the Button component (.button .surface .surface--rest
+   .surface--pill plus .t-label or .t-control), so height, padding,
+   shadow and hover lift all match the buttons beside it. */
+.picker-field {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+}
+.picker {
+  position: relative;
+  display: inline-flex;
+}
+.picker-trigger { justify-content: space-between; }
+.picker.is-placeholder .picker-value { color: var(--color-text-secondary); }
+
+/* The chevron is the only distinguishing mark. It turns with the menu,
+   on the enter/exit curve, because it moves with something entering. */
+.picker-chevron {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.picker.is-open .picker-chevron { transform: rotate(180deg); }
+
+/* The menu: the one surface style, hairline only like the tooltip and
+   toast — it can't be hovered as a whole, so no shadow. It is a larger
+   surface than a tooltip, so it scales from 0.95 with opacity rather
+   than from 0, and it grows from the trigger: transform-origin is the
+   corner nearest it. */
+.picker-menu {
+  position: absolute;
+  top: calc(100% + var(--space-8));
+  left: 0;
+  z-index: 40;
+  min-width: 100%;
+  max-height: 320px;            /* about nine options, then it scrolls */
+  overflow-y: auto;
+  padding: var(--space-4);      /* the segmented control's frame padding */
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  transform-origin: top left;
+  transform: scale(var(--scale-enter));
+  opacity: 0;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+.picker.is-above .picker-menu {
+  top: auto;
+  bottom: calc(100% + var(--space-8));
+  transform-origin: bottom left;
+}
+.picker.is-open .picker-menu {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.picker-list {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Focus lives on the list; the fill on the active option is the focus
+   indicator, so the list draws no outline of its own. */
+.picker-list:focus-visible { outline: none; }
+
+/* Options: Interactive type, secondary until indicated or selected.
+   Same padding as a compact button, so an option is a button's height. */
+.picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--duration-base) ease;
+}
+.picker-option.is-indicated,
+.picker-option[aria-selected="true"] { color: var(--color-text); }
+/* State without colour: the selected option carries a check. The empty
+   alt text keeps screen readers on aria-selected instead. */
+.picker-option[aria-selected="true"]::after { content: "✓" / ""; }
+.picker-option[aria-disabled="true"] {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}
+
+/* The fill: the segmented control's indicator inside the menu. It rests
+   on the selected option when the menu opens and glides to whatever the
+   pointer or arrow keys reach. Options are dense, so --duration-base. */
+.picker-fill {
+  position: absolute;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-subtle);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    left var(--duration-base) var(--ease-out),
+    top var(--duration-base) var(--ease-out),
+    width var(--duration-base) var(--ease-out),
+    height var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) ease;
+}
+.picker-menu.has-fill .picker-fill { opacity: 1; }

@@ -235,6 +235,7 @@ rules.
 | Tooltip | a detail worth having but not worth printing — inline, dropped on click, or announced by the cursor pill | `components/tooltip/` |
 | Toast | an action finished somewhere the result can't be seen — copied, saved, sent | `components/toast/` |
 | Table | rows of records — any list with more than one value per row | `components/table/` |
+| Picker | one choice from a list too long to show at once — a select menu | `components/picker/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
@@ -250,22 +251,6 @@ For tools and data artifacts that open with a large title and a short explanatio
 - Put the primary control UI immediately below the intro, second in the page hierarchy. Wrap the controls in the one rounded surface style and add the rest shadow for persistent elevation; this control panel is the exception to the hover-only shadow rule.
 - Make the entire control-panel heading row the accordion trigger. Keep the chevron at the far edge, preserve `aria-expanded` / `aria-controls`, and collapse the body without removing the heading.
 - The control-panel title uses `.t-mono` as a deliberate exception to the rule against mono control labels. Keep it terse and singular; field labels and control names inside the panel remain Label or Interactive.
-
-### Select / dropdown
-
-A select is a button with a chevron — nothing else distinguishes it.
-
-- Same height, same font (Label or Interactive), same padding, same pill
-  shape, same rest shadow as a button. A dropdown that looks smaller,
-  lighter or flatter than the buttons beside it is a defect.
-- The chevron is the only distinguishing mark. Draw it custom; never ship
-  the native select chrome.
-- The open list follows the surface rules: white fill, hairline, `20px`
-  radius, options in Interactive type, the selected option in
-  `--color-fill-subtle`.
-- Segmented controls (a denominator toggle, league pills) follow the same
-  metrics: button height, button font, button padding.
-
 
 ### Links, focus, disabled
 

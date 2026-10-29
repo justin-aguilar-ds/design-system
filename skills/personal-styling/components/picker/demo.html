@@ -1,0 +1,75 @@
+<div class="demo-grid">
+  <div class="demo-cell">
+    <p class="t-caption">Rest</p>
+    <div class="picker">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Range">
+        <span class="picker-value">Last 7 days</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Hover</p>
+    <div class="picker">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control force-hover" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Range">
+        <span class="picker-value">Last 7 days</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Focus</p>
+    <div class="picker">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control force-focus" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Range">
+        <span class="picker-value">Last 7 days</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Placeholder</p>
+    <div class="picker">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="demo-owner" aria-label="Owner">
+        <span class="picker-value">Choose an owner</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="picker-menu" hidden>
+        <ul class="picker-list" id="demo-owner" role="listbox" tabindex="-1" aria-label="Owner">
+          <li class="picker-option t-control" role="option" aria-selected="false">Design</li>
+          <li class="picker-option t-control" role="option" aria-selected="false">Engineering</li>
+          <li class="picker-option t-control" role="option" aria-selected="false">Research</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Disabled</p>
+    <div class="picker">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Range" disabled>
+        <span class="picker-value">Last 7 days</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-picker-room">
+    <p class="t-caption">Open — the fill rests on the selected option</p>
+    <div class="button-row">
+      <div class="picker is-open">
+        <button class="picker-trigger button surface surface--rest surface--pill t-label" type="button" aria-haspopup="listbox" aria-expanded="true" aria-controls="demo-range" aria-label="Range">
+          <span class="picker-value">Last 30 days</span>
+          <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="picker-menu">
+          <ul class="picker-list" id="demo-range" role="listbox" tabindex="-1" aria-label="Range">
+            <li class="picker-option t-control" role="option" aria-selected="false">Today</li>
+            <li class="picker-option t-control" role="option" aria-selected="false">Last 7 days</li>
+            <li class="picker-option t-control" role="option" aria-selected="true">Last 30 days</li>
+            <li class="picker-option t-control" role="option" aria-selected="false">This quarter</li>
+            <li class="picker-option t-control" role="option" aria-selected="false" aria-disabled="true">Custom range</li>
+          </ul>
+        </div>
+      </div>
+      <button class="button surface surface--rest surface--pill t-label" type="button">Export</button>
+    </div>
+  </div>
+</div>

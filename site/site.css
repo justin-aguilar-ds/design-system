@@ -108,3 +108,6 @@ body { min-height: 100vh; }
 /* Several examples in one shipped file stack with field spacing. */
 .demo > * + * { margin-top: var(--space-16); }
 .demo:has(> .toast-anchor) { padding-top: var(--space-48); }
+
+/* Picker demos: room below the open menu. */
+.demo-picker-room { min-height: 280px; }
