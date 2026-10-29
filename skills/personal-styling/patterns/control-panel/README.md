@@ -19,9 +19,11 @@ Requires: accordion, segmented, picker, chip, slider, button
 
 `.control-panel--docked` puts the panel beside the content instead of above it. Use it when the controls stay in use while the content scrolls, or for a long page's contents list.
 
-- **On the page, not a card.** A `280px` column (the tooltip's width), a `1px` divider on its content side, no surface, no shadow. It stays in view while the page scrolls, the page inset from the top.
+- **Docking changes where it sits, not what it is.** The same surface, persistent shadow, mono title and pill-to-card corner as the panel above a tool — so it reads as the control layer, not as part of the content beside it.
+- **A `280px` column** (the tooltip's width), `24px` from the content — a card's distance. It stays in view while the page scrolls, the page inset from the top.
 - **Wrap the content and the panel in `.control-dock`.** The content takes the room; the panel takes the column. Fields inside stack in one column.
-- **On narrow screens it floats bottom right**, the page inset from both edges, as a pill only as wide as its label. Tapping it grows it upward into a card — the panel's surface, persistent shadow and pill-to-card corner — and the chevron points up while closed, because that's the way it opens. Start it closed there with `data-closed-below="630"` on the accordion item.
+- **Keep its content shorter than the screen.** On wide screens it doesn't scroll inside itself, so a picker menu in it can open past its edge.
+- **On narrow screens it floats bottom right**, the page inset from both edges, as a pill only as wide as its label. Tapping it grows it upward into a card, and the chevron points up while closed, because that's the way it opens. Start it closed there with `data-closed-below="630"` on the accordion item.
 - **A contents list is a segmented list** (`.segmented--list`) inside a docked panel: one section is current at a time, so it takes the gliding fill, not an ink change.
 - Open by default. Collapse it when the controls are set-and-forget and the content needs the room.
 
@@ -30,6 +32,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.5.0
+
+- The docked panel is a surface with the persistent shadow, like the panel above a tool, instead of sitting on the page with a divider. It sits `24px` from the content.
 
 ## Changes in v0.4.0
 
