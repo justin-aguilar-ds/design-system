@@ -173,7 +173,7 @@ const section = (heading, content) => `<section class="site-section"><h2 class="
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
 <div class="site-intro">
   <h1 class="t-display">Personal styling</h1>
-  <p class="t-body measure">Every component in the library, rendered from the files the skill ships. Change a component in the skill, rebuild, and it changes here.</p>
+  <p class="t-body">Every component in the library, rendered from the files the skill ships. Change a component in the skill, rebuild, and it changes here.</p>
 </div>
 <ul class="component-list">
 ${components.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span class="t-label">${inline(c.title)}</span><span class="t-body component-summary">${inline(c.summary)}</span></a></li>`).join('\n')}
@@ -183,20 +183,20 @@ const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, ''
 writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
 <div class="site-intro">
   <h1 class="t-display">Rules</h1>
-  <p class="t-body measure">The full skill, as an agent reads it.</p>
+  <p class="t-body">The full skill, as an agent reads it.</p>
 </div>
-<div class="prose measure">${markdown(skillBody)}</div>`));
+<div class="prose">${markdown(skillBody)}</div>`));
 
 for (const c of components) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 <div class="site-intro">
   <h1 class="t-display">${inline(c.title)}</h1>
-  <p class="t-body measure">${inline(c.summary)}</p>
+  <p class="t-body">${inline(c.summary)}</p>
 </div>
 ${c.html ? section('As shipped', `<div class="surface demo">${c.html}</div>`) : ''}
 ${c.demo ? section('States', `<div class="surface demo">${c.demo}</div>`) : ''}
-${c.rest ? section('Guidance', `<div class="prose measure">${markdown(c.rest)}</div>`) : ''}
+${c.rest ? section('Guidance', `<div class="prose">${markdown(c.rest)}</div>`) : ''}
 ${section('Source', sources.map(([name, src]) => `<div class="source"><h3 class="t-caption">${name}</h3><pre class="surface code"><code>${escapeHtml(src)}</code></pre></div>`).join(''))}`));
 }
 

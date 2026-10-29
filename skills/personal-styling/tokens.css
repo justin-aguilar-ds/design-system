@@ -26,9 +26,8 @@ img, video, svg { display: block; max-width: 100%; }
 
   /* WIDTH — NEW. The source never needed one (every page is a fixed
      viewport with no scrolling body). 1280px is the industry-standard
-     ceiling; 890px is the source's prose measure, kept. */
+     ceiling. CHANGED (v0.5): the 890px prose measure is removed. */
   --container: 1280px;
-  --measure: 890px;
 
   /* COLOUR */
   --color-text: #000000;
@@ -143,7 +142,6 @@ body {
 /* ---- Width. Container is the default; full-bleed suits a single
    centred object. ---- */
 .container { max-width: var(--container); margin-left: auto; margin-right: auto; }
-.measure   { max-width: var(--measure); }
 
 /* ---- There is exactly ONE surface style, and a surface is for CONTENT:
    an image, a chart, a live demo, a real card. A list is not content —

@@ -138,7 +138,6 @@ mono's 10.5px. When in doubt, raise the ink, not the size.
 - **Rule of thumb: a number is often mono, a word almost never is.** If the mono text you're about to write is a phrase, it belongs in Caption or Label.
 - **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Reserve the one UI-heading exception for the title inside a collapsible control panel. Budget mono like the accent: if a view is speckled with small caps, cut it back.
 - The one exception the source documents is a **label under the cursor** — the hover-cursor pill is `-0.25px` and full black, because it has to read instantly at pointer speed.
-- Copy column maxes at `890px`, and that's the only measure constraint.
 
 ## Space & layout
 
@@ -149,7 +148,7 @@ mono's 10.5px. When in doubt, raise the ink, not the size.
   - `24` — the page inset, on all four sides, and card to card.
   - `48` — section to section.
 - **`24px` is the page inset**, top/right/bottom/left, for everything pinned to an edge.
-- **Cap reading content at `1280px` and centre it.** `890px` stays the prose measure *inside* it.
+- **Cap reading content at `1280px` and centre it.**
 - **Layout is binary per surface.** Centred at a max-width (reading surfaces) *or* full-width with the `24px` page inset (data-dense tools, wide tables). A surface that is neither — content that looks centred but isn't constrained, a wide table floating in an unconstrained frame — is a defect. Pick one and hold it; never let a container drift between the two.
 - **Derived positions are written as `calc()` with a comment explaining the arithmetic**, never as a hardcoded magic number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
 - Layout is **fixed-position chrome over a full-viewport content layer**, not a document that scrolls. `height: 100vh; overflow: hidden` on the page, content pinned to the edges, the middle given over to the main object.
