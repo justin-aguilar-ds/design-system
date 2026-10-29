@@ -16,6 +16,7 @@ A continuous value set by drag or keyboard, drawn like a compact segmented contr
 | Dragging, arrow keys | full ink |
 
 - **It comes in fast and leaves slower.** In on `--duration-fast`, because it answers a hand; out on `--duration-base`. Both plain `ease`: it's a colour change, not something entering the screen.
+- **The thumb presses in.** While the slider is held — dragged, or an arrow key down — the thumb scales to `--scale-press` (0.85), about 10px. It goes in on `--duration-fast` and springs back on `--duration-base`, on `--ease-out`, in step with the fill. Its position never transitions; only its scale does.
 - Only the fill's opacity transitions. Its width tracks the value immediately, so the control feels connected to the pointer.
 - **Spacing is measured from the visible track.** The 44px hit area hangs outside the slider's layout box, so the label sits `8px` above the track, on the scale.
 - **Touch target vs. visual size:** the track is `16px`, the hit area is `44px` tall with the track centred in it. A restyle that shrinks the hit area makes dragging harder on touch devices.
@@ -27,6 +28,10 @@ A continuous value set by drag or keyboard, drawn like a compact segmented contr
 - Copy the whole `.slider-field`. Give every input a unique `id` and point the `<label for>` and `<output for>` at it.
 - The value readout is optional. Delete the `<output>` if the value isn't worth printing.
 - `slider.js` sets `--slider-pct` and toggles `.is-active`. Load it after the markup.
+
+## Changes in v0.3.0
+
+- The thumb scales down to `--scale-press` while held, for a sense of touch.
 
 ## Changes in v0.2.0
 

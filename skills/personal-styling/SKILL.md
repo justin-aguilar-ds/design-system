@@ -317,6 +317,7 @@ the values and leave the vocabulary alone.
 
 - **Scale-in from `0`** for small things that pop (pills, tooltips, toasts) with a chosen `transform-origin` — a tooltip grows from the corner you clicked, a toast from the button it confirms.
 - **Scale-in from `0.95`** for large surfaces, paired with opacity.
+- **Press scales down — handles only.** A handle under a finger or a held key (a slider thumb, a drag handle) scales to `--scale-press` (0.85) while held: in on `fast`, back on `base`, on `--ease-out`. It's the tactile counterpart to the tooltip's scale-in. Buttons don't press; they lift.
 - **Blur as a crossfade bridge**: a flat opacity crossfade reads flat however you tune it. A hover reveal is `opacity 0→1` + `scale 1.015→1` + `blur(6px)→0` over `300ms` plain `ease`.
 - **Clip-path reveals text**, not width: `clip-path: inset(0 100% 0 0)` → `inset(0)` wipes left-to-right and works across wrapped lines.
 - **Stagger with JS, not `transition-delay`** when it should only apply on entrance — a CSS delay applies symmetrically and makes the close sequence run backwards. ~100ms is the stagger.

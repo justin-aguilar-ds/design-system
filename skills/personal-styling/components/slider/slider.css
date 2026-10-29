@@ -1,4 +1,4 @@
-/* personal-styling · slider · v0.2.0 */
+/* personal-styling · slider · v0.3.0 */
 
 .slider-field {
   display: grid;
@@ -116,6 +116,7 @@
   border-radius: var(--radius-pill);
   background: var(--color-range-thumb);
   box-shadow: var(--shadow-range-thumb);
+  transition: transform var(--duration-base) var(--ease-out);
 }
 .slider-input::-moz-range-track {
   height: 44px;
@@ -128,4 +129,18 @@
   border-radius: var(--radius-pill);
   background: var(--color-range-thumb);
   box-shadow: var(--shadow-range-thumb);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+/* Tactility: while the slider is held — dragged, or an arrow key down —
+   the thumb presses in to --scale-press, its shadow shrinking with it.
+   Same timing as the fill, so the two move as one: in on --duration-fast,
+   back on --duration-base, on the ease-out curve the tooltip scales on. */
+.slider.is-active .slider-input::-webkit-slider-thumb {
+  transform: scale(var(--scale-press));
+  transition-duration: var(--duration-fast);
+}
+.slider.is-active .slider-input::-moz-range-thumb {
+  transform: scale(var(--scale-press));
+  transition-duration: var(--duration-fast);
 }

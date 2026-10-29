@@ -94,6 +94,9 @@ img, video, svg { display: block; max-width: 100%; }
   --opacity-label-inactive: 0.3;
   --scale-inactive: 0.8;
   --scale-enter: 0.95;
+  /* NEW (v0.5): tactility — a handle under a pressing finger or held key
+     scales down this far. Handles only; buttons lift instead. */
+  --scale-press: 0.85;
 }
 
 :focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
