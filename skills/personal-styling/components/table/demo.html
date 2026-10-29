@@ -1,0 +1,53 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Hover — second row forced</p>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Delivery</th><th scope="col">Status</th><th scope="col" class="table-num">Latency</th><th scope="col">Last attempt</th></tr></thead>
+        <tbody>
+          <tr><td>DLV-20931</td><td>✓ Delivered</td><td class="table-num">182 ms</td><td>Oct 29, 14:02</td></tr>
+          <tr class="force-hover"><td>DLV-20930</td><td class="table-ink">! Retrying</td><td class="table-num">4,210 ms</td><td>Oct 29, 13:58</td></tr>
+          <tr><td>DLV-20929</td><td class="table-ink">✗ Failed</td><td class="table-num">–</td><td>Oct 29, 13:41</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Row links — the whole row is the hit area; tab to see the focus</p>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Endpoint</th><th scope="col" class="table-num">Deliveries</th><th scope="col" class="table-num">Failure rate</th></tr></thead>
+        <tbody>
+          <tr><td><a class="table-link" href="#">api.acme.dev/hooks</a></td><td class="table-num">12,804</td><td class="table-num">0.2%</td></tr>
+          <tr><td><a class="table-link force-focus" href="#">hooks.northwind.io</a></td><td class="table-num">3,117</td><td class="table-num table-ink">4.8%</td></tr>
+          <tr><td><a class="table-link" href="#">ingest.globex.com</a></td><td class="table-num">941</td><td class="table-num">1.1%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Sticky identifying column — scroll sideways</p>
+    <div class="table-wrap" style="max-width: 480px">
+      <table class="table table--sticky">
+        <thead><tr><th scope="col">Player</th><th scope="col" class="table-num">GP</th><th scope="col" class="table-num">PTS</th><th scope="col" class="table-num">REB</th><th scope="col" class="table-num">AST</th><th scope="col" class="table-num">STL</th><th scope="col" class="table-num">BLK</th><th scope="col" class="table-num">TOV</th><th scope="col" class="table-num">FG%</th></tr></thead>
+        <tbody>
+          <tr><td>J. Brunson</td><td class="table-num">68</td><td class="table-num">26.0</td><td class="table-num">2.9</td><td class="table-num">7.3</td><td class="table-num">0.9</td><td class="table-num">0.1</td><td class="table-num">2.4</td><td class="table-num">48.8</td></tr>
+          <tr><td>S. Gilgeous-Alexander</td><td class="table-num">76</td><td class="table-num">32.7</td><td class="table-num">5.0</td><td class="table-num">6.4</td><td class="table-num">1.7</td><td class="table-num">1.0</td><td class="table-num">2.4</td><td class="table-num">51.9</td></tr>
+          <tr><td>N. Jokić</td><td class="table-num">70</td><td class="table-num">29.6</td><td class="table-num">12.7</td><td class="table-num">10.2</td><td class="table-num">1.8</td><td class="table-num">0.6</td><td class="table-num">3.3</td><td class="table-num">57.6</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Verification — one size throughout</p>
+    <div class="table-wrap">
+      <table class="table table--uniform">
+        <thead><tr><th scope="col">Week</th><th scope="col" class="table-num">Player sum</th><th scope="col" class="table-num">Header total</th><th scope="col">Match</th></tr></thead>
+        <tbody>
+          <tr><td>Week 7</td><td class="table-num">1,284.5</td><td class="table-num">1,284.5</td><td>✓ Match</td></tr>
+          <tr><td>Week 8</td><td class="table-num">1,192.0</td><td class="table-num">1,196.0</td><td class="table-ink">✗ Off by 4.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

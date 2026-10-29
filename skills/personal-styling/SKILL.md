@@ -133,7 +133,7 @@ mono's 10.5px. When in doubt, raise the ink, not the size.
 - **Line-heights are px, and tight**: `16/19` (≈1.19), `14/18`, `56/64`. Not 1.5, not 1.6. Only mono uses a ratio (1.5).
 - **Flat hierarchy on purpose.** The intro paragraph and the career-timeline company names are the *same* 56px — there is no size step between them. Prefer flattening to adding a tier.
 - **Controls take the display family, never mono.** Two steps: **Label** (16/19, 600) for a primary action, **Interactive** (14/18, 600) for compact controls — segments, tabs, card actions. The one deliberate exception is the title inside a collapsible control panel: that title uses the mono label style so it reads as a quiet container label rather than a primary action.
-- **Mono is for values and identifiers, and nothing else**: a figure in a table, a tick on an axis, a timestamp, an ID, a hex code, a year range. Uppercase, `+0.3px`, secondary, 10.5px, weight 500. **Table content defaults to 10.5 mono** — tables do not inherit font sizes for mono; every data cell is 10.5 mono (see Tables). Weight is always 500.
+- **Mono is for values and identifiers, and nothing else**: a figure in a table, a tick on an axis, a timestamp, an ID, a hex code, a year range. Uppercase, `+0.3px`, secondary, 10.5px, weight 500. **Table content defaults to 10.5 mono** — tables do not inherit font sizes for mono; every data cell is 10.5 mono (see `components/table/`). Weight is always 500.
 - **Mono is always weight 500 — never bold.** Set the weight explicitly on the mono role so heading/title semantics, inherited control styles, and browser defaults can never promote it to 600 or 700. The collapsible control-panel title exception changes mono’s role, not its weight.
 - **Rule of thumb: a number is often mono, a word almost never is.** If the mono text you're about to write is a phrase, it belongs in Caption or Label.
 - **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Reserve the one UI-heading exception for the title inside a collapsible control panel. Budget mono like the accent: if a view is speckled with small caps, cut it back.
@@ -234,6 +234,7 @@ rules.
 | Segmented control | one choice out of a few, always visible — a view switch, a denominator, the page nav | `components/segmented/` |
 | Tooltip | a detail worth having but not worth printing — inline, dropped on click, or announced by the cursor pill | `components/tooltip/` |
 | Toast | an action finished somewhere the result can't be seen — copied, saved, sent | `components/toast/` |
+| Table | rows of records — any list with more than one value per row | `components/table/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
@@ -265,27 +266,6 @@ A select is a button with a chevron — nothing else distinguishes it.
 - Segmented controls (a denominator toggle, league pills) follow the same
   metrics: button height, button font, button padding.
 
-
-### Tables
-
-**A table is a list, so it sits on the page** — a heading, then the rows, with
-dividers. No card around it. A card around a table gives you two nested
-borders and a scroll container inside a rounded box, which is where the
-awkward negative-margin gutters come from.
-
-- Column headers: **Label** (16/19, 600, full ink) — never mono, never
-  uppercase. Left-aligned, `16px` bottom padding.
-- Row dividers: `1px solid var(--color-divider)`. No divider under the last
-  row, no vertical rules, no zebra striping.
-- Cells: `16px` vertical padding. **Table content defaults to 10.5 mono**: every data cell — values, figures, timestamps, IDs, statuses, supporting details — is 10.5 mono, weight 500. Tables do not inherit font sizes for mono. Value vs detail is distinguished by ink (full vs secondary), not size.
-- Column headers stay **Label** (16/19, 600, full ink) — they are labels, not content. The identifying column is also 10.5 mono; it carries full ink, and first-column position is what makes a row scannable.
-- **A verification table takes exactly one size**: 10.5 mono throughout, headers included. Reconciliation (player sums vs header) has no hierarchy to show, so the one-size rule wins over the headers-are-labels rule.
-- The identifying column (id, name) carries full ink; value vs detail inside a cell is ink (full vs secondary). That, not a bold weight or a size step, is what makes a row scannable.
-- Row hover: brighten the row label to full ink. No background change. Hover is mandatory on every row of an interactive table.
-- A sticky first column needs `position: sticky; left: 0` plus the surface
-  background, or the scrolled cells show through.
-- Wrap every table in `overflow-x: auto` and let it scroll rather than
-  shrinking the type.
 
 ### Links, focus, disabled
 

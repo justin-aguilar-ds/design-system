@@ -1,0 +1,95 @@
+/* personal-styling · table · v0.1.0 */
+
+/* A table is a list, so it sits on the page: no card, no outer border.
+   It fills its container and scrolls sideways rather than shrinking
+   the type. */
+.table-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Column headers are Label: 16/19, 600, full ink. Never mono. */
+.table th {
+  padding: 0 var(--space-24) var(--space-16) 0;
+  text-align: left;
+  vertical-align: bottom;
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: -0.1px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+/* Every data cell is 10.5 mono, set here rather than inherited.
+   Detail is secondary ink; value vs detail is ink, never size. */
+.table td {
+  padding: var(--space-16) var(--space-24) var(--space-16) 0;
+  vertical-align: top;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  transition: color var(--duration-fast) ease;
+}
+.table th:last-child,
+.table td:last-child { padding-right: 0; }
+
+/* Dividers between rows, including under the header row. None under
+   the last row, no vertical rules, no zebra. */
+.table tbody tr { border-top: 1px solid var(--color-divider); }
+
+/* The identifying column, and any value that must be read, take full ink.
+   The identifier stays on one line: a wide table scrolls instead. */
+.table td:first-child,
+.table .table-ink { color: var(--color-text); }
+.table td:first-child { white-space: nowrap; }
+
+/* Figures line up on the right; mono keeps the digits a fixed width. */
+.table .table-num { text-align: right; }
+
+/* Hover: the whole row brightens to full ink. No background change. */
+@media (hover: hover) and (pointer: fine) {
+  .table tbody tr:hover td { color: var(--color-text); }
+}
+
+/* ---- Row links: put .table-link on the anchor in the identifying cell
+   and the whole row becomes its hit area. The row carries the focus
+   outline. ---- */
+.table tbody tr:has(.table-link) { position: relative; }
+.table-link::after { content: ""; position: absolute; inset: 0; }
+.table-link:focus-visible { outline: none; }
+.table tbody tr:has(.table-link:focus-visible) {
+  outline: 2px solid var(--color-text);
+  outline-offset: -2px;         /* inside the row, so the scroll container doesn't clip it */
+}
+
+/* ---- Sticky identifying column, for wide tables. The page background
+   stops scrolled cells showing through. ---- */
+.table--sticky th:first-child,
+.table--sticky td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--color-bg);
+}
+
+/* ---- Verification table: one size throughout, headers included.
+   Reconciliation has no hierarchy to show. ---- */
+.table--uniform th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  text-transform: uppercase;
+}

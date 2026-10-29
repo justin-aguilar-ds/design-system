@@ -73,7 +73,7 @@ function markdown(src) {
       while (i < lines.length && lines[i].startsWith('|')) rows.push(lines[i++]);
       const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
       const [head, , ...body] = rows;
-      html.push(`<div class="table-wrap"><table><thead><tr>${cells(head).map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead>`
+      html.push(`<div class="table-wrap"><table class="table"><thead><tr>${cells(head).map((c) => `<th scope="col">${inline(c)}</th>`).join('')}</tr></thead>`
         + `<tbody>${body.map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
       continue;
     }
