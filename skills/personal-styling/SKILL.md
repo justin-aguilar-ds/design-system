@@ -265,7 +265,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Pattern | Reach for it when | Folder |
 |---|---|---|
 | Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
-| Control panel | a tool has controls that change the content beside or below them — or a long page needs a contents list | `patterns/control-panel/` |
+| Control panel | a tool has controls that change the content below them, or docked to the corner — or a long page needs a contents list | `patterns/control-panel/` |
 | Type pairs | two pieces of text need a hierarchy — a title and a line, a number and its name, a page's opening | `patterns/type-pairs/` |
 | Carousel | one piece of content at a time — projects, photos, videos — each with a caption | `patterns/carousel/` |
 

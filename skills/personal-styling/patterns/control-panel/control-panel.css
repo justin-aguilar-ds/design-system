@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.8.0 */
+/* personal-styling · control-panel · v0.9.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -48,71 +48,56 @@
 /* ================================================================
    Docked: the panel beside the content instead of above it — for a
    tool whose controls stay in use while the content scrolls, or a long
-   page's contents list. Wrap the content and the panel in .control-dock.
-   Docking changes where the panel sits, not what it is: the same
-   surface, persistent shadow, mono title and pill-to-card corner.
+   page's contents list. Docking changes where the panel sits, not what
+   it is: the same surface, persistent shadow, mono title and
+   pill-to-card corner.
    ================================================================ */
 
-/* The panel takes a 280px column — the tooltip's width, the system's
-   narrow measure — and the content takes the rest, a card's distance
-   away. */
-.control-dock {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: var(--space-24);
-  align-items: start;
-}
+/* CHANGED (v0.9): docked means docked to the corner, at every width —
+   never a second column. The content keeps the full page; the panel
+   floats bottom right, the page inset from both edges. Closed it's a pill
+   only as wide as its label; open, it grows upward into a 280px card (the
+   tooltip's width, the system's narrow measure). .control-dock stays as
+   the wrapper but no longer lays anything out. */
+.control-dock { display: block; }
 .control-dock > * { min-width: 0; }
 
-/* It stays in view while the page scrolls, the page inset from the top.
-   No overflow of its own, so a picker menu inside can open past its edge:
-   keep a docked panel's content shorter than the screen. */
 .control-panel--docked {
-  position: sticky;
-  top: var(--space-page);
+  position: fixed;
+  right: var(--space-page);
+  bottom: var(--space-page);
+  z-index: 30;
+  width: min(280px, calc(100vw - 2 * var(--space-page)));
+  max-width: calc(100vw - 2 * var(--space-page));
+  /* Width is a layout property; it animates here because the pill and
+     the card are one shape changing — label-wide to column-wide — on the
+     same duration and curve as the height and the corner. Browsers
+     without interpolate-size snap the width and still morph the rest. */
+  interpolate-size: allow-keywords;
+  transition:
+    border-radius var(--duration-entrance) var(--ease-out),
+    width var(--duration-entrance) var(--ease-out);
 }
 /* One column: fields stack. */
 .control-panel--docked .control-panel-fields { grid-template-columns: minmax(0, 1fr); }
 /* A segmented list fills its field, so every option's fill is the same width. */
 .control-field:has(> .segmented--list) { justify-items: stretch; }
+/* Closed, the pill is only as wide as its label: the list inside is kept
+   out of the width calculation, so the heading row alone sizes it. */
+.control-panel--docked:has(> .accordion-item:not(.is-open)) { width: max-content; }
+.control-panel--docked .accordion-content { contain: inline-size; }
+/* It opens upward, so the chevron points up while closed. */
+.control-panel--docked .accordion-chevron { transform: rotate(180deg); }
+.control-panel--docked .accordion-item.is-open .accordion-chevron { transform: none; }
+/* It can be taller than the screen: the open card scrolls inside itself
+   rather than running off the top. */
+.control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
+.control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - var(--height-row)); } /* minus the heading row */
 
-/* Narrow screens: a floating pill, bottom right, the page inset from both
-   edges, only as wide as its label. Tapping it grows it upward into a
-   card — the box is anchored at the bottom, so its top rises. */
+/* A large button pins itself to the bottom edge on phones; the panel
+   rises 16px above it rather than covering it, and its open card is
+   shortened by the button and the gap. */
 @media (max-width: 630px) {
-  .control-dock { grid-template-columns: minmax(0, 1fr); }
-  .control-panel--docked {
-    position: fixed;
-    top: auto;
-    right: var(--space-page);
-    bottom: var(--space-page);
-    z-index: 30;
-    width: min(280px, calc(100vw - 2 * var(--space-page))); /* open: the docked column's width */
-    max-width: calc(100vw - 2 * var(--space-page));
-    /* Width is a layout property; it animates here because the pill and
-       the card are one shape changing — label-wide to column-wide — on the
-       same duration and curve as the height and the corner. Browsers
-       without interpolate-size snap the width and still morph the rest. */
-    interpolate-size: allow-keywords;
-    transition:
-      border-radius var(--duration-entrance) var(--ease-out),
-      width var(--duration-entrance) var(--ease-out);
-  }
-  /* Closed, the pill is only as wide as its label: the list inside is kept
-     out of the width calculation, so the heading row alone sizes it. */
-  .control-panel--docked:has(> .accordion-item:not(.is-open)) { width: max-content; }
-  .control-panel--docked .accordion-content { contain: inline-size; }
-  /* It opens upward, so the chevron points up while closed. */
-  .control-panel--docked .accordion-chevron { transform: rotate(180deg); }
-  .control-panel--docked .accordion-item.is-open .accordion-chevron { transform: none; }
-  /* Floating, it can be taller than the screen: the open card scrolls
-     inside itself rather than running off the top. */
-  .control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
-  .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - var(--height-row)); } /* minus the heading row */
-
-  /* A large button pins itself to the bottom edge on phones; the panel
-     rises 16px above it rather than covering it, and its open card is
-     shortened by the button and the gap. */
   body:has(.button--large) .control-panel--docked { bottom: calc(var(--space-page) + var(--height-row) + var(--space-16)); }
   body:has(.button--large) .control-panel--docked .accordion-content {
     max-height: calc(100vh - 2 * var(--space-page) - 2 * var(--height-row) - var(--space-16));

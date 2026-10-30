@@ -244,8 +244,8 @@ const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, ''
 const toc = [];
 const rulesHtml = markdown(skillBody, { shift: 0, toc });
 // The contents are a docked control panel holding a segmented list: one
-// section is current at a time, so it takes the gliding fill. Beside the
-// rules on wide screens; a pill bottom right on narrow ones.
+// section is current at a time, so it takes the gliding fill. Docked to
+// the bottom-right corner at every width.
 const contents = `<nav class="segmented segmented--list" aria-label="Sections">
       <span class="segmented-indicator" aria-hidden="true"></span>
       ${toc.map((h, i) => `<a class="segmented-option t-control${i === 0 ? ' is-active' : ''}" href="#${h.id}"${i === 0 ? ' aria-current="true"' : ''}>${h.text}</a>`).join('\n      ')}
