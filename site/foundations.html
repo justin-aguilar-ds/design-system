@@ -38,6 +38,18 @@
       <div class="type-pair"><span class="t-label">Selected fill</span><span class="t-caption">State only — never a container</span><span class="t-mono" data-token="--color-fill-subtle"></span></div>
     </li>
     <li class="swatch">
+      <div class="swatch-chip" style="background: var(--color-fill-quiet)"></div>
+      <div class="type-pair"><span class="t-label">Quiet fill</span><span class="t-caption">A secondary control's surface</span><span class="t-mono" data-token="--color-fill-quiet"></span></div>
+    </li>
+    <li class="swatch">
+      <div class="swatch-chip swatch-chip--accent" style="background: var(--color-gain-fill)"><span class="t-title">+0.35</span></div>
+      <div class="type-pair"><span class="t-label">Gain</span><span class="t-caption">Polarity only — good for the total</span><span class="t-mono" data-token="--color-gain-fill"></span></div>
+    </li>
+    <li class="swatch">
+      <div class="swatch-chip swatch-chip--accent" style="background: var(--color-loss-fill)"><span class="t-title">−0.17</span></div>
+      <div class="type-pair"><span class="t-label">Loss</span><span class="t-caption">Polarity only — bad for the total</span><span class="t-mono" data-token="--color-loss-fill"></span></div>
+    </li>
+    <li class="swatch">
       <div class="swatch-chip swatch-chip--accent" style="background: var(--color-accent)"><span class="t-title">Aa</span></div>
       <div class="type-pair"><span class="t-label">Accent</span><span class="t-caption">Attention only: one flag, a selection</span><span class="t-mono" data-token="--color-accent"></span></div>
     </li>
@@ -148,6 +160,35 @@
         </ul>
       </div>
       <div class="type-pair"><span class="t-label">A list is never a card</span><span class="t-caption">Rows sit on the page, divided</span></div>
+    </li>
+  </ul>
+</section>
+
+<section class="site-section">
+  <h2 class="t-label">Icons</h2>
+  <p class="t-body">Three sizes and one stroke. Outlined, round, in the current ink. An icon alone is a control, on the lifted surface or the quiet fill.</p>
+  <div class="icon-sizes">
+    <div class="icon-size">
+      <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="type-pair"><span class="t-label">Mark</span><span class="t-caption">Inside a control</span><span class="t-mono" data-token="--icon-mark"></span></div>
+    </div>
+    <div class="icon-size">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div class="type-pair"><span class="t-label">Inline</span><span class="t-caption">Beside text</span><span class="t-mono" data-token="--icon-inline"></span></div>
+    </div>
+    <div class="icon-size">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="type-pair"><span class="t-label">Control</span><span class="t-caption">In an icon button</span><span class="t-mono" data-token="--icon-control"></span></div>
+    </div>
+  </div>
+  <ul class="specimen-grid">
+    <li class="specimen">
+      <div class="specimen-stage"><span class="icon-button surface surface--rest surface--pill"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+      <div class="type-pair"><span class="t-label">Primary</span><span class="t-caption">The lifted surface — the control a screen leans on</span></div>
+    </li>
+    <li class="specimen">
+      <div class="specimen-stage"><span class="icon-button icon-button--secondary"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="15.5" cy="10" r="1.5" fill="currentColor"/></svg></span></div>
+      <div class="type-pair"><span class="t-label">Secondary</span><span class="t-caption">The quiet fill — no edge, no shadow</span></div>
     </li>
   </ul>
 </section>

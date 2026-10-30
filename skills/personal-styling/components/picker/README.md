@@ -34,3 +34,7 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | A letter | — | jumps to the first option that starts with it |
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
+
+## Changes in v0.3.0
+
+- Its glyph is sized by the icon tokens (`--icon-mark` / `--icon-inline`) instead of a fixed number.

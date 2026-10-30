@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.7.0 */
+/* personal-styling · table · v0.8.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It fills its container and scrolls sideways rather than shrinking
@@ -23,8 +23,12 @@
 }
 
 /* Column headers are Label: 16/19, 600, full ink. Never mono. */
+/* Cells take half the 24px column gap on each side, so a filled cell's
+   text sits 12px inside its fill instead of against its edge. The first
+   and last columns drop their outer half, so the table lines up with the
+   page. */
 .table th {
-  padding: 0 var(--space-24) var(--space-16) 0;
+  padding: 0 calc(var(--space-24) / 2) var(--space-16);
   text-align: left;
   vertical-align: bottom;
   font-family: var(--font-display);
@@ -39,7 +43,7 @@
 /* Every data cell is 10.5 mono, set here rather than inherited.
    Detail is secondary ink; value vs detail is ink, never size. */
 .table td {
-  padding: var(--space-16) var(--space-24) var(--space-16) 0;
+  padding: var(--space-16) calc(var(--space-24) / 2);
   vertical-align: top;
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -52,8 +56,25 @@
 }
 /* No padding at the outer edges: the first and last columns line up with
    the content above and below the table. */
+.table th:first-child,
+.table td:first-child { padding-left: 0; }
 .table th:last-child,
 .table td:last-child { padding-right: 0; }
+
+/* Polarity: gain and loss as soft tints on the cell, full-ink values on
+   top — the one colour exception, for data that is inherently good or
+   bad. Interior cells already keep 12px between text and fill; a filled
+   first or last cell extends its fill 12px into the table's gutter with a
+   same-coloured shadow, so its text stays aligned with the page. */
+.table .table-gain,
+.table .table-loss {
+  background: var(--cell-fill);
+  color: var(--color-text);
+}
+.table .table-gain { --cell-fill: var(--color-gain-fill); }
+.table .table-loss { --cell-fill: var(--color-loss-fill); }
+.table td:first-child:is(.table-gain, .table-loss) { box-shadow: calc(var(--space-24) / -2) 0 0 var(--cell-fill); }
+.table td:last-child:is(.table-gain, .table-loss) { box-shadow: calc(var(--space-24) / 2) 0 0 var(--cell-fill); }
 
 /* One size per cell. Whatever sits inside a cell — code, a link, an
    emphasis, a span — takes the cell's type exactly, so every row keeps one
@@ -166,3 +187,31 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+
+/* ---- Sortable columns. The whole header is the button; the arrow is a
+   10px mark beside the label. Unsorted, the arrow waits until the header is
+   hovered or focused; sorted, it stays at full ink and points the way the
+   column runs — down for descending, up for ascending. ---- */
+.table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);          /* label to icon */
+  color: inherit;
+  text-align: inherit;
+}
+/* In a right-aligned column the arrow leads, so the label still ends on
+   the same edge as the figures under it, sorted or not. */
+.table-num .table-sort { flex-direction: row-reverse; }
+.table-sort-icon {
+  flex: none;
+  width: var(--icon-mark);
+  height: var(--icon-mark);
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease, transform var(--duration-base) var(--ease-out);
+}
+.table th[aria-sort] .table-sort-icon { opacity: 1; }
+.table th[aria-sort="ascending"] .table-sort-icon { transform: rotate(180deg); }
+@media (hover: hover) and (pointer: fine) {
+  .table-sort:hover .table-sort-icon { opacity: 1; }
+}
+.table-sort:focus-visible .table-sort-icon { opacity: 1; }

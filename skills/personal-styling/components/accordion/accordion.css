@@ -1,4 +1,4 @@
-/* personal-styling · accordion · v0.3.0 */
+/* personal-styling · accordion · v0.4.0 */
 
 /* A set of sections is a list, so it sits on the page with dividers.
    Wrap it in a surface only when it is the control panel (see
@@ -24,8 +24,8 @@
    picker's chevron. It sits at secondary ink until hovered. */
 .accordion-chevron {
   flex: none;
-  width: 10px;
-  height: 10px;
+  width: var(--icon-mark);
+  height: var(--icon-mark);
   color: var(--color-text-secondary);
   transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
 }

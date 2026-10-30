@@ -258,3 +258,18 @@ body { min-height: 100vh; }
 @media (max-width: 630px) {
   .type-specimens li { grid-template-columns: minmax(0, 1fr); gap: var(--space-16); }
 }
+
+/* Icon button demo: a phone's top bar. */
+.demo-topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-16);
+  max-width: 390px;
+}
+.demo-topbar > .t-label { text-align: center; }
+
+/* Foundations: icon sizes side by side. */
+.icon-sizes { display: flex; align-items: flex-end; gap: var(--space-48); padding: var(--space-24) 0; }
+.icon-size { display: grid; justify-items: start; gap: var(--space-16); }
+.icon-size svg { color: var(--color-text); }

@@ -1,4 +1,4 @@
-/* personal-styling · artifact-intro · v0.2.0 */
+/* personal-styling · artifact-intro · v0.3.0 */
 
 /* The title is the only visible intro copy. The title row is a two-column
    grid: the heading takes the room, the info button sits in its own
@@ -28,8 +28,8 @@
 }
 .intro-info[aria-expanded="true"] { background: var(--color-fill-subtle); }
 .intro-info-glyph {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-inline);
+  height: var(--icon-inline);
 }
 
 /* The description is a toggled tooltip. It hangs 8px below the title row,

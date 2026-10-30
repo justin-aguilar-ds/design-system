@@ -1,4 +1,4 @@
-/* personal-styling · accordion · v0.3.0 */
+/* personal-styling · accordion · v0.4.0 */
 
 // Each trigger owns one panel. A closed panel is inert, so its controls
 // leave the tab order and the accessibility tree while collapsed.

@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.2.0 */
+/* personal-styling · picker · v0.3.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -20,8 +20,8 @@
    on the enter/exit curve, because it moves with something entering. */
 .picker-chevron {
   flex: none;
-  width: 10px;
-  height: 10px;
+  width: var(--icon-mark);
+  height: var(--icon-mark);
   transition: transform var(--duration-base) var(--ease-out);
 }
 .picker.is-open .picker-chevron { transform: rotate(180deg); }

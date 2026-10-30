@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.7.0 */
+/* personal-styling · table · v0.8.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
@@ -70,6 +70,38 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
   table.addEventListener('focusin', (event) => indicate(rowOf(event.target) || selected()));
   table.addEventListener('focusout', (event) => {
     if (!table.contains(event.relatedTarget)) indicate(selected());
+  });
+
+  // ---- Sorting: a .table-sort button in a header sorts by that column.
+  // Descending first, then ascending. Numbers compare as numbers ("4,210
+  // ms", "+0.35", "99.8%"); anything else compares as text. With
+  // data-sort="manual" on the table, only the header state and the
+  // table-sort event change, and the app reorders its own rows.
+  const toNumber = (text) => {
+    const n = parseFloat(text.replace(/\u2212/g, '-').replace(/[^0-9.+-]/g, '')); // − (minus sign) counts as -
+    return Number.isNaN(n) ? null : n;
+  };
+  table.querySelectorAll('.table-sort').forEach((button) => {
+    button.addEventListener('click', () => {
+      const th = button.closest('th');
+      const column = [...th.parentElement.children].indexOf(th);
+      const direction = th.getAttribute('aria-sort') === 'descending' ? 'ascending' : 'descending';
+      table.querySelectorAll('th[aria-sort]').forEach((other) => other.removeAttribute('aria-sort'));
+      th.setAttribute('aria-sort', direction);
+      if (table.dataset.sort !== 'manual') {
+        const body = table.tBodies[0];
+        const value = (row) => row.children[column]?.textContent.trim() ?? '';
+        const rows = [...body.rows].sort((a, b) => {
+          const x = value(a), y = value(b);
+          const nx = toNumber(x), ny = toNumber(y);
+          const order = nx !== null && ny !== null ? nx - ny : x.localeCompare(y);
+          return direction === 'ascending' ? order : -order;
+        });
+        body.append(...rows);
+        if (indicated) place(indicated);
+      }
+      table.dispatchEvent(new CustomEvent('table-sort', { bubbles: true, detail: { column, direction } }));
+    });
   });
 
   indicate(selected());

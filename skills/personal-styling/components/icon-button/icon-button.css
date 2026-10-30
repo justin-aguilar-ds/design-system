@@ -1,0 +1,56 @@
+/* personal-styling · icon-button · v0.1.0 */
+
+/* An icon alone as a control — back, more, share, close. A 40px circle:
+   the visual and the touch target, the same as the intro's info button.
+   The icon inside is --icon-control (20px), full ink. */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+}
+/* Large: the height of a large button and a collapsed control panel, for
+   a phone's top bar or beside a pinned action. */
+.icon-button--large {
+  width: var(--height-row);
+  height: var(--height-row);
+}
+
+/* Every icon: --icon-control by default, drawn on a viewBox of the same
+   size so its 1.5 stroke is 1.5px. */
+.icon {
+  flex: none;
+  width: var(--icon-control);
+  height: var(--icon-control);
+}
+
+/* Primary takes the button's surface — .surface .surface--rest
+   .surface--pill — so it carries the rest shadow and lifts on hover.
+   Secondary sits on the quiet fill: no edge, no shadow, and the fill
+   deepens on hover. */
+.icon-button--secondary {
+  background: var(--color-fill-quiet);
+  transition: background-color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .icon-button--secondary:hover { background: var(--color-fill-quiet-hover); }
+}
+
+.icon-button:disabled {
+  opacity: var(--opacity-label-inactive);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+/* Three classes deep so it beats .surface--rest:hover in tokens.css. */
+.icon-button.surface--rest:disabled { box-shadow: none; }
+
+/* A group of icon buttons: 8px apart, like a button cluster. */
+.icon-button-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}

@@ -1,4 +1,4 @@
-/* personal-styling · input · v0.1.0 */
+/* personal-styling · input · v0.2.0 */
 
 /* A field is its label, 8px, the input, then an optional message. The
    label sits above, never inside or beside, so every input is the same
@@ -70,8 +70,8 @@
 }
 .input-message.is-error { color: var(--color-text); }
 
-/* Search: a leading glyph inside the pill. The text starts after it:
-   16px inset + the 16px glyph + 8px, icon to text. */
+/* Search: a leading inline icon inside the pill. The text starts after
+   it: 16px inset + the icon + 8px, icon to text. */
 .input-wrap {
   position: relative;
   display: block;
@@ -79,13 +79,13 @@
 }
 .input-icon {
   position: absolute;
-  top: calc(50% - 8px);         /* the 16px glyph centred on the field */
+  top: calc(50% - var(--icon-inline) / 2); /* centred on the field */
   left: var(--space-16);
-  width: 16px;
-  height: 16px;
+  width: var(--icon-inline);
+  height: var(--icon-inline);
   color: var(--color-text-secondary);
   pointer-events: none;
 }
-.input-wrap--search .input { padding-left: calc(var(--space-16) + 16px + var(--space-8)); }
+.input-wrap--search .input { padding-left: calc(var(--space-16) + var(--icon-inline) + var(--space-8)); }
 .input::-webkit-search-decoration,
 .input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

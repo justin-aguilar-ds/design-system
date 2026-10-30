@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.5
+   Personal styling tokens — v0.6
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -60,6 +60,18 @@ img, video, svg { display: block; max-width: 100%; }
   --color-accent-ink: #000000;
   --color-accent-soft: rgba(252, 255, 40, 0.42);
 
+  /* NEW (v0.6): POLARITY — the one colour exception: gain and loss, as
+     soft tints on a cell with full-ink values on top. Never text, never
+     decoration, never a status badge. */
+  --color-gain-fill: rgba(52, 168, 83, 0.14);
+  --color-loss-fill: rgba(234, 67, 53, 0.12);
+
+  /* NEW (v0.6): the quiet fill — the surface of a secondary control, such
+     as a secondary icon button. Never a container and never state:
+     selection keeps --color-fill-subtle. */
+  --color-fill-quiet: rgba(0, 0, 0, 0.06);
+  --color-fill-quiet-hover: rgba(0, 0, 0, 0.1);
+
   /* TYPE — two families */
   --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
@@ -92,6 +104,12 @@ img, video, svg { display: block; max-width: 100%; }
   /* NEW (v0.5): the height of a one-row surface people act on at full size —
      a collapsed control panel, a large button — so the two always match. */
   --height-row: 50px;
+
+  /* NEW (v0.6): ICONS — three sizes and one stroke. Draw each icon with a
+     viewBox the same size as it renders, so a 1.5 stroke is 1.5px. */
+  --icon-mark: 10px;     /* a chevron or arrow inside a control, beside its label */
+  --icon-inline: 16px;   /* an icon beside text — in an input, a row, a link */
+  --icon-control: 20px;  /* the icon in an icon button */
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);   /* only if it lifts */
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */
@@ -247,6 +265,10 @@ body {
     --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
     --color-glass: rgba(0, 0, 0, 0.5);
     --color-range-track: rgba(255, 255, 255, 0.24);
+    --color-gain-fill: rgba(48, 209, 88, 0.2);
+    --color-loss-fill: rgba(255, 69, 58, 0.2);
+    --color-fill-quiet: rgba(255, 255, 255, 0.1);
+    --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
     --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
     --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
     --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
@@ -266,6 +288,10 @@ body {
   --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
   --color-glass: rgba(0, 0, 0, 0.5);
   --color-range-track: rgba(255, 255, 255, 0.24);
+  --color-gain-fill: rgba(48, 209, 88, 0.2);
+  --color-loss-fill: rgba(255, 69, 58, 0.2);
+  --color-fill-quiet: rgba(255, 255, 255, 0.1);
+  --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);

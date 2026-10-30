@@ -79,6 +79,7 @@ glance.
 - Only when the user explicitly asks for it, or when the data itself is a
   good/bad signal (impact on a total, a gain vs a loss). Never decoration,
   never branding, never a status badge.
+- The tints are `--color-gain-fill` and `--color-loss-fill`; in a table, `.table-gain` and `.table-loss`.
 - Fills, not text. Soft tints on the cell, full-ink values on top. Never
   coloured text on the ground.
 - The accent stays the attention colour. Polarity never replaces it, and
@@ -147,6 +148,13 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Three exceptions, and only three: the title inside a collapsible control panel, the tooltip, and the name above a figure in a type pair (`patterns/type-pairs/`) — a figure's name is closer to an axis label than a heading. Budget mono like the accent: if a view is speckled with small caps, cut it back.
 - The one exception the source documents is a **label under the cursor** — the hover-cursor pill is `-0.25px` and full black, because it has to read instantly at pointer speed.
 
+## Icons
+
+- **Three sizes, one stroke.** `--icon-mark` (10px) for a chevron or arrow inside a control, beside its label; `--icon-inline` (16px) for an icon beside text; `--icon-control` (20px) for the icon in an icon button. Draw each on a viewBox the size it renders, so a `1.5` stroke is `1.5px`.
+- **Outlined, round, current colour.** `fill="none"`, `stroke="currentColor"`, round caps and joins. A dot is the only filled shape.
+- **Ink follows the job.** An icon in a control is full ink. An icon beside text takes the text's ink. A mark that only appears on hover — a sort arrow, a chevron — can wait at 0 until it's wanted.
+- **An icon alone is a control, and needs a name.** Use the icon button: primary on the lifted surface, secondary on the quiet fill. Every one takes an `aria-label`. If the icon isn't instantly clear, use a labelled button.
+
 ## Space & layout
 
 - **Five steps, and nothing between them: `4 / 8 / 16 / 24 / 48`.**
@@ -170,6 +178,7 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **Default to no surface.** The page is the ground and most things belong directly on it, separated by `1px solid var(--color-divider)`. Reach for a card only when the thing inside is *content*: an image, a chart, a live demo, or a card you are literally demonstrating.
 - **A list is never a card.** A table, a feed, a spec list, a set of rows — those get a heading and dividers on the page. Wrapping each one in a card is the fastest way to turn a calm page into a deck of floating boxes.
 - **There is exactly one surface style.** `background: #fff` + `1px solid #ececec`. No second, quieter container — a box of `--color-fill-subtle` is not a softer card, it is a *second card style*, and two is one too many.
+- **One quiet fill, for secondary controls only.** `--color-fill-quiet` is the surface of a secondary control — a secondary icon button: grey, no edge, no shadow, deepening to `--color-fill-quiet-hover` on hover. It is never a container and never state; selection keeps `--color-fill-subtle`.
 - `--color-fill-subtle` has one job: the **selected state** (a pressed segment, the current nav item, a chip that's on). It is not a background, not a well, not a panel, not a demo stage. If you are filling an area to group it, use a divider or nothing.
 - The hairline is the constant.
 - **The shadow is conditional, not part of the recipe.** `0 2px 14px rgba(0,0,0,.04)` goes on things that lift on hover — the nav pill, a floating call to action. Buttons are excepted: every button-shaped control carries the rest shadow at rest (see Buttons). The one persistent-elevation exception is the collapsible control panel near the top of an artifact; its shadow establishes the control layer above the content. The tooltip, the toast and the cursor pill carry the hairline alone. Shipping a shadow on any other surface that can't be hovered is the mistake, not shipping one without a shadow.
@@ -229,6 +238,7 @@ rules.
 | Picker | one choice from a list too long to show at once — a select menu | `components/picker/` |
 | Accordion | sections worth having but not worth showing all at once | `components/accordion/` |
 | Input | a line of text has to be typed — a name, a URL, a search | `components/input/` |
+| Icon button | an action is clear from an icon alone — back, more, share, close | `components/icon-button/` |
 
 ### Patterns
 
