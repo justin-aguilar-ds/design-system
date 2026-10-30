@@ -1,11 +1,11 @@
-/* personal-styling · sortable · v0.1.0 */
+/* personal-styling · sortable · v0.2.0 */
 
 // A list put in order by hand. Pointer: press, then move, and the item
 // lifts and follows; the rest part to show where it will land; let go and
-// it drops in. Touch: the grip drags at once, the rest of the row after a
-// long press, so a swipe still scrolls the page. Keyboard: Space or Enter
-// on the grip picks up, the arrows move, Space or Enter drops, Escape puts
-// it back.
+// it drops in. Touch: a long press picks up, so a swipe still scrolls the
+// page — or the optional grip, which drags at once. Keyboard: Space or
+// Enter on the item (or its grip, when it has one) picks up, the arrows
+// move, Space or Enter drops, Escape puts it back.
 
 // Mirrors --duration-pop: a dropped item has landed.
 const SORTABLE_DROP_MS = 350;
@@ -48,11 +48,12 @@ document.querySelectorAll('.sortable').forEach((list) => {
   const pillBelow = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pill-below')) || 60;
   const measure = () => itemsOf().forEach((item) => {
     item.classList.toggle('is-pill', item.offsetHeight < pillBelow);
+    // The grip is optional. Without one, the item itself takes focus.
     const handle = item.querySelector('.sortable-handle');
-    if (handle) {
-      handle.setAttribute('aria-describedby', help.id);
-      if (!handle.hasAttribute('aria-label')) handle.setAttribute('aria-label', `Move ${label(item)}`);
-    }
+    const target = handle || item;
+    if (!handle && !item.hasAttribute('tabindex')) item.tabIndex = 0;
+    target.setAttribute('aria-describedby', help.id);
+    if (handle && !handle.hasAttribute('aria-label')) handle.setAttribute('aria-label', `Move ${label(item)}`);
   });
   measure();
   new ResizeObserver(measure).observe(list);
@@ -214,6 +215,9 @@ document.querySelectorAll('.sortable').forEach((list) => {
       hold: touchBody ? setTimeout(() => press && lift(), SORTABLE_HOLD_MS) : 0,
     };
     item.classList.add('is-pressed');
+    // The hand closes as soon as it takes hold, and stays closed wherever
+    // the pointer wanders until it lets go.
+    document.documentElement.classList.add('sortable-grabbing');
   });
 
   document.addEventListener('pointermove', (event) => {
@@ -240,6 +244,7 @@ document.querySelectorAll('.sortable').forEach((list) => {
     clearTimeout(press.hold);
     cancelAnimationFrame(frame);
     press.item.classList.remove('is-pressed');
+    document.documentElement.classList.remove('sortable-grabbing');
     press = null;
     if (drag && !drag.keyed) finish({ cancel });
   };
@@ -252,9 +257,11 @@ document.querySelectorAll('.sortable').forEach((list) => {
 
   // ---- Keyboard, on the grip.
   list.addEventListener('keydown', (event) => {
+    // From the grip, or from the item itself when it has no grip.
     const handle = event.target.closest('.sortable-handle');
-    if (!handle || dropping) return;
-    const item = handle.closest('.sortable-item');
+    const item = handle ? handle.closest('.sortable-item') : event.target.closest('.sortable-item');
+    if (!item || dropping) return;
+    if (!handle && (event.target !== item || item.querySelector('.sortable-handle'))) return;
     if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
       if (!drag) begin(item, { keyed: true });

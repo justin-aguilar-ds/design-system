@@ -1,4 +1,4 @@
-/* personal-styling · sortable · v0.1.0 */
+/* personal-styling · sortable · v0.2.0 */
 
 /* A list you put in order by hand. Each item is a row on the one surface
    style, 16px from the next — rows are 16 apart — so each reads as a thing
@@ -20,7 +20,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-8);          /* handle to label */
+  gap: var(--space-8);          /* the grip, when there is one, to the label */
   min-height: var(--height-row);
   padding: var(--space-8) var(--space-16);
   background: var(--color-surface);
@@ -40,8 +40,10 @@
 .sortable-label { flex: 1; min-width: 0; }
 .sortable-meta { flex: none; }
 
-/* The grip is the keyboard's way in and a finger's instant handle. It
-   waits at secondary ink and comes up to full ink with the row. */
+/* The grip is optional. With one, it's the keyboard's way in and a
+   finger's instant handle; without, the row itself takes focus and a
+   finger picks up with a long press. It waits at secondary ink and comes
+   up to full ink with the row. */
 .sortable-handle {
   display: grid;
   place-items: center;
@@ -68,6 +70,12 @@
   .sortable-item:hover .sortable-handle { color: var(--color-text); }
 }
 .sortable-handle:focus-visible { color: var(--color-text); }
+
+/* The open hand on a row, the closed hand from the moment it's pressed
+   until it's let go — set on the root by sortable.js, so it holds even
+   where the pointer strays off the item. */
+.sortable-grabbing,
+.sortable-grabbing * { cursor: grabbing !important; }
 
 /* ---- Pick up, in three beats. ----
    Pressed: the finger or button is down and nothing has moved yet — the
