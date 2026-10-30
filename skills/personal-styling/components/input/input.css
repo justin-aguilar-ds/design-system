@@ -1,0 +1,91 @@
+/* personal-styling · input · v0.1.0 */
+
+/* A field is its label, 8px, the input, then an optional message. The
+   label sits above, never inside or beside, so every input is the same
+   height whatever its label says. */
+.input-field {
+  display: grid;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* The input is the picker's trigger, made for typing: the same pill,
+   surface, rest shadow and hover lift, and the same 36px height as a
+   compact picker beside it. The text is 16px — below that, iOS zooms the
+   page on focus — on an 18px line instead of Body's 19px, so the field
+   lands on 36px: 18 + 2 × 8 + 2px border. */
+.input {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-8) var(--space-16);
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-rest);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: -0.1px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: box-shadow var(--duration-deliberate) ease, border-color var(--duration-fast) ease;
+}
+
+/* What you type is full ink; the placeholder is the default secondary
+   ink — the system has no placeholder grey. */
+.input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .input:hover { box-shadow: var(--shadow-lift); }
+}
+
+/* Focus without a ring: the field lifts and its edge firms up for as long
+   as it's being typed in. The caret does the rest. */
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-lift);
+  border-color: var(--color-hairline-strong);
+}
+
+/* Invalid: a full-ink edge, and the message under it says why. */
+.input[aria-invalid="true"] { border-color: var(--color-text); }
+
+.input:disabled {
+  opacity: var(--opacity-label-inactive);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* The message: help in secondary ink; an error in full ink, glyph first. */
+.input-message {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+.input-message.is-error { color: var(--color-text); }
+
+/* Search: a leading glyph inside the pill. The text starts after it:
+   16px inset + the 16px glyph + 8px, icon to text. */
+.input-wrap {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.input-icon {
+  position: absolute;
+  top: calc(50% - 8px);         /* the 16px glyph centred on the field */
+  left: var(--space-16);
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+.input-wrap--search .input { padding-left: calc(var(--space-16) + 16px + var(--space-8)); }
+.input::-webkit-search-decoration,
+.input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

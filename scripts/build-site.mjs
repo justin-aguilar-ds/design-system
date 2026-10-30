@@ -264,7 +264,7 @@ const stage = (c, html) => (c.tier === 'patterns'
 for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
   // "Requires: a, b" links to each component's page.
-  const rest = c.rest.replace(/^Requires: (.+)$/m, (_, names) => `Requires: ${names.split(',').map((n) => n.trim()).map((n) => `[${titleOf[n] || n}](${n}.html)`).join(', ')}`);
+  const rest = c.rest.replace(/^Requires: (.+)$/m, (_, names) => `Requires: ${names.split(',').map((n) => n.trim()).map((n) => (titleOf[n] ? `[${titleOf[n]}](${n}.html)` : n)).join(', ')}`);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 ${intro(inline(c.title), inline(c.summary))}
 ${c.html ? section('As shipped', stage(c, c.html)) : ''}

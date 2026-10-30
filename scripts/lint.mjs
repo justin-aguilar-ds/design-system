@@ -85,7 +85,7 @@ for (const [tier, names] of [['components', components], ['patterns', patterns]]
     if (tier === 'patterns' && existsSync(join(dir, 'README.md'))) {
       const requires = readFileSync(join(dir, 'README.md'), 'utf8').match(/^Requires: (.+)$/m);
       if (!requires) report(join(dir, 'README.md'), 0, 'missing a "Requires: …" line');
-      else requires[1].split(',').map((s) => s.trim()).filter((c) => !components.includes(c))
+      else requires[1].split(',').map((s) => s.trim()).filter((c) => c !== 'none' && !components.includes(c))
         .forEach((c) => report(join(dir, 'README.md'), 0, `requires unknown component "${c}"`));
     }
   }

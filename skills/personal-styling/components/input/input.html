@@ -1,0 +1,15 @@
+<!-- personal-styling · input · v0.1.0 -->
+<div class="input-field">
+  <label class="t-label" for="endpoint-url">Endpoint</label>
+  <input class="input" id="endpoint-url" type="url" placeholder="https://api.example.com/hooks"
+         autocomplete="off" aria-describedby="endpoint-url-help">
+  <p class="input-message t-caption" id="endpoint-url-help">Deliveries are sent here as POST requests.</p>
+</div>
+
+<div class="input-field">
+  <label class="t-label" for="search-deliveries">Search</label>
+  <span class="input-wrap input-wrap--search">
+    <svg class="input-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <input class="input" id="search-deliveries" type="search" placeholder="Delivery or endpoint">
+  </span>
+</div>

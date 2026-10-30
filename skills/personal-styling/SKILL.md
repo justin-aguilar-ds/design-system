@@ -132,6 +132,8 @@ and meaningful takes full ink, including a toast, which arrives unasked.
 
 `SF Pro Display` stack for everything; a mono stack for metadata only.
 
+When two pieces of text need a hierarchy, take a pairing from `patterns/type-pairs/` — seven of them, subtle to expressive — rather than composing one.
+
 - **Weight 500 everywhere.** 600 on anything interactive. Never 400, never 700, never bold display type.
 - **Five roles.** Display 56/64, Title 32/38, Label 16/19 at 600, Body 16/19, Caption 14/18 — plus Interactive and Mono below. A card uses three of them, maximum.
 - **Tracking is negative only where the size earns it.** Everything 16px and under sits at `-0.1px` — Label, Interactive, Body and Caption alike. Display takes `-1px` at 56px, Title `-0.6px` at 32px. Positive `0.3px` on uppercase mono.
@@ -226,6 +228,7 @@ rules.
 | Table | rows of records — any list with more than one value per row | `components/table/` |
 | Picker | one choice from a list too long to show at once — a select menu | `components/picker/` |
 | Accordion | sections worth having but not worth showing all at once | `components/accordion/` |
+| Input | a line of text has to be typed — a name, a URL, a search | `components/input/` |
 
 ### Patterns
 
@@ -239,6 +242,7 @@ For a tool, reach for the patterns first, then fill them with components.
 |---|---|---|
 | Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
 | Control panel | a tool has controls that change the content beside or below them — or a long page needs a contents list | `patterns/control-panel/` |
+| Type pairs | two pieces of text need a hierarchy — a title and a line, a number and its name, a page's opening | `patterns/type-pairs/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the

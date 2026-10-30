@@ -1,0 +1,23 @@
+/* personal-styling · type-pairs · v0.1.0 */
+
+/* A pair is two type roles stacked. The roles bring all the type; this
+   only sets the distance between them. 8px is label to value — the
+   default, for pairs read as one unit. 16px is for a heading and the
+   sentence under it, which are read one after the other. */
+.type-pair {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+}
+.type-pair > * { margin: 0; }
+.type-pair--loose { gap: var(--space-16); }
+
+/* Flat: two lines at one size and no gap — the second line is part of the
+   same statement, quieter. The source site's signature: no size step, the
+   hierarchy carried by ink alone. */
+.type-pair--flat { gap: 0; }
+.type-pair-quiet { color: var(--color-text-secondary); }
+
+/* Detail: the value is meaningful and small, so it takes full ink (the
+   contrast floor) — mono's default secondary is for decoration only. */
+.type-pair-value { color: var(--color-text); }
