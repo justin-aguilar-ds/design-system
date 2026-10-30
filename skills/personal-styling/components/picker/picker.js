@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.3.0 */
+/* personal-styling · picker · v0.4.0 */
 
 // A button that opens a listbox (the "select-only combobox" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.

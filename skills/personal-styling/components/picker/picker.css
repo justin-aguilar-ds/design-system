@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.3.0 */
+/* personal-styling · picker · v0.4.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -39,7 +39,7 @@
   min-width: 100%;
   max-height: 320px;            /* about nine options, then it scrolls */
   overflow-y: auto;
-  padding: var(--space-4);      /* the segmented control's frame padding */
+  padding: var(--space-8);      /* a menu is a surface, not a small control, so 8 — not 4 */
   background: var(--color-surface);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
@@ -77,7 +77,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-16);
+  gap: var(--space-8);          /* label to check: icon to text */
   padding: var(--space-8) var(--space-16);
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);

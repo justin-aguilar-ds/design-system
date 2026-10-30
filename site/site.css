@@ -50,7 +50,7 @@ body { min-height: 100vh; }
 }
 
 /* A demo is content, so it earns the one surface. */
-.demo { padding: var(--space-24); min-width: 0; }
+.demo { padding: var(--space-16); min-width: 0; } /* inside a card: 16 */
 .demo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -85,11 +85,17 @@ body { min-height: 100vh; }
   gap: var(--space-16);
   min-width: 0;
 }
+/* Section to section is 48px. The prose already has a 16px gap between
+   blocks, so a section heading adds the rest. On the rules page the
+   divider sits in the middle: 16 + 8 above it, 24 below. In a component's
+   guidance there's no divider, so the heading adds 32. */
 .prose h2 {
+  margin-top: calc(var(--space-24) - var(--space-16));
   padding-top: var(--space-24);
   border-top: 1px solid var(--color-divider);
   scroll-margin-top: var(--space-24);
 }
+.prose > h3:not(:first-child) { margin-top: calc(var(--space-48) - var(--space-16)); }
 .prose ul, .prose ol { padding-left: var(--space-24); display: flex; flex-direction: column; gap: var(--space-8); }
 /* Emphasis is ink, never weight: 600 belongs to interactive things. */
 .prose strong { font-weight: inherit; color: var(--color-text); }
@@ -140,14 +146,14 @@ body { min-height: 100vh; }
 
 /* Source files sit in an accordion, closed: the code is there when wanted. */
 .site-section .accordion-body .code { margin: 0; }
-.prose--page > h2:first-child { padding-top: 0; border-top: 0; }
+.prose--page > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* Two pieces side by side at their real widths, for comparing heights. */
 .demo-pair {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  gap: var(--space-16);
+  gap: var(--space-24);         /* a card beside a button: card to card */
 }
 @media (max-width: 630px) { .demo-pair { grid-template-columns: minmax(0, 1fr); } }
 
@@ -181,8 +187,7 @@ body { min-height: 100vh; }
 .ink-ladder {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-48);
-  padding: var(--space-24) 0;
+  gap: var(--space-24);
 }
 .ink-full { color: var(--color-text); }
 .ink-secondary { color: var(--color-text-secondary); }
@@ -195,7 +200,7 @@ body { min-height: 100vh; }
 .swatch-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* two across on a phone */
-  gap: var(--space-48) var(--space-24);
+  gap: var(--space-24);         /* item to item, card to card */
 }
 .swatch { display: grid; gap: var(--space-16); align-content: start; }
 .swatch-chip {
@@ -212,7 +217,7 @@ body { min-height: 100vh; }
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   align-items: center;
   gap: var(--space-24);
-  padding: var(--space-24) 0;
+  padding: var(--space-16) 0;   /* a row, like a table row */
   border-top: 1px solid var(--color-divider);
 }
 
@@ -221,8 +226,14 @@ body { min-height: 100vh; }
 .specimen-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-48) var(--space-24);
-  padding-top: var(--space-24);
+  gap: var(--space-24);         /* item to item, card to card */
+}
+
+/* Inside a foundations section: heading, sentence and the first block
+   are 16 apart (the section's own gap); each block after that is a new
+   group, 48 from the last — 16 + 32. */
+.site-section > :is(.ink-ladder, .swatch-grid, .type-specimens, .specimen-grid, .icon-sizes) + :is(.ink-ladder, .swatch-grid, .type-specimens, .specimen-grid, .icon-sizes) {
+  margin-top: calc(var(--space-48) - var(--space-16));
 }
 .specimen { display: grid; gap: var(--space-16); align-content: start; }
 /* Specimens share their caption's left edge, centred top to bottom. */
@@ -233,8 +244,8 @@ body { min-height: 100vh; }
   justify-items: start;
 }
 .specimen-stage--row { display: flex; align-items: center; gap: var(--space-24); }
-.specimen-stage--stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--space-16); }
-.specimen-card { display: grid; gap: var(--space-8); padding: var(--space-16); width: 220px; }
+.specimen-stage--stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--space-24); } /* card to card */
+.specimen-card { display: grid; gap: var(--space-16); padding: var(--space-16); width: 220px; } /* inside a card: 16 */
 .specimen-box { display: grid; place-items: center; width: 220px; height: 128px; }
 .specimen-pill { padding: var(--space-8) var(--space-24); }
 .specimen-corner { width: 96px; height: 96px; }
@@ -247,7 +258,7 @@ body { min-height: 100vh; }
 }
 .specimen-two-row {
   display: grid;
-  gap: var(--space-8);
+  gap: var(--space-16);         /* inside a card: 16 */
   width: 220px;
   padding: var(--space-16);
 }
@@ -270,6 +281,6 @@ body { min-height: 100vh; }
 .demo-topbar > .t-label { text-align: center; }
 
 /* Foundations: icon sizes side by side. */
-.icon-sizes { display: flex; align-items: flex-end; gap: var(--space-48); padding: var(--space-24) 0; }
+.icon-sizes { display: flex; align-items: flex-end; gap: var(--space-24); } /* item to item */
 .icon-size { display: grid; justify-items: start; gap: var(--space-16); }
 .icon-size svg { color: var(--color-text); }

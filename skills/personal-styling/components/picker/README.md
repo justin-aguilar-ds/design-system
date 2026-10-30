@@ -35,6 +35,10 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
 
+## Changes in v0.4.0
+
+- The menu's inner padding is 8px, not 4px: 4 is only for a small control, and a menu is a surface. Label to check is 8px, icon to text.
+
 ## Changes in v0.3.0
 
 - Its glyph is sized by the icon tokens (`--icon-mark` / `--icon-inline`) instead of a fixed number.
