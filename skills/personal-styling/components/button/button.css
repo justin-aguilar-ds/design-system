@@ -1,4 +1,4 @@
-/* personal-styling · button · v0.2.0 */
+/* personal-styling · button · v0.3.0 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
@@ -47,14 +47,23 @@
 /* Large: the main action of a screen, above all on a phone. Everything
    else comes from the pill — surface, rest shadow, hover lift, Label type.
    Its height is --height-row, the height of a collapsed control panel, so
-   the two read as one family when they share a screen. Under 630px it
-   fills the width inside the page padding. */
+   the two read as one family when they share a screen. Under 630px it is
+   pinned to the bottom of the screen, full width inside the page inset —
+   within reach of a thumb wherever the page is scrolled. */
 .button--large {
   justify-content: center;
   min-height: var(--height-row);
   padding: 0 var(--space-24);
 }
 @media (max-width: 630px) {
-  .button--large { width: 100%; }
-  .button-row > .button--large { flex: 1 1 100%; }
+  .button--large {
+    position: fixed;
+    left: var(--space-page);
+    right: var(--space-page);
+    bottom: var(--space-page);
+    z-index: 30;
+  }
+  /* Room at the end of the page, so its last content can scroll clear of
+     the pinned button: the button plus the inset above and below it. */
+  body:has(.button--large) { padding-bottom: calc(var(--height-row) + 2 * var(--space-page)); }
 }

@@ -122,6 +122,12 @@ If a value is meaningful and small, it takes **full ink**. If it's meaningful
 and secondary, it takes `--color-text-secondary` at 14px or larger, never at
 mono's 10.5px. When in doubt, raise the ink, not the size.
 
+**The one exception is the tooltip.** Its text stays secondary at 10.5px
+mono, meaningful or not. A tooltip is a reveal the reader asked for, on its
+own surface, read at a glance and then dismissed — the quieter ink is what
+keeps it a gloss rather than a second page. Everything else that is small
+and meaningful takes full ink, including a toast, which arrives unasked.
+
 ## Type
 
 `SF Pro Display` stack for everything; a mono stack for metadata only.

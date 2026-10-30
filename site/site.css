@@ -142,3 +142,9 @@ body { min-height: 100vh; }
   gap: var(--space-16);
 }
 @media (max-width: 630px) { .demo-pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* The button page shows several large buttons as specimens; on a phone
+   they stay where they are instead of all pinning to the same spot. */
+@media (max-width: 630px) {
+  .demo .button--large { position: static; width: 100%; }
+}

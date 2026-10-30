@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.6.0 */
+/* personal-styling · control-panel · v0.7.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -114,4 +114,12 @@
      inside itself rather than running off the top. */
   .control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
   .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - var(--height-row)); } /* minus the heading row */
+
+  /* A large button pins itself to the bottom edge on phones; the panel
+     rises 16px above it rather than covering it, and its open card is
+     shortened by the button and the gap. */
+  body:has(.button--large) .control-panel--docked { bottom: calc(var(--space-page) + var(--height-row) + var(--space-16)); }
+  body:has(.button--large) .control-panel--docked .accordion-content {
+    max-height: calc(100vh - 2 * var(--space-page) - 2 * var(--height-row) - var(--space-16));
+  }
 }

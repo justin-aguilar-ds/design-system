@@ -21,7 +21,8 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - **For the main action of a screen** — the one thing the page exists to do. Above all on a phone, where it's the easiest target to reach.
 - **It's the pill, larger.** Same surface, rest shadow, hover lift and Label type. Add `.button--large` to a button that already has the pill classes.
 - **Its height is `--height-row` (50px)**, the height of a collapsed control panel, so a large button and a closed panel line up as one family.
-- **Full width on a phone**, inside the page padding. Above 630px it's as wide as its label plus `24px` either side.
+- **Pinned to the bottom on a phone**, full width inside the page inset and `24px` from the bottom edge, so it's within reach wherever the page is scrolled. The page gets room at its end so the last content scrolls clear of it. Above 630px it sits in the page, as wide as its label plus `24px` either side.
+- **It shares the bottom edge with a docked control panel.** When both are on a phone screen, the panel's pill rises `16px` above the button.
 - **One per screen.** If two actions both look large, one of them isn't the main action.
 
 ## Use
@@ -30,6 +31,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Always a real `<button type="button">`, or `type="submit"` in a form.
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
+
+## Changes in v0.3.0
+
+- On phones, `.button--large` is pinned to the bottom of the screen.
 
 ## Changes in v0.2.0
 

@@ -23,7 +23,7 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **A `280px` column** (the tooltip's width), `24px` from the content — a card's distance. It stays in view while the page scrolls, the page inset from the top.
 - **Wrap the content and the panel in `.control-dock`.** The content takes the room; the panel takes the column. Fields inside stack in one column.
 - **Keep its content shorter than the screen.** On wide screens it doesn't scroll inside itself, so a picker menu in it can open past its edge.
-- **On narrow screens it floats bottom right**, the page inset from both edges, as a pill only as wide as its label. Tapping it grows it upward into a card, and the chevron points up while closed, because that's the way it opens. Start it closed there with `data-closed-below="630"` on the accordion item.
+- **On narrow screens it floats bottom right**, the page inset from both edges, as a pill only as wide as its label. Tapping it grows it upward into a card, and the chevron points up while closed, because that's the way it opens. Start it closed there with `data-closed-below="630"` on the accordion item. If the page has a large button, which pins itself to the bottom edge on phones, the panel rises `16px` above it.
 - **A contents list is a segmented list** (`.segmented--list`) inside a docked panel: one section is current at a time, so it takes the gliding fill, not an ink change.
 - Open by default. Collapse it when the controls are set-and-forget and the content needs the room.
 
@@ -32,6 +32,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.7.0
+
+- On phones, a docked panel rises above a pinned large button instead of covering it.
 
 ## Changes in v0.6.0
 
