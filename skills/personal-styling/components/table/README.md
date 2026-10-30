@@ -16,7 +16,8 @@ Rows of records for tools: full width of its container, sitting on the page with
 - **A one-line row's fill is a pill.** Rows under `--pill-below` (60px) — any row that doesn't wrap — get a fully round fill, matching the segmented control and picker; a row that wraps to two lines keeps 20px corners. `table.js` decides per row as the fill moves.
 - **The fill appears in place, then glides.** Entering the table fades it in on the row under the pointer; it never slides in from somewhere else. Leaving fades it out, or sends it back to the selected row.
 - **Selection is the same fill, held.** A row with `.is-selected` keeps the fill when nothing is hovered, the way the segmented control returns to its active option. The fill is the only shape: the row's own `.is-selected` background is switched off while `table.js` runs, and comes back only as the no-JS fallback.
-- **Cells:** `16px` at the table's outer edges, so text sits inside the fill's rounded ends.
+- **No padding at the table's outer edges.** The first and last columns line up with the content above and below — on a phone, edge padding pushes the table out of line with the rest of the page.
+- **The fill bleeds; the content doesn't move.** The fill reaches `16px` past the table on each side, into the page margin, so text stays aligned with the page yet sits `16px` inside the fill's rounded ends instead of flush against them. A table needs `16px` of room on each side for this — the page inset and card padding both give it.
 - **Status is glyph + word** — `✓ Delivered`, `! Retrying`, `✗ Failed`, `– Unknown`. Warnings and failures take `.table-ink`: problems get full ink, not less.
 - **Figures align right** with `.table-num`, on the header and the cells.
 - **Scroll, don't shrink.** A wide table scrolls inside `.table-wrap`. Never drop the type size to make it fit. The identifying column never wraps.
@@ -35,6 +36,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 - Hover now brightens the **whole row**. The old rule said "brighten the row label", but the label column is already full ink, so that hover changed nothing.
 - v0.2.0: rows take a gliding background fill on hover, modelled on the segmented control. The old rule was "no background change". The table's outer edges gain `16px` of padding to make room for the fill's radius.
+- v0.6.0: no padding at the outer edges; the fill bleeds `16px` past the table instead, so content aligns with the page and still sits inside the fill.
 - v0.5.0: the fill is placed from layout offsets, so it lines up inside a scaled or zoomed container.
 - v0.3.0: the fill moves on `--duration-base`, not `--duration-deliberate` — rows are dense. A selected row no longer shows a square background behind the rounded fill.
 - Right-aligned figures (`.table-num`), row links and the column gap are new decisions.
