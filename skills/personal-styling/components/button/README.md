@@ -15,6 +15,7 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - **In a button lockup, every label aligns.** Labels share one height, one vertical centring and one baseline, regardless of treatment. `.button-row` aligns on the baseline and `.button-text` takes the pill's box, so a quiet action sits on the same line as the pills beside it.
 - There is no louder button. If one action must dominate a group, it does so by position, not by a second pill style.
 - Buttons never change background colour on hover. They lift, or they brighten their ink.
+- **On touch, a pill presses as well as lifts.** While a finger is down it scales to `--scale-tap` (0.97), in at once and springing back on `--duration-base` with `--ease-out`. The large button doesn't press — it's a surface-sized target — and nothing presses under reduced motion.
 
 ## Large
 

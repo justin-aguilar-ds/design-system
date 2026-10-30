@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.7
+   Personal styling tokens — v0.8
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -132,6 +132,10 @@ img, video, svg { display: block; max-width: 100%; }
   /* NEW (v0.5): tactility — a handle under a pressing finger or held key
      scales down this far. Handles only; buttons lift instead. */
   --scale-press: 0.85;
+  /* NEW (v0.8): a button-shaped control under a finger presses this far —
+     touch only, and never a large surface. Subtler than a handle's press,
+     because the target is bigger. */
+  --scale-tap: 0.97;
 }
 
 :focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
@@ -225,9 +229,16 @@ body {
 @media (hover: none) {
   .surface--rest:active { box-shadow: var(--shadow-lift); transition-duration: var(--duration-instant); }
   .link-quiet:active { color: var(--color-text); transition-duration: var(--duration-instant); }
+  /* NEW (v0.8): a pill under a finger presses in as well as lifting — the
+     slider thumb's tactility, toned down for a bigger target. The large
+     button is a surface-sized target, so it lifts without pressing. */
+  .surface--rest.surface--pill:not(.button--large):not(:disabled):active { scale: var(--scale-tap); }
 }
 .surface--rest, .link-quiet {
-  transition: box-shadow var(--duration-deliberate) ease, color var(--duration-fast) ease;
+  transition:
+    box-shadow var(--duration-deliberate) ease,
+    color var(--duration-fast) ease,
+    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
 }
 
 /* ---- The selected state is quiet: a subtle fill, not the accent. ---- */
@@ -257,6 +268,8 @@ body {
 /* ---- Reduced motion: always ship this ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+  /* No press scale either: the response stays as ink and shadow. */
+  .surface--rest:active { scale: none !important; }
 }
 
 /* ============================================================

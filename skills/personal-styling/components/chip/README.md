@@ -24,6 +24,10 @@ A filter is not the nav pill — the nav has one truth at a time, filters have m
 - Each chip is a `<button>` with `aria-pressed`. Put the row in a `role="group"` with an `aria-label` that names what it filters.
 - `chip.js` toggles `aria-pressed` and fires a bubbling `chip-change` event with `detail.on`. Listen for it on the row.
 
+## Changes in v0.3.0
+
+- On touch, a chip presses in to `--scale-tap` (0.97) as its ink brightens.
+
 ## Changes in v0.2.0
 
 - On touch screens the hover response plays while the finger is down — the native tap flash is gone.

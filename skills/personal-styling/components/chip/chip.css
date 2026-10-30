@@ -1,4 +1,4 @@
-/* personal-styling · chip · v0.2.0 */
+/* personal-styling · chip · v0.3.0 */
 
 .chip-row {
   display: flex;
@@ -14,7 +14,10 @@
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
-  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
 }
 
 /* The dot carries the state without colour: a ring when off, solid when on.
@@ -43,7 +46,7 @@
 /* Touch: the hover response plays on press — in at once, out on its
    usual timing (see tokens.css). */
 @media (hover: none) {
-  .chip:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
+  .chip:active:not(:disabled) { color: var(--color-text); scale: var(--scale-tap); transition-duration: var(--duration-instant); }
   .chip[aria-pressed="true"]:active:not(:disabled) { background: var(--color-divider); }
 }
 
@@ -52,4 +55,9 @@
   color: var(--color-text);
   opacity: var(--opacity-label-inactive);
   cursor: not-allowed;
+}
+
+/* Same specificity as the press, and later, so it wins. */
+@media (prefers-reduced-motion: reduce) {
+  .chip:active:not(:disabled) { scale: none; }
 }
