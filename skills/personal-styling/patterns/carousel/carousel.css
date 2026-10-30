@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.1.0 */
+/* personal-styling · carousel · v0.2.0 */
 
 /* One item at a time, centred, with its caption under it. Slides are the
    full width of the carousel, so moving the track by whole widths always
@@ -11,7 +11,7 @@
 }
 .carousel-viewport {
   width: 100%;
-  overflow: hidden;
+  overflow-x: clip;             /* sideways only, so the frames' lift isn't cut off */
   touch-action: pan-y;          /* a vertical swipe still scrolls the page */
   cursor: grab;
 }
@@ -36,9 +36,11 @@
   justify-content: center;
 }
 
-/* The frame is media: the card radius, no shadow — it doesn't lift. Empty
-   or still loading, it's the system's empty box: the subtle fill with a
-   hairline. Away from the centre it waits small and faint; the active one
+/* The frame is the one surface style — the card radius and the hairline —
+   and it always carries the lift shadow: the carousel's item is the object
+   you pick up and move, so it stays raised above the page (a persistent-
+   elevation exception, like the control panel). Empty or still loading,
+   it's the bare surface. Away from the centre it waits small and faint; the active one
    comes up to full size and ink. Set --item-aspect-ratio and
    --item-width on a frame for a different shape. */
 .carousel-frame {
@@ -48,9 +50,10 @@
   aspect-ratio: var(--item-aspect-ratio, 4 / 5);
   padding: 0;
   overflow: hidden;
-  background: var(--color-fill-subtle);
+  background: var(--color-surface);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lift);
   color: var(--color-text);
   scale: var(--scale-inactive);
   opacity: var(--opacity-inactive);
