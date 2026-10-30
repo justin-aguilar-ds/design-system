@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.9
+   Personal styling tokens — v0.10
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -137,6 +137,10 @@ img, video, svg { display: block; max-width: 100%; }
      touch only, and never a large surface. Subtler than a handle's press,
      because the target is bigger. */
   --scale-tap: 0.97;
+  /* NEW (v0.10): a thing picked up to be moved — a sortable item mid-drag —
+     grows this much as it rises to the media shadow. The one scale above 1:
+     held, it comes towards you. */
+  --scale-lift: 1.03;
 }
 
 :focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }

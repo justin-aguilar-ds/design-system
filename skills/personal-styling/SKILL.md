@@ -239,6 +239,7 @@ rules.
 | Accordion | sections worth having but not worth showing all at once | `components/accordion/` |
 | Input | a line of text has to be typed — a name, a URL, a search | `components/input/` |
 | Icon button | an action is clear from an icon alone — back, more, share, close | `components/icon-button/` |
+| Sortable list | the order of a short list is the user's to set — priorities, steps, a queue | `components/sortable/` |
 
 ### Patterns
 
@@ -325,7 +326,7 @@ the values and leave the vocabulary alone.
 - **Scale-in from `0`** for small things that pop (pills, tooltips, toasts) with a chosen `transform-origin` — a tooltip grows from the corner you clicked, a toast from the button it confirms.
 - **Scale-in from `0.95`** for large surfaces, paired with opacity.
 - **Press scales down.** A handle under a finger or a held key (a slider thumb, a drag handle) scales to `--scale-press` (0.85) while held: in on `fast`, back on `base`, on `--ease-out`. It's the tactile counterpart to the tooltip's scale-in.
-- **On touch, button-shaped controls press too — just less.** A pill button, an icon button or a chip under a finger scales to `--scale-tap` (0.97) as well as playing its hover response: in at once, back on `base`, on `--ease-out`. Touch only — with a pointer, buttons lift and don't press. Large surfaces never press: the large button, rows, cards and panels keep their lift or ink change. Nothing presses under reduced motion.
+- **On touch, button-shaped controls press too — just less.** A pill button, an icon button or a chip under a finger scales to `--scale-tap` (0.97) as well as playing its hover response: in at once, back on `base`, on `--ease-out`. Touch only — with a pointer, buttons lift and don't press. Large surfaces never press: the large button, rows, cards and panels keep their lift or ink change. The exception is a thing you pick up to move: a sortable item gives to `--scale-tap` under any pointer, then grows to `--scale-lift` once it's carried (see `components/sortable/`). Nothing presses under reduced motion.
 - **Blur as a crossfade bridge**: a flat opacity crossfade reads flat however you tune it. A hover reveal is `opacity 0→1` + `scale 1.015→1` + `blur(6px)→0` over `300ms` plain `ease`.
 - **Clip-path reveals text**, not width: `clip-path: inset(0 100% 0 0)` → `inset(0)` wipes left-to-right and works across wrapped lines.
 - **Stagger with JS, not `transition-delay`** when it should only apply on entrance — a CSS delay applies symmetrically and makes the close sequence run backwards. ~100ms is the stagger.

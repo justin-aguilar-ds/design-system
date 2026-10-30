@@ -1,0 +1,148 @@
+/* personal-styling · sortable · v0.1.0 */
+
+/* A list you put in order by hand. Each item is a row on the one surface
+   style, 16px from the next — rows are 16 apart — so each reads as a thing
+   you can pick up rather than a line in a table. */
+.sortable {
+  position: relative;           /* the slot and the offsets measure from here */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* At rest an item carries the rest shadow, because it lifts. One line is
+   under --pill-below, so it's a pill; sortable.js measures, and an item
+   that wraps keeps the card radius. */
+.sortable-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);          /* handle to label */
+  min-height: var(--height-row);
+  padding: var(--space-8) var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-rest);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;  /* a long press picks up; it doesn't open a menu */
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-deliberate) ease,
+    scale var(--duration-base) var(--ease-out);
+}
+.sortable-item.is-pill { border-radius: var(--radius-pill); }
+.sortable-label { flex: 1; min-width: 0; }
+.sortable-meta { flex: none; }
+
+/* The grip is the keyboard's way in and a finger's instant handle. It
+   waits at secondary ink and comes up to full ink with the row. */
+.sortable-handle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  margin-inline-start: calc(-1 * var(--space-8)); /* the hit area grows outward; the dots stay 16px from the edge */
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: inherit;
+  touch-action: none;           /* a finger on the grip drags at once, never scrolls */
+  transition: color var(--duration-fast) ease;
+}
+.sortable-handle svg {
+  display: block;
+  width: var(--icon-inline);
+  height: var(--icon-inline);
+}
+
+/* Hover lifts the row and brightens the grip. */
+@media (hover: hover) and (pointer: fine) {
+  .sortable-item:hover { box-shadow: var(--shadow-lift); }
+  .sortable-item:hover .sortable-handle { color: var(--color-text); }
+}
+.sortable-handle:focus-visible { color: var(--color-text); }
+
+/* ---- Pick up, in three beats. ----
+   Pressed: the finger or button is down and nothing has moved yet — the
+   item gives a little, --scale-tap on --duration-fast. On touch, outside
+   the grip, this is the long press winding up. */
+.sortable-item.is-pressed {
+  scale: var(--scale-tap);
+  box-shadow: var(--shadow-lift);
+  transition-duration: var(--duration-base), var(--duration-fast), var(--duration-fast);
+}
+.sortable-item.is-pressed .sortable-handle { color: var(--color-text); }
+
+/* Lifted: it springs past its resting size to --scale-lift and rises to
+   the media shadow on --duration-pop, then follows the pointer 1:1 with
+   no transform transition. sortable.js adds a sway and a tilt from the
+   pointer's sideways speed. */
+.sortable-item.is-lifted {
+  z-index: 2;
+  scale: var(--scale-lift);
+  box-shadow: var(--shadow-media);
+  cursor: grabbing;
+  transition:
+    box-shadow var(--duration-pop) var(--ease-out),
+    scale var(--duration-pop) var(--ease-out);
+}
+.sortable-item.is-lifted .sortable-handle { color: var(--color-text); }
+/* Lifted from the keyboard, it glides a slot at a time instead. */
+.sortable-item.is-lifted.is-keyed {
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-pop) var(--ease-out),
+    scale var(--duration-pop) var(--ease-out);
+}
+
+/* While one is up, the rest settle flat — hairline only — so the held item
+   is the only thing with depth, and they glide out of its way on
+   --duration-base: rows are dense, repeated targets. */
+.sortable.is-sorting { cursor: grabbing; }
+.sortable.is-sorting .sortable-item:not(.is-lifted, .is-dropping) { box-shadow: none; }
+
+/* Where it will land: an empty slot, the hairline and nothing else. It
+   follows the gap as the list parts. */
+.sortable-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-card);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    top var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) ease;
+}
+.sortable-slot.is-pill { border-radius: var(--radius-pill); }
+.sortable.is-sorting .sortable-slot { opacity: 1; }
+
+/* Dropped: it glides into the slot and comes back down to the rest shadow
+   and its own size on --duration-pop — the same beat it rose on. */
+.sortable-item.is-dropping {
+  z-index: 2;
+  transition:
+    transform var(--duration-pop) var(--ease-out),
+    box-shadow var(--duration-pop) var(--ease-out),
+    scale var(--duration-pop) var(--ease-out);
+}
+
+/* Touch: the hover response plays while the finger is down. */
+@media (hover: none) {
+  .sortable-item:active { box-shadow: var(--shadow-lift); transition-duration: var(--duration-instant); }
+  .sortable.is-sorting .sortable-item:not(.is-lifted, .is-dropping):active { box-shadow: none; }
+}
+
+/* No scale under reduced motion: pick-up reads as the shadow alone. */
+@media (prefers-reduced-motion: reduce) {
+  .sortable-item.is-pressed,
+  .sortable-item.is-lifted { scale: none; }
+}
