@@ -1,0 +1,91 @@
+/* personal-styling · carousel · v0.1.0 */
+
+/* One item at a time, centred, with its caption under it. Slides are the
+   full width of the carousel, so moving the track by whole widths always
+   lands an item dead centre — no per-item arithmetic. */
+.carousel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-16);         /* the item to its caption */
+  min-width: 0;
+}
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  touch-action: pan-y;          /* a vertical swipe still scrolls the page */
+  cursor: grab;
+}
+.carousel.is-dragging .carousel-viewport { cursor: grabbing; }
+
+/* The track settles on the carousel's own duration and the strong
+   ease-out; while dragging it follows the pointer 1:1, no transition. */
+.carousel-track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+  transition: transform var(--duration-carousel) var(--ease-out);
+}
+.carousel.is-dragging .carousel-track { transition: none; }
+.carousel-item {
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The frame is media: the card radius, no shadow — it doesn't lift. Empty
+   or still loading, it's the system's empty box: the subtle fill with a
+   hairline. Away from the centre it waits small and faint; the active one
+   comes up to full size and ink. Set --item-aspect-ratio and
+   --item-width on a frame for a different shape. */
+.carousel-frame {
+  display: grid;
+  place-items: center;
+  width: var(--item-width, min(360px, 70%));
+  aspect-ratio: var(--item-aspect-ratio, 4 / 5);
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-fill-subtle);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  color: var(--color-text);
+  scale: var(--scale-inactive);
+  opacity: var(--opacity-inactive);
+  transition:
+    scale var(--duration-carousel) var(--ease-out),
+    opacity var(--duration-carousel) var(--ease-out);
+}
+.carousel-item.is-active .carousel-frame {
+  scale: 1;
+  opacity: 1;
+}
+/* Mid-drag, scale and opacity are driven by the pointer (carousel.js). */
+.carousel.is-dragging .carousel-frame { transition: none; cursor: grabbing; }
+
+.carousel-frame :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;         /* drags pass through; no native drag ghost */
+  -webkit-user-drag: none;
+}
+
+/* The caption leaves downward and fades, swaps its words while hidden,
+   then rises back in — a small thing changing, on --duration-base. */
+.carousel-caption {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-8);          /* name to value */
+  text-align: center;
+  transition:
+    translate var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+.carousel-caption.is-leaving {
+  translate: 0 var(--space-16);
+  opacity: 0;
+}

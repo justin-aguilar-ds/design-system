@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.5.0 */
+/* personal-styling · tooltip · v0.6.0 */
 
 // Four declarative pieces:
 //   [data-tooltip="…"]         inline information — grows from the trigger on
@@ -173,7 +173,9 @@ document.addEventListener('pointermove', (event) => {
     document.body.append(cursorPill);
   }
   cursorPill.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
-  const show = Boolean(target) && !target.classList.contains('has-tooltip');
+  // Hidden while its tooltip is open, and while anything around it is being
+  // dragged (a carousel mid-swipe): the grab cursor takes over then.
+  const show = Boolean(target) && !target.classList.contains('has-tooltip') && !target.closest('.is-dragging');
   if (show) cursorPill.firstChild.textContent = target.dataset.cursor;
   cursorPill.classList.toggle('is-visible', show);
 });

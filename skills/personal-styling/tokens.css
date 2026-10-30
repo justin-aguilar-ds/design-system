@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.8
+   Personal styling tokens — v0.9
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -91,6 +91,7 @@ img, video, svg { display: block; max-width: 100%; }
   --duration-deliberate: 450ms; /* nav */
   --duration-entrance: 500ms;
   --duration-slow: 800ms;       /* full-surface takeovers */
+  --duration-carousel: 1200ms;  /* NEW (v0.9): the main object settling — listed in the rules, missing until now */
   --duration-instant: 0ms;      /* NEW (v0.7): a press — the response lands with the finger */
   /* NEW (v0.5): the tooltip's two beats, from the source site. */
   --duration-pop: 350ms;        /* a small surface scaling in from its origin */

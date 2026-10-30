@@ -253,6 +253,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
 | Control panel | a tool has controls that change the content beside or below them — or a long page needs a contents list | `patterns/control-panel/` |
 | Type pairs | two pieces of text need a hierarchy — a title and a line, a number and its name, a page's opening | `patterns/type-pairs/` |
+| Carousel | one piece of content at a time — projects, photos, videos — each with a caption | `patterns/carousel/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
@@ -309,7 +310,7 @@ the values and leave the vocabulary alone.
 | deliberate | `450ms` | nav, and a moving fill over a few large targets — meant to read as considered, not snappy |
 | entrance | `500ms` | a container appearing |
 | slow | `800ms` | full-surface takeovers, cross-page transitions |
-| carousel | `1200ms` | the main draggable object settling |
+| carousel | `1200ms` | the main draggable object settling (`--duration-carousel`, `patterns/carousel/`) |
 
 **Duration follows density, not component.** The same motion runs at different speeds depending on how often the pointer crosses its targets. A fill gliding between two or three large options — the page nav, a segmented control — takes `deliberate`: it moves rarely, and the pause reads as care. The same fill gliding between dense, repeated targets — table rows, list items — steps down to `base`, because at 450ms it trails a pointer sweeping down a column. Step down one token; never invent a value in between.
 
