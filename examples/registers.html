@@ -1,0 +1,375 @@
+<title>Register Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/accordion/accordion.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/chip/chip.css">
+<link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/input/input.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
+<link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
+<style>
+  /* Layout: the specimen page fills the content column; the register
+     slider and the live readout dock beside it. A temporary tool. */
+  .page {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page-block);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+  }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .slider-ends { display: flex; justify-content: space-between; }
+  .readout { display: grid; gap: var(--space-16); padding-top: var(--space-16); border-top: 1px solid var(--color-divider); }
+
+  /* ---- The specimen: a page inside the page, driven by --r (0 tool → 1 occasion). */
+  .specimen { position: relative; overflow: hidden; min-width: 0; }
+  .mock {
+    --r: 0;
+    --gap: calc(var(--space-48) + var(--space-48) * var(--r));
+    padding-block: var(--gap);
+    padding-inline: var(--space-24);
+  }
+  .band { overflow: clip; }
+  .band.is-full { overflow-clip-margin: var(--space-48); } /* room for shadows once it's fully open */
+  .band + .band { margin-top: calc(var(--gap) * var(--v, 1)); }
+  .band.is-row + .band.is-row { margin-top: 0; }
+
+  .fold {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 640px;
+    border-top: 1px solid var(--color-hairline-strong);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .fold span { position: absolute; right: var(--space-16); top: var(--space-4); }
+
+  .intro-stack { display: grid; align-items: start; }
+  .intro-stack > * { grid-area: 1 / 1; }
+  .intro-row { display: flex; align-items: start; justify-content: space-between; gap: var(--space-16); }
+  .fake-info { width: 40px; height: 40px; display: grid; place-items: center; flex: none; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
+  @media (max-width: 630px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .statement { max-width: 32ch; }
+  .mock :is(h2, p) { margin: 0; }
+  .filters { display: flex; justify-content: space-between; align-items: end; gap: var(--space-16); flex-wrap: wrap; }
+  .filters .input-wrap { flex: 0 1 240px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 0.6fr 1fr;
+    gap: var(--space-24);
+    padding-block: var(--space-16);
+    border-top: 1px solid var(--color-divider);
+  }
+  .row > :first-child { color: var(--color-text); }
+  .row > :nth-child(3) { text-align: right; }
+
+  .faces { display: flex; align-items: center; gap: var(--space-16); }
+  .face-stack { display: flex; }
+  .face {
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 0 0 2px var(--color-bg);
+  }
+  .face + .face { margin-left: calc(-1 * var(--space-8)); }
+
+  .main-object {
+    display: grid; place-items: center;
+    aspect-ratio: 16 / 9;
+    max-height: 420px;
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-lift);
+    transition: transform var(--duration-slow) var(--ease-out);
+    will-change: transform;
+  }
+  .main-wrap { perspective: 1200px; padding-block: var(--space-16); }
+
+  .reply { display: flex; flex-wrap: wrap; gap: var(--space-16); }
+  .reply .button { min-height: var(--height-row); padding-inline: var(--space-24); }
+  .reply .button.is-selected { background: var(--color-fill-subtle); }
+
+  /* Boxes: every word becomes its own grey bar, every shape stays. */
+  .specimen.is-boxes .mock :is(.t-display, .t-title, .t-label, .t-body, .t-mono):not(button) {
+    color: transparent !important;
+    background: var(--color-divider);
+    border-radius: var(--radius-pill);
+    width: fit-content;
+    max-width: 100%;
+  }
+  .specimen.is-boxes :is(button, .chip, .face) { color: transparent !important; }
+  .specimen.is-boxes .input::placeholder { color: transparent; }
+  .specimen.is-boxes .main-object > span { color: transparent; }
+
+  /* The occasion's one orchestrated moment: the page rises in, in order. */
+  @keyframes rise { from { opacity: 0; translate: 0 var(--space-16); } }
+  .mock.is-entering .band.is-on { animation: rise var(--duration-entrance) var(--ease-out) backwards; animation-delay: calc(var(--i) * 80ms); }
+</style>
+
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">Registers</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button"
+              aria-label="About this tool" aria-expanded="false" aria-controls="intro-about"
+              data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">A temporary tool. Drag between the Tool and Occasion registers and watch one page change: space, what's on screen, type, copy and motion. Colours, steps, components and curves never move.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="control-dock">
+    <section class="specimen surface" id="specimen" aria-label="Specimen page">
+      <div class="fold" aria-hidden="true"><span class="t-mono">First screen</span></div>
+      <div class="mock" id="mock">
+
+        <div class="band" data-mix="0.35 0.65" data-group="intro">
+          <div class="intro-stack">
+          <div class="intro-row" data-face="tool">
+            <h2 class="t-display">Rooftop, Nov 14</h2>
+            <span class="fake-info surface surface--pill" aria-hidden="true"><svg class="intro-info-glyph" viewBox="0 0 16 16"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>
+          </div>
+          <div class="type-pair type-pair--flat" data-face="occasion">
+            <h2 class="t-display">Rooftop.</h2>
+            <p class="t-display type-pair-quiet">Saturday the 14th, from seven.</p>
+          </div>
+          </div>
+        </div>
+
+        <div class="band" data-out="0.2 0.6" data-group="details">
+          <div class="grid4">
+            <div class="type-pair"><span class="t-mono">When</span><span class="t-body type-pair-value">Sat, Nov 14 · 7:00 PM</span></div>
+            <div class="type-pair"><span class="t-mono">Where</span><span class="t-body type-pair-value">220 Kent Ave</span></div>
+            <div class="type-pair"><span class="t-mono">Bring</span><span class="t-body type-pair-value">Something to share</span></div>
+            <div class="type-pair"><span class="t-mono">Reply by</span><span class="t-body type-pair-value">Mon, Nov 9</span></div>
+          </div>
+        </div>
+
+        <div class="band" data-out="0.25 0.65" data-group="figures">
+          <div class="grid4">
+            <div class="type-pair"><span class="t-mono">Going</span><span class="t-title tnum">20</span></div>
+            <div class="type-pair"><span class="t-mono">Maybe</span><span class="t-title tnum">4</span></div>
+            <div class="type-pair"><span class="t-mono">No reply</span><span class="t-title tnum">5</span></div>
+            <div class="type-pair"><span class="t-mono">Spots left</span><span class="t-title tnum">20</span></div>
+          </div>
+        </div>
+
+        <div class="band" data-out="0 0.4" data-group="filters">
+          <div class="filters">
+            <div class="chip-row" aria-hidden="true">
+              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>Going</span>
+              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>Maybe</span>
+              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>No reply</span>
+            </div>
+            <span class="input-wrap input-wrap--search" aria-hidden="true">
+              <svg class="input-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input class="input" type="search" placeholder="Search guests" tabindex="-1">
+            </span>
+          </div>
+        </div>
+        <div id="rows"></div>
+
+        <div class="band" data-out="0.3 0.6" data-group="action">
+          <span class="button surface surface--rest surface--pill t-label" aria-hidden="true" style="min-height: var(--height-row); padding-inline: var(--space-24); display: inline-flex; align-items: center;">Remind 9 people</span>
+        </div>
+
+        <div class="band" data-in="0.35 0.75" data-group="main">
+          <div class="main-wrap"><div class="main-object" id="main-object"><span class="t-body">The main object — photos from last year, a map, a playlist</span></div></div>
+        </div>
+        <div class="band" data-in="0.4 0.8" data-group="statement">
+          <p class="t-title statement">Up on the roof at 220 Kent Ave. Bring something to share, and something warm.</p>
+        </div>
+        <div class="band" data-in="0.45 0.85" data-group="faces">
+          <div class="faces">
+            <div class="face-stack" aria-hidden="true">
+              <span class="face t-control">AR</span><span class="face t-control">BO</span><span class="face t-control">DP</span><span class="face t-control">FB</span><span class="face t-control">HS</span><span class="face t-control">+15</span>
+            </div>
+            <span class="t-body">Ana, Ben and 18 others are going</span>
+          </div>
+        </div>
+        <div class="band" data-in="0.55 0.9" data-group="reply">
+          <div class="reply" role="group" aria-label="Reply" id="reply">
+            <button class="button surface surface--rest surface--pill t-label" type="button">I'm in</button>
+            <button class="button surface surface--rest surface--pill t-label" type="button">Maybe</button>
+            <button class="button surface surface--rest surface--pill t-label" type="button">Can't make it</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="control-panel control-panel--docked surface accordion" aria-label="Register">
+      <div class="accordion-item is-open" data-closed-below="630">
+        <h2 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="reg-trigger" aria-expanded="true" aria-controls="reg-body">
+            <span class="t-mono">Register</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h2>
+        <div class="accordion-panel" id="reg-body" role="region" aria-labelledby="reg-trigger">
+          <div class="accordion-content"><div class="accordion-body">
+            <div class="control-panel-fields">
+              <div class="slider-field">
+                <div class="slider-head">
+                  <label class="t-label" for="register">Register</label>
+                  <output class="slider-value t-mono" for="register" id="register-name">Tool</output>
+                </div>
+                <span class="slider">
+                  <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+                  <input class="slider-input" id="register" type="range" min="0" max="100" value="0" aria-valuetext="Tool">
+                </span>
+                <div class="slider-ends" aria-hidden="true"><span class="t-mono">Tool</span><span class="t-mono">Occasion</span></div>
+              </div>
+
+              <div class="control-field">
+                <span class="t-label" id="show-label">Show</span>
+                <div class="segmented" role="group" aria-labelledby="show-label" id="show">
+                  <span class="segmented-indicator" aria-hidden="true"></span>
+                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="content">Content</button>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="boxes">Boxes</button>
+                </div>
+              </div>
+
+              <div class="readout" aria-live="polite">
+                <div class="type-pair"><span class="t-mono">Page top and bottom</span><span class="t-body type-pair-value tnum" id="ro-page">48px</span></div>
+                <div class="type-pair"><span class="t-mono">Section to section</span><span class="t-body type-pair-value tnum" id="ro-gap">48px</span></div>
+                <div class="type-pair"><span class="t-mono">Things on the first screen</span><span class="t-body type-pair-value tnum" id="ro-count">–</span></div>
+                <div class="type-pair"><span class="t-mono">Type carrying the page</span><span class="t-body type-pair-value" id="ro-type">–</span></div>
+                <div class="type-pair"><span class="t-mono">Copy</span><span class="t-body type-pair-value" id="ro-copy">–</span></div>
+                <div class="type-pair"><span class="t-mono">Motion</span><span class="t-body type-pair-value" id="ro-motion">–</span></div>
+              </div>
+
+              <button class="button surface surface--rest surface--pill t-control" type="button" id="replay">Play the entrance</button>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="lib/components/accordion/accordion.js"></script>
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+
+// Guest rows: in a tool they're the page; in an occasion they're gone.
+const ROWS = [['Ana Ruiz', '✓ Going', 1, 'Oct 21'], ['Ben Okafor', '✓ Going', 0, 'Oct 21'], ['Chloe Park', '! Maybe', 1, 'Oct 22'],
+  ['Dev Patel', '✓ Going', 1, 'Oct 22'], ['Elif Kaya', '– No reply', '–', '–'], ['Felix Braun', '✓ Going', 0, 'Oct 23'], ['Gia Romano', '✗ Can’t', '–', 'Oct 23']];
+document.getElementById('rows').outerHTML = ROWS.map((r, i) => `<div class="band is-row" data-out="${(0.05 + i * 0.05).toFixed(2)} ${(0.25 + i * 0.05).toFixed(2)}" data-group="table">
+  <div class="row"><span class="t-mono">${r[0]}</span><span class="t-mono">${r[1]}</span><span class="t-mono">${r[2]}</span><span class="t-mono">${r[3]}</span></div></div>`).join('');
+
+const mock = document.getElementById('mock');
+const specimen = document.getElementById('specimen');
+const bands = [...mock.querySelectorAll('.band')];
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const vis = (band, r) => {
+  if (band.dataset.mix) return 1;
+  if (band.dataset.in) { const [a, b] = band.dataset.in.split(' ').map(Number); return smooth(a, b, r); }
+  const [a, b] = band.dataset.out.split(' ').map(Number); return 1 - smooth(a, b, r);
+};
+
+// Natural heights, measured with every band open.
+let heights = [];
+let faceHeights = {};
+const measure = () => {
+  bands.forEach((b) => { b.style.height = 'auto'; });
+  heights = bands.map((b) => b.scrollHeight);
+  mock.querySelectorAll('[data-face]').forEach((f) => { faceHeights[f.dataset.face] = f.offsetHeight; });
+  render();
+};
+
+let r = 0;
+function render() {
+  mock.style.setProperty('--r', r);
+  bands.forEach((b, i) => {
+    const v = vis(b, r);
+    b.style.setProperty('--v', v);
+    if (b.dataset.mix) {
+      // One slot, two faces: crossfade, and the slot's height follows.
+      const [a, z] = b.dataset.mix.split(' ').map(Number);
+      const m = smooth(a, z, r);
+      b.querySelector('[data-face="tool"]').style.opacity = 1 - m;
+      b.querySelector('[data-face="occasion"]').style.opacity = m;
+      b.style.height = `${faceHeights.tool + (faceHeights.occasion - faceHeights.tool) * m}px`;
+    } else {
+      b.style.height = `${heights[i] * v}px`;
+    }
+    b.style.opacity = Math.min(1, v * 1.6); // stays legible while its height gives way
+    b.style.visibility = v < 0.01 ? 'hidden' : '';
+    b.classList.toggle('is-on', v > 0.5);
+    b.classList.toggle('is-full', v > 0.99);
+  });
+
+  const page = Math.round(48 + 48 * r);
+  document.getElementById('ro-page').textContent = `${page}px`;
+  document.getElementById('ro-gap').textContent = `${page}px`;
+  const name = r < 0.2 ? 'Tool' : r > 0.8 ? 'Occasion' : 'Between';
+  document.getElementById('register-name').textContent = name;
+  document.getElementById('register').setAttribute('aria-valuetext', name);
+  document.getElementById('ro-type').textContent = r < 0.5 ? 'Label, Body, mono figures' : 'Display, the Flat pair';
+  document.getElementById('ro-copy').textContent = r < 0.5 ? 'Names and values' : 'Sentences, second person';
+  document.getElementById('ro-motion').textContent = r < 0.5 ? 'Responses only' : 'An entrance, and a main object that answers the pointer';
+  document.getElementById('replay').disabled = r < 0.5;
+
+  // Counted after layout settles: groups that are on and start above the fold.
+  requestAnimationFrame(() => {
+    const fold = 640;
+    const groups = new Set();
+    bands.forEach((b) => { if (vis(b, r) >= 0.45 && b.offsetTop < fold) groups.add(b.dataset.group); });
+    document.getElementById('ro-count').textContent = String(groups.size);
+  });
+}
+
+document.getElementById('register').addEventListener('input', (e) => { r = Number(e.target.value) / 100; render(); });
+document.getElementById('show').addEventListener('segmented-change', (e) => specimen.classList.toggle('is-boxes', e.detail.value === 'boxes'));
+
+document.getElementById('replay').addEventListener('click', () => {
+  let k = 0;
+  bands.forEach((b) => { if (b.classList.contains('is-on')) b.style.setProperty('--i', k++); });
+  mock.classList.remove('is-entering');
+  void mock.offsetWidth;
+  mock.classList.add('is-entering');
+  setTimeout(() => mock.classList.remove('is-entering'), 500 + k * 80);
+});
+
+// The main object leans toward the pointer, more the further into the occasion.
+const obj = document.getElementById('main-object');
+obj.addEventListener('pointermove', (e) => {
+  const k = Math.max(0, (r - 0.5) * 2);
+  const box = obj.getBoundingClientRect();
+  const x = (e.clientX - box.left) / box.width - 0.5, y = (e.clientY - box.top) / box.height - 0.5;
+  obj.style.transform = `rotateY(${x * 8 * k}deg) rotateX(${-y * 8 * k}deg)`;
+});
+obj.addEventListener('pointerleave', () => { obj.style.transform = ''; });
+
+document.getElementById('reply').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  document.querySelectorAll('#reply button').forEach((x) => { x.classList.toggle('is-selected', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+});
+
+// Re-measure only when the width changes; the height changes on every slide.
+let lastWidth = 0;
+new ResizeObserver(([entry]) => { const w = Math.round(entry.contentRect.width); if (w !== lastWidth) { lastWidth = w; measure(); } }).observe(specimen);
+measure();
+</script>

@@ -6,6 +6,7 @@ links the skill's own files through `lib/` (a symlink to
 
 - `pnl.html` — a trading P&L dashboard: control panel, figures, two charts, sortable tables.
 - `party.html` — a party host's page: docked settings, guest table, running order, large button.
+- `registers.html` — temporary: a slider from the Tool register to the Occasion register, with one specimen page answering live.
 - `dinners.html` — a week of dinners: a sortable week beside fixed nights, an ideas list, a small form.
 
 Open one through a local server from this folder, or publish it with its `lib/` files.
