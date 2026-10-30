@@ -1,4 +1,4 @@
-/* personal-styling · chip · v0.1.0 */
+/* personal-styling · chip · v0.2.0 */
 
 .chip-row {
   display: flex;
@@ -39,6 +39,12 @@
   /* Fill-deepening: --color-divider (8%) is the next step up from the
      4% selected fill. */
   .chip[aria-pressed="true"]:hover:not(:disabled) { background: var(--color-divider); }
+}
+/* Touch: the hover response plays on press — in at once, out on its
+   usual timing (see tokens.css). */
+@media (hover: none) {
+  .chip:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
+  .chip[aria-pressed="true"]:active:not(:disabled) { background: var(--color-divider); }
 }
 
 /* Disabled: 30% ink and a 30% ring, in either theme. */

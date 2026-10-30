@@ -22,6 +22,10 @@ Sections that open and close under a heading row, for content worth having but n
 - `accordion.js` fires a bubbling `accordion-toggle` event with `detail.open`.
 - Once a panel has finished opening it stops clipping (`.is-settled`), so a picker menu or tooltip inside it isn't cut off. Once it has finished closing the item gets `.is-collapsed`, so a container can change shape at a moment its height is final.
 
+## Changes in v0.5.0
+
+- On touch screens the hover response plays while the finger is down — the native tap flash is gone.
+
 ## Changes in v0.4.0
 
 - Its glyph is sized by the icon tokens (`--icon-mark` / `--icon-inline`) instead of a fixed number.

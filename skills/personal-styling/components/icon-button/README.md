@@ -17,3 +17,8 @@ An icon alone as a control — back, more, share, close — in two treatments: l
 - Secondary: `<button class="icon-button icon-button--secondary" aria-label="…">`.
 - Draw icons on a viewBox the size they render (`0 0 20 20` here), `fill="none"`, `stroke="currentColor"`, `stroke-width="1.5"`, round caps and joins.
 - No JavaScript.
+
+## Changes in v0.2.0
+
+- On touch screens the hover response plays while the finger is down — the native tap flash is gone.
+

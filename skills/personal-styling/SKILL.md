@@ -357,6 +357,8 @@ stay quiet.
   `--duration-reveal` (550ms), starting once the box has finished scaling. Wiping beats fading
   and survives wrapped lines, which a width transition doesn't.
 - **Hover is mandatory, and the bias is toward more of it.** Every interactive element — buttons, pills, selects, segments, chips, table rows, links, toggles — responds on hover: lift for buttons and surfaces, ink-brighten for text, a gliding fill for table rows (see `components/table/`), fill-deepening for chips and segments. A control with no hover response is a defect, not a minimalism choice. A hidden layer crossfades through a 6px blur.
+- **No native tap highlight.** The grey box a mobile browser flashes on every tap is the plainest sign of a web view, so `tokens.css` turns it off for everything (`-webkit-tap-highlight-color: transparent`). Never bring it back.
+- **On touch, the hover response is the press.** A touch screen can't hover, so the same response — lift, ink-brighten, fill-deepening — plays while the finger is down: in at once (`--duration-instant`), out on its usual timing when it lifts. Wrap it in `@media (hover: none)` beside the hover rule it mirrors. iOS only applies `:active` when the page listens for touches: put `ontouchstart` on `<body>`.
 - Hover-only information still needs a non-hover path: a tooltip on a chart
   point needs the table view; a tooltip carrying a definition needs the
   definition somewhere reachable. Hover is an upgrade, never the only route.

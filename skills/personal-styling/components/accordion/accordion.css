@@ -1,4 +1,4 @@
-/* personal-styling · accordion · v0.4.0 */
+/* personal-styling · accordion · v0.5.0 */
 
 /* A set of sections is a list, so it sits on the page with dividers.
    Wrap it in a surface only when it is the control panel (see
@@ -34,6 +34,11 @@
 /* Hover brightens everything in the row to full ink. */
 @media (hover: hover) and (pointer: fine) {
   .accordion-trigger:hover > * { color: var(--color-text); }
+}
+/* Touch: the hover response plays on press — in at once, out on its
+   usual timing (see tokens.css). */
+@media (hover: none) {
+  .accordion-trigger:active > * { color: var(--color-text); transition-duration: var(--duration-instant); }
 }
 
 /* The panel collapses to nothing and opens to its content's real

@@ -203,7 +203,7 @@ const page = (title, body, active = 'library') => `<!doctype html>
 ${styles}
 <link rel="stylesheet" href="site.css">
 </head>
-<body>
+<body ontouchstart>
 <div class="site container">
   <header class="site-header">
     <a class="t-body link-quiet" href="index.html">Personal styling</a>

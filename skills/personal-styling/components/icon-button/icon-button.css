@@ -1,4 +1,4 @@
-/* personal-styling · icon-button · v0.1.0 */
+/* personal-styling · icon-button · v0.2.0 */
 
 /* An icon alone as a control — back, more, share, close. A 40px circle:
    the visual and the touch target, the same as the intro's info button.
@@ -38,6 +38,11 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .icon-button--secondary:hover { background: var(--color-fill-quiet-hover); }
+}
+/* Touch: the hover response plays on press — in at once, out on its
+   usual timing (see tokens.css). */
+@media (hover: none) {
+  .icon-button--secondary:active:not(:disabled) { background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
 }
 
 .icon-button:disabled {

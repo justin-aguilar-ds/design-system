@@ -25,6 +25,10 @@ From the source site's media carousel, where a "Learn more" pill invited a click
 - **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the carousel pattern: the pill invites the click, the click explains. The pill hides while that element's tooltip is open.
 - Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
 
+## Changes in v0.5.0
+
+- On touch screens the hover response plays while the finger is down — the native tap flash is gone.
+
 ## Changes in v0.3.0
 
 - `.tooltip--prose` is gone: toggled tooltips are mono like the rest, in the standard `280px` box.
