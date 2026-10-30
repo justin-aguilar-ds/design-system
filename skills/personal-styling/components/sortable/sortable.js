@@ -1,4 +1,4 @@
-/* personal-styling · sortable · v0.2.0 */
+/* personal-styling · sortable · v0.2.1 */
 
 // A list put in order by hand. Pointer: press, then move, and the item
 // lifts and follows; the rest part to show where it will land; let go and
@@ -149,7 +149,7 @@ document.querySelectorAll('.sortable').forEach((list) => {
       const focused = document.activeElement;
       if (to !== from) {
         const rest = items.filter((el) => el !== item);
-        list.insertBefore(item, rest[to] || slot);
+        list.insertBefore(item, rest[to] || null); // last place: the end, wherever the slot sits
       }
       itemsOf().forEach((el) => {
         el.style.transition = 'none';

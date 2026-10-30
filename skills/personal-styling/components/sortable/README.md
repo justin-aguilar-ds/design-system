@@ -29,6 +29,10 @@ A short list whose order is the user's to set — priorities, steps, a queue —
 - For a list of more than a dozen or so, or one with more than one value per row, it's a table, not this.
 - Needs `--scale-lift` from `tokens.css` v0.10.
 
+## Changes in v0.2.1
+
+- Rows added after `sortable.js` runs reorder correctly: a drop into the last place no longer lands at the top.
+
 ## Changes in v0.2.0
 
 - The grip is optional, and off in the shipped markup. Without one, the row takes focus and a finger picks up with a long press.

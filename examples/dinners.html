@@ -1,0 +1,263 @@
+<title>Dinners, Nov 2–8</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/input/input.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/components/sortable/sortable.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
+<style>
+  /* Layout: one centred column. The week is the main object: the nights
+     stay put down the left, the dinners move beside them. */
+  .page {
+    max-width: 880px;
+    margin-inline: auto;
+    padding-block: var(--space-page) var(--space-48);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+  }
+  .page > * { min-width: 0; }
+  .section { display: flex; flex-direction: column; gap: var(--space-16); }
+  .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
+  .figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
+  @media (max-width: 630px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Night labels and dinners share one rhythm: a row's height and the
+     sortable's 16px gap, so each night sits level with its dinner. */
+  .week { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--space-16); }
+  .nights { display: flex; flex-direction: column; gap: var(--space-16); margin: 0; padding: 0; list-style: none; }
+  .nights li { display: flex; flex-direction: column; justify-content: center; }
+  .week .sortable-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .week .is-empty .sortable-label { color: var(--color-text-secondary); font-weight: 500; }
+  .meal-actions { display: flex; align-items: center; gap: var(--space-16); flex: none; }
+  @media (max-width: 630px) { .week .sortable-meta { display: none; } }
+
+  /* Ideas are a list on the page: dividers, no cards. */
+  .ideas { margin: 0; padding: 0; list-style: none; }
+  .idea {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    padding-block: var(--space-16);
+    border-top: 1px solid var(--color-divider);
+  }
+  .idea:first-child { border-top: 0; }
+  .idea .type-pair { flex: 1; min-width: 0; }
+  .add-form { display: flex; align-items: end; gap: var(--space-8); flex-wrap: wrap; }
+  .add-form .input-field { flex: 1 1 200px; min-width: 0; }
+  .add-form .input-field--short { flex: 0 1 140px; }
+  /* .control-field ships in the control-panel pattern; outside a panel the page defines it. */
+  .control-field { display: grid; justify-items: start; gap: var(--space-8); min-width: 0; }
+</style>
+
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">Dinners, Nov 2–8</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button"
+              aria-label="About this page" aria-expanded="false" aria-controls="intro-about"
+              data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">A week of dinners, some cooked and some ordered in. Drag dinners between nights; add from the ideas below. The meals are examples.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="figures" aria-label="This week">
+    <div class="type-pair"><span class="t-mono">Cooking</span><span class="t-title tnum" id="fig-cook">–</span></div>
+    <div class="type-pair"><span class="t-mono">Ordering in</span><span class="t-title tnum" id="fig-order">–</span></div>
+    <div class="type-pair"><span class="t-mono">Delivery spend</span><span class="t-title tnum" id="fig-spend">–</span></div>
+    <div class="type-pair"><span class="t-mono">Time cooking</span><span class="t-title tnum" id="fig-time">–</span></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="type-pair">
+        <h2 class="t-label">This week</h2>
+        <p class="t-body">Drag a dinner to another night.</p>
+      </div>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-control" type="button" id="fill">Fill open nights</button>
+        <span class="toast t-mono" role="status" id="toast"></span>
+      </span>
+    </div>
+    <div class="week">
+      <ol class="nights" aria-hidden="true" id="nights"></ol>
+      <ul class="sortable" aria-label="Dinners by night" id="meals"></ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="type-pair">
+        <h2 class="t-label">Ideas</h2>
+        <p class="t-body">Things we like. Add one to the next open night.</p>
+      </div>
+      <div class="segmented" role="group" aria-label="Show ideas" id="idea-filter">
+        <span class="segmented-indicator" aria-hidden="true"></span>
+        <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="all">All</button>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="cook">Cook</button>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="order">Order</button>
+      </div>
+    </div>
+    <ul class="ideas" id="ideas"></ul>
+    <form class="add-form" id="add-idea">
+      <div class="input-field">
+        <label class="t-label" for="idea-name">New idea</label>
+        <input class="input" id="idea-name" type="text" placeholder="Lemon chicken" autocomplete="off" required>
+      </div>
+      <div class="control-field input-field--short">
+        <span class="t-label" id="idea-kind-label">Kind</span>
+        <div class="segmented" role="group" aria-labelledby="idea-kind-label" id="idea-kind">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="cook">Cook</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="order">Order</button>
+        </div>
+      </div>
+      <div class="input-field input-field--short">
+        <label class="t-label" for="idea-detail" id="idea-detail-label">Minutes</label>
+        <input class="input" id="idea-detail" type="number" min="0" value="30" inputmode="numeric">
+      </div>
+      <button class="button surface surface--rest surface--pill t-control" type="submit">Add idea</button>
+    </form>
+  </section>
+</div>
+
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script src="lib/components/sortable/sortable.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+
+const NIGHTS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+let nextId = 1;
+const idea = (name, kind, n, where) => ({ id: nextId++, name, kind, n, where });
+const ideas = [
+  idea('Lemon pasta', 'cook', 20), idea('Chickpea curry', 'cook', 40), idea('Miso salmon', 'cook', 25),
+  idea('Mushroom risotto', 'cook', 45), idea('Fish tacos', 'cook', 30), idea('Shakshuka', 'cook', 25),
+  idea('Pad see ew', 'order', 32, 'Thai'), idea('Pizza', 'order', 28, 'Pizza'), idea('Ramen', 'order', 41, 'Ramen'),
+  idea('Sushi', 'order', 58, 'Sushi'), idea('Burritos', 'order', 26, 'Mexican'),
+];
+const byId = (id) => ideas.find((i) => i.id === id);
+// The week: one idea id (or null) per night, Monday first.
+let week = [1, 7, 2, null, 8, 4, null];
+let filter = 'all';
+
+const metaOf = (i) => (i.kind === 'cook' ? `Cook · ${i.n} min` : `Order · $${i.n}`);
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Seven rows, made once; sortable.js moves the nodes, and render() fills
+// them in their current order.
+const list = document.getElementById('meals');
+document.getElementById('nights').innerHTML = NIGHTS.map((n, k) => `<li><span class="t-label">${n}</span><span class="t-mono">Nov ${k + 2}</span></li>`).join('');
+NIGHTS.forEach(() => {
+  const li = document.createElement('li');
+  li.className = 'sortable-item';
+  li.innerHTML = '<span class="t-label sortable-label"></span><span class="meal-actions"><span class="t-mono sortable-meta"></span><button class="button-text link-quiet t-control" type="button" data-clear>Clear</button></span>';
+  list.append(li);
+});
+const rows = () => [...list.querySelectorAll('.sortable-item')];
+// Each night takes its dinner's height, so the two columns stay level
+// whatever a row holds.
+const nights = [...document.querySelectorAll('#nights li')];
+const level = () => rows().forEach((row, k) => { nights[k].style.height = `${row.offsetHeight}px`; });
+new ResizeObserver(level).observe(list);
+
+function render() {
+  rows().forEach((row, k) => {
+    const i = byId(week[k]);
+    row.dataset.id = week[k] ?? `empty-${k}`;
+    row.classList.toggle('is-empty', !i);
+    row.querySelector('.sortable-label').textContent = i ? i.name : 'Nothing planned';
+    row.querySelector('.sortable-meta').textContent = i ? metaOf(i) : '';
+    row.querySelector('[data-clear]').hidden = !i;
+    row.setAttribute('aria-label', `${FULL[k]}: ${i ? `${i.name}, ${metaOf(i)}` : 'nothing planned'}`);
+  });
+
+  const planned = week.map(byId).filter(Boolean);
+  const cook = planned.filter((i) => i.kind === 'cook'), order = planned.filter((i) => i.kind === 'order');
+  const mins = cook.reduce((s, i) => s + i.n, 0);
+  document.getElementById('fig-cook').textContent = `${cook.length} nights`;
+  document.getElementById('fig-order').textContent = `${order.length} nights`;
+  document.getElementById('fig-spend').textContent = `$${order.reduce((s, i) => s + i.n, 0)}`;
+  document.getElementById('fig-time').textContent = mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins}m`;
+
+  const open = week.indexOf(null);
+  document.getElementById('fill').disabled = open < 0;
+  document.getElementById('ideas').innerHTML = ideas
+    .filter((i) => filter === 'all' || i.kind === filter)
+    .map((i) => {
+      const on = week.includes(i.id);
+      const label = on ? `On ${NIGHTS[week.indexOf(i.id)]}` : open < 0 ? 'Week is full' : `Add to ${NIGHTS[open]}`;
+      return `<li class="idea">
+        <div class="type-pair"><span class="t-label">${esc(i.name)}</span><span class="t-mono">${metaOf(i)}${i.where ? ` · ${esc(i.where)}` : ''}</span></div>
+        <button class="button surface surface--rest surface--pill t-control" type="button" data-add="${i.id}"${on || open < 0 ? ' disabled' : ''}>${label}</button>
+      </li>`;
+    }).join('');
+}
+
+const toast = (msg) => showToast(document.getElementById('toast'), msg);
+
+list.addEventListener('sortable-change', (e) => {
+  week = e.detail.order.map((id) => (String(id).startsWith('empty') ? null : Number(id)));
+  render();
+});
+list.addEventListener('click', (e) => {
+  const clear = e.target.closest('[data-clear]');
+  if (!clear) return;
+  const k = rows().indexOf(clear.closest('.sortable-item'));
+  week[k] = null;
+  render();
+});
+document.getElementById('ideas').addEventListener('click', (e) => {
+  const add = e.target.closest('[data-add]');
+  if (!add) return;
+  const k = week.indexOf(null);
+  if (k < 0) return;
+  week[k] = Number(add.dataset.add);
+  render();
+  toast(`Added to ${FULL[k]}`);
+});
+document.getElementById('fill').addEventListener('click', () => {
+  const spare = ideas.filter((i) => !week.includes(i.id));
+  let filled = 0;
+  week = week.map((id) => {
+    if (id !== null || !spare.length) return id;
+    filled++;
+    return spare.splice(Math.floor(Math.random() * spare.length), 1)[0].id;
+  });
+  render();
+  toast(filled ? `Filled ${filled} ${filled === 1 ? 'night' : 'nights'}` : 'No open nights');
+});
+document.getElementById('idea-filter').addEventListener('segmented-change', (e) => { filter = e.detail.value; render(); });
+
+let kind = 'cook';
+document.getElementById('idea-kind').addEventListener('segmented-change', (e) => {
+  kind = e.detail.value;
+  document.getElementById('idea-detail-label').textContent = kind === 'cook' ? 'Minutes' : 'Dollars';
+});
+document.getElementById('add-idea').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('idea-name').value.trim();
+  if (!name) return;
+  ideas.push(idea(name, kind, Number(document.getElementById('idea-detail').value) || 0, kind === 'order' ? 'Delivery' : ''));
+  document.getElementById('idea-name').value = '';
+  if (filter !== 'all' && filter !== kind) document.querySelector(`#idea-filter [value="all"]`).click();
+  render();
+  toast(`Added ${name} to ideas`);
+});
+
+render();
+</script>

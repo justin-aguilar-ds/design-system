@@ -1,0 +1,518 @@
+<title>Desk P&amp;L</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/accordion/accordion.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
+<link rel="stylesheet" href="lib/components/chip/chip.css">
+<link rel="stylesheet" href="lib/components/table/table.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
+<link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
+<style>
+  /* Layout: one centred column at the container width; summary, then the
+     two charts, then the tables. Everything else comes from the library. */
+  .page {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page) var(--space-48);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+  }
+  .page > * { min-width: 0; }
+  .head { display: flex; flex-direction: column; gap: var(--space-24); }
+
+  .section { display: flex; flex-direction: column; gap: var(--space-16); }
+  .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
+
+  .figures {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
+    gap: var(--space-24);
+    align-items: end;
+  }
+  @media (max-width: 900px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figures > :first-child { grid-column: 1 / -1; } }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Charts are content, so they sit on the surface. Drawn at their
+     rendered pixel size and redrawn on resize, so type stays true. */
+  .chart {
+    position: relative;
+    padding: var(--space-16);
+    min-width: 0;
+  }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .chart text { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.3px; text-transform: uppercase; fill: var(--color-text-secondary); }
+  .chart .grid { stroke: var(--color-divider); stroke-width: 1; }
+  .chart .zero { stroke: var(--color-hairline-strong); stroke-width: 1; }
+  .chart .line { fill: none; stroke: var(--color-text); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .area { fill: var(--color-fill-subtle); stroke: none; }
+  .chart .bar-gain { fill: var(--color-gain-fill); }
+  .chart .bar-loss { fill: var(--color-loss-fill); }
+  .chart .cross { stroke: var(--color-hairline-strong); stroke-width: 1; }
+  .chart .dot { fill: var(--color-accent); stroke: var(--color-text); stroke-width: 1.5; }
+  .chart .bar-on { stroke: var(--color-text); stroke-width: 1; }
+  .chart-tip {
+    position: absolute;
+    top: var(--space-8);
+    left: 0;
+    pointer-events: none;
+    padding: var(--space-8) var(--space-16);
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--duration-fast) ease;
+  }
+  .chart-tip.is-visible { opacity: 1; }
+  .charts { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--space-24); }
+  @media (max-width: 900px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="page">
+  <div class="head">
+    <header class="intro">
+      <div class="intro-title-row">
+        <h1 class="t-display">Desk P&amp;L</h1>
+        <button class="intro-info surface surface--rest surface--pill" type="button"
+                aria-label="About this dashboard" aria-expanded="false" aria-controls="intro-about"
+                data-tooltip-toggle="intro-about">
+          <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+        </button>
+        <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+          <p class="tooltip-text t-mono">Example account with made-up trades. Realized and unrealized P&amp;L in USD, marked at each day's close. Through Oct 30, 2026.</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="control-panel surface accordion" aria-label="Controls">
+      <div class="accordion-item is-open">
+        <h2 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="controls-trigger" aria-expanded="true" aria-controls="controls-body">
+            <span class="t-mono">Controls</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h2>
+        <div class="accordion-panel" id="controls-body" role="region" aria-labelledby="controls-trigger">
+          <div class="accordion-content"><div class="accordion-body">
+            <div class="control-panel-fields">
+              <div class="control-field">
+                <span class="t-label" id="period-label">Period</span>
+                <div class="segmented" role="group" aria-labelledby="period-label" id="period">
+                  <span class="segmented-indicator" aria-hidden="true"></span>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="5">1W</button>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="21">1M</button>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="63">3M</button>
+                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="all">YTD</button>
+                </div>
+              </div>
+
+              <div class="picker-field">
+                <span class="t-label" id="account-label">Account</span>
+                <div class="picker" id="account">
+                  <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
+                          aria-haspopup="listbox" aria-expanded="false" aria-controls="account-list"
+                          aria-labelledby="account-label account-value">
+                    <span class="picker-value" id="account-value">All accounts</span>
+                    <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div class="picker-menu" hidden>
+                    <ul class="picker-list" id="account-list" role="listbox" tabindex="-1" aria-labelledby="account-label">
+                      <li class="picker-option t-control" role="option" aria-selected="true" data-value="all">All accounts</li>
+                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="margin">Margin</li>
+                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="ira">Roth IRA</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-field">
+                <span class="t-label" id="asset-label">Asset class</span>
+                <div class="chip-row" role="group" aria-labelledby="asset-label" id="assets">
+                  <button class="chip t-control" type="button" aria-pressed="true" data-asset="Equities"><span class="chip-dot" aria-hidden="true"></span>Equities</button>
+                  <button class="chip t-control" type="button" aria-pressed="true" data-asset="Options"><span class="chip-dot" aria-hidden="true"></span>Options</button>
+                  <button class="chip t-control" type="button" aria-pressed="true" data-asset="Futures"><span class="chip-dot" aria-hidden="true"></span>Futures</button>
+                </div>
+              </div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="figures" aria-label="Summary">
+    <div class="type-pair">
+      <span class="t-mono">Net P&amp;L</span>
+      <span class="t-display tnum" id="fig-net">–</span>
+    </div>
+    <div class="type-pair">
+      <span class="t-mono">Realized</span>
+      <span class="t-title tnum" id="fig-realized">–</span>
+    </div>
+    <div class="type-pair">
+      <span class="t-mono">Unrealized</span>
+      <span class="t-title tnum" id="fig-unrealized">–</span>
+    </div>
+    <div class="type-pair">
+      <span class="t-mono">Green days</span>
+      <span class="t-title tnum" id="fig-win">–</span>
+    </div>
+    <div class="type-pair">
+      <span class="t-mono">Max drawdown</span>
+      <span class="t-title tnum" id="fig-dd">–</span>
+    </div>
+  </section>
+
+  <div class="charts">
+    <section class="section">
+      <div class="type-pair">
+        <h2 class="t-label">Equity curve</h2>
+        <p class="t-body">Cumulative P&amp;L, day by day.</p>
+      </div>
+      <div class="chart surface" id="curve"><svg role="img" aria-label="Cumulative P&amp;L"></svg><div class="chart-tip t-mono"></div></div>
+    </section>
+    <section class="section">
+      <div class="type-pair">
+        <h2 class="t-label" id="daily-title">Daily P&amp;L</h2>
+        <p class="t-body" id="daily-sub">Each day, green above the line and red below.</p>
+      </div>
+      <div class="chart surface" id="daily"><svg role="img" aria-label="Daily P&amp;L"></svg><div class="chart-tip t-mono"></div></div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="type-pair">
+        <h2 class="t-label">Open positions</h2>
+        <p class="t-body" id="positions-summary">Marked at today's close.</p>
+      </div>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-control" type="button" id="copy-csv" data-copy="" data-toast="Copied">Copy as CSV</button>
+        <span class="toast t-mono" role="status"></span>
+      </span>
+    </div>
+    <div class="table-wrap">
+      <table class="table table--sticky" id="positions" data-sort="manual">
+        <thead><tr>
+          <th scope="col">Symbol</th>
+          <th scope="col">Class</th>
+          <th scope="col" class="table-num"><button class="table-sort" type="button">Qty <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col" class="table-num">Avg cost</th>
+          <th scope="col" class="table-num">Last</th>
+          <th scope="col" class="table-num"><button class="table-sort" type="button">Day <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col" class="table-num" aria-sort="descending"><button class="table-sort" type="button">Unrealized <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col" class="table-num"><button class="table-sort" type="button">Weight <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="type-pair">
+      <h2 class="t-label">Closed trades</h2>
+      <p class="t-body">The last ten round trips in the period.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="table" id="trades">
+        <thead><tr>
+          <th scope="col">Closed</th>
+          <th scope="col">Symbol</th>
+          <th scope="col">Side</th>
+          <th scope="col" class="table-num">Qty</th>
+          <th scope="col" class="table-num">Held</th>
+          <th scope="col" class="table-num">P&amp;L</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script src="lib/components/accordion/accordion.js"></script>
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/picker/picker.js"></script>
+<script src="lib/components/chip/chip.js"></script>
+<script src="lib/components/table/table.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+
+// ---- Example data: seeded, so every visit shows the same book.
+let seed = 20261030;
+const rand = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+const gauss = () => { let u = 0; for (let i = 0; i < 6; i++) u += rand(); return u - 3; };
+
+// Trading days from Jan 2 to Oct 30, 2026.
+const days = [];
+for (let d = new Date(2026, 0, 2); d <= new Date(2026, 9, 30); d.setDate(d.getDate() + 1)) {
+  if (d.getDay() !== 0 && d.getDay() !== 6) days.push(new Date(d));
+}
+const ACCOUNTS = ['margin', 'ira'];
+const ASSETS = ['Equities', 'Options', 'Futures'];
+const DRIFT = { margin: { Equities: 38, Options: 22, Futures: 14 }, ira: { Equities: 26, Options: 6, Futures: 0 } };
+const VOL = { margin: { Equities: 420, Options: 610, Futures: 520 }, ira: { Equities: 260, Options: 140, Futures: 0 } };
+const series = {};
+for (const a of ACCOUNTS) for (const c of ASSETS) {
+  series[`${a}:${c}`] = days.map((_, i) => Math.round(DRIFT[a][c] + VOL[a][c] * gauss() + (i > 150 && i < 166 ? -VOL[a][c] * 0.3 : 0)));
+}
+
+const positions = [
+  ['NVDA', 'Equities', 'margin', 120, 118.4, 141.2, 2.1],
+  ['MSFT', 'Equities', 'margin', 80, 402.1, 431.8, -0.4],
+  ['AAPL', 'Equities', 'ira', 150, 211.3, 226.9, 0.7],
+  ['COST', 'Equities', 'ira', 22, 903.5, 878.1, -1.2],
+  ['SPY 590C 12/18', 'Options', 'margin', 10, 14.2, 19.85, 6.4],
+  ['TSLA 220P 11/20', 'Options', 'margin', -6, 8.9, 5.1, -3.8],
+  ['QQQ 500P 11/20', 'Options', 'ira', 4, 6.1, 4.25, -2.6],
+  ['ES DEC', 'Futures', 'margin', 2, 5872, 5911.5, 0.3],
+  ['CL DEC', 'Futures', 'margin', -3, 71.4, 69.8, -1.1],
+].map(([symbol, cls, account, qty, cost, last, day]) => {
+  const mult = cls === 'Options' ? 100 : symbol.startsWith('ES') ? 50 : symbol.startsWith('CL') ? 1000 : 1;
+  return { symbol, cls, account, qty, cost, last, day, unrealized: Math.round((last - cost) * qty * mult), value: Math.abs(last * qty * mult) };
+});
+
+const trades = [];
+const NAMES = { Equities: ['AMD', 'META', 'AMZN', 'GOOGL', 'JPM'], Options: ['SPY 580C', 'IWM 220P', 'NVDA 150C'], Futures: ['NQ', 'GC', 'ZN'] };
+for (let i = days.length - 1; i > 0 && trades.length < 80; i -= 2) {
+  const cls = ASSETS[Math.floor(rand() * 3)];
+  const account = rand() < 0.65 ? 'margin' : 'ira';
+  if (account === 'ira' && cls === 'Futures') continue;
+  trades.push({ day: i, cls, account, symbol: NAMES[cls][Math.floor(rand() * NAMES[cls].length)], side: rand() < 0.7 ? 'Long' : 'Short',
+    qty: cls === 'Equities' ? 25 * Math.ceil(rand() * 8) : Math.ceil(rand() * 6), held: Math.ceil(rand() * 12), pnl: Math.round(gauss() * 900 + 120) });
+}
+
+// ---- Formatting. A real minus sign; money signed so gains read as gains.
+const money = (n, sign = true) => `${n < 0 ? '−' : sign && n > 0 ? '+' : ''}$${Math.abs(Math.round(n)).toLocaleString('en-US')}`;
+const short = (n) => {
+  const a = Math.abs(n);
+  const s = a >= 1000 ? `${(a / 1000).toFixed(a >= 10000 ? 0 : 1)}k` : `${Math.round(a)}`;
+  return `${n < 0 ? '−' : ''}$${s}`;
+};
+const fmtDate = (d, opts = { month: 'short', day: 'numeric' }) => d.toLocaleDateString('en-US', opts);
+
+// ---- State
+const state = { period: 'all', account: 'all', assets: new Set(ASSETS), sort: { key: 'unrealized', dir: 'descending' } };
+const inScope = (account, cls) => (state.account === 'all' || state.account === account) && state.assets.has(cls);
+
+function daily() {
+  const start = state.period === 'all' ? 0 : days.length - Number(state.period);
+  const out = [];
+  for (let i = start; i < days.length; i++) {
+    let v = 0;
+    for (const a of ACCOUNTS) for (const c of ASSETS) if (inScope(a, c)) v += series[`${a}:${c}`][i];
+    out.push({ i, date: days[i], v });
+  }
+  let run = 0;
+  out.forEach((d) => { run += d.v; d.cum = run; });
+  return out;
+}
+
+// ---- Charts
+const NS = 'http://www.w3.org/2000/svg';
+const el = (name, attrs, parent) => {
+  const node = document.createElementNS(NS, name);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  parent?.append(node);
+  return node;
+};
+const niceStep = (span, count) => {
+  const raw = span / count;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  return [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+};
+function scaleY(lo, hi, top, bottom) {
+  lo = Math.min(lo, 0); hi = Math.max(hi, 0);
+  if (lo === hi) hi = lo + 1;
+  const step = niceStep(hi - lo, 4);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const y = (v) => bottom - ((v - lo) / (hi - lo)) * (bottom - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + step / 2; v += step) ticks.push(v);
+  return { y, ticks };
+}
+const H = 240, M = { top: 8, right: 8, bottom: 24, left: 52 };
+
+function frame(host, data, { lo, hi }) {
+  const svg = host.querySelector('svg');
+  const W = svg.clientWidth || host.clientWidth - 32;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('height', H);
+  svg.replaceChildren();
+  const { y, ticks } = scaleY(lo, hi, M.top, H - M.bottom);
+  const x0 = M.left, x1 = W - M.right;
+  ticks.forEach((t) => {
+    el('line', { class: t === 0 ? 'zero' : 'grid', x1: x0, x2: x1, y1: y(t), y2: y(t) }, svg);
+    el('text', { x: x0 - 8, y: y(t) + 3.5, 'text-anchor': 'end' }, svg).textContent = short(t);
+  });
+  // Month ticks, thinned to fit.
+  const months = [];
+  data.forEach((d, k) => { if (k === 0 || d.date.getMonth() !== data[k - 1].date.getMonth()) months.push(k); });
+  const xAt = (k) => x0 + (data.length === 1 ? 0 : (k / (data.length - 1)) * (x1 - x0));
+  const every = Math.max(1, Math.ceil(months.length / Math.floor((x1 - x0) / 56)));
+  if (months.length > 1) {
+    months.filter((_, j) => j % every === 0).forEach((k) => {
+      el('text', { x: xAt(k), y: H - 6, 'text-anchor': k === 0 ? 'start' : 'middle' }, svg).textContent = fmtDate(data[k].date, { month: 'short' });
+    });
+  } else {
+    [0, data.length - 1].forEach((k) => {
+      el('text', { x: xAt(k), y: H - 6, 'text-anchor': k === 0 ? 'start' : 'end' }, svg).textContent = fmtDate(data[k].date);
+    });
+  }
+  return { svg, y, x0, x1, xAt, W };
+}
+
+function hover(host, data, f, describe, mark) {
+  const tip = host.querySelector('.chart-tip');
+  const hit = el('rect', { x: f.x0, y: 0, width: f.x1 - f.x0, height: H, fill: 'transparent' }, f.svg);
+  const layer = el('g', {}, f.svg);
+  const at = (event) => {
+    const r = f.svg.getBoundingClientRect();
+    const px = (event.clientX - r.left) * (f.W / r.width);
+    return Math.max(0, Math.min(data.length - 1, Math.round(((px - f.x0) / (f.x1 - f.x0)) * (data.length - 1))));
+  };
+  const show = (k) => {
+    layer.replaceChildren();
+    mark(layer, k);
+    tip.textContent = describe(data[k]);
+    tip.classList.add('is-visible');
+    const left = 16 + f.xAt(k) * (f.svg.getBoundingClientRect().width / f.W);
+    const w = tip.offsetWidth;
+    tip.style.transform = `translateX(${Math.max(8, Math.min(host.clientWidth - w - 8, left - w / 2))}px)`;
+  };
+  hit.addEventListener('pointermove', (e) => show(at(e)));
+  hit.addEventListener('pointerdown', (e) => show(at(e)));
+  hit.addEventListener('pointerleave', () => { layer.replaceChildren(); tip.classList.remove('is-visible'); });
+}
+
+function drawCurve(data) {
+  const host = document.getElementById('curve');
+  const f = frame(host, data, { lo: Math.min(...data.map((d) => d.cum)), hi: Math.max(...data.map((d) => d.cum)) });
+  const pts = data.map((d, k) => `${f.xAt(k)},${f.y(d.cum)}`);
+  el('path', { class: 'area', d: `M${f.xAt(0)},${f.y(0)}L${pts.join('L')}L${f.xAt(data.length - 1)},${f.y(0)}Z` }, f.svg);
+  el('path', { class: 'line', d: `M${pts.join('L')}` }, f.svg);
+  hover(host, data, f, (d) => `${fmtDate(d.date)} · ${money(d.cum)}`, (layer, k) => {
+    el('line', { class: 'cross', x1: f.xAt(k), x2: f.xAt(k), y1: M.top, y2: H - M.bottom }, layer);
+    el('circle', { class: 'dot', cx: f.xAt(k), cy: f.y(data[k].cum), r: 5 }, layer);
+  });
+}
+
+// Past three months a day is too thin to read, so bars become weeks.
+function bars(data) {
+  if (data.length <= 63) return { unit: 'Daily', data };
+  const weeks = [];
+  data.forEach((d) => {
+    const monday = new Date(d.date); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    const last = weeks[weeks.length - 1];
+    if (last && last.key === +monday) last.v += d.v;
+    else weeks.push({ key: +monday, date: d.date, v: d.v }); // dated by its first trading day in range
+  });
+  return { unit: 'Weekly', data: weeks };
+}
+
+function drawDaily(all) {
+  const { unit, data } = bars(all);
+  document.getElementById('daily-title').textContent = `${unit} P&L`;
+  document.getElementById('daily-sub').textContent = `${unit === 'Daily' ? 'Each day' : 'Each week'}, green above the line and red below.`;
+  const host = document.getElementById('daily');
+  const f = frame(host, data, { lo: Math.min(...data.map((d) => d.v)), hi: Math.max(...data.map((d) => d.v)) });
+  const slot = (f.x1 - f.x0) / data.length;
+  const bw = Math.max(1, slot - 2); // a 2px gap of ground between bars
+  const zero = f.y(0);
+  const xb = (k) => f.x0 + k * slot + (slot - bw) / 2;
+  f.xAt = (k) => f.x0 + k * slot + slot / 2;
+  data.forEach((d, k) => {
+    const top = Math.min(zero, f.y(d.v)), h = Math.max(1, Math.abs(f.y(d.v) - zero));
+    el('rect', { class: d.v >= 0 ? 'bar-gain' : 'bar-loss', x: xb(k), y: top, width: bw, height: h, rx: Math.min(2, bw / 2) }, f.svg);
+  });
+  hover(host, data, f, (d) => `${unit === 'Weekly' ? 'Week of ' : ''}${fmtDate(d.date)} · ${money(d.v)}`, (layer, k) => {
+    const d = data[k];
+    const top = Math.min(zero, f.y(d.v)), h = Math.max(1, Math.abs(f.y(d.v) - zero));
+    el('rect', { class: `${d.v >= 0 ? 'bar-gain' : 'bar-loss'} bar-on`, x: xb(k), y: top, width: bw, height: h, rx: Math.min(2, bw / 2) }, layer);
+  });
+}
+
+// ---- Figures and tables
+function figures(data) {
+  // Open positions are marked now; everything else in the period is realized.
+  const unrealized = positions.filter((p) => inScope(p.account, p.cls)).reduce((s, p) => s + p.unrealized, 0);
+  const net = data[data.length - 1].cum;
+  const realized = net - unrealized;
+  let peak = 0, dd = 0;
+  data.forEach((d) => { peak = Math.max(peak, d.cum); dd = Math.min(dd, d.cum - peak); });
+  document.getElementById('fig-net').textContent = money(net);
+  document.getElementById('fig-realized').textContent = money(realized);
+  document.getElementById('fig-unrealized').textContent = money(unrealized);
+  document.getElementById('fig-win').textContent = `${Math.round((data.filter((d) => d.v > 0).length / data.length) * 100)}%`;
+  document.getElementById('fig-dd').textContent = money(dd);
+}
+
+const polarity = (n) => (n > 0 ? ' table-gain' : n < 0 ? ' table-loss' : '');
+function positionRows() {
+  const rows = positions.filter((p) => inScope(p.account, p.cls));
+  const total = rows.reduce((s, p) => s + p.value, 0) || 1;
+  rows.forEach((p) => { p.weight = p.value / total; });
+  const { key, dir } = state.sort;
+  rows.sort((a, b) => (dir === 'ascending' ? 1 : -1) * (a[key] - b[key]));
+  const body = document.querySelector('#positions tbody');
+  body.innerHTML = rows.map((p) => `<tr>
+    <td>${p.symbol}</td><td>${p.cls}</td>
+    <td class="table-num">${p.qty < 0 ? '−' : ''}${Math.abs(p.qty)}</td>
+    <td class="table-num">${p.cost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+    <td class="table-num">${p.last.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+    <td class="table-num${polarity(p.day)}">${p.day > 0 ? '+' : p.day < 0 ? '−' : ''}${Math.abs(p.day).toFixed(1)}%</td>
+    <td class="table-num${polarity(p.unrealized)}">${money(p.unrealized)}</td>
+    <td class="table-num">${(p.weight * 100).toFixed(1)}%</td>
+  </tr>`).join('') || '<tr><td colspan="8">– No open positions in this selection</td></tr>';
+  const open = rows.reduce((s, p) => s + p.unrealized, 0);
+  document.getElementById('positions-summary').textContent = `${rows.length} open, ${money(open)} unrealized, marked at today's close.`;
+  const csv = ['Symbol,Class,Qty,Avg cost,Last,Day %,Unrealized,Weight %', ...rows.map((p) => [p.symbol, p.cls, p.qty, p.cost, p.last, p.day, p.unrealized, (p.weight * 100).toFixed(1)].join(','))].join('\n');
+  const copy = document.getElementById('copy-csv');
+  copy.dataset.copy = csv;
+  copy.dataset.toast = `Copied ${rows.length} rows`;
+}
+const SORT_KEYS = { 2: 'qty', 5: 'day', 6: 'unrealized', 7: 'weight' };
+document.getElementById('positions').addEventListener('table-sort', (e) => {
+  state.sort = { key: SORT_KEYS[e.detail.column], dir: e.detail.direction };
+  positionRows();
+});
+
+function tradeRows(data) {
+  const rows = trades.filter((t) => inScope(t.account, t.cls) && t.day >= data[0].i).slice(0, 10);
+  document.querySelector('#trades tbody').innerHTML = rows.map((t) => `<tr>
+    <td>${fmtDate(days[t.day])}</td><td>${t.symbol}</td><td>${t.side}</td>
+    <td class="table-num">${t.qty}</td><td class="table-num">${t.held}d</td>
+    <td class="table-num${polarity(t.pnl)}">${money(t.pnl)}</td>
+  </tr>`).join('') || '<tr><td colspan="6">– No closed trades in this selection</td></tr>';
+}
+
+function render() {
+  const data = daily();
+  figures(data);
+  drawCurve(data);
+  drawDaily(data);
+  positionRows();
+  tradeRows(data);
+}
+
+document.getElementById('period').addEventListener('segmented-change', (e) => { state.period = e.detail.value; render(); });
+document.getElementById('account').addEventListener('picker-change', (e) => { state.account = e.detail.value; render(); });
+document.getElementById('assets').addEventListener('chip-change', (e) => {
+  const asset = e.target.closest('[data-asset]').dataset.asset;
+  if (e.detail.on) state.assets.add(asset); else state.assets.delete(asset);
+  render();
+});
+let resizeFrame = 0;
+new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(() => { const d = daily(); drawCurve(d); drawDaily(d); }); }).observe(document.querySelector('.charts'));
+render();
+</script>
