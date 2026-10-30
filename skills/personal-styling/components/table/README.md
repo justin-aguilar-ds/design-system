@@ -9,6 +9,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 - **Full width of its container.** The table is `width: 100%` inside `.table-wrap`. It never sets its own max-width; the container does.
 - **Column headers are Label** (16/19, 600, full ink) — never mono, never uppercase. Left-aligned, `16px` bottom padding.
 - **Every data cell is 10.5 mono**, weight 500: values, figures, timestamps, IDs, statuses, details. Tables don't inherit font sizes for mono.
+- **One font size per cell.** Nothing inside a cell — code, a link, an emphasis — changes its size, family, tracking or case; the component enforces it. A second size in a cell gives that row a different height and baseline, and the hover fill no longer fits it. Only ink may change, with `.table-ink`.
 - **Value vs detail is ink, not size.** The identifying column (id, name) carries full ink; first-column position is what makes a row scannable. Anything else that must be read takes `.table-ink`. The rest is secondary.
 - **Row dividers:** `1px solid var(--color-divider)`. None under the last row, no vertical rules, no zebra striping.
 - **Cells:** `16px` vertical padding, `24px` between columns.
@@ -36,6 +37,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 - Hover now brightens the **whole row**. The old rule said "brighten the row label", but the label column is already full ink, so that hover changed nothing.
 - v0.2.0: rows take a gliding background fill on hover, modelled on the segmented control. The old rule was "no background change". The table's outer edges gain `16px` of padding to make room for the fill's radius.
+- v0.7.0: one font size per cell, enforced — anything inside a cell takes the cell's type.
 - v0.6.0: no padding at the outer edges; the fill bleeds `16px` past the table instead, so content aligns with the page and still sits inside the fill.
 - v0.5.0: the fill is placed from layout offsets, so it lines up inside a scaled or zoomed container.
 - v0.3.0: the fill moves on `--duration-base`, not `--duration-deliberate` — rows are dense. A selected row no longer shows a square background behind the rounded fill.

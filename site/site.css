@@ -93,16 +93,24 @@ body { min-height: 100vh; }
 .prose ul, .prose ol { padding-left: var(--space-24); display: flex; flex-direction: column; gap: var(--space-8); }
 /* Emphasis is ink, never weight: 600 belongs to interactive things. */
 .prose strong { font-weight: inherit; color: var(--color-text); }
-/* Inline code takes the same site-only code role as the blocks. */
-.prose code { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--color-text); }
+/* Inline code is a value or an identifier, so it takes the mono role —
+   10.5px, uppercase, +0.3px — at full ink, because it's meaningful. Code
+   blocks keep their case and size: they're copied, not read at a glance. */
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
 .prose-link { text-decoration: none; }
 @media (hover: hover) and (pointer: fine) {
   .prose-link:hover { text-decoration: underline; }
 }
 
-/* Markdown tables use the table component; inline code inside them
-   keeps its case. */
-.prose td code { text-transform: none; }
+/* Markdown tables use the table component, which gives every cell one
+   size; nothing here overrides it. */
 
 @media (max-width: 630px) {
   .component-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }

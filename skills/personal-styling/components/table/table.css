@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.6.0 */
+/* personal-styling · table · v0.7.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It fills its container and scrolls sideways rather than shrinking
@@ -54,6 +54,20 @@
    the content above and below the table. */
 .table th:last-child,
 .table td:last-child { padding-right: 0; }
+
+/* One size per cell. Whatever sits inside a cell — code, a link, an
+   emphasis, a span — takes the cell's type exactly, so every row keeps one
+   baseline and one height, and the fill fits it. Ink may change; size,
+   family, tracking and case may not. */
+.table th *,
+.table td * {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+}
 
 /* Dividers between rows, including under the header row. None under
    the last row, no vertical rules, no zebra. */

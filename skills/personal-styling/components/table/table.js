@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.6.0 */
+/* personal-styling · table · v0.7.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
