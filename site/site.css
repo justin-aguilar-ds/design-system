@@ -156,3 +156,15 @@ body { min-height: 100vh; }
   align-items: start;
   gap: var(--space-48);
 }
+
+/* Type pairs as shipped: the pairs in the same columns as their states,
+   48px apart, so each reads on its own. */
+.pattern-stage:has(> .type-pair) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+  gap: var(--space-48);
+}
+/* A pair that opens with a Display line is a page opening; it takes the
+   full width rather than a column. */
+.pattern-stage > .type-pair:has(> .t-display:first-child) { grid-column: 1 / -1; }

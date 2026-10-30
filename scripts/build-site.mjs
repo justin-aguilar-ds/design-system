@@ -268,7 +268,7 @@ for (const c of all) {
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 ${intro(inline(c.title), inline(c.summary))}
 ${c.html ? section('As shipped', stage(c, c.html)) : ''}
-${c.demo ? section('States', stage(c, c.demo)) : ''}
+${c.demo ? `<div class="accordion">${accordionItem('states', 'States', stage(c, c.demo), { level: 2 })}</div>` : ''}
 ${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
 ${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));
 }
