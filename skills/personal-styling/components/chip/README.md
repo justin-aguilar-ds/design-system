@@ -13,7 +13,7 @@ A filter is not the nav pill — the nav has one truth at a time, filters have m
 ## Rules
 
 - The dot is what makes the state readable without colour. Keep it.
-- `4px` vertical padding, `8px` horizontal, `8px` from dot to label; fully round.
+- **36px tall, like every other control**: `8px` vertical padding, `16px` horizontal, `8px` from dot to label; fully round. A chip row sits in a row of pickers, inputs and segmented controls without breaking the line.
 - Transition `background` and `color` on `--duration-fast` with plain `ease`.
 - A row of chips is `8px` gaps, wrapping.
 - Hover brightens an off chip's ink to full; an on chip's fill deepens from 4% to 8%.
@@ -23,6 +23,10 @@ A filter is not the nav pill — the nav has one truth at a time, filters have m
 
 - Each chip is a `<button>` with `aria-pressed`. Put the row in a `role="group"` with an `aria-label` that names what it filters.
 - `chip.js` toggles `aria-pressed` and fires a bubbling `chip-change` event with `detail.on`. Listen for it on the row.
+
+## Changes in v0.4.0
+
+- 36px tall (was 28px), the height the segmented control, picker, input and compact button share.
 
 ## Changes in v0.3.0
 

@@ -30,7 +30,7 @@
   .head { display: flex; flex-direction: column; gap: var(--space-24); }
 
   .section { display: flex; flex-direction: column; gap: var(--space-16); }
-  .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
 
   .figures {
     display: grid;
@@ -103,20 +103,16 @@
         </h2>
         <div class="accordion-panel" id="controls-body" role="region" aria-labelledby="controls-trigger">
           <div class="accordion-content"><div class="accordion-body">
-            <div class="control-panel-fields">
-              <div class="control-field">
-                <span class="t-label" id="period-label">Period</span>
-                <div class="segmented" role="group" aria-labelledby="period-label" id="period">
+            <div class="field-row">
+                <div class="segmented" role="group" aria-label="Period" id="period">
                   <span class="segmented-indicator" aria-hidden="true"></span>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="5">1W</button>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="21">1M</button>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="63">3M</button>
                   <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="all">YTD</button>
                 </div>
-              </div>
 
-              <div class="picker-field">
-                <span class="t-label" id="account-label">Account</span>
+                <span id="account-label" hidden>Account</span>
                 <div class="picker" id="account">
                   <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
                           aria-haspopup="listbox" aria-expanded="false" aria-controls="account-list"
@@ -132,16 +128,12 @@
                     </ul>
                   </div>
                 </div>
-              </div>
 
-              <div class="control-field">
-                <span class="t-label" id="asset-label">Asset class</span>
-                <div class="chip-row" role="group" aria-labelledby="asset-label" id="assets">
+                <div class="chip-row" role="group" aria-label="Asset class" id="assets">
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Equities"><span class="chip-dot" aria-hidden="true"></span>Equities</button>
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Options"><span class="chip-dot" aria-hidden="true"></span>Options</button>
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Futures"><span class="chip-dot" aria-hidden="true"></span>Futures</button>
                 </div>
-              </div>
             </div>
           </div></div>
         </div>
@@ -174,27 +166,18 @@
 
   <div class="charts">
     <section class="section">
-      <div class="type-pair">
-        <h2 class="t-label">Equity curve</h2>
-        <p class="t-body">Cumulative P&amp;L, day by day.</p>
-      </div>
+      <h2 class="t-label">Equity curve</h2>
       <div class="chart surface" id="curve"><svg role="img" aria-label="Cumulative P&amp;L"></svg><div class="chart-tip t-mono"></div></div>
     </section>
     <section class="section">
-      <div class="type-pair">
-        <h2 class="t-label" id="daily-title">Daily P&amp;L</h2>
-        <p class="t-body" id="daily-sub">Each day, green above the line and red below.</p>
-      </div>
+      <h2 class="t-label" id="daily-title">Daily P&amp;L</h2>
       <div class="chart surface" id="daily"><svg role="img" aria-label="Daily P&amp;L"></svg><div class="chart-tip t-mono"></div></div>
     </section>
   </div>
 
   <section class="section">
     <div class="section-head">
-      <div class="type-pair">
-        <h2 class="t-label">Open positions</h2>
-        <p class="t-body" id="positions-summary">Marked at today's close.</p>
-      </div>
+      <h2 class="t-label">Open positions</h2>
       <span class="toast-anchor">
         <button class="button surface surface--rest surface--pill t-control" type="button" id="copy-csv" data-copy="" data-toast="Copied">Copy as CSV</button>
         <span class="toast t-mono" role="status"></span>
@@ -218,10 +201,7 @@
   </section>
 
   <section class="section">
-    <div class="type-pair">
-      <h2 class="t-label">Closed trades</h2>
-      <p class="t-body">The last ten round trips in the period.</p>
-    </div>
+    <h2 class="t-label">Closed trades</h2>
     <div class="table-wrap">
       <table class="table" id="trades">
         <thead><tr>
@@ -423,7 +403,6 @@ function bars(data) {
 function drawDaily(all) {
   const { unit, data } = bars(all);
   document.getElementById('daily-title').textContent = `${unit} P&L`;
-  document.getElementById('daily-sub').textContent = `${unit === 'Daily' ? 'Each day' : 'Each week'}, green above the line and red below.`;
   const host = document.getElementById('daily');
   const f = frame(host, data, { lo: Math.min(...data.map((d) => d.v)), hi: Math.max(...data.map((d) => d.v)) });
   const slot = (f.x1 - f.x0) / data.length;
@@ -474,8 +453,6 @@ function positionRows() {
     <td class="table-num${polarity(p.unrealized)}">${money(p.unrealized)}</td>
     <td class="table-num">${(p.weight * 100).toFixed(1)}%</td>
   </tr>`).join('') || '<tr><td colspan="8">– No open positions in this selection</td></tr>';
-  const open = rows.reduce((s, p) => s + p.unrealized, 0);
-  document.getElementById('positions-summary').textContent = `${rows.length} open, ${money(open)} unrealized, marked at today's close.`;
   const csv = ['Symbol,Class,Qty,Avg cost,Last,Day %,Unrealized,Weight %', ...rows.map((p) => [p.symbol, p.cls, p.qty, p.cost, p.last, p.day, p.unrealized, (p.weight * 100).toFixed(1)].join(','))].join('\n');
   const copy = document.getElementById('copy-csv');
   copy.dataset.copy = csv;

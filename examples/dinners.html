@@ -25,7 +25,7 @@
   }
   .page > * { min-width: 0; }
   .section { display: flex; flex-direction: column; gap: var(--space-16); }
-  .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
   .figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
   @media (max-width: 630px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .tnum { font-variant-numeric: tabular-nums; }
@@ -51,11 +51,8 @@
   }
   .idea:first-child { border-top: 0; }
   .idea .type-pair { flex: 1; min-width: 0; }
-  .add-form { display: flex; align-items: end; gap: var(--space-8); flex-wrap: wrap; }
   .add-form .input-field { flex: 1 1 200px; min-width: 0; }
   .add-form .input-field--short { flex: 0 1 140px; }
-  /* .control-field ships in the control-panel pattern; outside a panel the page defines it. */
-  .control-field { display: grid; justify-items: start; gap: var(--space-8); min-width: 0; }
 </style>
 
 <div class="page">
@@ -82,10 +79,7 @@
 
   <section class="section">
     <div class="section-head">
-      <div class="type-pair">
-        <h2 class="t-label">This week</h2>
-        <p class="t-body">Drag a dinner to another night.</p>
-      </div>
+      <h2 class="t-label">This week</h2>
       <span class="toast-anchor">
         <button class="button surface surface--rest surface--pill t-control" type="button" id="fill">Fill open nights</button>
         <span class="toast t-mono" role="status" id="toast"></span>
@@ -99,10 +93,7 @@
 
   <section class="section">
     <div class="section-head">
-      <div class="type-pair">
-        <h2 class="t-label">Ideas</h2>
-        <p class="t-body">Things we like. Add one to the next open night.</p>
-      </div>
+      <h2 class="t-label">Ideas</h2>
       <div class="segmented" role="group" aria-label="Show ideas" id="idea-filter">
         <span class="segmented-indicator" aria-hidden="true"></span>
         <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="all">All</button>
@@ -111,7 +102,7 @@
       </div>
     </div>
     <ul class="ideas" id="ideas"></ul>
-    <form class="add-form" id="add-idea">
+    <form class="field-row add-form" id="add-idea">
       <div class="input-field">
         <label class="t-label" for="idea-name">New idea</label>
         <input class="input" id="idea-name" type="text" placeholder="Lemon chicken" autocomplete="off" required>

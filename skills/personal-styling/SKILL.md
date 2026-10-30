@@ -197,11 +197,24 @@ The constraint that does the most work in practice.
 
 - **Three type styles to a card, maximum.** A title (Label), body copy (Body), and one emphasis — the large number (Display/Title) *or* the mono detail. Picking both is the mistake. Chart internals — axis ticks, tooltips, legends — sit outside the budget.
 - **One headline to a view.** No eyebrow above it, no kicker below it, **and nothing on the line beside it.** A heading followed by a `<span>` descriptor — `## Colour · seven greys and one accent` — is the same mistake wearing a different hat: it turns the heading into a label and buries the summary in chrome. Say `Relay`, then describe it in body copy on its own line; not `RELAY · DELIVERY PLATFORM` stacked over `Overview`, and not `Colour` with a trailing gloss.
-- If the descriptor is worth reading, it is a sentence under the heading. If it isn't, delete it.
+- If the descriptor is worth reading, it is a sentence under the heading. If it isn't, delete it. Usually it isn't — see Labels.
 - **If a card needs a second line, it is body copy**, not a smaller heading and not mono.
 - A four-style card is the commonest failure: eyebrow, title, number, mono footer. Drop the eyebrow and turn the footer into a sentence.
 
 **Show the rule, don't describe it.** When you need to state a choice — a rule, a do/don't, a before/after — the default form is a **two-column comparison row**: the generic version on the left under a secondary label, the house version on the right under a full-ink one, on the page with a divider above. It is faster to read than a paragraph, it proves the rule instead of asserting it, and it needs no card. Use it wherever you would otherwise write "prefer X to Y".
+
+## Labels
+
+The heading names the section and the content names itself. Most labels are a second name for something already named, and a page of them reads dense and administrative. Lean towards none.
+
+- **A heading is enough.** A section opens with its heading alone. A sentence goes under it only when it says what the content can't: a caveat, a rule, an instruction that isn't obvious. "Cumulative P&L, day by day" under "Equity curve", or "9 open" above a table of nine rows, repeats the content. Cut it.
+- **Prefer no label at all.** Cover the label: if the control still says what it is, the label goes. Chips reading Equities / Options / Futures, a segmented 1W / 1M / YTD, a picker reading "All accounts", a search box with its icon all name themselves. A bare control still takes an accessible name: `aria-label` on the control or its group.
+- **Label when the value alone is ambiguous.** A number ("40" means nothing without "Capacity"), a slider, an on/off pair like Shown / Hidden, a field someone types into. A placeholder never labels a field someone fills in, because it vanishes as they type. The one exception is a single field with a button beside it that names it ("Add guest").
+- **Never label twice.** A control under a heading that already names it takes no label of its own. "Invite link" over a field labelled "Link" is one name said twice.
+- **A group is all labelled or all bare.** Controls side by side (a filter bar, a form row, a control panel) either all have a label above them or none do. One labelled field beside bare ones pushes its control off the shared line and the row breaks. If one control in a group needs a label, they all get one.
+- **Every control is 36px, so any control can sit beside any other.** The segmented control, picker, input, compact button and chip share one height. Put a group in `.field-row`: it wraps, keeps `16px` between controls, and lines them up along the bottom.
+- **A label is Label, `8px` above its control, in a field.** The input, picker and slider bring their own (`.input-field`, `.picker-field`, `.slider-field`); a segmented control or chip row goes in `.control-field`. All four are the same shape.
+- **Values keep their names.** A figure still takes its mono name above it (see `patterns/type-pairs/`), because a number with no name is a guess. These rules are about chrome, not data.
 
 ## Components
 

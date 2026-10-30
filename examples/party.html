@@ -35,10 +35,9 @@
   .figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
   @media (max-width: 630px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .tnum { font-variant-numeric: tabular-nums; }
-  .inline-form { display: flex; align-items: end; gap: var(--space-8); flex-wrap: wrap; }
-  .inline-form .input-field { flex: 1 1 240px; min-width: 0; }
-  .filters { display: flex; align-items: end; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
-  .filters .input-field { flex: 0 1 280px; min-width: 0; }
+  .inline-form .input { flex: 1 1 240px; }
+  .filters { justify-content: space-between; }
+  .filters .search { flex: 0 1 280px; }
   .order-list { max-width: 560px; }
   .message { max-width: 65ch; }
   .content > .toast-anchor { align-self: flex-start; } /* the toast centres on its button, not the column */
@@ -77,15 +76,9 @@
       </section>
 
       <section class="section">
-        <div class="type-pair">
-          <h2 class="t-label">Invite link</h2>
-          <p class="t-body">Anyone with the link can reply. Replies show up in the guest list.</p>
-        </div>
-        <div class="inline-form">
-          <div class="input-field">
-            <label class="t-label" for="invite-link">Link</label>
-            <input class="input" id="invite-link" type="text" value="rsvp.example/rooftop-nov-14" readonly>
-          </div>
+        <h2 class="t-label" id="invite-heading">Invite link</h2>
+        <div class="field-row inline-form">
+          <input class="input" id="invite-link" type="text" value="rsvp.example/rooftop-nov-14" readonly aria-labelledby="invite-heading">
           <span class="toast-anchor">
             <button class="button surface surface--rest surface--pill t-control" type="button" data-copy="https://rsvp.example/rooftop-nov-14" data-toast="Link copied">Copy link</button>
             <span class="toast t-mono" role="status"></span>
@@ -94,24 +87,18 @@
       </section>
 
       <section class="section">
-        <div class="type-pair">
-          <h2 class="t-label">Guests</h2>
-          <p class="t-body" id="guest-summary">Everyone invited, and how they replied.</p>
-        </div>
-        <div class="filters">
+        <h2 class="t-label">Guests</h2>
+        <div class="field-row filters">
           <div class="chip-row" role="group" aria-label="Show replies" id="status-chips">
             <button class="chip t-control" type="button" aria-pressed="true" data-status="going"><span class="chip-dot" aria-hidden="true"></span>Going</button>
             <button class="chip t-control" type="button" aria-pressed="true" data-status="maybe"><span class="chip-dot" aria-hidden="true"></span>Maybe</button>
             <button class="chip t-control" type="button" aria-pressed="true" data-status="none"><span class="chip-dot" aria-hidden="true"></span>No reply</button>
             <button class="chip t-control" type="button" aria-pressed="true" data-status="no"><span class="chip-dot" aria-hidden="true"></span>Can't</button>
           </div>
-          <div class="input-field">
-            <label class="t-label" for="guest-search">Search</label>
-            <span class="input-wrap input-wrap--search">
-              <svg class="input-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input class="input" id="guest-search" type="search" placeholder="Name">
-            </span>
-          </div>
+          <span class="input-wrap input-wrap--search search">
+            <svg class="input-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input class="input" id="guest-search" type="search" placeholder="Search guests" aria-label="Search guests">
+          </span>
         </div>
         <div class="table-wrap">
           <table class="table table--sticky" id="guests">
@@ -125,23 +112,17 @@
             <tbody></tbody>
           </table>
         </div>
-        <form class="inline-form" id="add-guest">
-          <div class="input-field">
-            <label class="t-label" for="guest-name">Add a guest</label>
-            <input class="input" id="guest-name" type="text" placeholder="Name" autocomplete="off" required>
-          </div>
+        <form class="field-row inline-form" id="add-guest">
+          <input class="input" id="guest-name" type="text" placeholder="Name" autocomplete="off" required aria-label="Guest name">
           <span class="toast-anchor">
-            <button class="button surface surface--rest surface--pill t-control" type="submit">Add</button>
+            <button class="button surface surface--rest surface--pill t-control" type="submit">Add guest</button>
             <span class="toast t-mono" role="status" id="add-toast"></span>
           </span>
         </form>
       </section>
 
       <section class="section">
-        <div class="type-pair">
-          <h2 class="t-label">Running order</h2>
-          <p class="t-body">Drag to reorder. Start times follow.</p>
-        </div>
+        <h2 class="t-label">Running order</h2>
         <ul class="sortable order-list" aria-label="Running order" id="order">
           <li class="sortable-item" data-id="doors" data-min="30"><span class="t-label sortable-label">Doors and drinks</span><span class="t-mono sortable-meta"></span></li>
           <li class="sortable-item" data-id="food" data-min="60"><span class="t-label sortable-label">Food comes out</span><span class="t-mono sortable-meta"></span></li>
@@ -153,10 +134,7 @@
       </section>
 
       <section class="section">
-        <div class="type-pair">
-          <h2 class="t-label">The invite</h2>
-          <p class="t-body">What guests see when they open the link.</p>
-        </div>
+        <h2 class="t-label">The invite</h2>
         <p class="t-body message" id="message"></p>
       </section>
 
@@ -278,7 +256,6 @@ function render() {
     <td>${esc(g.note) || '–'}</td>
     <td>${g.replied || '–'}</td>
   </tr>`).join('') || '<tr><td colspan="5">– Nobody matches</td></tr>';
-  document.getElementById('guest-summary').textContent = `${guests.length} invited, ${heads} coming including plus-ones. Showing ${rows.length}.`;
 
   const waiting = count('none') + count('maybe');
   const remind = document.getElementById('remind');

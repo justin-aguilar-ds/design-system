@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.7.0 */
+/* personal-styling · control-panel · v0.8.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -43,12 +43,7 @@
 
 /* A field is its label, 8px, then its control. The picker and slider bring
    their own field wrappers; this is the one for everything else. */
-.control-field {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-8);
-  min-width: 0;
-}
+/* .control-field lives in tokens.css (v0.11), so it works outside a panel too. */
 
 /* ================================================================
    Docked: the panel beside the content instead of above it — for a

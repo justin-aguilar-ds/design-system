@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.10
+   Personal styling tokens — v0.11
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -245,6 +245,28 @@ body {
     color var(--duration-fast) ease,
     scale var(--duration-base) var(--ease-out); /* the touch press springs back */
 }
+
+/* ---- NEW (v0.11): fields. A label is Label, 8px above its control.
+   The input, picker and slider bring their own field wrapper with these
+   same metrics; anything else — a segmented control, a chip row — goes
+   in .control-field. Moved here from the control-panel pattern, so it
+   works outside a panel. */
+.control-field {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+  min-width: 0;
+}
+/* A group of controls side by side — a filter bar, a form row. Every
+   control is 36px, so they share one line; aligned to the bottom, a row
+   whose fields all carry labels lines up too. All labelled or all bare. */
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-16);
+}
+.field-row > * { min-width: 0; }
 
 /* ---- The selected state is quiet: a subtle fill, not the accent. ---- */
 .is-selected {
