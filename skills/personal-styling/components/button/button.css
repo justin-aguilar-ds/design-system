@@ -1,4 +1,4 @@
-/* personal-styling · button · v0.3.0 */
+/* personal-styling · button · v0.4.0 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
@@ -63,7 +63,8 @@
     bottom: var(--space-page);
     z-index: 30;
   }
-  /* Room at the end of the page, so its last content can scroll clear of
-     the pinned button: the button plus the inset above and below it. */
-  body:has(.button--large) { padding-bottom: calc(var(--height-row) + 2 * var(--space-page)); }
+  /* Room at the end of the page for the pinned button's footprint — the
+     button and the inset under it. The page's own --space-page-block
+     then clears it, so the last content ends 48px above the button. */
+  body:has(.button--large) { padding-bottom: calc(var(--height-row) + var(--space-page)); }
 }

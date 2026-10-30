@@ -4,8 +4,8 @@
 h1, h2, h3, p, ul, ol, pre { margin: 0; }
 body { min-height: 100vh; }
 
-/* A reading surface: centred at --container, with the page inset. */
-.site { padding: var(--space-page); }
+/* A reading surface: centred at --container; 48 top and bottom, 24 at the sides. */
+.site { padding: var(--space-page-block) var(--space-page); }
 
 /* The header: the name top-left in secondary ink, like a short
    name block; the nav pill and the quiet theme action on the right. */

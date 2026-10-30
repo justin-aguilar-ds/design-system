@@ -161,9 +161,9 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
   - `4` — inner padding of a small control (pill, chip, segment button). Never a gap between blocks.
   - `8` — label to value, icon to text.
   - `16` — inside a card, between fields.
-  - `24` — the page inset, on all four sides, and card to card.
-  - `48` — section to section.
-- **`24px` is the page inset**, top/right/bottom/left, for everything pinned to an edge.
+  - `24` — the page's side inset, the inset of anything pinned to an edge, and card to card.
+  - `48` — section to section, and the top and bottom of the page.
+- **The page is `48` top and bottom, `24` at the sides.** `--space-page-block` (48) opens and closes the page flow: the air above the intro is a section's worth, twice the sides, which gives the opening its weight. `--space-page` (24) is the side inset and the inset of everything pinned to an edge — a docked panel, the large button, a nav pill — on every side. Both are roles that point at existing steps; there is no sixth step.
 - **Cap reading content at `1280px` and centre it.**
 - **Layout is binary per surface.** Centred at a max-width (reading surfaces) *or* full-width with the `24px` page inset (data-dense tools, wide tables). A surface that is neither — content that looks centred but isn't constrained, a wide table floating in an unconstrained frame — is a defect. Pick one and hold it; never let a container drift between the two.
 - **Derived positions are written as `calc()` with a comment explaining the arithmetic**, never as a hardcoded magic number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.

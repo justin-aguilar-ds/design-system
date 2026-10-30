@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.11
+   Personal styling tokens — v0.12
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -25,9 +25,13 @@ img, video, svg { display: block; max-width: 100%; }
   --space-4: 4px;    /* inner padding of small controls */
   --space-8: 8px;    /* label to value, icon to text */
   --space-16: 16px;  /* inside a card, between fields */
-  --space-24: 24px;  /* page inset, card to card */
+  --space-24: 24px;  /* side inset, card to card */
   --space-48: 48px;  /* section to section */
-  --space-page: var(--space-24);
+  --space-page: var(--space-24);        /* left and right, and anything pinned to an edge */
+  /* NEW (v0.12): the top and bottom of the page flow. A role, not a new
+     step: a section's worth of air above the intro and after the last
+     section, twice the sides, so the opening has weight. */
+  --space-page-block: var(--space-48);
 
   /* WIDTH — NEW. The source never needed one (every page is a fixed
      viewport with no scrolling body). 1280px is the industry-standard
