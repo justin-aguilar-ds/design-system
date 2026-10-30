@@ -173,6 +173,7 @@ const navOption = (label, href, on) => `<a class="segmented-option t-control${on
 const nav = (active) => `<nav class="segmented" aria-label="Site">
       <span class="segmented-indicator" aria-hidden="true"></span>
       ${navOption('Library', 'index.html', active === 'library')}
+      ${navOption('Foundations', 'foundations.html', active === 'foundations')}
       ${navOption('Rules', 'rules.html', active === 'rules')}
     </nav>`;
 
@@ -231,6 +232,13 @@ writeFileSync(join(out, 'index.html'), page('Personal styling', `
 ${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange components; components are single controls.')}
 ${section('Patterns', list(patterns))}
 ${section('Components', list(components))}`));
+
+// Foundations: the colour, type and surface rules as specimens. The page
+// body is site/foundations.html; site.js fills in values from the live
+// tokens, so it can never disagree with tokens.css.
+writeFileSync(join(out, 'foundations.html'), page('Foundations — Personal styling', `
+${intro('Foundations', 'Colour, type and surfaces, drawn rather than described. Every value is read from the tokens as the page loads.')}
+${read(join(root, 'site/foundations.html'))}`, 'foundations'));
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 const toc = [];

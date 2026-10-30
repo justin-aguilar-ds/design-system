@@ -43,3 +43,24 @@ renderToggle();
     if (event.target.closest('a') && matchMedia('(max-width: 630px)').matches) setAccordion(item, false);
   });
 })();
+
+// Foundations: every value shown is read from the live page — tokens from
+// :root, type metrics from the specimen itself — so the page can't drift
+// from tokens.css, and theme or screen-size changes update it.
+(() => {
+  const tokens = [...document.querySelectorAll('[data-token]')];
+  const metrics = [...document.querySelectorAll('[data-metrics-for]')];
+  if (!tokens.length && !metrics.length) return;
+  const round = (n) => Math.round(parseFloat(n) * 100) / 100;
+  const fill = () => {
+    const root = getComputedStyle(document.documentElement);
+    tokens.forEach((el) => { el.textContent = `${el.dataset.token} · ${root.getPropertyValue(el.dataset.token).trim()}`; });
+    metrics.forEach((el) => {
+      const s = getComputedStyle(document.getElementById(el.dataset.metricsFor));
+      el.textContent = `${round(s.fontSize)} / ${round(s.lineHeight)} · ${s.fontWeight} · ${s.letterSpacing}`;
+    });
+  };
+  fill();
+  toggle.addEventListener('click', () => requestAnimationFrame(fill));
+  addEventListener('resize', fill);
+})();

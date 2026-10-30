@@ -176,3 +176,85 @@ body { min-height: 100vh; }
 /* A pair that opens with a Display line is a page opening; it takes the
    full width rather than a column. */
 .pattern-stage > .type-pair:has(> .t-display:first-child) { grid-column: 1 / -1; }
+
+/* ---- Foundations: the rules drawn as specimens. ---- */
+.ink-ladder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-48);
+  padding: var(--space-24) 0;
+}
+.ink-full { color: var(--color-text); }
+.ink-secondary { color: var(--color-text-secondary); }
+.ink-inactive { color: var(--color-text); opacity: var(--opacity-label-inactive); }
+
+.swatch-grid,
+.specimen-grid,
+.type-specimens,
+.specimen-list { list-style: none; padding: 0; }
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* two across on a phone */
+  gap: var(--space-48) var(--space-24);
+}
+.swatch { display: grid; gap: var(--space-16); align-content: start; }
+.swatch-chip {
+  height: 96px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+}
+.swatch-chip--accent { display: grid; place-items: center; color: var(--color-accent-ink); }
+
+/* Type roles: a list, so rows on the page with dividers. The specimen on
+   the left at its real size; its name, use and live metrics on the right. */
+.type-specimens li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-24);
+  padding: var(--space-24) 0;
+  border-top: 1px solid var(--color-divider);
+}
+
+/* Specimens: each rule shown in a fixed-height area so their captions line
+   up, with no box of its own — the specimen inside is the subject. */
+.specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-48) var(--space-24);
+  padding-top: var(--space-24);
+}
+.specimen { display: grid; gap: var(--space-16); align-content: start; }
+/* Specimens share their caption's left edge, centred top to bottom. */
+.specimen-stage {
+  height: 176px;
+  display: grid;
+  align-items: center;
+  justify-items: start;
+}
+.specimen-stage--row { display: flex; align-items: center; gap: var(--space-24); }
+.specimen-stage--stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--space-16); }
+.specimen-card { display: grid; gap: var(--space-8); padding: var(--space-16); width: 220px; }
+.specimen-box { display: grid; place-items: center; width: 220px; height: 128px; }
+.specimen-pill { padding: var(--space-8) var(--space-24); }
+.specimen-corner { width: 96px; height: 96px; }
+.specimen-one-row {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 var(--space-16);
+  border-radius: var(--radius-pill);
+}
+.specimen-two-row {
+  display: grid;
+  gap: var(--space-8);
+  width: 220px;
+  padding: var(--space-16);
+}
+.specimen-list { width: 220px; }
+.specimen-list li { padding: var(--space-8) 0; border-top: 1px solid var(--color-divider); }
+.specimen-list li:first-child { border-top: 0; }
+
+@media (max-width: 630px) {
+  .type-specimens li { grid-template-columns: minmax(0, 1fr); gap: var(--space-16); }
+}
