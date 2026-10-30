@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.5.0 */
+/* personal-styling · control-panel · v0.6.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -26,6 +26,7 @@
 /* Inside a card, 16px. The trigger takes the card's radius so its focus
    outline follows the panel's corners. */
 .control-panel .accordion-trigger {
+  min-height: calc(var(--height-row) - 2px); /* the panel's two 1px borders make up the rest */
   padding: var(--space-16);
   border-radius: var(--radius-card);
 }
@@ -112,5 +113,5 @@
   /* Floating, it can be taller than the screen: the open card scrolls
      inside itself rather than running off the top. */
   .control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
-  .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - 50px); } /* minus the 50px heading row */
+  .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - var(--height-row)); } /* minus the heading row */
 }

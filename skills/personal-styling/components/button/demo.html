@@ -8,10 +8,6 @@
     <button class="button surface surface--rest surface--pill t-label force-hover" type="button">Save changes</button>
   </div>
   <div class="demo-cell">
-    <p class="t-caption">Focus</p>
-    <button class="button surface surface--rest surface--pill t-label force-focus" type="button">Save changes</button>
-  </div>
-  <div class="demo-cell">
     <p class="t-caption">Disabled</p>
     <button class="button surface surface--rest surface--pill t-label" type="button" disabled>Save changes</button>
   </div>
@@ -29,6 +25,26 @@
       <button class="button surface surface--rest surface--pill t-label" type="button">Save changes</button>
       <button class="button surface surface--rest surface--pill t-control" type="button">Export</button>
       <button class="button-text link-quiet t-control" type="button">Delete week</button>
+    </div>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Large</p>
+    <button class="button button--large surface surface--rest surface--pill t-label" type="button">Start export</button>
+  </div>
+  <div class="demo-cell">
+    <p class="t-caption">Large, hover</p>
+    <button class="button button--large surface surface--rest surface--pill t-label force-hover" type="button">Start export</button>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Large beside a closed control panel — the same 50px</p>
+    <div class="demo-pair">
+      <section class="control-panel surface accordion" aria-label="Filters">
+        <div class="accordion-item">
+          <h2 class="accordion-heading"><button class="accordion-trigger" type="button" id="demo-large-trigger" aria-expanded="false" aria-controls="demo-large-body"><span class="t-mono">Filters</span><svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h2>
+          <div class="accordion-panel" id="demo-large-body" role="region" aria-labelledby="demo-large-trigger" inert><div class="accordion-content"><div class="accordion-body"><p class="t-body">Status, range and endpoint.</p></div></div></div>
+        </div>
+      </section>
+      <button class="button button--large surface surface--rest surface--pill t-label" type="button">Start export</button>
     </div>
   </div>
 </div>

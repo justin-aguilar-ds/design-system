@@ -16,9 +16,21 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - There is no louder button. If one action must dominate a group, it does so by position, not by a second pill style.
 - Buttons never change background colour on hover. They lift, or they brighten their ink.
 
+## Large
+
+- **For the main action of a screen** — the one thing the page exists to do. Above all on a phone, where it's the easiest target to reach.
+- **It's the pill, larger.** Same surface, rest shadow, hover lift and Label type. Add `.button--large` to a button that already has the pill classes.
+- **Its height is `--height-row` (50px)**, the height of a collapsed control panel, so a large button and a closed panel line up as one family.
+- **Full width on a phone**, inside the page padding. Above 630px it's as wide as its label plus `24px` either side.
+- **One per screen.** If two actions both look large, one of them isn't the main action.
+
 ## Use
 
 - Primary action: `.t-label`. Compact controls — card actions, toolbars: `.t-control`.
 - Always a real `<button type="button">`, or `type="submit"` in a form.
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
+
+## Changes in v0.2.0
+
+- `.button--large`: the main action, 50px tall, full width on a phone.

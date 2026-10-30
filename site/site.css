@@ -133,3 +133,12 @@ body { min-height: 100vh; }
 /* Source files sit in an accordion, closed: the code is there when wanted. */
 .site-section .accordion-body .code { margin: 0; }
 .prose--page > h2:first-child { padding-top: 0; border-top: 0; }
+
+/* Two pieces side by side at their real widths, for comparing heights. */
+.demo-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-16);
+}
+@media (max-width: 630px) { .demo-pair { grid-template-columns: minmax(0, 1fr); } }

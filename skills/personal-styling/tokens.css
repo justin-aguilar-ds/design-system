@@ -89,6 +89,9 @@ img, video, svg { display: block; max-width: 100%; }
      so a corner can animate to it from --radius-card. 999px can't be
      animated to — it passes the half-height cap at once and snaps. */
   --radius-row: calc(var(--pill-below) / 2);
+  /* NEW (v0.5): the height of a one-row surface people act on at full size —
+     a collapsed control panel, a large button — so the two always match. */
+  --height-row: 50px;
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);   /* only if it lifts */
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);   /* hover */
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24); /* images/video */

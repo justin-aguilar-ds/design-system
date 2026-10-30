@@ -33,6 +33,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
 
+## Changes in v0.6.0
+
+- The heading row is pinned to `--height-row`, so a collapsed panel is exactly 50px — the height of a large button.
+
 ## Changes in v0.5.0
 
 - The docked panel is a surface with the persistent shadow, like the panel above a tool, instead of sitting on the page with a divider. It sits `24px` from the content.

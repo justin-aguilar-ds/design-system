@@ -211,7 +211,7 @@ rules.
 
 | Component | Reach for it when | Folder |
 |---|---|---|
-| Button | an action needs a control — the pill, or the quiet text treatment for infrequent actions | `components/button/` |
+| Button | an action needs a control — the pill, the large pill for a screen's main action, or the quiet text treatment for infrequent actions | `components/button/` |
 | Toggle chip | several filters can be on at once | `components/chip/` |
 | Range slider | a continuous value, set by drag or keyboard | `components/slider/` |
 | Segmented control | one choice out of a few, always visible — a view switch, a denominator, the page nav | `components/segmented/` |

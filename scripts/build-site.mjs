@@ -14,16 +14,17 @@ const read = (path) => readFileSync(path, 'utf8');
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 // ---- Forced states -------------------------------------------------------
-// Hover and focus can't be triggered from markup, so every selector using
-// :hover or :focus-visible gets a twin using .force-hover / .force-focus.
-// demo.html files put those classes on elements to show the state at rest.
+// Hover can't be triggered from markup, so every selector using :hover gets
+// a twin using .force-hover. demo.html files put that class on an element
+// to show the state at rest. Focus is left to the keyboard: forced focus
+// rings were the loudest thing on every demo page.
 function forceStates(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/([^{}]+)\{/g, (match, prelude) => {
     if (prelude.trim().startsWith('@')) return match;
     const selectors = prelude.split(',');
     const twins = selectors
-      .filter((s) => /:hover|:focus-visible/.test(s))
-      .map((s) => s.replace(/:hover/g, '.force-hover').replace(/:focus-visible/g, '.force-focus'));
+      .filter((s) => /:hover/.test(s))
+      .map((s) => s.replace(/:hover/g, '.force-hover'));
     return twins.length ? `${[...selectors, ...twins].join(',')}{` : match;
   });
 }
