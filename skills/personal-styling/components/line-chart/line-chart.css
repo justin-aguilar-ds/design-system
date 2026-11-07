@@ -1,0 +1,133 @@
+/* personal-styling · line-chart · v0.1.0 */
+
+/* Series over time, for comparing one against the rest. The quiet series
+   are a solid grey, the focus is full ink on top, and the values come
+   from a tooltip at the point rather than from axis labels. Drawn by
+   line-chart.js at its real pixel width, so type stays true. */
+.line-chart {
+  --line-chart-weight: 2.25;                    /* the quiet series; the focus is one step heavier */
+  --line-chart-fade: var(--duration-base);      /* lines brightening and dimming */
+  --line-chart-grow: var(--duration-pop);       /* the tooltip and its point appearing */
+  --line-chart-follow: var(--duration-fast);    /* the tooltip moving from point to point */
+  position: relative;
+  min-width: 0;
+  margin: 0;
+}
+/* On a surface, like a card; without the modifier it sits on the page
+   like a table or a list. */
+.line-chart--surface {
+  padding: var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+}
+.line-chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  touch-action: pan-y;          /* sideways is the chart's; up and down still scrolls */
+}
+.line-chart text {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  fill: var(--color-text-secondary);
+}
+
+/* Guides are dotted: reference, not data. 1.5px dots, 4px apart, in the
+   strong hairline. */
+.line-chart-guide {
+  stroke: var(--color-hairline-strong);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0 4;
+}
+
+/* Every series in the solid series grey, so crossings stay one grey
+   instead of stacking darker; the focus in full ink, one step heavier.
+   Round caps and joins; monotone curves that never overshoot the data. */
+.line-chart-series {
+  fill: none;
+  stroke: var(--color-series);
+  stroke-width: var(--line-chart-weight);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    stroke var(--line-chart-fade) ease,
+    stroke-width var(--line-chart-fade) var(--ease-out);
+}
+.line-chart-series.is-focus {
+  stroke: var(--color-text);
+  stroke-width: calc(var(--line-chart-weight) + 1);
+}
+.line-chart-end { fill: var(--color-text); }
+
+/* The point under the pointer: a small dot in the line's own ink, ringed
+   by the ground. Never the accent with a black ring. */
+.line-chart-point {
+  fill: var(--color-text);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+  opacity: 0;
+  transition: opacity var(--line-chart-grow) ease;
+}
+.line-chart--surface .line-chart-point { stroke: var(--color-surface); }
+.line-chart.has-tip .line-chart-point { opacity: 1; }
+
+/* The tooltip grows from the point, like the tooltip component, and
+   follows from point to point. One row of text: a pill. */
+.line-chart-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: var(--space-8) var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: bottom center;
+  scale: 0;
+  transition:
+    scale var(--line-chart-grow) var(--ease-out),
+    translate var(--line-chart-follow) var(--ease-out);
+}
+.line-chart.has-tip .line-chart-tip { scale: 1; }
+.line-chart-tip.is-below { transform-origin: top center; }
+
+/* The legend: names in order under the chart, each a control. Every name
+   carries the chip's dot — a ring, filled for the focus — so nothing
+   appears or disappears and the names stay aligned. */
+.line-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-16);
+  margin: var(--space-16) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.line-chart-legend button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+  color: var(--color-text-secondary);
+  transition: color var(--line-chart-fade) ease;
+}
+.line-chart-legend button.is-focus { color: var(--color-text); }
+.line-chart-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--line-chart-fade) ease;
+}
+.line-chart-legend button.is-focus .line-chart-dot { background: currentColor; }
+@media (hover: hover) and (pointer: fine) {
+  .line-chart-legend button:hover { color: var(--color-text); }
+}
+@media (hover: none) {
+  .line-chart-legend button:active { color: var(--color-text); transition-duration: var(--duration-instant); }
+}

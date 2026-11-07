@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.9.0 */
+/* personal-styling · table · v1.0.0 */
 
 // One fill per table, gliding to the row under the pointer or keyboard
 // focus — the segmented control's indicator, turned on its side. With no
@@ -59,14 +59,62 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
     return row && row.parentElement.tagName === 'TBODY' && table.contains(row) ? row : null;
   };
 
+  // ---- Column focus: the column under the pointer comes up to full ink,
+  // header included, so a value reads at the crossing of its row and column.
+  let col = -1;
+  const focusColumn = (index) => {
+    if (index === col) return;
+    table.querySelectorAll('.is-col').forEach((cell) => cell.classList.remove('is-col'));
+    col = index;
+    if (index < 0) return;
+    for (const row of table.rows) row.cells[index]?.classList.add('is-col');
+  };
+
+  // ---- A linked chart (data-chart="#id", rows carry data-series): the row
+  // under the pointer previews its line; a tapped row focuses it; a line
+  // focused in the chart selects its row.
+  const chart = table.dataset.chart ? document.querySelector(table.dataset.chart) : null;
+  const select = (row) => {
+    table.querySelectorAll('tbody tr.is-selected').forEach((r) => r.classList.remove('is-selected'));
+    if (row) row.classList.add('is-selected');
+    indicate(selected());
+  };
+
   table.addEventListener('pointerover', (event) => {
     if (event.pointerType !== 'mouse') return; // touch has no hover to show
+    const cell = event.target.closest?.('td, th');
+    if (cell && table.contains(cell)) focusColumn(cell.cellIndex);
     const row = rowOf(event.target);
     if (row) indicate(row);
+    if (row && chart?.lineChart) chart.lineChart.preview(row.dataset.series || null);
   });
   table.addEventListener('pointerleave', (event) => {
-    if (event.pointerType === 'mouse') indicate(selected());
+    if (event.pointerType !== 'mouse') return;
+    focusColumn(-1);
+    indicate(selected());
+    chart?.lineChart?.preview(null);
   });
+  if (chart) {
+    table.addEventListener('click', (event) => {
+      if (event.target.closest('button, a, input')) return;
+      const row = rowOf(event.target);
+      if (!row?.dataset.series) return;
+      select(row);
+      chart.lineChart?.focus(row.dataset.series);
+    });
+    chart.addEventListener('line-chart-focus', (event) => {
+      select([...table.tBodies[0].rows].find((r) => r.dataset.series === event.detail.name) || null);
+    });
+  }
+
+  // ---- Sparklines: a cell with data-spark="2,5,9" draws the row's series
+  // in the line chart's spec (needs line-chart.js), all on one scale.
+  const sparks = [...table.querySelectorAll('td[data-spark]')];
+  if (sparks.length && typeof lineChartSpark === 'function') {
+    const values = sparks.map((cell) => cell.dataset.spark.split(',').map(Number));
+    const max = Math.max(...values.flat());
+    sparks.forEach((cell, i) => { cell.innerHTML = lineChartSpark(values[i], { max }); });
+  }
   table.addEventListener('focusin', (event) => indicate(rowOf(event.target) || selected()));
   table.addEventListener('focusout', (event) => {
     if (!table.contains(event.relatedTarget)) indicate(selected());
@@ -81,8 +129,25 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
     const n = parseFloat(text.replace(/\u2212/g, '-').replace(/[^0-9.+-]/g, '')); // − (minus sign) counts as -
     return Number.isNaN(n) ? null : n;
   };
+  // Rows slide from where they were to where they land, on --duration-base,
+  // instead of jumping. A row is the same row by its data-key (or its first
+  // cell), so it works when the app re-renders its own rows too.
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const keyOf = (row) => row.dataset.key || row.cells[0]?.textContent.trim();
+  const slide = (before) => {
+    if (still.matches) return;
+    const css = getComputedStyle(document.documentElement);
+    const duration = parseFloat(css.getPropertyValue('--duration-base')) || 250;
+    const easing = css.getPropertyValue('--ease-out').trim() || 'ease-out';
+    for (const row of table.tBodies[0].rows) {
+      const dy = (before.get(keyOf(row)) ?? row.offsetTop) - row.offsetTop;
+      if (dy) row.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration, easing });
+    }
+  };
+
   table.querySelectorAll('.table-sort').forEach((button) => {
     button.addEventListener('click', () => {
+      const before = new Map([...table.tBodies[0].rows].map((row) => [keyOf(row), row.offsetTop]));
       const th = button.closest('th');
       const column = [...th.parentElement.children].indexOf(th);
       const direction = th.getAttribute('aria-sort') === 'descending' ? 'ascending' : 'descending';
@@ -101,6 +166,8 @@ document.querySelectorAll('.table-wrap').forEach((wrap) => {
         if (indicated) place(indicated);
       }
       table.dispatchEvent(new CustomEvent('table-sort', { bubbles: true, detail: { column, direction } }));
+      slide(before);
+      if (col >= 0) { const c = col; col = -1; focusColumn(c); }
     });
   });
 

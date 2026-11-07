@@ -1,4 +1,4 @@
-/* personal-styling · table · v0.9.0 */
+/* personal-styling · table · v1.0.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It always fills its container, and scrolls sideways rather than
@@ -225,3 +225,38 @@
   .table-sort:hover .table-sort-icon { opacity: 1; }
 }
 .table-sort:focus-visible .table-sort-icon { opacity: 1; }
+
+/* ---- NEW (v1.0) · Column focus: the column under the pointer, header
+   included, comes up to full ink (table.js marks it). ---- */
+.table .is-col { color: var(--color-text); }
+.table th { transition: color var(--duration-fast) ease; }
+
+/* ---- NEW (v1.0) · A value that explains itself: wrap it in the tooltip
+   component's trigger. It takes the cell's type exactly. ---- */
+.table .table-value { color: inherit; }
+
+/* ---- NEW (v1.0) · Sparklines, in the line chart's spec: the series grey,
+   brightening to full ink with its end point when the row is indicated. */
+.table-spark {
+  display: block;
+  width: 64px;
+  height: 20px;
+  overflow: visible;
+}
+.table-spark path {
+  fill: none;
+  stroke: var(--color-series);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke var(--duration-base) ease;
+}
+.table-spark circle {
+  fill: var(--color-text);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+.table tbody tr.is-indicated .table-spark path { stroke: var(--color-text); }
+.table tbody tr.is-indicated .table-spark circle { opacity: 1; }

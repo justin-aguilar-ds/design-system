@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.13
+   Personal styling tokens — v0.14
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -69,6 +69,11 @@ img, video, svg { display: block; max-width: 100%; }
      splits (patterns/stage-sheet/): the opposite of the page, black in
      light, white in dark. It is the text colour, so it flips with it. */
   --color-ground: var(--color-text);
+
+  /* NEW (v0.14): SERIES — the quiet lines in a chart (components/line-chart/).
+     A solid grey, never black at an opacity: translucent lines stack darker
+     where they cross, and a bundle turns into a smear. */
+  --color-series: #d2d2d2;
 
   --color-accent: #FCFF28;
   --color-accent-ink: #000000;
@@ -332,6 +337,7 @@ body {
     --color-loss-fill: rgba(255, 69, 58, 0.2);
     --color-fill-quiet: rgba(255, 255, 255, 0.1);
     --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
+    --color-series: #3a3a3a;
     --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
     --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
     --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
@@ -355,6 +361,7 @@ body {
   --color-loss-fill: rgba(255, 69, 58, 0.2);
   --color-fill-quiet: rgba(255, 255, 255, 0.1);
   --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
+  --color-series: #3a3a3a;
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);

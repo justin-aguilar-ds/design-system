@@ -74,6 +74,7 @@ Effectively monochrome. The palette is a ground, a text colour, a half-strength 
 - **A selected tab, a current nav item, a pressed segment are state** — they take `--color-fill-subtle`. Selection is structure; the accent is emphasis. Painting every active control with it is the mistake, and it's an easy one: the controls are the things you notice building a page, so they're the first place the colour lands.
 - Always a *fill* under black text. Never a text colour on the ground (yellow on white is unreadable), never a data series, never decoration. Anything sitting on it takes `--color-accent-ink`.
 - There is no placeholder grey. An empty box is `--color-fill-subtle` with a hairline.
+- **Quiet data takes a solid grey.** The background series in a chart are `--color-series`, never black at an opacity: translucent lines stack darker where they cross. The one in focus is full ink.
 - `--color-overlay-backdrop` is declared and unused. Leave it that way.
 - De-emphasis is done with **opacity, not grey**: inactive nav labels sit at `0.3`, off-centre media at `0.2`.
 - No gradients except functional fade-to-ground masks.
@@ -260,6 +261,7 @@ rules.
 | Tooltip | a detail worth having but not worth printing — inline, dropped on click, or announced by the cursor pill | `components/tooltip/` |
 | Toast | an action finished somewhere the result can't be seen — copied, saved, sent | `components/toast/` |
 | Table | rows of records — any list with more than one value per row | `components/table/` |
+| Line chart | values over time, one series against the rest — the shape first, the values on hover | `components/line-chart/` |
 | Picker | one choice from a list too long to show at once — a select menu | `components/picker/` |
 | Accordion | sections worth having but not worth showing all at once | `components/accordion/` |
 | Input | a line of text has to be typed — a name, a URL, a search | `components/input/` |
@@ -322,6 +324,9 @@ the values and leave the vocabulary alone.
   small solid triangle in the same ink; never an outlined arrowhead.
 - Dashed is reserved for **provisional or optional** — a planned edge, a
   drop zone. Never for a live edge, and never on gridlines or axis rules.
+- **Dotted is for chart guides.** Gridlines in a chart are dotted — 1.5px
+  dots 4px apart in `--color-hairline-strong` — so they read as reference,
+  not data (see `components/line-chart/`). Dotted means nothing else.
 - Edge labels sit on a `--color-bg` rect with no stroke (a halo), so the
   edge doesn't run through the text. Caption or mono, secondary ink.
 - Hit targets: at least `24px`, separate from the drawn mark.

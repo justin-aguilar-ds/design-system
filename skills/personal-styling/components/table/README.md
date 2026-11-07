@@ -21,12 +21,22 @@ Rows of records for tools: full width of its container, sitting on the page with
 - **The fill bleeds; the content doesn't move.** The fill reaches `16px` past the table on each side, into the page margin, so text stays aligned with the page yet sits `16px` inside the fill's rounded ends instead of flush against them. A table needs `16px` of room on each side for this — the page inset and card padding both give it.
 - **Status is glyph + word** — `✓ Delivered`, `! Retrying`, `✗ Failed`, `– Unknown`. Warnings and failures take `.table-ink`: problems get full ink, not less.
 - **Figures align right** with `.table-num`, on the header and the cells.
+- **The column under the pointer comes up to full ink**, header included, while the row fill follows the pointer, so a value reads at the crossing of its row and column.
+- **A value can explain itself.** Wrap it in the tooltip component's trigger (`<button class="tooltip-trigger table-value" data-tooltip="…">`): hover or tap for its context, such as a rank or a share. It keeps the cell's type exactly.
+- **Rows slide when sorted.** Each row moves from where it was to where it lands, on `--duration-base` and `--ease-out`, so you can follow a row to its new place. Nothing moves under reduced motion.
+- **A sparkline is the line chart, small.** A cell with `data-spark` draws its row's series at 64 × 20 in the series grey, all rows on one scale; the indicated row's line comes up to full ink with its end point.
+- **A table can answer with a chart.** Linked to a line chart, the row under the pointer previews its line, a tapped row focuses it, and a line focused in the chart selects its row.
 - **Gain and loss are soft fills, not coloured text.** `.table-gain` and `.table-loss` tint a cell with `--color-gain-fill` or `--color-loss-fill`, with the value on top at full ink. Only when the data is inherently good or bad — an impact on a total, a gain against a loss — never as decoration. A filled first or last cell extends its fill into the table's gutter rather than moving its text out of line. The identifying column is never filled.
 - **Sortable columns are a header button with a 10px arrow.** The arrow waits until the header is hovered or focused; once the column is sorted it stays at full ink, pointing down for descending and up for ascending. The first click sorts descending — the biggest figures first. In a right-aligned column the arrow sits before the label, so the label ends on the same edge as the figures under it.
 - **Scroll, don't shrink.** A wide table scrolls inside `.table-wrap`. Never drop the type size to make it fit. The identifying column never wraps.
 - **A verification table takes exactly one size** (`.table--uniform`): 10.5 mono throughout, headers included. Reconciliation has no hierarchy to show, so the one-size rule wins over the headers-are-labels rule.
 
 ## Use
+
+- **Column focus, row slides:** built in.
+- **Value tooltips:** load `tooltip.css` and `tooltip.js`, and wrap the value as above.
+- **Sparklines:** `<td data-spark="2,5,9,…">`, with `line-chart.js` loaded.
+- **Linked chart:** `data-chart="#chart-id"` on the table, `data-series="Name"` on each row (matching the chart's series names). Give rows a `data-key` when the app re-renders them on sort, so they slide.
 
 - Wrap the `<table class="table">` in `<div class="table-wrap">`. Give headers `scope="col"`. Load `table.js` after the markup: it adds the fill to every `.table-wrap`.
 - **Selected row:** add `.is-selected` and `aria-selected="true"` to the `<tr>`. Move them yourself when the selection changes; the fill follows on the next hover or focus.
@@ -41,6 +51,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 - Hover now brightens the **whole row**. The old rule said "brighten the row label", but the label column is already full ink, so that hover changed nothing.
 - v0.2.0: rows take a gliding background fill on hover, modelled on the segmented control. The old rule was "no background change". The table's outer edges gain `16px` of padding to make room for the fill's radius.
+- v1.0.0: column focus, value tooltips, rows that slide when sorted, sparklines (`data-spark`), and linking to a line chart (`data-chart`).
 - v0.9.0: the wrap states its full width, so the table fills its container even in a grid or flex parent that aligns to the start; `min-width: 100%` on the table makes full width the minimum.
 - v0.8.0: cells keep 12px either side, so fills never meet their text; `.table-gain` / `.table-loss` polarity fills; sortable column headers.
 - v0.7.0: one font size per cell, enforced — anything inside a cell takes the cell's type.

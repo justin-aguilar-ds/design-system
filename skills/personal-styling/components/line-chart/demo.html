@@ -1,0 +1,29 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">On a surface, with labels — data-labels="on", .line-chart--surface</p>
+    <figure class="line-chart line-chart--surface" aria-label="Category wins, totaled by week" data-labels="on" data-focus="Chloe">
+      <script type="application/json">{"x":["Wk 1","Wk 2","Wk 3","Wk 4","Wk 5","Wk 6","Wk 7","Wk 8","Wk 9"],"series":[{"name":"Ana","values":[2,6,8,12,15,17,20,22,25]},{"name":"Ben","values":[2,6,11,13,16,20,26,30,33]},{"name":"Chloe","values":[3,10,14,18,22,27,34,38,44]},{"name":"Dev","values":[5,11,15,19,23,29,34,39,45]},{"name":"Elif","values":[5,12,19,24,30,36,44,51,56]},{"name":"Felix","values":[3,7,12,15,19,21,26,31,35]},{"name":"Gia","values":[4,9,14,19,23,29,35,39,44]},{"name":"Hana","values":[5,10,16,22,26,30,35,38,42]}]}</script>
+    </figure>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Linked to a table — hover or tap a row, its line lights up; tap a line, its row is selected</p>
+    <figure class="line-chart" id="demo-linked-chart" aria-label="Category wins, totaled by week" data-focus="Ana" data-rank="on">
+      <script type="application/json">{"x":["Wk 1","Wk 2","Wk 3","Wk 4","Wk 5","Wk 6","Wk 7","Wk 8","Wk 9"],"series":[{"name":"Ana","values":[2,6,8,12,15,17,20,22,25]},{"name":"Ben","values":[2,6,11,13,16,20,26,30,33]},{"name":"Chloe","values":[3,10,14,18,22,27,34,38,44]},{"name":"Dev","values":[5,11,15,19,23,29,34,39,45]},{"name":"Elif","values":[5,12,19,24,30,36,44,51,56]},{"name":"Felix","values":[3,7,12,15,19,21,26,31,35]},{"name":"Gia","values":[4,9,14,19,23,29,35,39,44]},{"name":"Hana","values":[5,10,16,22,26,30,35,38,42]}]}</script>
+    </figure>
+    <div class="table-wrap">
+      <table class="table" data-chart="#demo-linked-chart">
+        <thead><tr><th scope="col">Team</th><th scope="col" class="table-num">W</th><th scope="col" class="table-num">Wk 9</th><th scope="col">Season</th></tr></thead>
+        <tbody>
+          <tr data-series="Elif" data-key="Elif"><td>Elif</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Elif · 56 categories won">56</button></td><td class="table-num">5</td><td data-spark="5,12,19,24,30,36,44,51,56"></td></tr>
+          <tr data-series="Dev" data-key="Dev"><td>Dev</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Dev · 45 categories won">45</button></td><td class="table-num">6</td><td data-spark="5,11,15,19,23,29,34,39,45"></td></tr>
+          <tr data-series="Chloe" data-key="Chloe"><td>Chloe</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Chloe · 44 categories won">44</button></td><td class="table-num">6</td><td data-spark="3,10,14,18,22,27,34,38,44"></td></tr>
+          <tr data-series="Gia" data-key="Gia"><td>Gia</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Gia · 44 categories won">44</button></td><td class="table-num">5</td><td data-spark="4,9,14,19,23,29,35,39,44"></td></tr>
+          <tr data-series="Hana" data-key="Hana"><td>Hana</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Hana · 42 categories won">42</button></td><td class="table-num">4</td><td data-spark="5,10,16,22,26,30,35,38,42"></td></tr>
+          <tr data-series="Felix" data-key="Felix"><td>Felix</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Felix · 35 categories won">35</button></td><td class="table-num">4</td><td data-spark="3,7,12,15,19,21,26,31,35"></td></tr>
+          <tr data-series="Ben" data-key="Ben"><td>Ben</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Ben · 33 categories won">33</button></td><td class="table-num">3</td><td data-spark="2,6,11,13,16,20,26,30,33"></td></tr>
+          <tr data-series="Ana" data-key="Ana"><td>Ana</td><td class="table-num"><button class="tooltip-trigger table-value" type="button" data-tooltip="Ana · 25 categories won">25</button></td><td class="table-num">3</td><td data-spark="2,6,8,12,15,17,20,22,25"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
