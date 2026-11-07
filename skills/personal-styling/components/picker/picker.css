@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.5.0 */
+/* personal-styling · picker · v0.6.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -13,12 +13,12 @@
   position: relative;
   display: inline-flex;
 }
-.picker-trigger { justify-content: space-between; -webkit-tap-highlight-color: transparent; }
+.picker-trigger { justify-content: flex-start; -webkit-tap-highlight-color: transparent; }
 /* NEW (v0.5): Large — beside the page nav in the bottom slot, the same
    --height-slot (64px) as the large button and segmented control. */
 .picker--large .picker-trigger {
   min-height: var(--height-slot);
-  padding: 0 var(--space-24);
+  padding: 0 var(--inset-slot);
 }
 .picker.is-placeholder .picker-value { color: var(--color-text-secondary); }
 
@@ -45,7 +45,7 @@
   min-width: 100%;
   max-height: 320px;            /* about nine options, then it scrolls */
   overflow-y: auto;
-  padding: var(--space-8);      /* a menu is a surface, not a small control, so 8 — not 4 */
+  padding: var(--inset-fill);   /* inset like a control, so options line up under the trigger's label */
   background: var(--color-surface);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
@@ -78,14 +78,18 @@
 .picker-list:focus-visible { outline: none; }
 
 /* Options: Interactive type, secondary until indicated or selected.
-   Same padding as a compact button, so an option is a button's height. */
+   Inset like a control: see the padding below. */
 .picker-option {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-8);          /* label to check: icon to text */
-  padding: var(--space-8) var(--space-16);
+  gap: var(--gap-mark);         /* label to check */
+  /* 32px: a pill whose radius is the menu's corner less the inset, so the
+     fill is concentric with the menu. The label pads by edge − fill, so it
+     sits right under the trigger's label. */
+  min-height: calc(2 * (var(--radius-card) - var(--inset-fill)));
+  padding: 0 calc(var(--inset-control) - var(--inset-fill));
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   white-space: nowrap;

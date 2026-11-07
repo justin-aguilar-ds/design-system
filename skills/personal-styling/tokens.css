@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.16
+   Personal styling tokens — v0.17
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -32,6 +32,19 @@ img, video, svg { display: block; max-width: 100%; }
      step: a section's worth of air above the intro and after the last
      section, twice the sides, so the opening has weight. */
   --space-page-block: var(--space-48);
+  /* NEW (v0.17): the space inside a control — three distances, one value
+     per size, so every control is spaced the same way. Roles that point
+     at existing steps, like --space-page; there is no new step.
+     --inset-control  a label to a 36px control's edge, in a fill or not
+     --inset-slot     the same at 64px, in the bottom slot
+     --inset-fill     a frame to the fill inside it: a segment, a menu
+                      option. The same at both sizes.
+     --gap-mark       a label to its chevron, arrow, check or dot
+     A label inside a fill pads by edge − fill: 12 at 36, 20 at 64. */
+  --inset-control: var(--space-16);
+  --inset-slot: var(--space-24);
+  --inset-fill: var(--space-4);
+  --gap-mark: var(--space-8);
 
   /* WIDTH — NEW. The source never needed one (every page is a fixed
      viewport with no scrolling body). 1280px is the industry-standard

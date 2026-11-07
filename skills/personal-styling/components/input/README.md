@@ -22,6 +22,10 @@ A single line of text — a name, a URL, a search — in the same pill as the pi
 - In a control panel, put `.input-field` straight into `.control-panel-fields` beside the other fields.
 - No JavaScript.
 
+## Changes in v0.3.1
+
+- Padding and the search icon's offsets read `--inset-control` and `--gap-mark`. No visual change.
+
 ## Changes in v0.3.0
 
 - Height comes from `--height-control`.

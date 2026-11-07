@@ -1,4 +1,4 @@
-/* personal-styling · button · v0.6.0 */
+/* personal-styling · button · v0.7.0 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
@@ -7,9 +7,9 @@
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
-  gap: var(--space-8);          /* icon to text */
+  gap: var(--gap-mark);         /* icon to text */
   min-height: var(--height-control);   /* 36px with either type: a Label pill no longer lands a pixel taller */
-  padding: 0 var(--space-16);
+  padding: 0 var(--inset-control);
   color: var(--color-text);
   white-space: nowrap;
 }
@@ -22,7 +22,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--height-control);
-  padding: 0 var(--space-16);
+  padding: 0 var(--inset-control);
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
@@ -58,7 +58,7 @@
 .button--large {
   justify-content: center;
   min-height: var(--height-slot);
-  padding: 0 var(--space-24);
+  padding: 0 var(--inset-slot);
 }
 @media (max-width: 630px) {
   .button--large {

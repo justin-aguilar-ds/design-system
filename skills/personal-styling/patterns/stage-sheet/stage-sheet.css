@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.3.0 */
+/* personal-styling · stage-sheet · v0.4.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -83,20 +83,23 @@
 
 /* The heading row is the control panel's: mono title, 16px, a bare 10px
    chevron at the far edge. No fill behind the chevron — an icon inside a
-   control is a mark. 50px with the border, 16px padding: even insets. */
+   control is a mark. 50px with the border, 16px padding: even insets.
+   On a phone the title is Label type, like the large button beside it in
+   the bottom slot (stage-sheet.js swaps the class). Closed, the chevron
+   is --gap-mark after the title. */
 .stage-sheet-toggle {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: flex;
   flex: none;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-16);
+  gap: var(--gap-mark);
   width: 100%;
   min-height: calc(var(--height-row) - 2px);
   text-align: left;
 }
 .stage-sheet-toggle > * { transition: color var(--duration-fast) ease; }
-.stage-sheet-toggle .t-mono { white-space: nowrap; }
+.stage-sheet-title { white-space: nowrap; }
 /* Closed it points up, the way it opens. Lifted 1px to centre on the
    capitals of the mono title, not its line box. */
 .stage-sheet-chevron {
@@ -169,6 +172,12 @@
   }
   .stage-sheet-sheet { --radius-sheet: calc(var(--radius-slot) - var(--open) * (var(--radius-slot) - var(--radius-card))); }
   .stage-sheet-toggle { min-height: calc(var(--height-slot) - var(--open) * (var(--height-slot) - var(--height-row)) - 2px); }
+  /* NEW (v0.4): closed, the pill is a 64px control, so its title is
+     --inset-slot from the edge, like the large button's label; open, the
+     heading settles to the panel's 16. */
+  .stage-sheet-sheet { padding: 0 calc(var(--inset-slot) - var(--open) * (var(--inset-slot) - var(--inset-control))); }
+  /* The chevron's 1px lift centres it on mono capitals; Label type needs none. */
+  .stage-sheet-title.t-label + .stage-sheet-chevron { translate: none; }
   /* The heading is the handle: drag to resize, tap to close. */
   .stage-sheet.is-open .stage-sheet-toggle { cursor: grab; touch-action: none; }
   .stage-sheet.is-resizing .stage-sheet-toggle { cursor: grabbing; }

@@ -21,7 +21,7 @@ From a portfolio whose page nav sat at the bottom, and an about page whose one a
   | four or more pages | two pages docked beside a large select for the rest |
   | anything else: filters, sort, a second action | nothing. It goes in the page or the control panel. |
 
-- **Docked: two surfaces, 8px apart.** The nav and its partner are separate controls, each with its own frame and rest shadow. With two parts, the nav's options come in to `16px` from their edges so both fit a phone.
+- **Docked: two surfaces, 8px apart.** The nav and its partner are separate controls, each with its own frame and rest shadow. With two parts, the nav's options pad `16px`, so a label sits `20px` from the frame rather than the usual `24px` (`--inset-slot`): the one exception to the inset rule, so both fit a 390px phone.
 - **Never more than two parts, never more than three pages showing.** Past three pages, two stay as segments and the rest go in the select. Check every combination at `390px`: two pages and a short action fit with room to spare; three pages and an action don't.
 - **The action stays put.** A page that has an action shows it from the moment it loads. It doesn't arrive, leave or change the nav's width as you move between pages.
 - **A select opens upward.** Give the picker `data-side="above"`; its chevron points up while closed and turns down as the menu opens.
@@ -34,3 +34,7 @@ From a portfolio whose page nav sat at the bottom, and an about page whose one a
 - Nav options are `<a>` with `.is-active` and `aria-current="page"` on the current page (see the segmented control). Type is `.t-label` throughout.
 - The large button places itself at the bottom of a phone when it's on its own. Inside the slot, the slot places it instead.
 - When the current page is in the select, set its option `aria-selected="true"` so the trigger shows its name, and leave no nav option `.is-active`.
+
+## Changes in v0.1.1
+
+- The docked exception is stated against the new inset rule: alone, the nav's labels sit `24px` from the frame; docked, `20px`.

@@ -33,6 +33,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
 
+## Changes in v0.7.0
+
+- Padding and the icon gap read the inset tokens (`--inset-control`, `--inset-slot`, `--gap-mark`). No visual change.
+
 ## Changes in v0.6.0
 
 - The large button is 64px (`--height-slot`), not 50: whatever sits at the bottom of a screen is one height. It no longer matches a collapsed control panel (50px), which is a panel row, not a slot.

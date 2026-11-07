@@ -24,6 +24,10 @@ A filter is not the nav pill — the nav has one truth at a time, filters have m
 - Each chip is a `<button>` with `aria-pressed`. Put the row in a `role="group"` with an `aria-label` that names what it filters.
 - `chip.js` toggles `aria-pressed` and fires a bubbling `chip-change` event with `detail.on`. Listen for it on the row.
 
+## Changes in v0.5.1
+
+- Padding and the dot's gap read `--inset-control` and `--gap-mark`. No visual change.
+
 ## Changes in v0.5.0
 
 - Height comes from `--height-control`.

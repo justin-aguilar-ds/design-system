@@ -1,4 +1,4 @@
-/* personal-styling · input · v0.3.0 */
+/* personal-styling · input · v0.3.1 */
 
 /* A field is its label, 8px, the input, then an optional message. The
    label sits above, never inside or beside, so every input is the same
@@ -19,7 +19,7 @@
   min-width: 0;
   margin: 0;
   min-height: var(--height-control);
-  padding: 0 var(--space-16);
+  padding: 0 var(--inset-control);
   -webkit-appearance: none;
   appearance: none;
   background: var(--color-surface);
@@ -81,12 +81,12 @@
 .input-icon {
   position: absolute;
   top: calc(50% - var(--icon-inline) / 2); /* centred on the field */
-  left: var(--space-16);
+  left: var(--inset-control);
   width: var(--icon-inline);
   height: var(--icon-inline);
   color: var(--color-text-secondary);
   pointer-events: none;
 }
-.input-wrap--search .input { padding-left: calc(var(--space-16) + var(--icon-inline) + var(--space-8)); }
+.input-wrap--search .input { padding-left: calc(var(--inset-control) + var(--icon-inline) + var(--gap-mark)); }
 .input::-webkit-search-decoration,
 .input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

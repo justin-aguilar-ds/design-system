@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.3.0 */
+/* personal-styling · stage-sheet · v0.4.0 */
 
 // Opens and closes the sheet, splits the screen on phones, and lets the
 // sheet's heading resize the split by drag. Fires a bubbling
@@ -30,12 +30,17 @@ document.querySelectorAll('.stage-sheet').forEach((root) => {
 
   // The pill is as wide as its heading; the wide-screen card as tall as its
   // controls, within the screen.
+  const title = toggle.querySelector('.stage-sheet-title');
   const measure = () => {
+    // On a phone the title is Label type, like the large button in the
+    // bottom slot; on a wide screen it is the docked panel's mono.
+    title?.classList.toggle('t-label', phone());
+    title?.classList.toggle('t-mono', !phone());
     const clone = toggle.cloneNode(true);
     clone.removeAttribute('id');
     clone.style.cssText = 'position:absolute;visibility:hidden;width:auto;';
     sheet.append(clone);
-    set('--sheet-pill-w', `${clone.offsetWidth + 2 * px('--space-16') + 2}px`);
+    set('--sheet-pill-w', `${clone.offsetWidth + 2 * px(phone() ? '--inset-slot' : '--inset-control') + 2}px`);
     clone.remove();
     const room = root.clientHeight - 2 * px('--space-page');
     set('--sheet-card-h', `${Math.min(room, toggle.offsetHeight + body.scrollHeight + 2)}px`);

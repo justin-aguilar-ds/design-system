@@ -8,7 +8,8 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 - **The chevron is the only distinguishing mark.** It's drawn custom, never the native select chrome, and it turns 180° as the menu opens, over `--duration-base` on `--ease-out`.
 - **The menu follows the surface rules:** white fill, hairline, `20px` radius. Hairline only, like the tooltip and toast — no shadow, because the menu as a whole can't be hovered.
 - **It grows from the trigger.** `scale(0.95)` → `scale(1)` with opacity, over `--duration-base` on `--ease-out`, with `transform-origin` on the corner nearest the trigger. A menu is bigger than a tooltip, so it takes the large-surface scale (0.95), not the pop from 0. It opens above the trigger when there's no room below.
-- **Its width never changes.** The trigger is as wide as its widest option (or placeholder), measured on load, so choosing an option never shifts the chevron or the layout around it. To match a column or a neighbour instead, give `.picker-trigger` an explicit width.
+- **It hugs its label.** The chevron is always `8px` (`--gap-mark`) after the label, so choosing a shorter option makes the trigger narrower. To hold a width in a row or a column, give `.picker-trigger` an explicit width; the chevron still follows the label.
+- **The menu lines up with the trigger.** It is inset `4px` (`--inset-fill`) and each option pads `12px`, so option labels sit right under the trigger's label. Options are `32px`, so the fill is concentric with the menu's corner (20 − 4 = 16).
 - **Options are Interactive type**, secondary ink, going to full ink when indicated. An option is a compact button's height.
 - **One fill moves between options**, like the segmented control's indicator: `--color-fill-subtle`, pill radius. It appears in place on the selected option when the menu opens, then glides to whatever the pointer or arrow keys reach. Options are dense targets, so it moves on `--duration-base`, not `--duration-deliberate`.
 - **The selected option carries a check** at full ink — state shown with a glyph, never the accent.
@@ -35,6 +36,11 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | A letter | — | jumps to the first option that starts with it |
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
+
+## Changes in v0.6.0
+
+- The trigger hugs its label, so the chevron is always `8px` after it. It used to keep its widest option's width, which left a gap of up to 60px after a short label.
+- The menu is inset `4px`, and options are `32px` tall with `12px` either side: each option's label sits right under the trigger's, and the fill is concentric with the menu's corner.
 
 ## Changes in v0.5.0
 
