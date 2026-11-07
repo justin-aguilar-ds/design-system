@@ -34,6 +34,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
 
+## Changes in v0.10.0
+
+- The chevron beside the mono title lifts 1px, so it centres on the capitals rather than the line box.
+
 ## Changes in v0.9.0
 
 - Docked means docked to the bottom-right corner at every width: the two-column layout on wide screens is gone.

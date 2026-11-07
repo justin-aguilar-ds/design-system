@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.9.0 */
+/* personal-styling · control-panel · v0.10.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -103,3 +103,9 @@
     max-height: calc(100vh - 2 * var(--space-page) - 2 * var(--height-row) - var(--space-16));
   }
 }
+
+/* NEW (v0.10): the chevron beside the mono title is centred on the
+   capitals, not on the line box. Uppercase mono sits 1px high in its
+   line, so the 10px mark lifts 1px to meet it (see "Optical alignment"
+   in SKILL.md). translate, not transform, so it survives the turn. */
+.control-panel .accordion-chevron { translate: 0 -1px; }

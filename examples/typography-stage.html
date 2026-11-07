@@ -335,11 +335,7 @@
            merged, that's exactly the closed pill over a full-bleed stage. */
         bottom: calc(var(--split) * (var(--surface-inset) + var(--split-gap) + env(safe-area-inset-bottom, 0px))
                      + var(--sheet-h) - (1 - var(--split)) * var(--bar-h));
-        /* Inset: every corner rounds. Full width: only the corners that
-           face the sheet. */
-        border-radius:
-          calc(var(--split) * var(--stage-top-radius)) calc(var(--split) * var(--stage-top-radius))
-          calc(var(--split) * var(--radius-card)) calc(var(--split) * var(--radius-card));
+        border-radius: calc(var(--split) * var(--radius-card));
         overflow: hidden;
         border: none;
         background: transparent;
@@ -413,32 +409,42 @@
       .panel.no-transition .panel-body, .panel.no-transition .panel-chevron {
         transition: none !important;
       }
+      /* The heading row is the system's control-panel heading
+         (patterns/control-panel/): the mono title, 16px, then a bare
+         10px chevron mark at the far edge. No filled circle: an icon
+         inside a control is a mark, never a second button. The panel's
+         16px side padding and this row's 50px height (with the border)
+         keep the insets even, so nothing sits off-centre in the pill. */
       .panel-toggle {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: var(--space-16);
         width: 100%;
-        min-height: var(--height-row);
-        padding: var(--space-4) 0;
+        min-height: calc(var(--height-row) - 2px);
+        padding: 0;
         text-align: left;
         border-radius: var(--radius-row);
       }
-      .panel-toggle .t-label { flex: 1 1 auto; min-width: 0; }
+      .panel-toggle .t-mono { flex: 1 1 auto; min-width: 0; transition: color var(--duration-fast) ease; }
       /* Chevron points up while closed — the way the panel opens —
          and rotates to point down while open. */
       .panel-chevron {
         flex: none;
-        width: 36px;
-        height: 36px;
-        border-radius: var(--radius-pill);
-        background: var(--color-fill-quiet);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform var(--duration-base) var(--ease-out), background var(--duration-fast) ease;
+        display: block;
+        width: var(--icon-mark);
+        height: var(--icon-mark);
+        color: var(--color-text-secondary);
+        translate: 0 -1px;   /* centred on the capitals, not the line box: uppercase mono sits 1px high in its line */
+        transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
       }
-      .panel-toggle:hover .panel-chevron { background: var(--color-fill-quiet-hover); }
-      .panel-chevron svg { width: 16px; height: 16px; display: block; }
+      /* Hover (touch: press) brightens the whole row to full ink. */
+      @media (hover: hover) and (pointer: fine) {
+        .panel-toggle:hover > * { color: var(--color-text); }
+      }
+      @media (hover: none) {
+        .panel-toggle:active > * { color: var(--color-text); transition-duration: var(--duration-instant); }
+      }
       .panel[data-open="true"] .panel-chevron { transform: rotate(180deg); }
       .panel-body-wrap {
         display: grid;
@@ -601,18 +607,14 @@
          stage still covers it, so it never fades through grey.
          ============================================================ */
       @property --split { syntax: '<number>'; inherits: true; initial-value: 0; }
-      @property --sheet-h { syntax: '<length>'; inherits: true; initial-value: 52px; }
+      @property --sheet-h { syntax: '<length>'; inherits: true; initial-value: 50px; }
       :root {
         --color-split-ground: var(--color-text);   /* the opposite of the page: black in light, white in dark */
         --split-gap: var(--space-8);
-        --bar-h: calc(var(--height-row) + 2px);
+        --bar-h: var(--height-row);          /* the closed pill: the system's 50px row, border included */
         --split: 0;
         --sheet-h: var(--bar-h);
-        /* Surfaces: inset (8px from every edge, all corners round) or
-           full width (edge to edge, only the facing corners round). */
-        --surface-inset: var(--split-gap);
-        --stage-top-radius: var(--radius-card);
-        --sheet-bottom-radius: var(--radius-card);
+        --surface-inset: var(--split-gap);   /* both surfaces sit 8px in from every edge */
 
         /* Both surfaces, one move. */
         transition:
@@ -620,11 +622,10 @@
           --sheet-h var(--duration-deliberate) var(--ease-out);
       }
       :root.is-resizing { transition: none; }
-      :root[data-surfaces="full"] { --surface-inset: 0px; --stage-top-radius: 0px; --sheet-bottom-radius: 0px; }
       /* Where the closed pill sits: its left and right edges. Worked out
          on the panel, where its measured --pill-w lives. */
-      .panel { --pill-left: calc(100vw - var(--space-16) - var(--pill-w)); --pill-right: var(--space-16); }
-      :root[data-pill="center"] .panel { --pill-left: calc((100vw - var(--pill-w)) / 2); --pill-right: calc((100vw - var(--pill-w)) / 2); }
+      .panel { --pill-left: calc((100vw - var(--pill-w)) / 2); --pill-right: calc((100vw - var(--pill-w)) / 2); }
+      :root[data-pill="right"] .panel { --pill-left: calc(100vw - var(--space-16) - var(--pill-w)); --pill-right: var(--space-16); }
 
       @media (max-width: 630px) {
         :root.is-ground body { background: var(--color-split-ground); }
@@ -633,8 +634,7 @@
            stage (--split, --sheet-h), so the two surfaces are one shape
            changing on every frame. No width of its own to animate, and
            no max-width to snap to: closed, its edges are the pill's
-           (right or centre); open, the surface inset (8px, or 0 at full
-           width). */
+           (centre by default, or right); open, 8px from every edge. */
         .panel {
           left: calc(var(--split) * var(--surface-inset) + (1 - var(--split)) * var(--pill-left));
           right: calc(var(--split) * var(--surface-inset) + (1 - var(--split)) * var(--pill-right));
@@ -643,11 +643,7 @@
           max-width: none;
           height: var(--sheet-h);
           max-height: none;
-          border-radius:
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)));
+          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
           padding-bottom: 0;
           /* One material from pill to sheet: the solid surface. Glass
              would turn grey over the ground as the sheet closes. */
@@ -659,11 +655,7 @@
         .panel[data-open="true"] {
           width: auto;
           max-width: none;
-          border-radius:
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)))
-            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)));
+          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
           box-shadow: none;
           touch-action: pan-y;
           padding-bottom: 0;
@@ -694,10 +686,8 @@
 
     <aside class="panel" id="controlPanel" data-open="true" data-closed-below="630" aria-label="Controls">
       <button type="button" class="panel-toggle" id="panelToggle" aria-expanded="true" aria-controls="panelBody">
-        <span class="t-label">Controls</span>
-        <span class="panel-chevron" aria-hidden="true">
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
+        <span class="t-mono">Controls</span>
+        <svg class="panel-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="panel-body-wrap">
         <div class="panel-body-clip">
@@ -707,15 +697,8 @@
             <div class="control-field">
               <span class="t-label" id="pillLabel">Closed pill</span>
               <div class="segmented" role="group" aria-labelledby="pillLabel" id="pillSeg">
-                <button type="button" class="t-control" data-pill="right" aria-pressed="true">Right</button>
-                <button type="button" class="t-control" data-pill="center" aria-pressed="false">Center</button>
-              </div>
-            </div>
-            <div class="control-field">
-              <span class="t-label" id="surfacesLabel">Surfaces</span>
-              <div class="segmented" role="group" aria-labelledby="surfacesLabel" id="surfacesSeg">
-                <button type="button" class="t-control" data-surfaces="inset" aria-pressed="true">Inset</button>
-                <button type="button" class="t-control" data-surfaces="full" aria-pressed="false">Full width</button>
+                <button type="button" class="t-control" data-pill="center" aria-pressed="true">Center</button>
+                <button type="button" class="t-control" data-pill="right" aria-pressed="false">Right</button>
               </div>
             </div>
           </div>
@@ -1524,7 +1507,7 @@
         /* ---------- Stage and sheet (phones) ---------- */
         var root = document.documentElement;
         var phone = window.matchMedia('(max-width: 630px)');
-        var BAR_H = 52;
+        var BAR_H = 50;
         var SNAPS = [0.4, 0.55, 0.75];      /* sheet heights, as a share of the screen */
         var CLOSE_BELOW = 0.28;             /* let go lower than this and it closes */
         var MIN_H = 0.2, MAX_H = 0.85;
@@ -1632,21 +1615,15 @@
         });
         window.addEventListener('resize', function () { applySplit(isOpen(), true); });
 
-        /* Prototype options, kept in the hash (#center-full etc.) so a
-           reload keeps them. */
-        var opts = { pill: 'right', surfaces: 'inset' };
-        location.hash.slice(1).split('-').forEach(function (w) {
-          if (w === 'right' || w === 'center') opts.pill = w;
-          if (w === 'inset' || w === 'full') opts.surfaces = w;
-        });
+        /* Prototype option, kept in the hash (#center, #right) so a
+           reload keeps it. Centre is the default. */
+        var opts = { pill: location.hash.slice(1) === 'right' ? 'right' : 'center' };
         function applyOpts() {
           root.setAttribute('data-pill', opts.pill);
-          root.setAttribute('data-surfaces', opts.surfaces);
           setPressed($('pillSeg'), 'data-pill', opts.pill);
-          setPressed($('surfacesSeg'), 'data-surfaces', opts.surfaces);
-          try { history.replaceState(null, '', '#' + opts.pill + '-' + opts.surfaces); } catch (err) {}
+          try { history.replaceState(null, '', '#' + opts.pill); } catch (err) {}
         }
-        ['pill', 'surfaces'].forEach(function (key) {
+        ['pill'].forEach(function (key) {
           $(key + 'Seg').addEventListener('click', function (e) {
             var btn = e.target.closest('button');
             if (!btn) return;
