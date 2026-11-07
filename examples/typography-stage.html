@@ -321,22 +321,25 @@
         height: 100%;
       }
 
+      /* The stage's box is driven by two animated values on the root
+         (see "stage and sheet" below): --split separates the surfaces,
+         --sheet-h is the sheet's height. Its bottom edge is computed
+         from the same --sheet-h the sheet uses, so the two edges are
+         one gap apart on every frame and can never overlap. */
       .stage {
         position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
+        top: calc(var(--split) * (var(--split-gap) + env(safe-area-inset-top, 0px)));
+        left: calc(var(--split) * var(--split-gap));
+        right: calc(var(--split) * var(--split-gap));
+        /* One gap above the sheet, less whatever hasn't separated yet:
+           merged, that's exactly the closed bar over a full-bleed stage,
+           so the overlap never exceeds the bar's own height. */
+        bottom: calc(var(--sheet-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px)
+                     - (1 - var(--split)) * (var(--bar-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px)));
+        border-radius: calc(var(--split) * var(--radius-card));
         overflow: hidden;
         border: none;
-        border-radius: 0;
         background: transparent;
-        transition:
-          top var(--duration-deliberate) var(--ease-out),
-          right var(--duration-deliberate) var(--ease-out),
-          bottom var(--duration-deliberate) var(--ease-out),
-          left var(--duration-deliberate) var(--ease-out),
-          border-radius var(--duration-deliberate) var(--ease-out);
       }
       .stage canvas {
         width: 100%;
@@ -584,70 +587,91 @@
 
 
       /* ============================================================
-         PROTOTYPE · stage and sheet (phones)
+         PROTOTYPE · stage and sheet (phones), round 2
          Opening the controls on a phone splits the screen into two
-         surfaces on a black ground: the stage shrinks into a card at
-         the top, the panel grows into a card below, 8px apart. The
-         gap says they are two surfaces. The stage's content re-fits
-         the smaller card, so nothing is covered while you adjust it.
-         The sheet's heading row resizes the split by drag, snapping
-         to set heights; a drag or flick down past the lowest closes
-         it. Above 630px the panel floats in the corner as before.
+         surfaces on a ground of the opposite colour: the stage shrinks
+         into a card at the top and re-fits its content, the controls
+         become a sheet below, 8px apart.
+
+         Three openings to compare (the switch is in the panel):
+           corner  — the pill grows out of the bottom-right corner
+           bar     — a full-width bar grows upward; nothing moves sideways
+           staged  — the bar, in two beats: the surfaces separate first
+                     (corners round, the ground shows), then the sheet
+                     grows; closing runs it backwards
+
+         Fixes in all three: one value drives both surfaces, so their
+         edges never overlap; the sheet's controls are there as it
+         grows, revealed by its edge, not faded in late; the ground
+         switches while the stage still covers it, so it never passes
+         through grey.
          ============================================================ */
+      @property --split { syntax: '<number>'; inherits: true; initial-value: 0; }
+      @property --sheet-h { syntax: '<length>'; inherits: true; initial-value: 52px; }
       :root {
-        --color-split-ground: #000000;   /* the gap between the two surfaces, in both themes */
+        --color-split-ground: var(--color-text);   /* the opposite of the page: black in light, white in dark */
         --split-gap: var(--space-8);
-        --sheet-h: 55vh;                 /* set by script from the snap points */
+        --bar-h: calc(var(--height-row) + 2px);
+        --split: 0;
+        --sheet-h: var(--bar-h);
+        /* timing, per opening */
+        --d-split: var(--duration-deliberate);
+        --d-sheet: var(--duration-deliberate);
+        --delay-split: 0ms;
+        --delay-sheet: 0ms;
+        transition:
+          --split var(--d-split) var(--ease-out) var(--delay-split),
+          --sheet-h var(--d-sheet) var(--ease-out) var(--delay-sheet);
       }
-      body { transition: background-color var(--duration-deliberate) var(--ease-out); }
+      /* Staged: open = separate (250ms), then grow (450ms);
+         close = shrink (350ms), then merge (250ms). */
+      :root[data-variant="staged"].is-split { --d-split: var(--duration-base); --delay-sheet: var(--duration-base); }
+      :root[data-variant="staged"]:not(.is-split) { --d-split: var(--duration-base); --d-sheet: var(--duration-pop); --delay-split: var(--duration-pop); }
+      :root.is-resizing { transition: none; }
+
       @media (max-width: 630px) {
-        body.is-split { background: var(--color-split-ground); }
-        body.is-split .stage {
-          top: calc(var(--split-gap) + env(safe-area-inset-top, 0px));
-          left: var(--split-gap);
-          right: var(--split-gap);
-          bottom: calc(var(--sheet-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px));
-          border-radius: var(--radius-card);
-        }
-        /* Closed: the floating pill, its height fixed so it can animate. */
+        :root.is-ground body { background: var(--color-split-ground); }
+
         .panel {
-          height: calc(var(--height-row) + 2px);
+          right: var(--split-gap);
+          bottom: calc(var(--split-gap) + env(safe-area-inset-bottom, 0px));
+          height: var(--sheet-h);
           max-height: none;
+          border-radius: var(--radius-row);
+          /* One material from bar to sheet: the solid surface. Glass
+             would turn grey over the ground as the sheet closes. */
+          background: var(--color-surface);
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
           transition:
-            width var(--duration-deliberate) var(--ease-out),
-            height var(--duration-deliberate) var(--ease-out),
-            right var(--duration-deliberate) var(--ease-out),
-            bottom var(--duration-deliberate) var(--ease-out),
-            border-radius var(--duration-deliberate) var(--ease-out),
-            background-color var(--duration-deliberate) var(--ease-out),
-            box-shadow var(--duration-deliberate) var(--ease-out),
-            padding-bottom var(--duration-deliberate) var(--ease-out);
+            width var(--d-sheet) var(--ease-out) var(--delay-sheet),
+            border-radius var(--d-sheet) var(--ease-out) var(--delay-sheet),
+            background-color var(--duration-fast) ease,
+            box-shadow var(--duration-fast) ease;
         }
-        /* Open: the second surface, full width inside the gap. Solid,
-           because there is nothing behind it to see through. */
+        /* bar and staged: full width at every moment, so the sheet only ever grows upward */
+        :root:not([data-variant="corner"]) .panel { width: calc(100vw - 2 * var(--split-gap)); max-width: none; }
         .panel[data-open="true"] {
           width: calc(100vw - 2 * var(--split-gap));
           max-width: none;
-          height: var(--sheet-h);
-          right: var(--split-gap);
-          bottom: calc(var(--split-gap) + env(safe-area-inset-bottom, 0px));
+          border-radius: var(--radius-card);
           background: var(--color-surface);
           -webkit-backdrop-filter: none;
           backdrop-filter: none;
           box-shadow: none;
-          touch-action: pan-y;           /* the sheet scrolls; only its heading row takes the drag */
+          touch-action: pan-y;
+          padding-bottom: 0;
         }
-        .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: auto; align-self: stretch; }
-        /* The row is the sheet's height, not its content's, so the body scrolls. */
-        .panel[data-open="true"] .panel-body-wrap { grid-template-rows: minmax(0, 1fr); }
+        /* The controls sit at full size under the heading from the
+           first frame; the sheet's growing edge reveals them. */
+        .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: auto; align-self: stretch; grid-template-rows: minmax(0, 1fr); transition: none; }
         .panel-body-clip { height: 100%; }
-        .panel-body { width: auto; height: 100%; max-height: none; padding-bottom: var(--space-16); }
-        /* The heading row is the handle: drag to resize, tap to close. */
+        .panel-body { width: auto; height: 100%; max-height: none; padding-bottom: var(--space-16); transition: opacity var(--duration-fast) ease, visibility 0s linear var(--duration-fast); }
+        .panel[data-open="true"] .panel-body { transition: opacity var(--duration-base) ease var(--delay-sheet), visibility 0s; }
+
         .panel[data-open="true"] .panel-toggle { cursor: grab; touch-action: none; }
-        body.is-resizing .panel-toggle { cursor: grabbing; }
-        /* While a finger drags the split, both surfaces follow it 1:1. */
-        body.is-resizing .stage,
-        body.is-resizing .panel { transition: none !important; }
+        :root.is-resizing .panel-toggle { cursor: grabbing; }
+        :root.is-resizing .panel { transition: none !important; }
       }
     </style>
   </head>
@@ -670,6 +694,17 @@
       <div class="panel-body-wrap">
         <div class="panel-body-clip">
           <div class="panel-body" id="panelBody">
+          <div class="panel-section">
+            <h2 class="t-mono panel-title">Prototype</h2>
+            <div class="control-field">
+              <span class="t-label" id="variantLabel">Opening</span>
+              <div class="segmented" role="group" aria-labelledby="variantLabel" id="variantSeg">
+                <button type="button" class="t-control" data-variant="corner" aria-pressed="false">Corner</button>
+                <button type="button" class="t-control" data-variant="bar" aria-pressed="false">Bar</button>
+                <button type="button" class="t-control" data-variant="staged" aria-pressed="true">Staged</button>
+              </div>
+            </div>
+          </div>
           <div class="panel-section panel-section--actions">
             <div class="action-row">
               <button type="button" class="button button--primary" id="randomizeBtn"><span class="t-control">Randomize</span></button>
@@ -889,9 +924,8 @@
           CSSW = Math.max(300, Math.round(w));
           CSSH = Math.max(300, Math.round(h));
           /* Fit the 1200 x 800 composition inside the stage: a short
-             stage (the split, with a tall sheet) widens the reference
-             space instead, so the word and its wave scale down whole
-             rather than running off the card. */
+             stage widens the reference space instead, so the word and
+             its wave scale down whole rather than running off the card. */
           VW = Math.max(1200, Math.round(800 * CSSW / CSSH));
           VH = Math.max(300, Math.round(VW * CSSH / CSSW));
           CX = VW / 2;
@@ -1474,21 +1508,53 @@
         }
 
         /* ---------- Stage and sheet (phones) ---------- */
+        var root = document.documentElement;
         var phone = window.matchMedia('(max-width: 630px)');
+        var BAR_H = 52;
         var SNAPS = [0.4, 0.55, 0.75];      /* sheet heights, as a share of the screen */
         var CLOSE_BELOW = 0.28;             /* let go lower than this and it closes */
         var MIN_H = 0.2, MAX_H = 0.85;
         var FLICK = 0.6;                    /* px per ms */
         var sheetFrac = SNAPS[1];
+        var groundTimer = null;
+        var VARIANTS = ['corner', 'bar', 'staged'];
+        var variant = VARIANTS.indexOf(location.hash.slice(1)) >= 0 ? location.hash.slice(1) : 'staged';
+        root.setAttribute('data-variant', variant);
+
+        function setSheetPx(px) { root.style.setProperty('--sheet-h', px + 'px'); }
+        function isOpen() { return panel.getAttribute('data-open') === 'true'; }
         function setSheet(frac) {
           sheetFrac = Math.max(MIN_H, Math.min(MAX_H, frac));
-          document.documentElement.style.setProperty('--sheet-h', (sheetFrac * window.innerHeight) + 'px');
+          if (isOpen() && phone.matches) setSheetPx(sheetFrac * window.innerHeight);
         }
-        setSheet(sheetFrac);
+        /* When the stage is whole again: the ground goes back then. */
+        function closeDuration() { return variant === 'staged' ? 600 : 450; }
+        function applySplit(open, instant) {
+          clearTimeout(groundTimer);
+          if (instant) root.classList.add('is-resizing');
+          if (!phone.matches) {
+            root.classList.remove('is-split', 'is-ground');
+            root.style.setProperty('--split', 0);
+            setSheetPx(BAR_H);
+          } else if (open) {
+            /* The stage still covers the screen, so the ground can
+               change now: it shows only as the surfaces separate. */
+            root.classList.add('is-ground', 'is-split');
+            root.style.setProperty('--split', 1);
+            setSheetPx(sheetFrac * window.innerHeight);
+          } else {
+            root.classList.remove('is-split');
+            root.style.setProperty('--split', 0);
+            setSheetPx(BAR_H);
+            if (instant) root.classList.remove('is-ground');
+            else groundTimer = setTimeout(function () { root.classList.remove('is-ground'); }, closeDuration());
+          }
+          if (instant) { void root.offsetWidth; root.classList.remove('is-resizing'); }
+        }
 
         function setPanelOpen(open, instant) {
           if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
-          document.body.classList.toggle('is-split', open);
+          applySplit(open, instant);
           if (instant) panel.classList.add('no-transition');
           if (open) {
             panel.classList.remove('is-settled-closed');
@@ -1519,7 +1585,7 @@
         var sheetDrag = null, suppressClick = false;
         panelToggle.addEventListener('pointerdown', function (e) {
           suppressClick = false;   /* a drag that ended without a click mustn't swallow this tap */
-          if (!phone.matches || panel.getAttribute('data-open') !== 'true') return;
+          if (!phone.matches || !isOpen()) return;
           sheetDrag = { y: e.clientY, frac: sheetFrac, moved: false, lastY: e.clientY, lastT: performance.now(), v: 0 };
           panelToggle.setPointerCapture(e.pointerId);
         });
@@ -1528,7 +1594,7 @@
           var dy = e.clientY - sheetDrag.y;
           if (!sheetDrag.moved && Math.abs(dy) < 6) return;   /* still a tap */
           sheetDrag.moved = true;
-          document.body.classList.add('is-resizing');
+          root.classList.add('is-resizing');
           var now = performance.now();
           sheetDrag.v = (e.clientY - sheetDrag.lastY) / Math.max(1, now - sheetDrag.lastT);
           sheetDrag.lastY = e.clientY; sheetDrag.lastT = now;
@@ -1537,10 +1603,11 @@
         function endSheetDrag() {
           if (!sheetDrag) return;
           var d = sheetDrag; sheetDrag = null;
-          document.body.classList.remove('is-resizing');
+          void root.offsetWidth;
+          root.classList.remove('is-resizing');
           if (!d.moved) return;
           suppressClick = true;
-          if (sheetFrac < CLOSE_BELOW || d.v > FLICK) { setPanelOpen(false); setSheet(SNAPS[1]); return; }
+          if (sheetFrac < CLOSE_BELOW || d.v > FLICK) { sheetFrac = SNAPS[1]; setPanelOpen(false); return; }
           /* A flick up goes to the next snap; otherwise the nearest. */
           var target = SNAPS.reduce(function (a, b) { return Math.abs(b - sheetFrac) < Math.abs(a - sheetFrac) ? b : a; });
           if (d.v < -FLICK) target = SNAPS.filter(function (s) { return s > d.frac + 0.01; })[0] || SNAPS[SNAPS.length - 1];
@@ -1550,9 +1617,22 @@
         panelToggle.addEventListener('pointercancel', endSheetDrag);
         panelToggle.addEventListener('click', function () {
           if (suppressClick) { suppressClick = false; return; }
-          setPanelOpen(panel.getAttribute('data-open') !== 'true');
+          setPanelOpen(!isOpen());
         });
-        window.addEventListener('resize', function () { setSheet(sheetFrac); });
+        window.addEventListener('resize', function () { applySplit(isOpen(), true); });
+
+        /* The prototype switch: which opening to use. Kept in the hash
+           (#corner, #bar, #staged) so a reload keeps it. */
+        var variantSeg = $('variantSeg');
+        setPressed(variantSeg, 'data-variant', variant);
+        variantSeg.addEventListener('click', function (e) {
+          var btn = e.target.closest('button');
+          if (!btn) return;
+          variant = btn.getAttribute('data-variant');
+          root.setAttribute('data-variant', variant);
+          setPressed(variantSeg, 'data-variant', variant);
+          try { history.replaceState(null, '', '#' + variant); } catch (err) {}
+        });
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && panel.getAttribute('data-open') === 'true') {
             setPanelOpen(false);
