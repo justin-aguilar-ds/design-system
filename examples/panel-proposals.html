@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Control Panel Proposals</title>
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/accordion/accordion.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
+<style>
+  /* Layout: the three panels side by side where they fit, stacked on a
+     phone; the proposals and decisions after them. */
+  h1, h2, h3, p { margin: 0; }
+  .page {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page-block);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+  }
+  .page > * { min-width: 0; }
+  .versions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-24); align-items: start; }
+  .version { display: grid; gap: var(--space-16); min-width: 0; }
+  .version-head { display: grid; gap: var(--space-8); }
+  .version-head .t-body { max-width: 44ch; }
+  .version .control-panel-fields { grid-template-columns: minmax(0, 1fr); }
+
+  .proposals { margin: 0; padding: 0; list-style: none; max-width: 760px; }
+  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .proposal-copy { display: grid; gap: var(--space-8); }
+  .proposal-copy .t-body { max-width: 60ch; }
+  .proposal.is-declined .proposal-copy { opacity: var(--opacity-label-inactive); }
+  .decisions-end { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-16); }
+
+  /* ============================================================
+     PROPOSED · control panel fields
+     ============================================================ */
+  /* P2 · Separators: a divider between fields, 16px either side, so a
+     long panel reads as a list with a rhythm. */
+  .v-sep .control-panel-fields { gap: 0; }
+  .v-sep .control-panel-fields > * { padding-block: var(--space-16); }
+  .v-sep .control-panel-fields > * + * { border-top: 1px solid var(--color-divider); }
+  .v-sep .control-panel-fields > :first-child { padding-top: var(--space-8); }
+  .v-sep .control-panel-fields > :last-child { padding-bottom: 0; }
+
+  /* P3 · Full width: every control fills the panel's width — segments
+     share it equally, a picker runs edge to edge. */
+  .v-full :is(.control-field, .picker-field) { justify-items: stretch; }
+  .v-full .segmented { display: flex; width: 100%; }
+  .v-full .segmented-option { flex: 1; justify-content: center; }
+  .v-full .picker, .v-full .picker-trigger { width: 100%; }
+
+  /* P4 · Inline: the label on the left, the control on the right, on one
+     row. A control that can't fit beside its label drops underneath it
+     rather than squeezing. A slider keeps its label-and-value row, the
+     track under it. */
+  .v-inline :is(.control-field, .picker-field) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8) var(--space-16);
+  }
+  .v-inline .picker-trigger { min-width: 140px; }
+</style>
+</head>
+<body ontouchstart>
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">A calmer panel</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">Ways to make a control panel with many fields feel less clunky. The same eleven fields, three ways; approve or decline each idea at the end.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="versions" id="versions"></div>
+
+  <section aria-labelledby="dec-h" style="display: grid; gap: var(--space-24);">
+    <h2 class="t-title" id="dec-h">The ideas</h2>
+    <ol class="proposals" id="proposals"></ol>
+    <div class="decisions-end">
+      <p class="t-body" id="decision-summary"></p>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-label" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
+        <span class="toast t-mono" role="status"></span>
+      </span>
+    </div>
+  </section>
+</div>
+
+<script>
+// Panels and decision switches are built before the component scripts
+// set themselves up.
+const DURATIONS = [['instant', 'Instant · 0'], ['fast', 'Fast · 160'], ['base', 'Base · 250'], ['pop', 'Pop · 350'], ['deliberate', 'Deliberate · 450']];
+const FIELDS = [
+  ['slider', 'Line weight', { min: 1, max: 3, step: 0.25, value: 2.25 }],
+  ['seg', 'Grey', [['light', 'Light'], ['mid', 'Mid']], 'light'],
+  ['seg', 'Curve', [['straight', 'Straight'], ['rounded', 'Rounded']], 'rounded'],
+  ['seg', 'Labels', [['off', 'Off'], ['on', 'On']], 'off'],
+  ['seg', 'Guides', [['none', 'None'], ['base', 'Baseline'], ['grid', 'Grid']], 'grid'],
+  ['seg', 'Guide style', [['solid', 'Solid'], ['dotted', 'Dotted'], ['dashed', 'Dashed']], 'dotted'],
+  ['seg', 'Density', [['few', 'Few'], ['more', 'More']], 'few'],
+  ['seg', 'Legend', [['names', 'Names'], ['off', 'Off']], 'names'],
+  ['pick', 'Yellow', [['off', 'Off'], ['area', 'Area'], ['band', 'Week band'], ['flag', 'End value']], 'off'],
+  ['pick', 'Line fade', DURATIONS, 'base'],
+  ['pick', 'Tooltip grow', DURATIONS, 'pop'],
+];
+const VERSIONS = [
+  ['a', 'A · Today', 'Label-size labels above controls that hug their contents.', '', 't-label'],
+  ['b', 'B · Mono, separators, full width', 'Quiet mono labels, a divider between fields, every control the full width of the panel.', 'v-sep v-full', 't-mono'],
+  ['c', 'C · Mono, separators, inline', 'Quiet mono labels, a divider between fields, the label left and the control right.', 'v-sep v-inline', 't-mono'],
+];
+const field = (v, labelClass, [kind, label, opts, active], k) => {
+  const id = `${v}-${k}`;
+  if (kind === 'slider') return `
+    <div class="slider-field">
+      <div class="slider-head">
+        <label class="${labelClass}" for="${id}">${label}</label>
+        <output class="slider-value t-mono" for="${id}">${opts.value}</output>
+      </div>
+      <span class="slider">
+        <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+        <input class="slider-input" id="${id}" type="range" min="${opts.min}" max="${opts.max}" step="${opts.step}" value="${opts.value}">
+      </span>
+    </div>`;
+  if (kind === 'seg') return `
+    <div class="control-field">
+      <span class="${labelClass}" id="${id}-l">${label}</span>
+      <div class="segmented" role="group" aria-labelledby="${id}-l">
+        <span class="segmented-indicator" aria-hidden="true"></span>
+        ${opts.map(([val, t]) => `<button class="segmented-option t-control${val === active ? ' is-active' : ''}" type="button" aria-pressed="${val === active}" value="${val}">${t}</button>`).join('')}
+      </div>
+    </div>`;
+  return `
+    <div class="picker-field">
+      <span class="${labelClass}" id="${id}-l">${label}</span>
+      <div class="picker">
+        <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="${id}-list" aria-labelledby="${id}-l ${id}-v">
+          <span class="picker-value" id="${id}-v">${opts.find((o) => o[0] === active)[1]}</span>
+          <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="picker-menu" hidden>
+          <ul class="picker-list" id="${id}-list" role="listbox" tabindex="-1" aria-labelledby="${id}-l">
+            ${opts.map(([val, t]) => `<li class="picker-option t-control" role="option" aria-selected="${val === active}" data-value="${val}">${t}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>`;
+};
+document.getElementById('versions').innerHTML = VERSIONS.map(([v, title, body, cls, labelClass]) => `
+  <section class="version" aria-labelledby="${v}-h">
+    <div class="version-head">
+      <h2 class="t-label" id="${v}-h">${title}</h2>
+      <p class="t-body">${body}</p>
+    </div>
+    <section class="control-panel surface accordion ${cls}" aria-label="Adjustments, version ${v.toUpperCase()}">
+      <div class="accordion-item is-open">
+        <h3 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="${v}-trigger" aria-expanded="true" aria-controls="${v}-body">
+            <span class="t-mono">Adjustments</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h3>
+        <div class="accordion-panel" id="${v}-body" role="region" aria-labelledby="${v}-trigger">
+          <div class="accordion-content"><div class="accordion-body">
+            <div class="control-panel-fields">${FIELDS.map((f, k) => field(v, labelClass, f, k)).join('')}</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </section>`).join('');
+
+const PROPOSALS = [
+  ['P1', 'Mono field labels', 'Field labels in a control panel are mono, quieter than the controls they name, so the controls carry the weight. Changes the rule that spends mono once, on the panel’s title: inside a panel, every field label becomes mono too. Outside a panel, field labels stay Label.'],
+  ['P2', 'Separators between fields', 'A divider between fields, 16px above and below, so a long panel reads as a list with a rhythm. For panels with more than about four fields; a short panel stays as it is.'],
+  ['P3', 'Full-width controls', 'Every control fills the panel: segments share the width equally, a picker runs edge to edge. Labels stay above. Version B.'],
+  ['P4', 'Label and control on one row', 'The label on the left, the control on the right. A control too wide to sit beside its label drops underneath it; a slider keeps its label-and-value row with the track below. Version C. Pick P3 or P4.'],
+];
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem('panel-proposals') || '{}'); } catch {}
+document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
+  <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
+    <div class="proposal-copy">
+      <span class="t-mono">${id}</span>
+      <h3 class="t-label">${title}</h3>
+      <p class="t-body">${body}</p>
+    </div>
+    <div class="segmented" role="group" aria-label="${id} decision">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${['pending', 'approve', 'decline'].map((val) => `<button class="segmented-option t-control${(decisions[id] || 'pending') === val ? ' is-active' : ''}" type="button" aria-pressed="${(decisions[id] || 'pending') === val}" value="${val}">${val[0].toUpperCase() + val.slice(1)}</button>`).join('')}
+    </div>
+  </li>`).join('');
+</script>
+<script src="lib/components/accordion/accordion.js"></script>
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/picker/picker.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+function summarise() {
+  const ids = PROPOSALS.map((p) => p[0]);
+  const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
+  const a = by('approve'), d = by('decline'), p = by('pending');
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide.`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+}
+document.getElementById('proposals').addEventListener('segmented-change', (e) => {
+  const item = e.target.closest('.proposal'); if (!item) return;
+  decisions[item.dataset.id] = e.detail.value;
+  try { localStorage.setItem('panel-proposals', JSON.stringify(decisions)); } catch {}
+  item.classList.toggle('is-declined', e.detail.value === 'decline');
+  summarise();
+});
+summarise();
+</script>
+</body>
+</html>
