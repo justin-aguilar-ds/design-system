@@ -615,46 +615,43 @@
       @media (max-width: 630px) {
         :root.is-ground body { background: var(--color-split-ground); }
 
+        /* The sheet's whole box comes from the same two values as the
+           stage (--split, --sheet-h), so the two surfaces are one shape
+           changing on every frame. No width of its own to animate, and
+           no max-width to snap to: closed, its left edge sits a pill's
+           width from the right; open, a gap from the left. */
         .panel {
-          right: var(--space-16);
-          bottom: calc(var(--space-16) + env(safe-area-inset-bottom, 0px));
+          left: calc(var(--split) * var(--split-gap) + (1 - var(--split)) * (100vw - var(--space-16) - var(--pill-w)));
+          right: calc(var(--space-16) - var(--split) * (var(--space-16) - var(--split-gap)));
+          bottom: calc(var(--space-16) - var(--split) * (var(--space-16) - var(--split-gap)) + env(safe-area-inset-bottom, 0px));
+          width: auto;
+          max-width: none;
           height: var(--sheet-h);
           max-height: none;
-          border-radius: var(--radius-row);
-          /* One material from bar to sheet: the solid surface. Glass
+          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
+          padding-bottom: 0;
+          /* One material from pill to sheet: the solid surface. Glass
              would turn grey over the ground as the sheet closes. */
           background: var(--color-surface);
           -webkit-backdrop-filter: none;
           backdrop-filter: none;
-          transition:
-            width var(--duration-deliberate) var(--ease-out),
-            right var(--duration-deliberate) var(--ease-out),
-            bottom var(--duration-deliberate) var(--ease-out),
-            border-radius var(--duration-deliberate) var(--ease-out),
-            background-color var(--duration-fast) ease,
-            box-shadow var(--duration-fast) ease;
+          transition: box-shadow var(--duration-deliberate) var(--ease-out);
         }
         .panel[data-open="true"] {
-          right: var(--split-gap);
-          bottom: calc(var(--split-gap) + env(safe-area-inset-bottom, 0px));
-          width: calc(100vw - 2 * var(--split-gap));
+          width: auto;
           max-width: none;
-          border-radius: var(--radius-card);
-          background: var(--color-surface);
-          -webkit-backdrop-filter: none;
-          backdrop-filter: none;
+          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
           box-shadow: none;
           touch-action: pan-y;
           padding-bottom: 0;
         }
-        /* The controls sit at full size under the heading from the
-           first frame; the sheet's growing edge reveals them. */
-        /* The controls keep the open sheet's width the whole time, so the
-           growing or shrinking edge clips them instead of re-flowing them. */
+        /* The controls keep the open sheet's width, so the moving edge
+           never re-flows them. They leave fast on close, before the edge
+           reaches them, and arrive just behind the edge on open. */
         .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: calc(100vw - 2 * var(--split-gap) - 2 * var(--space-16)); align-self: flex-start; grid-template-rows: minmax(0, 1fr); transition: none; }
         .panel-body-clip { height: 100%; }
         .panel-body { width: 100%; height: 100%; max-height: none; padding-bottom: var(--space-16); transition: opacity var(--duration-fast) ease, visibility 0s linear var(--duration-fast); }
-        .panel[data-open="true"] .panel-body { transition: opacity var(--duration-base) ease, visibility 0s; }
+        .panel[data-open="true"] .panel-body { transition: opacity var(--duration-base) ease var(--duration-fast), visibility 0s; }
 
         .panel[data-open="true"] .panel-toggle { cursor: grab; touch-action: none; }
         :root.is-resizing .panel-toggle { cursor: grabbing; }
