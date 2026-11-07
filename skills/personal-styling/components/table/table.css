@@ -1,11 +1,20 @@
-/* personal-styling · table · v0.8.0 */
+/* personal-styling · table · v0.9.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
-   It fills its container and scrolls sideways rather than shrinking
-   the type. */
+   It always fills its container, and scrolls sideways rather than
+   shrinking the type when its columns need more room. */
 .table-wrap {
   position: relative;
+  /* CHANGED (v0.9): the wrap states its width — the container plus the
+     16px bleed either side — instead of relying on a block's default.
+     In a grid or flex parent that aligns its items to the start, an
+     unstated width shrinks to the content and the table stops short. */
+  width: calc(100% + 2 * var(--space-16));
+  max-width: none;
   min-width: 0;
+  flex: none;
+  justify-self: stretch;
+  align-self: stretch;
   overflow-x: auto;
   /* The row fill bleeds 16px past the content on each side, so the text
      lines up with the page yet never sits flush against the fill. A scroll
@@ -19,6 +28,7 @@
 }
 .table {
   width: 100%;
+  min-width: 100%;   /* full width is the least it takes; more columns grow it, and the wrap scrolls */
   border-collapse: collapse;
 }
 

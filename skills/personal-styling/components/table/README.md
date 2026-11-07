@@ -6,7 +6,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 **A table is a list, so it sits on the page** — a heading, then the rows, with dividers. No card around it. A card around a table gives you two nested borders and a scroll container inside a rounded box, which is where the awkward negative-margin gutters come from.
 
-- **Full width of its container.** The table is `width: 100%` inside `.table-wrap`. It never sets its own max-width; the container does.
+- **Always the full width of its container, at least.** `.table-wrap` states its own width (the container plus the fill's 16px bleed on each side), so the table fills its column in any layout, including a grid or flex parent that aligns its items to the start. Full width is the minimum: a table whose columns need more room grows wider and scrolls sideways inside the wrap. It never sets its own max-width; the container does.
 - **Column headers are Label** (16/19, 600, full ink) — never mono, never uppercase. Left-aligned, `16px` bottom padding.
 - **Every data cell is 10.5 mono**, weight 500: values, figures, timestamps, IDs, statuses, details. Tables don't inherit font sizes for mono.
 - **One font size per cell.** Nothing inside a cell — code, a link, an emphasis — changes its size, family, tracking or case; the component enforces it. A second size in a cell gives that row a different height and baseline, and the hover fill no longer fits it. Only ink may change, with `.table-ink`.
@@ -41,6 +41,7 @@ Rows of records for tools: full width of its container, sitting on the page with
 
 - Hover now brightens the **whole row**. The old rule said "brighten the row label", but the label column is already full ink, so that hover changed nothing.
 - v0.2.0: rows take a gliding background fill on hover, modelled on the segmented control. The old rule was "no background change". The table's outer edges gain `16px` of padding to make room for the fill's radius.
+- v0.9.0: the wrap states its full width, so the table fills its container even in a grid or flex parent that aligns to the start; `min-width: 100%` on the table makes full width the minimum.
 - v0.8.0: cells keep 12px either side, so fills never meet their text; `.table-gain` / `.table-loss` polarity fills; sortable column headers.
 - v0.7.0: one font size per cell, enforced — anything inside a cell takes the cell's type.
 - v0.6.0: no padding at the outer edges; the fill bleeds `16px` past the table instead, so content aligns with the page and still sits inside the fill.
