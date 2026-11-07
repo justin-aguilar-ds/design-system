@@ -44,15 +44,18 @@
      PROPOSED · H1 · the large size: everything in the slot is 50px
      ============================================================ */
   .segmented--large .segmented-option {
-    min-height: calc(var(--height-row) - 2 * var(--space-4) - 2px); /* 50px frame: 4px padding each side and the 1px border */
+    min-height: calc(var(--slot-h) - 2 * var(--space-4) - 2px); /* the frame: 4px padding each side and the 1px border */
     padding: 0 var(--space-24);
   }
-  .picker--large .picker-trigger { min-height: var(--height-row); padding: 0 var(--space-24); }
-  .button--slot { justify-content: center; min-height: var(--height-row); padding: 0 var(--space-24); }
+  .picker--large .picker-trigger { min-height: var(--slot-h); padding: 0 var(--space-24); }
+  .button--slot { justify-content: center; min-height: var(--slot-h); padding: 0 var(--space-24); }
   .mark { flex: none; width: var(--icon-mark); height: var(--icon-mark); }
 
   /* ---- The mock screens. Full bleed on a phone, so the slot has the
      width it would really have: the screen less the page inset. */
+  /* The slot's height, chosen on the page: 64, 50, 48 or 36. */
+  #opt-section { --slot-h: var(--height-row); }
+  .switches { display: grid; gap: var(--space-16); }
   .pair-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-16); }
   .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-48) var(--space-24); }
   .option { display: grid; gap: var(--space-16); align-content: start; min-width: 0; }
@@ -140,7 +143,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-8);
-    min-height: calc(var(--height-row) - 2 * var(--space-4) - 2px);
+    min-height: calc(var(--slot-h) - 2 * var(--space-4) - 2px);
     padding: 0 var(--space-16);
     border-radius: var(--radius-pill);
     color: var(--color-text);
@@ -217,10 +220,21 @@
     </div>
   </section>
 
-  <section class="section" aria-labelledby="opt-h">
+  <section class="section" aria-labelledby="opt-h" id="opt-section">
     <div class="section-head">
       <h2 class="t-title" id="opt-h">Two controls as one</h2>
-      <p class="t-body">A small site: the nav at the bottom, and a page that needs one more thing. Tap through the pages in each screen. Everything in these slots is 50px.</p>
+      <p class="t-body">A small site: the nav at the bottom, and a page that needs one more thing. Tap through the pages in each screen, and try the slot at each height.</p>
+    </div>
+    <div class="switches">
+    <div class="pair-switch">
+      <span class="t-label" id="size-l">Height</span>
+      <div class="segmented" role="group" aria-labelledby="size-l" id="size">
+        <span class="segmented-indicator" aria-hidden="true"></span>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="64">64</button>
+        <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="50">50</button>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="48">48</button>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="36">36</button>
+      </div>
     </div>
     <div class="pair-switch">
       <span class="t-label" id="pair-l">Pair the nav with</span>
@@ -229,6 +243,7 @@
         <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="button">A button</button>
         <button class="segmented-option t-control" type="button" aria-pressed="false" value="select">A select</button>
       </div>
+    </div>
     </div>
     <div class="options" id="options"></div>
   </section>
@@ -266,7 +281,7 @@
 // come after it: they're driven by this page, so the select can take the
 // fill inside a frame.
 const PROPOSALS = [
-  ['H1', 'One height at the bottom: 50px', 'Everything in the bottom slot is --height-row, the height the large button and the sheet’s pill already are. The page nav drops from 61px to 50 (.segmented--nav becomes .segmented--large: 40px options, 4px frame), and the picker gets .picker--large to match. Compact controls stay 36px everywhere else.'],
+  ['H1', 'One height at the bottom', 'Everything in the bottom slot is one height — try 64, 50, 48 or 36 above. 50 is --height-row, the height the large button and the sheet’s pill already are; 36 is --height-control, the compact size. The page nav goes from 61px to the chosen height (.segmented--nav becomes .segmented--large), and the picker gets .picker--large to match. The height you’re on is copied with your decisions. Compact controls stay 36px everywhere else.'],
   ['S1', 'One bottom slot, as a pattern', 'A new pattern, patterns/bottom-slot/, owns the bottom of the screen: one row, centred, 24px (--space-page) from the bottom and sides plus the safe area, and room at the end of the page so content clears it. It holds one thing. The segmented README’s hand-written “pin it bottom-centre” moves here, and the large button’s pinning uses it.'],
   ['S2', 'What goes in the slot', 'The guide above, as rules in the pattern’s README: decide by what the screen is for, one answer per screen. Never two things stacked at the bottom, never a nav at both the top and the bottom, never a row of icons.'],
   ['A', 'Combined control · Dock', 'Two surfaces side by side, 8px apart, each its own control: the nav’s frame, then a large button or a large select. Simplest to build and to read; with a select, the current page can live in either half, so the nav’s fill has nowhere to be.'],
@@ -427,16 +442,22 @@ document.querySelectorAll('.screen').forEach((screen) => {
   new ResizeObserver(() => place(shown)).observe(nav);
 });
 
+document.getElementById('size').addEventListener('segmented-change', (e) => {
+  document.getElementById('opt-section').style.setProperty('--slot-h', `${e.detail.value}px`);
+  slotH = e.detail.value;
+  summarise();
+});
 document.getElementById('pair').addEventListener('segmented-change', (e) => {
   document.querySelectorAll('.screen').forEach((s) => { s.hidden = s.dataset.mode !== e.detail.value; });
 });
 
+let slotH = '50';
 function summarise() {
   const ids = PROPOSALS.map((p) => p[0]);
   const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
   const a = by('approve'), d = by('decline'), p = by('pending');
   document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide.`;
-  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}\nHeight: ${slotH}px`;
 }
 document.getElementById('proposals').addEventListener('segmented-change', (e) => {
   const item = e.target.closest('.proposal'); if (!item) return;
