@@ -20,8 +20,16 @@
 <style>
   /* Layout: one reading column. The chart opens with its adjustments,
      the table follows, then the open proposals with their decisions.
-     Round 2: approved items are built in; only open ones have switches. */
+     Round 3: approved items are built in; only open ones have switches. */
   h1, h2, h3, p { margin: 0; }
+
+  /* PROPOSED (C15): a real grey for series. Solid, so crossing lines
+     never stack darker the way black at an opacity does. Two shades to
+     compare, each with its dark-mode partner. */
+  :root { --color-series-light: #d2d2d2; --color-series-mid: #b0b0b0; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --color-series-light: #3a3a3a; --color-series-mid: #5a5a5a; } }
+  :root[data-theme="dark"] { --color-series-light: #3a3a3a; --color-series-mid: #5a5a5a; }
+
   .page {
     max-width: 760px;
     margin-inline: auto;
@@ -34,7 +42,6 @@
   }
   .page > * { min-width: 0; }
   .part { display: flex; flex-direction: column; gap: var(--space-24); min-width: 0; }
-  .status { display: grid; gap: var(--space-8); }
   .status .t-body { max-width: 60ch; }
 
   .proposals { margin: 0; padding: 0; list-style: none; }
@@ -46,23 +53,35 @@
   .decisions-end { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-16); }
 
   /* ============================================================
-     PROPOSED · line chart, round 2
+     PROPOSED · line chart, round 3
      ============================================================ */
-  .chart { --w: 1.5; position: relative; min-width: 0; }
+  .chart {
+    --w: 1.5;
+    --series: var(--color-series-light);
+    /* C19: hover timing, from the duration tokens. */
+    --t-fade: var(--duration-base);
+    --t-grow: var(--duration-pop);
+    --t-follow: var(--duration-fast);
+    position: relative;
+    min-width: 0;
+  }
+  .chart[data-grey="mid"] { --series: var(--color-series-mid); }
   .chart.on-surface { padding: var(--space-16); background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
   .chart svg { display: block; width: 100%; overflow: visible; touch-action: pan-y; }
   .chart text { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.3px; text-transform: uppercase; fill: var(--color-text-secondary); }
-  .chart .grid { stroke: var(--color-divider); stroke-width: 1; }
-  .chart .baseline { stroke: var(--color-hairline-strong); stroke-width: 1; }
-  /* Approved line spec (C1), weight adjustable (C10): every series at the
-     weight and the inactive opacity, the focus one step heavier at full ink. */
-  .chart .series { fill: none; stroke: var(--color-text); stroke-width: var(--w); stroke-linecap: round; stroke-linejoin: round; stroke-opacity: var(--opacity-inactive);
-    transition: stroke-opacity var(--duration-base) ease, stroke-width var(--duration-base) var(--ease-out); }
-  .chart .series.is-focus { stroke-opacity: 1; stroke-width: calc(var(--w) + 1); }
+  /* Guides: solid, dotted (C17) or dashed (C18). */
+  .chart .guide { stroke: var(--color-divider); stroke-width: 1; }
+  .chart .guide.is-base { stroke: var(--color-hairline-strong); }
+  .chart[data-guide-style="dotted"] .guide { stroke: var(--color-hairline-strong); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 0 4; }
+  .chart[data-guide-style="dashed"] .guide { stroke: var(--color-hairline-strong); stroke-dasharray: 4 4; }
+  /* Line spec (C1) in a real grey (C15): every series at the weight in
+     the series grey; the focus one step heavier at full ink, on top. */
+  .chart .series { fill: none; stroke: var(--series); stroke-width: var(--w); stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke var(--t-fade) ease, stroke-width var(--t-fade) var(--ease-out); }
+  .chart .series.is-focus { stroke: var(--color-text); stroke-width: calc(var(--w) + 1); }
   .chart .end-dot { fill: var(--color-text); }
-  /* C4, round 2: a tooltip at the point, no hairline. The point is a
-     small dot in the line's own ink, ringed by the ground. */
-  .chart .point { fill: var(--color-text); stroke: var(--color-bg); stroke-width: 2; opacity: 0; transition: opacity var(--duration-fast) ease; }
+  /* Tooltip at the point (C4): no hairline, a small dot in the line's ink. */
+  .chart .point { fill: var(--color-text); stroke: var(--color-bg); stroke-width: 2; opacity: 0; transition: opacity var(--t-grow) ease; }
   .chart.on-surface .point { stroke: var(--color-surface); }
   .chart.has-tip .point { opacity: 1; }
   .chart-tip {
@@ -77,30 +96,22 @@
     pointer-events: none;
     transform-origin: bottom center;
     scale: 0;
-    transition: scale var(--duration-pop) var(--ease-out), translate var(--duration-fast) var(--ease-out);
+    transition: scale var(--t-grow) var(--ease-out), translate var(--t-follow) var(--ease-out);
   }
   .chart.has-tip .chart-tip { scale: 1; }
   .chart-tip.is-below { transform-origin: top center; }
-  /* Yellow, round 2 (C11–C14). The accent is only ever a fill, under ink. */
+  /* Yellow (C11–C13): only ever a fill, under ink. */
   .chart .y-area { fill: var(--color-accent-soft); }
-  .chart .y-band { fill: var(--color-accent-soft); transition: x var(--duration-base) var(--ease-out), width var(--duration-base) var(--ease-out); }
+  .chart .y-band { fill: var(--color-accent-soft); transition: x var(--t-follow) var(--ease-out), width var(--t-follow) var(--ease-out); }
   .chart .y-flag rect { fill: var(--color-accent); }
   .chart .y-flag text { fill: var(--color-accent-ink); }
 
   .legend { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-16); margin: var(--space-16) 0 0; padding: 0; list-style: none; }
-  .legend button { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) 0; color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
+  .legend button { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) 0; color: var(--color-text-secondary); transition: color var(--t-fade) ease; }
   .legend button.is-focus { color: var(--color-text); }
-  .legend button .swatch { width: 12px; height: 2px; border-radius: var(--radius-pill); background: currentColor; opacity: 0; transition: opacity var(--duration-fast) ease; }
+  .legend button .swatch { width: 12px; height: 2px; border-radius: var(--radius-pill); background: currentColor; opacity: 0; transition: opacity var(--t-fade) ease; }
   .legend button.is-focus .swatch { opacity: 1; }
   @media (hover: hover) and (pointer: fine) { .legend button:hover { color: var(--color-text); } }
-
-  /* Sequential accent ramp (C8): five steps, ink flips at the fourth. */
-  .heat-1 { --heat: 10%; } .heat-2 { --heat: 20%; } .heat-3 { --heat: 32%; } .heat-4 { --heat: 48%; } .heat-5 { --heat: 70%; }
-  .heat-on .table td[class*="heat-"] { background: color-mix(in srgb, var(--color-accent) var(--heat), transparent); color: var(--color-text); }
-  .heat-on .table td.heat-4, .heat-on .table td.heat-5 { color: var(--color-accent-ink); }
-  .ramp { display: flex; align-items: center; gap: var(--space-8); }
-  .ramp-steps { display: flex; gap: var(--space-4); }
-  .ramp-steps span { width: 24px; height: 12px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--color-accent) var(--heat), transparent); border: 1px solid var(--color-hairline); }
 
   /* ============================================================
      APPROVED · table (T1–T5), built in
@@ -109,9 +120,10 @@
   .table[data-col="4"] tr > :nth-child(4), .table[data-col="5"] tr > :nth-child(5) { color: var(--color-text); }
   .table th { transition: color var(--duration-fast) ease; }
   .spark { display: block; width: 64px; height: 20px; overflow: visible; }
-  .spark path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.5; transition: opacity var(--duration-base) ease; }
-  .spark circle { fill: currentColor; stroke: var(--color-bg); stroke-width: 2; opacity: 0; transition: opacity var(--duration-base) ease; }
-  .table tr.is-indicated .spark path, .table tr.is-indicated .spark circle { opacity: 1; }
+  .spark path { fill: none; stroke: var(--color-series-mid); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--duration-base) ease; }
+  .spark circle { fill: var(--color-text); stroke: var(--color-bg); stroke-width: 2; opacity: 0; transition: opacity var(--duration-base) ease; }
+  .table tr.is-indicated .spark path { stroke: var(--color-text); }
+  .table tr.is-indicated .spark circle { opacity: 1; }
   .table .cell-trigger { font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; }
 </style>
 </head>
@@ -124,7 +136,7 @@
         <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
       </button>
       <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
-        <p class="tooltip-text t-mono">Round 2 of the chart and table proposals. Approved items are built in; the open ones are listed at the end. Example season, made-up teams.</p>
+        <p class="tooltip-text t-mono">Round 3 of the chart and table proposals. Approved items are built in; the open ones are listed at the end. Example season, made-up teams.</p>
       </div>
     </div>
   </header>
@@ -143,77 +155,7 @@
         </h3>
         <div class="accordion-panel" id="adj-body" role="region" aria-labelledby="adj-trigger">
           <div class="accordion-content"><div class="accordion-body">
-            <div class="control-panel-fields">
-              <div class="slider-field">
-                <div class="slider-head">
-                  <label class="t-label" for="adj-weight">Line weight</label>
-                  <output class="slider-value t-mono" for="adj-weight">1.5</output>
-                </div>
-                <span class="slider">
-                  <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
-                  <input class="slider-input" id="adj-weight" type="range" min="1" max="3" step="0.25" value="1.5">
-                </span>
-              </div>
-              <div class="control-field">
-                <span class="t-label" id="adj-curve-l">Curve</span>
-                <div class="segmented" role="group" aria-labelledby="adj-curve-l" data-opt="curve">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="straight">Straight</button>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="rounded">Rounded</button>
-                </div>
-              </div>
-              <div class="control-field">
-                <span class="t-label" id="adj-axes-l">Axes</span>
-                <div class="segmented" role="group" aria-labelledby="adj-axes-l" data-opt="axes">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="none">None</button>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="few">Few</button>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="more">More</button>
-                </div>
-              </div>
-              <div class="control-field">
-                <span class="t-label" id="adj-legend-l">Legend</span>
-                <div class="segmented" role="group" aria-labelledby="adj-legend-l" data-opt="legend">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="names">Names</button>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="off">Off</button>
-                </div>
-              </div>
-              <div class="control-field">
-                <span class="t-label" id="adj-hover-l">Hover</span>
-                <div class="segmented" role="group" aria-labelledby="adj-hover-l" data-opt="hover">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="tooltip">Tooltip</button>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="off">Off</button>
-                </div>
-              </div>
-              <div class="picker-field">
-                <span class="t-label" id="adj-yellow-l">Yellow</span>
-                <div class="picker" id="adj-yellow">
-                  <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="adj-yellow-list" aria-labelledby="adj-yellow-l adj-yellow-v">
-                    <span class="picker-value" id="adj-yellow-v">Off</span>
-                    <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                  <div class="picker-menu" hidden>
-                    <ul class="picker-list" id="adj-yellow-list" role="listbox" tabindex="-1" aria-labelledby="adj-yellow-l">
-                      <li class="picker-option t-control" role="option" aria-selected="true" data-value="off">Off</li>
-                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="area">Area under the focus</li>
-                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="band">Week band</li>
-                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="flag">End value</li>
-                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="strip">Weekly heat strip</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="control-field">
-                <span class="t-label" id="adj-place-l">Sits</span>
-                <div class="segmented" role="group" aria-labelledby="adj-place-l" data-opt="place">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="page">On the page</button>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="surface">On a surface</button>
-                </div>
-              </div>
-            </div>
+            <div class="control-panel-fields" id="adj-fields"></div>
           </div></div>
         </div>
       </div>
@@ -229,24 +171,17 @@
   <!-- ===================== TABLE ===================== -->
   <section class="part" aria-labelledby="table-h">
     <h2 class="t-title" id="table-h">Table</h2>
-    <div id="table-host">
-      <div class="table-wrap">
-        <table class="table table--sticky" id="standings" data-sort="manual">
-          <thead><tr>
-            <th scope="col">Team</th>
-            <th scope="col" class="table-num" aria-sort="descending"><button class="table-sort" type="button">W <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
-            <th scope="col" class="table-num"><button class="table-sort" type="button">L <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
-            <th scope="col" class="table-num"><button class="table-sort" type="button">Wk 9 <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
-            <th scope="col">Season</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="ramp" id="ramp" aria-hidden="true">
-      <span class="t-mono">Wk 9 · 0</span>
-      <span class="ramp-steps"><span class="heat-1"></span><span class="heat-2"></span><span class="heat-3"></span><span class="heat-4"></span><span class="heat-5"></span></span>
-      <span class="t-mono">9 categories</span>
+    <div class="table-wrap">
+      <table class="table table--sticky" id="standings" data-sort="manual">
+        <thead><tr>
+          <th scope="col">Team</th>
+          <th scope="col" class="table-num" aria-sort="descending"><button class="table-sort" type="button">W <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col" class="table-num"><button class="table-sort" type="button">L <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col" class="table-num"><button class="table-sort" type="button">Wk 9 <svg class="table-sort-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5v7M2.25 5.75 5 8.5l2.75-2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></th>
+          <th scope="col">Season</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
   </section>
 
@@ -254,7 +189,7 @@
   <section class="part" aria-labelledby="dec-h">
     <h2 class="t-title" id="dec-h">Still to decide</h2>
     <div class="status">
-      <p class="t-body">Built in from round 1: C1 rounded lines and the line spec, C2 fewer gridlines, C3 room between labels and data, C6 the quieter legend, and T1 to T5 for the table. Declined: C5, the ringed yellow marker.</p>
+      <p class="t-body">Built in: C1 rounded lines and the line spec, C2 fewer gridlines, C3 room between labels and data, C4 tooltips at the point, C6 the quieter legend, C7 placement, C9 the bare chart, and T1 to T5 for the table. Declined: C5 the ringed marker, C8 yellow as a sequential scale, C14 the heat strip.</p>
     </div>
     <ol class="proposals" id="proposals"></ol>
     <div class="decisions-end">
@@ -268,20 +203,69 @@
 </div>
 
 <script>
-// The decision switches exist before segmented.js sets controls up.
+// Controls and decision switches are built before the component scripts
+// set themselves up.
+const DURATIONS = [['instant', 'Instant · 0'], ['fast', 'Fast · 160'], ['base', 'Base · 250'], ['pop', 'Pop · 350'], ['deliberate', 'Deliberate · 450'], ['entrance', 'Entrance · 500'], ['reveal', 'Reveal · 550'], ['slow', 'Slow · 800']];
+const seg = (key, label, options, active) => `
+  <div class="control-field">
+    <span class="t-label" id="adj-${key}-l">${label}</span>
+    <div class="segmented" role="group" aria-labelledby="adj-${key}-l" data-opt="${key}">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${options.map(([v, t]) => `<button class="segmented-option t-control${v === active ? ' is-active' : ''}" type="button" aria-pressed="${v === active}" value="${v}">${t}</button>`).join('')}
+    </div>
+  </div>`;
+const pick = (key, label, options, active) => `
+  <div class="picker-field">
+    <span class="t-label" id="adj-${key}-l">${label}</span>
+    <div class="picker" data-opt="${key}">
+      <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="adj-${key}-list" aria-labelledby="adj-${key}-l adj-${key}-v">
+        <span class="picker-value" id="adj-${key}-v">${options.find((o) => o[0] === active)[1]}</span>
+        <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="picker-menu" hidden>
+        <ul class="picker-list" id="adj-${key}-list" role="listbox" tabindex="-1" aria-labelledby="adj-${key}-l">
+          ${options.map(([v, t]) => `<li class="picker-option t-control" role="option" aria-selected="${v === active}" data-value="${v}">${t}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  </div>`;
+document.getElementById('adj-fields').innerHTML = `
+  <div class="slider-field">
+    <div class="slider-head">
+      <label class="t-label" for="adj-weight">Line weight</label>
+      <output class="slider-value t-mono" for="adj-weight">1.5</output>
+    </div>
+    <span class="slider">
+      <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+      <input class="slider-input" id="adj-weight" type="range" min="1" max="3" step="0.25" value="1.5">
+    </span>
+  </div>
+  ${seg('grey', 'Grey', [['light', 'Light'], ['mid', 'Mid']], 'light')}
+  ${seg('curve', 'Curve', [['straight', 'Straight'], ['rounded', 'Rounded']], 'rounded')}
+  ${seg('labels', 'Labels', [['off', 'Off'], ['on', 'On']], 'off')}
+  ${seg('guides', 'Guides', [['none', 'None'], ['base', 'Baseline'], ['grid', 'Grid']], 'grid')}
+  ${seg('guideStyle', 'Guide style', [['solid', 'Solid'], ['dotted', 'Dotted'], ['dashed', 'Dashed']], 'dotted')}
+  ${seg('density', 'Density', [['few', 'Few'], ['more', 'More']], 'few')}
+  ${seg('legend', 'Legend', [['names', 'Names'], ['off', 'Off']], 'names')}
+  ${pick('yellow', 'Yellow', [['off', 'Off'], ['area', 'Area under the focus'], ['band', 'Week band'], ['flag', 'End value']], 'off')}
+  ${pick('fade', 'Line fade', DURATIONS, 'base')}
+  ${pick('grow', 'Tooltip grow', DURATIONS, 'pop')}
+  ${pick('follow', 'Tooltip follow', DURATIONS, 'fast')}
+  ${seg('place', 'Sits', [['page', 'On the page'], ['surface', 'On a surface']], 'page')}`;
+
 const PROPOSALS = [
-  ['C4', 'Tooltips, not a scrub', 'Round 2. No hairline and no yellow dot. Nearing a line brightens it and grows a tooltip from the nearest point, in the tooltip component’s style: week, value and rank. A small dot in the line’s own ink marks the point. A tap does the same on a phone.', { hover: 'tooltip' }],
-  ['C7', 'Full width, below, on the page or a surface', 'On a phone a chart is always full width with its legend below, never beside. It sits on the page like a table, or on a surface like a card. Try it with Sits.', { place: 'surface' }],
-  ['C8', 'Yellow as a sequential scale', 'The accent gets one more job: magnitude, as five steps from faint to strong, with the ink flipping to the accent ink at the fourth. One sequential scale per view. Shown in the table’s Wk 9 column and the heat strip (C14).', null],
-  ['C9', 'A bare version', 'A chart with no axis labels and no lines at all: just the series. For a chart that shows a shape rather than values, like a trend beside a headline figure. The tooltip still gives the values.', { axes: 'none' }],
-  ['C10', 'Chart options', 'The chart takes its line weight, curve, axes (none, few, more), legend and hover as options, as the adjustments above do. Defaults: 1.5, rounded, few, names, tooltip.', null],
+  ['C15', 'A real grey for series', 'The quiet series draw in a solid grey instead of black at an opacity, so where lines cross they stay one grey instead of stacking darker. The focus stays full ink, on top. A new token, --color-series, in a light or a mid shade (pick with Grey) with its dark-mode partner.', { grey: 'light' }],
+  ['C16', 'No labels by default', 'A chart starts bare: no axis labels, and the tooltip gives the values. Labels are an option for charts read for exact values.', { labels: 'off' }],
+  ['C17', 'Dotted guides', 'Guides draw as dots (1.5px, 4px apart) in the strong hairline, so they read as reference, not data. This changes the rule that keeps dashes off gridlines.', { guideStyle: 'dotted', guides: 'grid' }],
+  ['C18', 'Dashed guides', 'The same, as short dashes (4px on, 4px off). Choose one of C17 and C18, or neither to keep them solid.', { guideStyle: 'dashed', guides: 'grid' }],
+  ['C19', 'Hover timing', 'The hover has three timings, each a duration token: how fast lines fade (Base, 250), how fast the tooltip grows (Pop, 350) and how fast it follows the pointer (Fast, 160). Try others in the adjustments; tell me the defaults you want.', null],
+  ['C10', 'Chart options', 'The chart takes its line weight, grey, curve, labels, guides, legend and hover timing as options, as the adjustments do.', null],
   ['C11', 'Yellow: area under the focus', 'The focused line gets a soft accent area down to the baseline. It moves with the focus.', { yellow: 'area' }],
   ['C12', 'Yellow: week band', 'A soft accent band marks one week: the latest at rest, the one under the pointer while you hover.', { yellow: 'band' }],
   ['C13', 'Yellow: end value', 'The focused line’s latest value sits on an accent chip at its end: a value that needs the eye, which the accent already does.', { yellow: 'flag' }],
-  ['C14', 'Yellow: weekly heat strip', 'Under the chart, one cell per week tinted by the focused team’s wins that week, in the sequential scale (needs C8). The line shows the total; the strip shows each week.', { yellow: 'strip' }],
 ];
 let decisions = {};
-try { decisions = JSON.parse(localStorage.getItem('data-proposals-2') || '{}'); } catch {}
+try { decisions = JSON.parse(localStorage.getItem('data-proposals-3') || '{}'); } catch {}
 document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body, tryIt]) => `
   <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
     <div class="proposal-copy">
@@ -305,7 +289,7 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
 <script src="lib/components/tooltip/tooltip.js"></script>
 <script>
 document.body.ontouchstart = () => {};
-const opt = { weight: 1.5, curve: 'rounded', axes: 'few', legend: 'names', hover: 'tooltip', yellow: 'off', place: 'page' };
+const opt = { weight: 1.5, grey: 'light', curve: 'rounded', labels: 'off', guides: 'grid', guideStyle: 'dotted', density: 'few', legend: 'names', yellow: 'off', fade: 'base', grow: 'pop', follow: 'fast', place: 'page' };
 
 /* ---------------- Example season ---------------- */
 let seed = 7;
@@ -326,7 +310,6 @@ const teams = NAMES.map((name, k) => {
 });
 const ranked = () => teams.slice().sort((a, b) => b.w - a.w || a.l - b.l);
 const ord = (n) => n + (['st', 'nd', 'rd'][((n + 90) % 100 - 10) % 10 - 1] || 'th');
-const heatStep = (wins) => Math.max(1, Math.ceil((wins / 9) * 5));
 let focus = 'Ana', preview = null;
 const shown = () => preview || focus;
 
@@ -355,6 +338,12 @@ const svg = document.getElementById('chart-svg');
 const tip = document.getElementById('chart-tip');
 let geo = null;
 
+function niceTicks(max, count) {
+  const raw = max / count, mag = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map((v) => v * mag).find((v) => v >= raw);
+  const ticks = []; for (let v = 0; ; v += step) { ticks.push(v); if (v >= max) break; }
+  return ticks;
+}
 // C12: the band covers one week, clamped to the plot so the ends don't overhang.
 function placeBand(i) {
   const band = svg.querySelector('#y-band'); if (!band || !geo) return;
@@ -362,42 +351,44 @@ function placeBand(i) {
   const x0 = Math.max(geo.L, cx - cw / 2), x1 = Math.min(geo.L + geo.pw, cx + cw / 2);
   band.setAttribute('x', x0); band.setAttribute('width', x1 - x0);
 }
-function niceTicks(max, count) {
-  const raw = max / count, mag = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].map((v) => v * mag).find((v) => v >= raw);
-  const ticks = []; for (let v = 0; ; v += step) { ticks.push(v); if (v >= max) break; }
-  return ticks;
+function applyTiming() {
+  chart.style.setProperty('--t-fade', `var(--duration-${opt.fade})`);
+  chart.style.setProperty('--t-grow', `var(--duration-${opt.grow})`);
+  chart.style.setProperty('--t-follow', `var(--duration-${opt.follow})`);
 }
 
 function drawChart() {
   chart.style.setProperty('--w', opt.weight);
+  chart.dataset.grey = opt.grey;
+  chart.dataset.guideStyle = opt.guideStyle;
   chart.classList.toggle('on-surface', opt.place === 'surface');
+  applyTiming();
   const W = svg.clientWidth || 340;
-  const bare = opt.axes === 'none';
-  const strip = opt.yellow === 'strip';
-  const H = (W < 500 ? 240 : 280) + (strip ? 24 : 0);
+  const labels = opt.labels === 'on';
+  const H = W < 500 ? 240 : 280;
   const yMax = Math.max(...teams.map((s) => s.points[WEEKS - 1]));
-  const ticks = bare ? [0, yMax] : niceTicks(yMax, opt.axes === 'more' ? 8 : 4);
+  const ticks = niceTicks(yMax, opt.density === 'more' ? 8 : 4);
   const top = ticks[ticks.length - 1];
   const gap = 16;                                  // C3: labels 16px from the data
   const labelW = 7 * String(top).length;
-  const L = bare ? 4 : labelW + gap, R = 4, T = opt.yellow === 'flag' ? 28 : 8;
-  const B = (bare ? 4 : 15 + gap) + (strip ? 24 : 0);
+  const L = labels ? labelW + gap : 4, R = 4, T = opt.yellow === 'flag' ? 28 : 8;
+  const B = labels ? 15 + gap : 4;
   const pw = W - L - R, ph = H - T - B;
   const x = (i) => L + (pw * i) / (WEEKS - 1);
   const y = (v) => T + ph * (1 - v / top);
-  geo = { W, H, L, T, pw, ph, x, y, B };
+  geo = { W, H, L, T, pw, ph, x, y };
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('height', H);
   svg.replaceChildren();
   if (opt.yellow === 'band') el('rect', { class: 'y-band', id: 'y-band', x: 0, y: T, width: 0, height: ph }, svg);
-  if (!bare) {
-    ticks.forEach((v) => {
-      el('line', { class: v === 0 ? 'baseline' : 'grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }, svg);
-      el('text', { x: L - gap, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = v;
-    });
+  ticks.forEach((v) => {
+    const show = opt.guides === 'grid' || (opt.guides === 'base' && v === 0);
+    if (show) el('line', { class: 'guide' + (v === 0 ? ' is-base' : ''), x1: L, x2: W - R, y1: y(v), y2: y(v) }, svg);
+    if (labels) el('text', { x: L - gap, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = v;
+  });
+  if (labels) {
     const every = Math.ceil((32 + 16) / (pw / (WEEKS - 1)));
-    for (let i = 0; i < WEEKS; i += every) el('text', { x: x(i), y: H - 2 - (strip ? 24 : 0), 'text-anchor': i === 0 ? 'start' : i === WEEKS - 1 ? 'end' : 'middle' }, svg).textContent = `Wk ${i + 1}`;
+    for (let i = 0; i < WEEKS; i += every) el('text', { x: x(i), y: H - 2, 'text-anchor': i === 0 ? 'start' : i === WEEKS - 1 ? 'end' : 'middle' }, svg).textContent = `Wk ${i + 1}`;
   }
   el('path', { class: 'y-area', id: 'y-area', d: '' }, svg);
   const ordered = teams.filter((s) => s.name !== shown()).concat(teams.filter((s) => s.name === shown()));
@@ -406,7 +397,6 @@ function drawChart() {
   });
   el('circle', { class: 'end-dot', id: 'end-dot', r: 3 }, svg);
   el('g', { class: 'y-flag', id: 'y-flag' }, svg);
-  el('g', { class: 'y-strip', id: 'y-strip' }, svg);
   el('circle', { class: 'point', id: 'point', r: 4, cx: 0, cy: 0 }, svg);
   placeBand(WEEKS - 1);
   drawLegend();
@@ -428,13 +418,11 @@ function applyFocus(kept = false) {
     p.classList.toggle('is-focus', me);
     if (me) svg.insertBefore(p, svg.querySelector('#end-dot'));
   });
-  const { x, y, T, ph, pw, H } = geo;
+  const { x, y, T, ph } = geo;
   const end = [x(WEEKS - 1), y(f.points[WEEKS - 1])];
   const dot = svg.querySelector('#end-dot'); dot.setAttribute('cx', end[0]); dot.setAttribute('cy', end[1]);
-  // C11: area under the focus
   const pts = f.points.map((v, i) => [x(i), y(v)]);
   svg.querySelector('#y-area').setAttribute('d', opt.yellow === 'area' ? `${linePath(pts)}L${x(WEEKS - 1)},${T + ph}L${x(0)},${T + ph}Z` : '');
-  // C13: the end value on an accent chip
   const flag = svg.querySelector('#y-flag'); flag.replaceChildren();
   if (opt.yellow === 'flag') {
     const label = String(f.points[WEEKS - 1]);
@@ -442,22 +430,12 @@ function applyFocus(kept = false) {
     el('rect', { x: end[0] - w, y: end[1] - h - 8, width: w, height: h, rx: h / 2 }, flag);
     el('text', { x: end[0] - w / 2, y: end[1] - 8 - h / 2 + 3.5, 'text-anchor': 'middle' }, flag).textContent = label;
   }
-  // C14: the weekly heat strip
-  const strip = svg.querySelector('#y-strip'); strip.replaceChildren();
-  if (opt.yellow === 'strip') {
-    const cw = pw / (WEEKS - 1), stepPct = { 1: 10, 2: 20, 3: 32, 4: 48, 5: 70 };
-    f.weekly.forEach((wins, i) => {
-      const r = el('rect', { x: x(i) - cw / 2 + 2, y: H - 14, width: cw - 4, height: 10, rx: 5 }, strip);
-      r.style.fill = `color-mix(in srgb, var(--color-accent) ${stepPct[heatStep(wins)]}%, transparent)`;
-    });
-  }
   document.querySelectorAll('#legend button').forEach((b) => b.classList.toggle('is-focus', b.dataset.name === name));
   if (kept) syncRow();
 }
 
-// C4, round 2: the nearest point on a nearby line grows a tooltip.
+// Tooltip at the nearest point on a nearby line (C4).
 function showTip(ev) {
-  if (opt.hover !== 'tooltip') return null;
   const r = svg.getBoundingClientRect();
   const px = ev.clientX - r.left, py = ev.clientY - r.top;
   const i = Math.max(0, Math.min(WEEKS - 1, Math.round(((px - geo.L) / geo.pw) * (WEEKS - 1))));
@@ -503,24 +481,26 @@ document.getElementById('legend').addEventListener('pointerover', (e) => {
 document.getElementById('legend').addEventListener('pointerleave', () => { if (preview) { preview = null; applyFocus(); } });
 
 /* ---------------- Adjustments ---------------- */
-document.querySelectorAll('[data-opt]').forEach((seg) => seg.addEventListener('segmented-change', (e) => { opt[seg.dataset.opt] = e.detail.value; hideTip(); drawChart(); }));
+document.querySelectorAll('.segmented[data-opt]').forEach((s) => s.addEventListener('segmented-change', (e) => { opt[s.dataset.opt] = e.detail.value; hideTip(); drawChart(); }));
+document.querySelectorAll('.picker[data-opt]').forEach((p) => p.addEventListener('picker-change', (e) => {
+  opt[p.dataset.opt] = e.detail.value;
+  if (['fade', 'grow', 'follow'].includes(p.dataset.opt)) applyTiming(); else { hideTip(); drawChart(); }
+}));
 document.getElementById('adj-weight').addEventListener('input', (e) => { opt.weight = +e.target.value; chart.style.setProperty('--w', opt.weight); });
-document.getElementById('adj-yellow').addEventListener('picker-change', (e) => { opt.yellow = e.detail.value; hideTip(); drawChart(); });
 function setOpt(key, value) {
   opt[key] = value;
-  if (key === 'yellow') {
-    const pk = document.getElementById('adj-yellow');
-    pk.querySelectorAll('[role="option"]').forEach((o) => o.setAttribute('aria-selected', String(o.dataset.value === value)));
-    pk.querySelector('.picker-value').textContent = pk.querySelector(`[data-value="${value}"]`).textContent;
+  const p = document.querySelector(`.picker[data-opt="${key}"]`);
+  if (p) {
+    p.querySelectorAll('[role="option"]').forEach((o) => o.setAttribute('aria-selected', String(o.dataset.value === value)));
+    p.querySelector('.picker-value').textContent = p.querySelector(`[data-value="${value}"]`).textContent;
   } else {
-    document.querySelector(`[data-opt="${key}"] .segmented-option[value="${value}"]`)?.click();
+    document.querySelector(`.segmented[data-opt="${key}"] .segmented-option[value="${value}"]`)?.click();
   }
 }
 
 /* ---------------- Table (T1–T5 built in) ---------------- */
 const table = document.getElementById('standings');
 const tbody = table.querySelector('tbody');
-const host = document.getElementById('table-host');
 let sort = { key: 'w', dir: -1 };
 function spark(s) {
   const w = 64, h = 20, max = Math.max(...teams.map((t) => t.points[WEEKS - 1]));
@@ -528,9 +508,6 @@ function spark(s) {
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${monotone(pts)}"/><circle r="3" cx="${pts[WEEKS - 1][0]}" cy="${pts[WEEKS - 1][1]}"/></svg>`;
 }
 function drawTable() {
-  const heat = decisions.C8 !== 'decline';
-  host.classList.toggle('heat-on', heat);
-  document.getElementById('ramp').hidden = !heat;
   const wkRank = teams.map((t) => t.wk).sort((a, b) => b - a);
   const rows = teams.slice().sort((a, b) => sort.dir * (a[sort.key] - b[sort.key]) || a.name.localeCompare(b.name));
   tbody.innerHTML = rows.map((s) => {
@@ -540,7 +517,7 @@ function drawTable() {
       <td>${s.name}</td>
       <td class="table-num">${val(s.w, `${s.name} · ${s.w} categories won · ${ord(seasonRank)} in the league`)}</td>
       <td class="table-num">${val(s.l, `${s.name} · ${s.l} lost · ${s.t} tied`)}</td>
-      <td class="table-num heat-${heatStep(s.wk)}">${val(s.wk, `${s.name} · ${s.wk} of 9 in week ${WEEKS} · ${ord(wkRank.indexOf(s.wk) + 1)} that week`)}</td>
+      <td class="table-num">${val(s.wk, `${s.name} · ${s.wk} of 9 in week ${WEEKS} · ${ord(wkRank.indexOf(s.wk) + 1)} that week`)}</td>
       <td>${spark(s)}</td>
     </tr>`;
   }).join('');
@@ -589,15 +566,15 @@ function summarise() {
   const ids = PROPOSALS.map((p) => p[0]);
   const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
   const a = by('approve'), d = by('decline'), p = by('pending');
+  const timing = `Timing I picked: line fade ${opt.fade}, tooltip grow ${opt.grow}, tooltip follow ${opt.follow}. Grey: ${opt.grey}.`;
   document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide.`;
-  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}\n${timing}`;
 }
 document.getElementById('proposals').addEventListener('segmented-change', (e) => {
   const item = e.target.closest('.proposal'); if (!item) return;
   decisions[item.dataset.id] = e.detail.value;
-  try { localStorage.setItem('data-proposals-2', JSON.stringify(decisions)); } catch {}
+  try { localStorage.setItem('data-proposals-3', JSON.stringify(decisions)); } catch {}
   item.classList.toggle('is-declined', e.detail.value === 'decline');
-  if (item.dataset.id === 'C8') drawTable();
   summarise();
 });
 document.getElementById('proposals').addEventListener('click', (e) => {
@@ -607,6 +584,8 @@ document.getElementById('proposals').addEventListener('click', (e) => {
   drawChart();
   chart.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
+document.addEventListener('picker-change', summarise);
+document.addEventListener('segmented-change', summarise);
 
 let chartW = 0;
 new ResizeObserver(() => { if (chart.clientWidth !== chartW) { chartW = chart.clientWidth; drawChart(); } }).observe(chart);
