@@ -37,6 +37,15 @@ how do I show hierarchy, how do I group this, how do I mark state, how do
 I make this interactive. Answer only the questions the page is actually
 asking.
 
+## Check it where they'll see it
+
+Every page is built for a form factor: the device the person is prompting from, and will look at the result on. Know which one it is, and do your checking there.
+
+- **Know the form factor before you build.** Read it from what the person tells you, from their screenshots (a phone frame, a narrow viewport, desktop browser chrome) or from the app they're writing in. If nothing says, ask once rather than guess. When the form factor changes mid-conversation, a new screenshot from a phone for example, follow it.
+- **Iterate in their form factor.** When working on feedback, reproduce the problem and confirm the fix at the person's form factor first. From a phone: a 390px-wide viewport with touch on, and touch interactions (tap, long press, swipe, a pinned control under the thumb). From a desktop: a desktop-width viewport with a mouse (hover, the cursor, a sticky or docked panel). A fix confirmed only at the other size isn't confirmed.
+- **A problem reported on mobile is solved on mobile.** Reproduce it on a phone-sized screen with touch before changing anything, and check the fix there. Desktop gets a pass afterwards, so the fix for one doesn't break the other.
+- **Say where you checked.** Name the form factor in the reply ("checked at 390px with touch"), so the person knows the fix was seen where they'll see it.
+
 ## The six rules that matter most
 
 1. **Monochrome plus one accent, spent sparingly.** Black text, 50%-black secondary text, white ground, and `#FCFF28` for *attention* — never for state. If two things on screen are accented, the rule is already broken.

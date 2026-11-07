@@ -8,3 +8,4 @@ This repo is a design system, not an app. The skill in `skills/personal-styling/
 - A component's rules live in its `README.md`. `SKILL.md` keeps only the system-wide rules and the component index.
 - Run `npm run check` before committing. It must pass.
 - Build output (`dist/`) is not committed.
+- Check work in the form factor the person is prompting from (see "Check it where they'll see it" in `SKILL.md`): feedback from a phone is reproduced and fixed at phone width with touch, then checked on desktop.
