@@ -628,6 +628,9 @@
       :root[data-pill="right"] .panel { --pill-left: calc(100vw - var(--space-16) - var(--pill-w)); --pill-right: var(--space-16); }
 
       @media (max-width: 630px) {
+        /* The page's own background (it paints the whole viewport, safe
+           areas and overscroll included) is the ground while split. It
+           switches at once both ways, never animated. */
         :root.is-ground body { background: var(--color-split-ground); }
 
         /* The sheet's whole box comes from the same two values as the
@@ -1513,7 +1516,6 @@
         var MIN_H = 0.2, MAX_H = 0.85;
         var FLICK = 0.6;                    /* px per ms */
         var sheetFrac = SNAPS[1];
-        var groundTimer = null;
 
         function setSheetPx(px) { root.style.setProperty('--sheet-h', px + 'px'); }
         function isOpen() { return panel.getAttribute('data-open') === 'true'; }
@@ -1521,10 +1523,7 @@
           sheetFrac = Math.max(MIN_H, Math.min(MAX_H, frac));
           if (isOpen() && phone.matches) setSheetPx(sheetFrac * window.innerHeight);
         }
-        /* When the stage is whole again (--duration-deliberate), the ground goes back. */
-        var CLOSE_MS = 450;
         function applySplit(open, instant) {
-          clearTimeout(groundTimer);
           if (instant) root.classList.add('is-resizing');
           if (!phone.matches) {
             root.classList.remove('is-split', 'is-ground');
@@ -1540,8 +1539,9 @@
             root.classList.remove('is-split');
             root.style.setProperty('--split', 0);
             setSheetPx(BAR_H);
-            if (instant) root.classList.remove('is-ground');
-            else groundTimer = setTimeout(function () { root.classList.remove('is-ground'); }, CLOSE_MS);
+            /* The ground goes back the moment the close is asked for,
+               not after the surfaces have merged. */
+            root.classList.remove('is-ground');
           }
           if (instant) { void root.offsetWidth; root.classList.remove('is-resizing'); }
         }
