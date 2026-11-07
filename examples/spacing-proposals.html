@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Control Spacing Proposals</title>
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
+<link rel="stylesheet" href="lib/components/chip/chip.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<style>
+  h1, h2, h3, h4, p { margin: 0; }
+  body { background: var(--color-bg); }
+  .page {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page-block);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+  }
+  .page > * { min-width: 0; }
+  .section { display: grid; gap: var(--space-24); }
+  .section-head { display: grid; gap: var(--space-8); }
+  .section-head .t-body { max-width: 60ch; color: var(--color-text-secondary); }
+  .view-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-16); }
+
+  /* The board: one specimen per row, its measurements under it. */
+  .board { display: grid; gap: var(--space-24); }
+  .spec { display: grid; justify-items: start; gap: var(--space-8); padding-bottom: var(--space-24); border-bottom: 1px solid var(--color-divider); }
+  .spec-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+  .spec-name { color: var(--color-text-secondary); }
+  .spec-measure { color: var(--color-text-secondary); }
+  .spec-measure b { color: var(--color-text); font-weight: 500; }
+  .mark { flex: none; width: var(--icon-mark); height: var(--icon-mark); }
+  .picker-room { min-height: 200px; align-content: start; }
+
+  /* The static menu: the picker's own menu, held open, under a trigger. */
+  .spec-menu-wrap { position: relative; display: grid; justify-items: start; gap: var(--space-8); }
+  .spec-menu-wrap .picker-menu { position: static; transform: none; opacity: 1; min-width: 0; }
+  .spec-menu-wrap .picker-menu .picker-fill { opacity: 1; transition: none; }
+
+  /* A stand-in for the stage and sheet's closed pill on a phone. */
+  .sheet-pill { display: inline-flex; align-items: center; justify-content: space-between; min-height: var(--height-slot); }
+  .sheet-pill svg { color: var(--color-text-secondary); transform: rotate(180deg); }
+
+  /* ============================================================
+     TODAY — as shipped. The docked nav comes in to 16, as the bottom
+     slot does it; the sheet pill is 16 from its edges, 16 to its chevron.
+     ============================================================ */
+  :root { --fill-in: var(--space-4); --fill-in-slot: var(--space-4); }
+  .dock .segmented-option { padding-inline: var(--space-16); }
+  .sheet-pill { padding: 0 var(--space-16); gap: var(--space-16); }
+
+  /* ============================================================
+     PROPOSED — each idea on its own class, so a decline turns it off.
+     ============================================================ */
+  /* F1 · the fill inset scales with the control: 4 in a 36, 8 in a 64. */
+  .is-proposed.f1 { --fill-in-slot: var(--space-8); }
+  .is-proposed.f1 .segmented--large { padding: var(--fill-in-slot); }
+  .is-proposed.f1 .segmented--large .segmented-option { min-height: calc(var(--height-slot) - 2 * var(--fill-in-slot) - 2px); }
+
+  /* F2 · a label is the edge inset from its control's edge, in a fill or not. */
+  .is-proposed.f2 .segmented-option { padding-inline: calc(var(--space-16) - var(--fill-in)); }
+  .is-proposed.f2 .segmented--large .segmented-option,
+  .is-proposed.f2 .dock .segmented-option { padding-inline: calc(var(--space-24) - var(--fill-in-slot)); }
+
+  /* F3 · the menu is inset like a control: options' labels line up under
+     the trigger's, and the fill is concentric with the menu's corner. */
+  .is-proposed.f3 .picker-menu { padding: var(--fill-in); }
+  .is-proposed.f3 .picker-option {
+    min-height: calc(2 * (var(--radius-card) - var(--fill-in)));   /* 32: a pill whose radius is the menu's corner less the inset */
+    padding: 0 calc(var(--space-16) - var(--fill-in));
+  }
+
+  /* F4 · a mark is 8 from its label and the edge inset from the edge. */
+  .is-proposed.f4 .sheet-pill { padding: 0 var(--space-24); gap: var(--space-8); }
+
+  /* P1 · the select hugs its label: the chevron is always 8 after it. */
+  .is-proposed.p1 .picker-trigger { min-width: 0 !important; justify-content: flex-start; }
+  /* P2 · the select keeps its widest width; the chevron follows the label
+     and the room left over sits at the end. */
+  .is-proposed.p2:not(.p1) .picker-trigger { justify-content: flex-start; }
+
+  /* ---- The ideas. */
+  .proposals { margin: 0; padding: 0; list-style: none; max-width: 760px; }
+  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .proposal > .segmented { justify-self: start; }
+  .proposal-copy { display: grid; gap: var(--space-8); }
+  .proposal-copy .t-body { max-width: 60ch; }
+  .proposal.is-declined .proposal-copy { opacity: var(--opacity-label-inactive); }
+  .decisions-end { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-16); }
+  .spec-table { width: 100%; max-width: 760px; border-collapse: collapse; }
+  .spec-table th, .spec-table td { text-align: left; padding: var(--space-8) var(--space-16) var(--space-8) 0; border-top: 1px solid var(--color-divider); vertical-align: top; }
+  .spec-table th { color: var(--color-text-secondary); font-weight: 500; }
+</style>
+</head>
+<body ontouchstart class="is-proposed">
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">Spacing inside controls</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">An audit of the space inside every control at 36 and 64: label to edge, frame to fill, label to chevron. Switch between Today and Proposed to compare, then approve or decline each idea. Nothing here is in the skill yet.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="sys-h">
+    <div class="section-head">
+      <h2 class="t-title" id="sys-h">The system</h2>
+      <p class="t-body">Three distances, one value per size. Everything else follows from them.</p>
+    </div>
+    <table class="spec-table t-body">
+      <thead><tr><th>Distance</th><th>36 · compact</th><th>64 · slot</th></tr></thead>
+      <tbody>
+        <tr><td>Edge: a label to its control’s edge, in a fill or not</td><td>16</td><td>24</td></tr>
+        <tr><td>Fill: a frame to the fill inside it — a segment, a menu option</td><td>4</td><td>8</td></tr>
+        <tr><td>Mark: a label to its chevron, arrow, check or dot</td><td>8</td><td>8</td></tr>
+        <tr><td>A label inside a fill pads by edge − fill</td><td>12</td><td>16</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" aria-labelledby="board-h">
+    <div class="section-head">
+      <h2 class="t-title" id="board-h">Side by side</h2>
+      <p class="t-body">Measured live under each control, from inside its border. Tap the selects and choose a short option to see the chevron.</p>
+    </div>
+    <div class="view-switch">
+      <span class="t-label" id="view-l">Show</span>
+      <div class="segmented" role="group" aria-labelledby="view-l" id="view">
+        <span class="segmented-indicator" aria-hidden="true"></span>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="today">Today</button>
+        <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="proposed">Proposed</button>
+      </div>
+    </div>
+    <div class="board">
+      <div class="spec" data-measure="button">
+        <span class="t-mono spec-name">Button · 36</span>
+        <div class="spec-row">
+          <button class="button surface surface--rest surface--pill t-control" type="button">Export</button>
+          <button class="button surface surface--rest surface--pill t-control" type="button">Next <svg class="mark" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5.5 2.5 8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="seg">
+        <span class="t-mono spec-name">Segmented · 36</span>
+        <div class="spec-row">
+          <div class="segmented" role="group" aria-label="Range">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true">Day</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false">Week</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false">Month</button>
+          </div>
+          <button class="button surface surface--rest surface--pill t-control" type="button">Export</button>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec picker-room" data-measure="picker">
+        <span class="t-mono spec-name">Select · 36</span>
+        <div class="spec-row">
+          <div class="picker">
+            <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sort-list" aria-label="Sort">
+              <span class="picker-value">Most recent</span>
+              <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="picker-menu" hidden>
+              <ul class="picker-list" id="sort-list" role="listbox" tabindex="-1" aria-label="Sort">
+                <li class="picker-option t-control" role="option" aria-selected="true">Most recent</li>
+                <li class="picker-option t-control" role="option" aria-selected="false">Name</li>
+                <li class="picker-option t-control" role="option" aria-selected="false">Oldest first</li>
+                <li class="picker-option t-control" role="option" aria-selected="false">Size</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="menu">
+        <span class="t-mono spec-name">Menu, held open</span>
+        <div class="spec-menu-wrap">
+          <span class="button surface surface--rest surface--pill t-control spec-trigger" aria-hidden="true"><span>Name</span><svg class="picker-chevron mark" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="picker-menu has-fill" aria-hidden="true">
+            <span class="picker-fill"></span>
+            <ul class="picker-list">
+              <li class="picker-option t-control">Most recent</li>
+              <li class="picker-option t-control is-indicated" aria-selected="true">Name</li>
+              <li class="picker-option t-control">Oldest first</li>
+            </ul>
+          </div>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="chip">
+        <span class="t-mono spec-name">Chip · 36</span>
+        <div class="spec-row chip-row">
+          <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Delivered</button>
+          <button class="chip t-control" type="button" aria-pressed="false"><span class="chip-dot" aria-hidden="true"></span>Failed</button>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="dock">
+        <span class="t-mono spec-name">Bottom slot, docked · 64</span>
+        <div class="spec-row dock">
+          <nav class="segmented segmented--large" aria-label="Pages">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-label" type="button" aria-pressed="false">Work</button>
+            <button class="segmented-option t-label is-active" type="button" aria-pressed="true">About</button>
+          </nav>
+          <button class="button button--large surface surface--rest surface--pill t-label" type="button" style="position: static;">Get in touch <svg class="mark" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5.5 2.5 8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="nav">
+        <span class="t-mono spec-name">Page nav alone · 64</span>
+        <div class="spec-row">
+          <nav class="segmented segmented--large" aria-label="Pages, alone">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-label is-active" type="button" aria-pressed="true">Work</button>
+            <button class="segmented-option t-label" type="button" aria-pressed="false">About</button>
+            <button class="segmented-option t-label" type="button" aria-pressed="false">Notes</button>
+          </nav>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+      <div class="spec" data-measure="sheet">
+        <span class="t-mono spec-name">Sheet pill, closed on a phone · 64</span>
+        <div class="spec-row">
+          <span class="sheet-pill surface surface--rest surface--pill" aria-hidden="true"><span class="t-mono">Controls</span><svg class="mark" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <span class="t-mono spec-measure"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="dec-h">
+    <h2 class="t-title" id="dec-h">The ideas</h2>
+    <ol class="proposals" id="proposals"></ol>
+    <div class="decisions-end">
+      <p class="t-body" id="decision-summary"></p>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-label" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
+        <span class="toast t-mono" role="status"></span>
+      </span>
+    </div>
+  </section>
+</div>
+
+<script>
+const PROPOSALS = [
+  ['F1', 'The fill inset scales with the control', 'A frame is 4px from the fill inside it in a 36px control and 8px in a 64px one, so the fill is the same share of the frame at both sizes (26 of 36, 46 of 64 — 72%). Today the 64px nav keeps the 36px control’s 4, and its fill all but fills the frame.'],
+  ['F2', 'A label is the same distance from the edge, in a fill or not', 'A label sits 16px from its control’s edge at 36 and 24px at 64, whether it’s on a button or in a segment. A segment pads by edge minus fill: 12 at 36, 16 at 64. Today a segment’s label sits 20 from the frame (28 at 64) beside a button’s 16, so a row of controls doesn’t line up inside.'],
+  ['F3', 'Menus are inset like controls', 'The menu is 4px from its options, an option pads 12 either side, and options are 32px tall: so each option’s label sits right under the trigger’s label, and the fill is exactly concentric with the menu’s corner (20 − 4 = 16, half of 32). Today the menu’s 8 puts the options 8px right of the trigger’s label, and a 34px fill sits in a corner that’s 12 from it.'],
+  ['F4', 'A mark is 8 from its label, at both sizes', 'A chevron, arrow, check or dot sits 8px from its label and the edge inset from the control’s edge. Fixes the sheet’s closed pill, which is 16 from its edges and 16 to its chevron at 64 — it becomes 24 and 8, like the large button.'],
+  ['P1', 'The select hugs its label', 'The chevron is always 8px after the label, and the trigger is as wide as the option showing. Choosing a shorter option makes the trigger narrower, which can move the controls after it in a row. Today the trigger keeps its widest label’s width and pushes the chevron to the far edge, so a short label leaves a gap of up to 29px.'],
+  ['P2', 'Or: the select keeps its width, the chevron follows the label', 'The trigger keeps its widest width so nothing moves, the chevron sits 8px after the label, and the room left over goes at the end. Pick P1 or P2; declining both keeps today’s far-edge chevron.'],
+  ['T', 'Name the three distances as tokens', 'Add role tokens to tokens.css that point at existing steps, like --space-page: --inset-control (16), --inset-slot (24), --inset-fill (4), --inset-fill-slot (8), --gap-mark (8). Components read the role, so the next control can’t pick a different number.'],
+];
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem('spacing-proposals') || '{}'); } catch {}
+document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
+  <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
+    <div class="proposal-copy">
+      <span class="t-mono">${id}</span>
+      <h3 class="t-label">${title}</h3>
+      <p class="t-body">${body}</p>
+    </div>
+    <div class="segmented" role="group" aria-label="${id} decision">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${['pending', 'approve', 'decline'].map((val) => `<button class="segmented-option t-control${(decisions[id] || 'pending') === val ? ' is-active' : ''}" type="button" aria-pressed="${(decisions[id] || 'pending') === val}" value="${val}">${val[0].toUpperCase() + val.slice(1)}</button>`).join('')}
+    </div>
+  </li>`).join('');
+// Pending and approved ideas are on in the Proposed view.
+const applyClasses = () => PROPOSALS.forEach(([id]) => document.body.classList.toggle(id.toLowerCase(), decisions[id] !== 'decline'));
+applyClasses();
+</script>
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/picker/picker.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+const R = (el) => el.getBoundingClientRect();
+const inner = (el) => { const r = R(el), cs = getComputedStyle(el); return { left: r.left + parseFloat(cs.borderLeftWidth), right: r.right - parseFloat(cs.borderRightWidth), top: r.top + parseFloat(cs.borderTopWidth) }; };
+const textBox = (el) => { const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n; const rs = []; while ((n = w.nextNode())) { if (!n.textContent.trim()) continue; const g = document.createRange(); g.selectNodeContents(n); const r = g.getBoundingClientRect(); if (r.width) rs.push(r); } return rs.length ? { left: Math.min(...rs.map((r) => r.left)), right: Math.max(...rs.map((r) => r.right)) } : null; };
+const n = (v) => `<b>${Math.round(v)}</b>`;
+
+// The held-open menu's fill sits on its selected option.
+const placeMenuFill = () => {
+  const menu = document.querySelector('.spec-menu-wrap .picker-menu');
+  const list = menu.querySelector('.picker-list'), o = menu.querySelector('.is-indicated'), f = menu.querySelector('.picker-fill');
+  Object.assign(f.style, { left: `${list.offsetLeft + o.offsetLeft}px`, top: `${list.offsetTop + o.offsetTop}px`, width: `${o.offsetWidth}px`, height: `${o.offsetHeight}px` });
+  const t = document.querySelector('.spec-trigger');
+  menu.style.width = `${Math.max(t.offsetWidth, 180)}px`;
+};
+
+const MEASURE = {
+  button: (s) => { const b = s.querySelectorAll('.button'); const t = textBox(b[1]), m = R(b[1].querySelector('svg')), i = inner(b[1]); return `edge ${n(textBox(b[0]).left - inner(b[0]).left)} · mark ${n(m.left - t.right)} · mark to edge ${n(i.right - m.right)}`; },
+  seg: (s) => { const f = s.querySelector('.segmented'), i = inner(f), ind = R(f.querySelector('.segmented-indicator')), b = s.querySelector('.button'); return `fill ${n(ind.top - i.top)} · label to frame ${n(textBox(f.querySelector('.segmented-option')).left - i.left)} · button beside ${n(textBox(b).left - inner(b).left)}`; },
+  picker: (s) => { const t = s.querySelector('.picker-trigger'), x = textBox(t.querySelector('.picker-value')), c = R(t.querySelector('.picker-chevron')), i = inner(t); return `edge ${n(x.left - i.left)} · chevron ${n(c.left - x.right)} · chevron to edge ${n(i.right - c.right)} · width ${n(R(t).width)}`; },
+  menu: (s) => { const t = s.querySelector('.spec-trigger'), m = s.querySelector('.picker-menu'), o = m.querySelector('.is-indicated'), f = R(m.querySelector('.picker-fill')), mi = inner(m); const fillIn = f.left - mi.left; const r = parseFloat(getComputedStyle(m).borderTopLeftRadius); return `fill ${n(fillIn)} · option label ${n(textBox(o).left - textBox(t).left)} from the trigger’s · corner ${n(r - fillIn)} vs fill ${n(f.height / 2)}`; },
+  chip: (s) => { const c = s.querySelector('.chip'), d = R(c.querySelector('.chip-dot')), i = inner(c), t = textBox(c); return `edge ${n(d.left - i.left)} · mark ${n(t.left - d.right)} · end ${n(i.right - t.right)}`; },
+  dock: (s) => { const f = s.querySelector('.segmented'), i = inner(f), ind = R(f.querySelector('.segmented-indicator')), b = s.querySelector('.button'), bt = textBox(b); return `fill ${n(ind.top - i.top)} · label to frame ${n(textBox(f.querySelector('.segmented-option')).left - i.left)} · button edge ${n(bt.left - inner(b).left)} · width ${n(R(s.querySelector('.spec-row')).width)}`; },
+  nav: (s) => { const f = s.querySelector('.segmented'), i = inner(f), ind = R(f.querySelector('.segmented-indicator')); return `fill ${n(ind.top - i.top)} (fill ${n(ind.height)} of ${n(R(f).height)}) · label to frame ${n(textBox(f.querySelector('.segmented-option')).left - i.left)}`; },
+  sheet: (s) => { const p = s.querySelector('.sheet-pill'), i = inner(p), t = textBox(p), c = R(p.querySelector('svg')); return `edge ${n(t.left - i.left)} · mark ${n(c.left - t.right)} · mark to edge ${n(i.right - c.right)}`; },
+};
+const measureAll = () => {
+  placeMenuFill();
+  document.querySelectorAll('.spec').forEach((s) => { s.querySelector('.spec-measure').innerHTML = MEASURE[s.dataset.measure](s); });
+};
+// Segments re-place their fill when their size changes; measure after.
+const remeasure = () => requestAnimationFrame(() => setTimeout(measureAll, 500));
+document.fonts?.ready.then(remeasure);
+remeasure();
+document.addEventListener('picker-change', remeasure);
+
+document.getElementById('view').addEventListener('segmented-change', (e) => {
+  document.body.classList.toggle('is-proposed', e.detail.value === 'proposed');
+  remeasure();
+});
+
+function summarise() {
+  const ids = PROPOSALS.map((p) => p[0]);
+  const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
+  const a = by('approve'), d = by('decline'), p = by('pending');
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide.`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+}
+document.getElementById('proposals').addEventListener('segmented-change', (e) => {
+  const item = e.target.closest('.proposal'); if (!item) return;
+  decisions[item.dataset.id] = e.detail.value;
+  try { localStorage.setItem('spacing-proposals', JSON.stringify(decisions)); } catch {}
+  item.classList.toggle('is-declined', e.detail.value === 'decline');
+  applyClasses();
+  remeasure();
+  summarise();
+});
+summarise();
+</script>
+</body>
+</html>
