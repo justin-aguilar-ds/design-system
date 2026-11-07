@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.10.0 */
+/* personal-styling · control-panel · v0.11.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -109,3 +109,18 @@
    line, so the 10px mark lifts 1px to meet it (see "Optical alignment"
    in SKILL.md). translate, not transform, so it survives the turn. */
 .control-panel .accordion-chevron { translate: 0 -1px; }
+
+/* NEW (v0.11): each field is a row — its mono label on the left, its control
+   on the right — so a long list of fields reads as quiet names beside the
+   controls that carry the weight. A control too wide to sit beside its label
+   drops underneath it rather than squeezing; a slider keeps its
+   label-and-value row with the track below. */
+.control-panel :is(.control-field, .picker-field) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-16);
+}
+/* A contents list fills its column instead (see Docked). */
+.control-panel .control-field:has(> .segmented--list) { display: grid; }

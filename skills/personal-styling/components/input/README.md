@@ -22,6 +22,10 @@ A single line of text — a name, a URL, a search — in the same pill as the pi
 - In a control panel, put `.input-field` straight into `.control-panel-fields` beside the other fields.
 - No JavaScript.
 
+## Changes in v0.3.0
+
+- Height comes from `--height-control`.
+
 ## Changes in v0.2.0
 
 - Its glyph is sized by the icon tokens (`--icon-mark` / `--icon-inline`) instead of a fixed number.

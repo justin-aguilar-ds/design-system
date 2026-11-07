@@ -1,4 +1,4 @@
-/* personal-styling · input · v0.2.0 */
+/* personal-styling · input · v0.3.0 */
 
 /* A field is its label, 8px, the input, then an optional message. The
    label sits above, never inside or beside, so every input is the same
@@ -18,7 +18,8 @@
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: var(--space-8) var(--space-16);
+  min-height: var(--height-control);
+  padding: 0 var(--space-16);
   -webkit-appearance: none;
   appearance: none;
   background: var(--color-surface);

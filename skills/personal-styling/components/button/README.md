@@ -33,6 +33,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
 
+## Changes in v0.5.0
+
+- Height comes from `--height-control` (36px), so a Label pill is 36px like a compact one (it was 37px).
+
 ## Changes in v0.4.0
 
 - The room left under a pinned large button is its footprint only; the page's `--space-page-block` clears it.

@@ -1,4 +1,4 @@
-/* personal-styling · button · v0.4.1 */
+/* personal-styling · button · v0.5.0 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
@@ -8,7 +8,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);          /* icon to text */
-  padding: var(--space-8) var(--space-16);
+  min-height: var(--height-control);   /* 36px with either type: a Label pill no longer lands a pixel taller */
+  padding: 0 var(--space-16);
   color: var(--color-text);
   white-space: nowrap;
 }
@@ -20,7 +21,8 @@
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
-  padding: var(--space-8) var(--space-16);
+  min-height: var(--height-control);
+  padding: 0 var(--space-16);
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);

@@ -10,9 +10,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **A card when open, a pill when collapsed, morphing between.** Collapsed, the panel is one row — just its heading — so it takes the pill shape of the buttons and pickers inside it. The corner animates with the height, from `--radius-card` (20px) to `--radius-row` (30px, half of `--pill-below`), on the accordion's `--duration-entrance` and `--ease-out`, so the shape changes continuously as it opens and closes.
 - **One accordion item in the one surface style.** The whole heading row is the trigger, the chevron is at the far edge, and collapsing hides the body without removing the heading.
 - **The persistent shadow is the exception.** The panel carries `--shadow-rest` at rest and keeps it, to put the controls on a layer above the content. It's the only surface whose shadow doesn't mean "this lifts", so it never lifts on hover.
-- **The title is mono — the one documented exception** to the rule against mono labels. It reads as a quiet container label rather than a primary action. Keep it terse and singular: "Controls", "Filters".
-- **Field labels follow the label rules in SKILL.md.** Drop a label when the control names itself — chips reading Equities / Options, a period reading 1W / 1M / YTD — and keep it when the value alone is ambiguous: a number, a slider, an on/off pair. All the fields are labelled or none are; with none, put the controls in `.field-row` instead of `.control-panel-fields`, so they sit on one line. Labels that stay are Label; mono is spent once, on the title.
-- **Fields flow in columns** of at least `240px`, `16px` apart, wrapping as the panel narrows. Each field is its label, `8px`, then its control.
+- **The title is mono**, and so are the field labels: inside a panel, mono is the quiet voice for names, so the controls carry the weight. Keep the title terse and singular: "Controls", "Filters".
+- **Field labels follow the label rules in SKILL.md.** Drop a label when the control names itself — chips reading Equities / Options, a period reading 1W / 1M / YTD — and keep it when the value alone is ambiguous: a number, a slider, an on/off pair. All the fields are labelled or none are; with none, put the controls in `.field-row` instead of `.control-panel-fields`, so they sit on one line. Labels that stay are mono (see above).
+- **Each field is a row: the mono label on the left, the control on the right.** A control too wide to sit beside its label drops underneath it rather than squeezing. A slider keeps its label-and-value row, with the track below. No dividers between fields.
+- **Fields flow in columns** of at least `240px`, `16px` apart, wrapping as the panel narrows.
 - **Only controls go in.** A table or chart the controls change goes under or beside the panel, on the page. A contents list counts: it's a control that moves you through the page.
 
 ## Docked
@@ -34,6 +35,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.11.0
+
+- Field labels are mono, and each field is a row: label left, control right, dropping underneath when it can't fit.
 
 ## Changes in v0.10.0
 

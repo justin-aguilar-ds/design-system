@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.1.1 */
+/* personal-styling · stage-sheet · v0.2.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -162,4 +162,17 @@
   /* The heading is the handle: drag to resize, tap to close. */
   .stage-sheet.is-open .stage-sheet-toggle { cursor: grab; touch-action: none; }
   .stage-sheet.is-resizing .stage-sheet-toggle { cursor: grabbing; }
+}
+
+/* NEW (v0.2): each field is a row — its mono label on the left, its control
+   on the right — so a long list of fields reads as quiet names beside the
+   controls that carry the weight. A control too wide to sit beside its label
+   drops underneath it rather than squeezing; a slider keeps its
+   label-and-value row with the track below. */
+.stage-sheet-body :is(.control-field, .picker-field) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-16);
 }

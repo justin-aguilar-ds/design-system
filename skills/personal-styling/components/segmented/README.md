@@ -11,7 +11,7 @@ From the source site's nav pill, which switched between its two top-level pages.
 - **Hovering an option previews it.** The indicator slides under the hovered option and slides back when the pointer leaves the control. Mouse only: touch has no hover to preview.
 - **Unselected labels sit at 30% and go to full ink** when indicated or focused. Opacity transitions with plain `ease` over the same 450ms, so the label and the fill move together.
 - **The frame lifts.** It carries the rest shadow and deepens to `--shadow-lift` on hover, like a button.
-- **Metrics follow the button.** The default control is exactly the height of a pill in the same type — 36px with `.t-control`, 37px with `.t-label`. `.segmented--nav` is the page-nav size.
+- **Metrics follow the button.** The default control is exactly the height of a pill in the same type — 36px (`--height-control`) with either type. `.segmented--nav` is the page-nav size.
 - Two to four options. Past four, use a select.
 
 ## Use
@@ -21,6 +21,10 @@ From the source site's nav pill, which switched between its two top-level pages.
 - **List:** `.segmented--list` stacks the options down a column, on the page with no frame — a contents list, a list of views. Options rest at secondary ink rather than 30% (a long list at 30% can't be read), the fill is a pill, and it glides on `--duration-base` because a list is dense. Move the selection from script by dispatching `segmented-set` on the control with `{ detail: { option } }`.
 - **Gliding across pages:** add `view-transition-name: segmented-indicator` to the indicator and `@view-transition { navigation: auto; }` to both pages, and the fill glides from one page's option to the next.
 - Type: `.t-control` in-page, `.t-label` in the nav.
+
+## Changes in v0.4.0
+
+- The frame is `--height-control` (36px) whatever the type; with `.t-label` it was 37px.
 
 ## Changes from the source
 

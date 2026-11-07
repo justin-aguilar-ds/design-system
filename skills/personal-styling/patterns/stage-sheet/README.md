@@ -23,7 +23,7 @@ From building a typography tool on a phone: the docked control panel covered the
 ## Use
 
 - `.stage-sheet` › `.stage-sheet-stage` (the work) and `.stage-sheet-sheet` › `button.stage-sheet-toggle` + `.stage-sheet-body` (the controls). It fills the screen itself (`position: fixed`), so it is the page.
-- Put the controls in the body as they'd go in a control panel: each labelled control in its field, `24px` apart. All labelled or all bare.
+- Put the controls in the body as they'd go in a control panel: each field a row, its mono label left and the control right, `24px` apart. All labelled or all bare.
 - Content that draws itself, like a canvas, observes `.stage-sheet-stage` with a `ResizeObserver` and redraws, once per frame while the split moves.
 - `data-pill="right"` on `.stage-sheet` puts the pill in the corner. `data-open="false"` starts it closed on a wide screen; on a phone it always starts closed.
 - `stage-sheet.js` fires a bubbling `stage-sheet-toggle` event with `detail.open`. Escape closes it.
@@ -33,3 +33,8 @@ From building a typography tool on a phone: the docked control panel covered the
 ## Open question
 
 - The stage takes the page colour, so it always stands out from the ground: a white stage on black in light, a black stage on white in dark. Content that paints its own background (a poster canvas set to white, say) can match the ground in dark mode, and then the stage's edge disappears and only the sheet shows the split. Undecided: give the stage a hairline when its content matches the ground, or accept it.
+
+## Changes in v0.2.0
+
+- Fields in the sheet follow the control panel: mono labels, label left and control right.
+

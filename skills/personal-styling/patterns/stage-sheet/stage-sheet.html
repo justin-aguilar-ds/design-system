@@ -1,4 +1,4 @@
-<!-- personal-styling · stage-sheet · v0.1.1 -->
+<!-- personal-styling · stage-sheet · v0.2.0 -->
 <!-- The whole page: the stage is the work, the sheet holds its controls.
      Size the stage's content to the stage — its box changes on every
      frame of the split (a canvas: observe .stage-sheet-stage and redraw). -->
@@ -17,7 +17,7 @@
     <div class="stage-sheet-body" id="sheet-body">
       <div class="slider-field">
         <div class="slider-head">
-          <label class="t-label" for="sheet-size">Size</label>
+          <label class="t-mono" for="sheet-size">Size</label>
           <output class="slider-value t-mono" for="sheet-size">56</output>
         </div>
         <span class="slider">
@@ -26,7 +26,7 @@
         </span>
       </div>
       <div class="control-field">
-        <span class="t-label" id="sheet-weight-label">Weight</span>
+        <span class="t-mono" id="sheet-weight-label">Weight</span>
         <div class="segmented" role="group" aria-labelledby="sheet-weight-label">
           <span class="segmented-indicator" aria-hidden="true"></span>
           <button class="segmented-option is-active t-control" type="button" aria-pressed="true">Medium</button>
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="control-field">
-        <span class="t-label" id="sheet-effects-label">Effects</span>
+        <span class="t-mono" id="sheet-effects-label">Effects</span>
         <div class="chip-row" role="group" aria-labelledby="sheet-effects-label">
           <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Wave</button>
           <button class="chip t-control" type="button" aria-pressed="false"><span class="chip-dot" aria-hidden="true"></span>Jitter</button>

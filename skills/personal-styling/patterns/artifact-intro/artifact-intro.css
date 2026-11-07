@@ -1,4 +1,4 @@
-/* personal-styling · artifact-intro · v0.3.1 */
+/* personal-styling · artifact-intro · v0.4.0 */
 
 /* The title is the only visible intro copy. The title row is a two-column
    grid: the heading takes the room, the info button sits in its own
@@ -23,8 +23,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--height-control);   /* the height of every other control */
+  height: var(--height-control);
   color: var(--color-text);
 }
 .intro-info[aria-expanded="true"] { background: var(--color-fill-subtle); }
