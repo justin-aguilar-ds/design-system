@@ -1,20 +1,22 @@
-<title>Register Explorer</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
+<title>Register Explorer</title>
 <script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="stylesheet" href="lib/tokens.css">
 <link rel="stylesheet" href="lib/components/button/button.css">
-<link rel="stylesheet" href="lib/components/accordion/accordion.css">
 <link rel="stylesheet" href="lib/components/segmented/segmented.css">
-<link rel="stylesheet" href="lib/components/chip/chip.css">
 <link rel="stylesheet" href="lib/components/slider/slider.css">
-<link rel="stylesheet" href="lib/components/input/input.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
 <link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
 <link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
-<link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
-<link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Layout: the specimen page fills the content column; the register
-     slider and the live readout dock beside it. A temporary tool. */
+  /* A temporary tool: a register slider, and a screen that recomposes. */
+  h1, h2, h3, h4, p { margin: 0; }
+  body { background: var(--color-bg); }
   .page {
     max-width: var(--container);
     margin-inline: auto;
@@ -23,353 +25,443 @@
     padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
     display: flex;
     flex-direction: column;
-    gap: var(--space-24);
+    gap: var(--space-48);
   }
-  .tnum { font-variant-numeric: tabular-nums; }
+  .page > * { min-width: 0; }
+  .section { display: grid; gap: var(--space-24); }
+  .section-head { display: grid; gap: var(--space-8); }
+  .section-head .t-body { max-width: 60ch; color: var(--color-text-secondary); }
+
+  /* ---- The explorer: controls and readout beside the screen on a wide
+     screen, above and below it on a phone. */
+  .explorer { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24); align-items: start; }
+  @media (min-width: 900px) { .explorer { grid-template-columns: 320px minmax(0, 1fr); } }
+  .side { display: grid; gap: var(--space-24); align-content: start; }
+  .controls { display: grid; gap: var(--space-24); }
+  .control-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-16); }
   .slider-ends { display: flex; justify-content: space-between; }
-  .readout { display: grid; gap: var(--space-16); padding-top: var(--space-16); border-top: 1px solid var(--color-divider); }
+  .slider-ends .t-mono:last-child { text-align: right; }
+  .readout { display: grid; gap: var(--space-16); padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .readout-note { color: var(--color-text-secondary); }
+  .readout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); }
+  .pair { display: grid; gap: var(--space-4); }
+  .pair .t-body { color: var(--color-text); }
+  .carries { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-8); }
+  .carries li { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: var(--space-8); align-items: baseline; }
 
-  /* ---- The specimen: a page inside the page, driven by --r (0 tool → 1 occasion). */
-  .specimen { position: relative; overflow: hidden; min-width: 0; }
-  .mock {
-    --r: 0;
-    --gap: calc(var(--space-48) + var(--space-48) * var(--r));
-    padding-block: var(--gap);
-    padding-inline: var(--space-24);
-  }
-  .band { overflow: clip; }
-  .band.is-full { overflow-clip-margin: var(--space-48); } /* room for shadows once it's fully open */
-  .band + .band { margin-top: calc(var(--gap) * var(--v, 1)); }
-  .band.is-row + .band.is-row { margin-top: 0; }
-
-  .fold {
+  /* ---- The stage: the screen at its real size, scaled to fit. */
+  .stage { min-width: 0; }
+  .screen-box { position: relative; margin-inline: auto; }
+  .screen {
     position: absolute;
+    top: 0;
     left: 0;
-    right: 0;
-    top: 640px;
-    border-top: 1px solid var(--color-hairline-strong);
-    pointer-events: none;
-    z-index: 2;
-  }
-  .fold span { position: absolute; right: var(--space-16); top: var(--space-4); }
-
-  .intro-stack { display: grid; align-items: start; }
-  .intro-stack > * { grid-area: 1 / 1; }
-  .intro-row { display: flex; align-items: start; justify-content: space-between; gap: var(--space-16); }
-  .fake-info { width: 40px; height: 40px; display: grid; place-items: center; flex: none; }
-  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
-  @media (max-width: 630px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .statement { max-width: 32ch; }
-  .mock :is(h2, p) { margin: 0; }
-  .filters { display: flex; justify-content: space-between; align-items: end; gap: var(--space-16); flex-wrap: wrap; }
-  .filters .input-wrap { flex: 0 1 240px; }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 0.6fr 1fr;
-    gap: var(--space-24);
-    padding-block: var(--space-16);
-    border-top: 1px solid var(--color-divider);
-  }
-  .row > :first-child { color: var(--color-text); }
-  .row > :nth-child(3) { text-align: right; }
-
-  .faces { display: flex; align-items: center; gap: var(--space-16); }
-  .face-stack { display: flex; }
-  .face {
-    width: 40px; height: 40px;
-    display: grid; place-items: center;
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    transform-origin: top left;
+    overflow: hidden auto;
+    container: screen / size;
+    background: var(--color-bg);
     border: 1px solid var(--color-hairline);
-    box-shadow: 0 0 0 2px var(--color-bg);
+    border-radius: var(--radius-card);
+    scrollbar-width: none;
   }
-  .face + .face { margin-left: calc(-1 * var(--space-8)); }
+  .screen::-webkit-scrollbar { display: none; }
+  @media (max-width: 630px) {
+    .stage { margin-inline: calc(-1 * var(--space-page)); }
+    .screen.is-phone { border-inline: 0; border-radius: 0; }
+  }
+  .fold-note { margin-top: var(--space-8); text-align: center; color: var(--color-text-secondary); }
 
-  .main-object {
-    display: grid; place-items: center;
-    aspect-ratio: 16 / 9;
-    max-height: 420px;
-    width: 100%;
+  /* The type in the screen follows the screen's size, not this window's. */
+  .screen.is-phone .t-display { font-size: 32px; line-height: 1.2; }
+  .screen.is-phone .t-title { font-size: 24px; line-height: 1.2; }
+  .screen.is-desktop .t-display { font-size: 56px; line-height: 64px; }
+  .screen.is-desktop .t-title { font-size: 32px; line-height: 38px; }
+
+  /* ============================================================
+     THE MOCK PAGE. Every distance comes from the register:
+     --m-inset (sides), --m-block (top and bottom), --m-section (between
+     groups). The main group centres in the room left over when the
+     register fits to the screen and the content allows it.
+     ============================================================ */
+  .m {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: var(--m-block) var(--m-inset) calc(var(--m-block) + var(--m-slot, 0px));
+    transition: opacity var(--duration-fast) ease;
+  }
+  .m.is-swapping { opacity: 0; }
+  .m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-section); }
+  .m.is-fit .m-main { margin-block: auto; }
+  .m-head { display: flex; justify-content: space-between; align-items: start; gap: var(--space-16); }
+  .m-head p { max-width: 30ch; }
+  .m-quiet { color: var(--color-text-secondary); }
+  .m-stack { display: grid; gap: var(--space-8); }
+  .m-center { text-align: center; justify-items: center; }
+
+  /* Expressive: the carousel, sized from the screen. */
+  .m-carousel { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+  .m-card {
+    flex: none;
+    display: grid;
+    align-content: start;
+    padding: var(--space-24);
+    width: min(64cqw, 44cqh);
+    aspect-ratio: 4 / 5;
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-lift);
-    transition: transform var(--duration-slow) var(--ease-out);
-    will-change: transform;
+    transition: translate var(--duration-pop) var(--ease-out), rotate var(--duration-pop) var(--ease-out);
   }
-  .main-wrap { perspective: 1200px; padding-block: var(--space-16); }
+  .m-card.is-side { opacity: 0.2; width: min(40cqw, 32cqh); box-shadow: none; }
+  .m-card:not(.is-side):hover { translate: 0 calc(-1 * var(--space-4)); rotate: -1deg; }
 
-  .reply { display: flex; flex-wrap: wrap; gap: var(--space-16); }
-  .reply .button { min-height: var(--height-row); padding-inline: var(--space-24); }
-  .reply .button.is-selected { background: var(--color-fill-subtle); }
+  /* Showcase: one piece of work. */
+  .m-media { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
+  .is-desktop .m-media { width: min(100%, 720px); margin-inline: auto; }
 
-  /* Boxes: every word becomes its own grey bar, every shape stays. */
-  .specimen.is-boxes .mock :is(.t-display, .t-title, .t-label, .t-body, .t-mono):not(button) {
-    color: transparent !important;
-    background: var(--color-divider);
-    border-radius: var(--radius-pill);
-    width: fit-content;
-    max-width: 100%;
+  /* Page: a statement, then a list on dividers. */
+  .m-list { display: grid; }
+  .m-row { display: grid; gap: var(--space-4); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
+  .m-row:first-child { border-top: 0; padding-top: 0; }
+
+  /* Workspace and tool: intro, panel row, figures, chart, table. */
+  .m-intro { display: flex; justify-content: space-between; align-items: center; gap: var(--space-16); }
+  .m-info { flex: none; width: var(--height-control); height: var(--height-control); display: grid; place-items: center; border-radius: var(--radius-pill); }
+  .m-info svg { width: var(--icon-inline); height: var(--icon-inline); }
+  .m-panel { display: flex; align-items: center; justify-content: space-between; min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+  .m-panel svg, .m-pill svg { width: var(--icon-mark); height: var(--icon-mark); color: var(--color-text-secondary); }
+  .m-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--m-gap-inner); }
+  .is-desktop .m-figures { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .m-chart { width: 100%; height: auto; display: block; }
+  .m-chart path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .m-table { width: 100%; border-collapse: collapse; }
+  .m-table th, .m-table td { text-align: left; padding: var(--m-row-pad) var(--space-8) var(--m-row-pad) 0; border-top: 1px solid var(--color-divider); }
+  .m-table th { border-top: 0; }
+  .m-table .num { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+  .m-split { display: grid; gap: var(--m-section); }
+  .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+
+  /* The bottom slot, drawn in the screen (the real one is fixed to the window). */
+  .m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
+  .m-slot > * { pointer-events: auto; }
+  .m.is-fit .m-slot { margin-top: 0; }
+  .m .segmented-option.is-indicated { opacity: 1; background: var(--color-fill-subtle); }
+  .m-big { min-height: var(--height-slot); padding: 0 var(--inset-slot); justify-content: center; }
+  .is-phone .m-slot .m-big:only-child { flex: 1; }
+  .m-pill { display: inline-flex; align-items: center; gap: var(--gap-mark); min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+  .m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
+
+  /* ---- Show space: the register's distances, marked in the screen. */
+  .show-space [data-gap] { position: relative; }
+  .show-space [data-gap]::before {
+    content: attr(data-gap);
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: var(--gap-h);
+    display: grid;
+    place-items: center;
+    background: var(--color-accent-soft);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--color-accent-ink);
+    pointer-events: none;
   }
-  .specimen.is-boxes :is(button, .chip, .face) { color: transparent !important; }
-  .specimen.is-boxes .input::placeholder { color: transparent; }
-  .specimen.is-boxes .main-object > span { color: transparent; }
+  .show-space .m { box-shadow: inset var(--m-inset) 0 0 var(--color-accent-soft), inset calc(-1 * var(--m-inset)) 0 0 var(--color-accent-soft); }
 
-  /* The occasion's one orchestrated moment: the page rises in, in order. */
-  @keyframes rise { from { opacity: 0; translate: 0 var(--space-16); } }
-  .mock.is-entering .band.is-on { animation: rise var(--duration-entrance) var(--ease-out) backwards; animation-delay: calc(var(--i) * 80ms); }
+  /* ---- The ideas. */
+  .proposals { margin: 0; padding: 0; list-style: none; max-width: 760px; }
+  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .proposal > .segmented { justify-self: start; }
+  .proposal-copy { display: grid; gap: var(--space-8); }
+  .proposal-copy .t-body { max-width: 60ch; }
+  .proposal.is-declined .proposal-copy { opacity: var(--opacity-label-inactive); }
+  .decisions-end { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-16); }
 </style>
-
+</head>
+<body ontouchstart>
 <div class="page">
   <header class="intro">
     <div class="intro-title-row">
       <h1 class="t-display">Registers</h1>
-      <button class="intro-info surface surface--rest surface--pill" type="button"
-              aria-label="About this tool" aria-expanded="false" aria-controls="intro-about"
-              data-tooltip-toggle="intro-about">
+      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
         <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
       </button>
       <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
-        <p class="tooltip-text t-mono">A temporary tool. Drag between the Tool and Occasion registers and watch one page change: space, what's on screen, type, copy and motion. Colours, steps, components and curves never move.</p>
+        <p class="tooltip-text t-mono">A layout visualizer for the registers, from Expressive to Tool. The same system at every stop: what changes is space, layout and how many things share the screen. A temporary tool; the ideas at the end are proposals.</p>
       </div>
     </div>
   </header>
 
-  <div class="control-dock">
-    <section class="specimen surface" id="specimen" aria-label="Specimen page">
-      <div class="fold" aria-hidden="true"><span class="t-mono">First screen</span></div>
-      <div class="mock" id="mock">
-
-        <div class="band" data-mix="0.35 0.65" data-group="intro">
-          <div class="intro-stack">
-          <div class="intro-row" data-face="tool">
-            <h2 class="t-display">Rooftop, Nov 14</h2>
-            <span class="fake-info surface surface--pill" aria-hidden="true"><svg class="intro-info-glyph" viewBox="0 0 16 16"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>
+  <section class="explorer" aria-label="Explorer">
+    <div class="side">
+      <div class="controls">
+        <div class="slider-field">
+          <div class="slider-head">
+            <label class="t-label" for="register">Register</label>
+            <output class="slider-value t-mono" for="register" id="register-out">Expressive</output>
           </div>
-          <div class="type-pair type-pair--flat" data-face="occasion">
-            <h2 class="t-display">Rooftop.</h2>
-            <p class="t-display type-pair-quiet">Saturday the 14th, from seven.</p>
-          </div>
-          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="register" type="range" min="0" max="4" step="1" value="0">
+          </span>
+          <div class="slider-ends"><span class="t-mono">Expressive</span><span class="t-mono">Tool</span></div>
         </div>
-
-        <div class="band" data-out="0.2 0.6" data-group="details">
-          <div class="grid4">
-            <div class="type-pair"><span class="t-mono">When</span><span class="t-body type-pair-value">Sat, Nov 14 · 7:00 PM</span></div>
-            <div class="type-pair"><span class="t-mono">Where</span><span class="t-body type-pair-value">220 Kent Ave</span></div>
-            <div class="type-pair"><span class="t-mono">Bring</span><span class="t-body type-pair-value">Something to share</span></div>
-            <div class="type-pair"><span class="t-mono">Reply by</span><span class="t-body type-pair-value">Mon, Nov 9</span></div>
+        <div class="control-row">
+          <span class="t-label" id="content-l">Content</span>
+          <div class="segmented" role="group" aria-labelledby="content-l" id="content">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="0">Little</button>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="1">Some</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="2">Lots</button>
           </div>
         </div>
-
-        <div class="band" data-out="0.25 0.65" data-group="figures">
-          <div class="grid4">
-            <div class="type-pair"><span class="t-mono">Going</span><span class="t-title tnum">20</span></div>
-            <div class="type-pair"><span class="t-mono">Maybe</span><span class="t-title tnum">4</span></div>
-            <div class="type-pair"><span class="t-mono">No reply</span><span class="t-title tnum">5</span></div>
-            <div class="type-pair"><span class="t-mono">Spots left</span><span class="t-title tnum">20</span></div>
+        <div class="control-row">
+          <span class="t-label" id="screen-l">Screen</span>
+          <div class="segmented" role="group" aria-labelledby="screen-l" id="screen-size">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="phone">Phone</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="desktop">Desktop</button>
           </div>
         </div>
-
-        <div class="band" data-out="0 0.4" data-group="filters">
-          <div class="filters">
-            <div class="chip-row" aria-hidden="true">
-              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>Going</span>
-              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>Maybe</span>
-              <span class="chip t-control" aria-pressed="true"><span class="chip-dot"></span>No reply</span>
-            </div>
-            <span class="input-wrap input-wrap--search" aria-hidden="true">
-              <svg class="input-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input class="input" type="search" placeholder="Search guests" tabindex="-1">
-            </span>
-          </div>
-        </div>
-        <div id="rows"></div>
-
-        <div class="band" data-out="0.3 0.6" data-group="action">
-          <span class="button surface surface--rest surface--pill t-label" aria-hidden="true" style="min-height: var(--height-row); padding-inline: var(--space-24); display: inline-flex; align-items: center;">Remind 9 people</span>
-        </div>
-
-        <div class="band" data-in="0.35 0.75" data-group="main">
-          <div class="main-wrap"><div class="main-object" id="main-object"><span class="t-body">The main object — photos from last year, a map, a playlist</span></div></div>
-        </div>
-        <div class="band" data-in="0.4 0.8" data-group="statement">
-          <p class="t-title statement">Up on the roof at 220 Kent Ave. Bring something to share, and something warm.</p>
-        </div>
-        <div class="band" data-in="0.45 0.85" data-group="faces">
-          <div class="faces">
-            <div class="face-stack" aria-hidden="true">
-              <span class="face t-control">AR</span><span class="face t-control">BO</span><span class="face t-control">DP</span><span class="face t-control">FB</span><span class="face t-control">HS</span><span class="face t-control">+15</span>
-            </div>
-            <span class="t-body">Ana, Ben and 18 others are going</span>
-          </div>
-        </div>
-        <div class="band" data-in="0.55 0.9" data-group="reply">
-          <div class="reply" role="group" aria-label="Reply" id="reply">
-            <button class="button surface surface--rest surface--pill t-label" type="button">I'm in</button>
-            <button class="button surface surface--rest surface--pill t-label" type="button">Maybe</button>
-            <button class="button surface surface--rest surface--pill t-label" type="button">Can't make it</button>
+        <div class="control-row">
+          <span class="t-label" id="space-l">Show space</span>
+          <div class="segmented" role="group" aria-labelledby="space-l" id="show-space">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="off">Off</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="on">On</button>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="control-panel control-panel--docked surface accordion" aria-label="Controls">
-      <div class="accordion-item is-open" data-closed-below="630">
-        <h2 class="accordion-heading">
-          <button class="accordion-trigger" type="button" id="reg-trigger" aria-expanded="true" aria-controls="reg-body">
-            <span class="t-mono">Controls</span>
-            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </h2>
-        <div class="accordion-panel" id="reg-body" role="region" aria-labelledby="reg-trigger">
-          <div class="accordion-content"><div class="accordion-body">
-            <div class="control-panel-fields">
-              <div class="slider-field">
-                <div class="slider-head">
-                  <label class="t-label" for="register">Register</label>
-                  <output class="slider-value t-mono" for="register" id="register-name">Tool</output>
-                </div>
-                <span class="slider">
-                  <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
-                  <input class="slider-input" id="register" type="range" min="0" max="100" value="0" aria-valuetext="Tool">
-                </span>
-                <div class="slider-ends" aria-hidden="true"><span class="t-mono">Tool</span><span class="t-mono">Occasion</span></div>
-              </div>
-
-              <div class="control-field">
-                <span class="t-label" id="show-label">Show</span>
-                <div class="segmented" role="group" aria-labelledby="show-label" id="show">
-                  <span class="segmented-indicator" aria-hidden="true"></span>
-                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="content">Content</button>
-                  <button class="segmented-option t-control" type="button" aria-pressed="false" value="boxes">Boxes</button>
-                </div>
-              </div>
-
-              <div class="readout" aria-live="polite">
-                <div class="type-pair"><span class="t-mono">Page top and bottom</span><span class="t-body type-pair-value tnum" id="ro-page">48px</span></div>
-                <div class="type-pair"><span class="t-mono">Section to section</span><span class="t-body type-pair-value tnum" id="ro-gap">48px</span></div>
-                <div class="type-pair"><span class="t-mono">Things on the first screen</span><span class="t-body type-pair-value tnum" id="ro-count">–</span></div>
-                <div class="type-pair"><span class="t-mono">Type carrying the page</span><span class="t-body type-pair-value" id="ro-type">–</span></div>
-                <div class="type-pair"><span class="t-mono">Copy</span><span class="t-body type-pair-value" id="ro-copy">–</span></div>
-                <div class="type-pair"><span class="t-mono">Motion</span><span class="t-body type-pair-value" id="ro-motion">–</span></div>
-              </div>
-
-              <button class="button surface surface--rest surface--pill t-control" type="button" id="replay">Play the entrance</button>
-            </div>
-          </div></div>
-        </div>
+      <div class="readout" aria-live="polite">
+        <h2 class="t-title" id="r-name">Expressive</h2>
+        <p class="t-body readout-note" id="r-note"></p>
+        <div class="readout-grid" id="r-grid"></div>
+        <ul class="carries" id="r-carries"></ul>
       </div>
-    </section>
-  </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="screen-box" id="screen-box">
+        <div class="screen is-phone" id="screen"></div>
+      </div>
+      <p class="t-mono fold-note" id="fold-note"></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="dec-h">
+    <div class="section-head">
+      <h2 class="t-title" id="dec-h">The ideas</h2>
+      <p class="t-body">What the explorer would put into the system. Approve or decline each.</p>
+    </div>
+    <ol class="proposals" id="proposals"></ol>
+    <div class="decisions-end">
+      <p class="t-body" id="decision-summary"></p>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-label" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
+        <span class="toast t-mono" role="status"></span>
+      </span>
+    </div>
+  </section>
 </div>
 
-<script src="lib/components/accordion/accordion.js"></script>
+<script>
+const PROPOSALS = [
+  ['R1', 'Five registers, Expressive to Tool', 'Expressive, Showcase, Page, Workspace and Tool, each a layout recipe in SKILL.md: what it is for, how many things share the screen, its distances, and its hero. A brief names its register before anything is built; the register picks the recipe, the components stay the same.'],
+  ['R2', 'A 96 step, for the expressive end', 'A sixth spacing step, --space-96, used only between groups at Expressive and Showcase. And a role token, --space-section, that the register sets: 96, 96, 48, 48, 24. Components never read 96; layouts do.'],
+  ['R3', 'Wider sides on a wide screen, at the expressive end', 'Expressive, Showcase and Page take 48 at the sides on a wide screen, so the work sits inside a frame of air. Workspace and Tool keep 24 for the room. Phones keep 24 at every register.'],
+  ['R4', 'Fit to the screen', 'When the content fits one screen, the main group centres in the room between the header and the bottom slot, so a page with little on it reads as composed, not unfinished. Expressive, Showcase and Page fit; Workspace and Tool stay top-aligned, because a tool is read from the top. Try Page with Little content.'],
+  ['R5', 'One hero, front and centre', 'The expressive end has exactly one hero: the tool’s focus, a component, or display type. It is sized from the screen (a share of its width and height), not a fixed number, so it fills a phone and a desktop alike. Everything else steps back to secondary ink.'],
+  ['R6', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
+];
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem('register-proposals') || '{}'); } catch {}
+document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
+  <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
+    <div class="proposal-copy">
+      <span class="t-mono">${id}</span>
+      <h3 class="t-label">${title}</h3>
+      <p class="t-body">${body}</p>
+    </div>
+    <div class="segmented" role="group" aria-label="${id} decision">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${['pending', 'approve', 'decline'].map((val) => `<button class="segmented-option t-control${(decisions[id] || 'pending') === val ? ' is-active' : ''}" type="button" aria-pressed="${(decisions[id] || 'pending') === val}" value="${val}">${val[0].toUpperCase() + val.slice(1)}</button>`).join('')}
+    </div>
+  </li>`).join('');
+</script>
 <script src="lib/components/segmented/segmented.js"></script>
 <script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/toast/toast.js"></script>
 <script src="lib/components/tooltip/tooltip.js"></script>
 <script>
 document.body.ontouchstart = () => {};
 
-// Guest rows: in a tool they're the page; in an occasion they're gone.
-const ROWS = [['Ana Ruiz', '✓ Going', 1, 'Oct 21'], ['Ben Okafor', '✓ Going', 0, 'Oct 21'], ['Chloe Park', '! Maybe', 1, 'Oct 22'],
-  ['Dev Patel', '✓ Going', 1, 'Oct 22'], ['Elif Kaya', '– No reply', '–', '–'], ['Felix Braun', '✓ Going', 0, 'Oct 23'], ['Gia Romano', '✗ Can’t', '–', 'Oct 23']];
-document.getElementById('rows').outerHTML = ROWS.map((r, i) => `<div class="band is-row" data-out="${(0.05 + i * 0.05).toFixed(2)} ${(0.25 + i * 0.05).toFixed(2)}" data-group="table">
-  <div class="row"><span class="t-mono">${r[0]}</span><span class="t-mono">${r[1]}</span><span class="t-mono">${r[2]}</span><span class="t-mono">${r[3]}</span></div></div>`).join('');
+// ---- The registers. Distances are in px; phone | desktop where they differ.
+const REG = [
+  { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
+    note: 'One thing, front and centre. Personal software with a single job: a type toy, a mix, a card. The layout is the design.',
+    things: '1 hero, a header line, the nav', hero: 'A component, sized from the screen',
+    carries: [['Layout', 'The hero fills the screen between the header and the nav'], ['Space', '96 around the hero; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
+  { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
+    note: 'One piece of work at a time, with a caption. A portfolio page, a launch, a single result.',
+    things: '1 hero, a caption, a header, the nav', hero: 'A piece of media, as wide as the column',
+    carries: [['Layout', 'The work centred, the caption under it'], ['Space', '96 between the header, the work and the caption'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
+  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: 48, inner: 16, rowPad: 16,
+    note: 'Something to read and one thing to do. An about page, an invitation, a menu.',
+    things: 'A statement, a list, one action', hero: 'Display type',
+    carries: [['Type', 'A display statement carries the page'], ['Space', '48 between groups, 16 inside the list'], ['Layout', 'With little content it centres; with lots it reads from the top']] },
+  { name: 'Workspace', fit: false, inset: [24, 24], block: [48, 48], section: 48, inner: 24, rowPad: 16,
+    note: 'A tool with one main view. A planner, a calculator, a tracker you check.',
+    things: 'Intro, panel, figures, a chart', hero: 'The main view: a chart or a list',
+    carries: [['Layout', 'Top-aligned: read from the title down'], ['Space', '48 between sections, 24 inside them'], ['Interaction', 'Hover, tooltips and focus carry the feel']] },
+  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: 24, inner: 16, rowPad: 8,
+    note: 'Dense and precise, still designed. A league tool, a dashboard, a ledger. Precision is the expression.',
+    things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
+    carries: [['Space', '24 between sections, the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as Expressive']] },
+];
+const SIZES = { phone: [390, 844], desktop: [1280, 800] };
+const state = { r: 0, content: 1, size: 'phone', space: false };
 
-const mock = document.getElementById('mock');
-const specimen = document.getElementById('specimen');
-const bands = [...mock.querySelectorAll('.band')];
-const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-const vis = (band, r) => {
-  if (band.dataset.mix) return 1;
-  if (band.dataset.in) { const [a, b] = band.dataset.in.split(' ').map(Number); return smooth(a, b, r); }
-  const [a, b] = band.dataset.out.split(' ').map(Number); return 1 - smooth(a, b, r);
+const CHEV = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEV_DOWN = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ARROW = '<svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M2 5h6M5.5 2.5 8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const INFO = '<span class="m-info surface surface--rest" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>';
+const nav = (a, b, on = 0) => `<div class="segmented segmented--large" aria-hidden="true"><span class="segmented-indicator" style="opacity:0"></span><span class="segmented-option t-label${on === 0 ? ' is-indicated' : ''}">${a}</span><span class="segmented-option t-label${on === 1 ? ' is-indicated' : ''}">${b}</span></div>`;
+const head = (right = 'About', sub = '') => `<div class="m-head"><div class="m-stack"><span class="t-body m-quiet">Studio Folio</span>${sub ? `<p class="t-body m-quiet">${sub}</p>` : ''}</div><span class="t-body m-quiet">${right}</span></div>`;
+
+// A chart: one series in ink, two quiet ones in the series grey.
+const chart = (w, h) => {
+  const line = (seed, amp) => { let d = ''; for (let i = 0; i <= 12; i++) { const x = (i / 12) * w, y = h * 0.55 - Math.sin(i * 0.7 + seed) * amp - i * (h * 0.02); d += `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`; } return d; };
+  return `<svg class="m-chart" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    ${[0.25, 0.5, 0.75].map((f) => `<line x1="0" x2="${w}" y1="${h * f}" y2="${h * f}" stroke="var(--color-hairline-strong)" stroke-dasharray="0 4" stroke-linecap="round"/>`).join('')}
+    <path d="${line(2, h * 0.12)}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${line(4, h * 0.1)}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${line(0, h * 0.18)}" stroke="var(--color-text)" stroke-width="3.25"/></svg>`;
+};
+const PEOPLE = ['Ana Ruiz', 'Ben Okafor', 'Chloe Park', 'Dev Shah', 'Eli Moreau', 'Fay Lin', 'Gus Romero', 'Hana Ito', 'Ivo Petrov', 'Jun Ahn', 'Kai Berg', 'Lia Costa', 'Max Ross', 'Nia Cole', 'Omar Haddad', 'Pia Lund', 'Quinn Ray', 'Rex Hale', 'Sol Vega', 'Tao Wen'];
+const table = (rows) => `<table class="m-table"><thead><tr><th class="t-label">Player</th><th class="t-label">Team</th><th class="t-label num">Pts</th></tr></thead><tbody>${PEOPLE.slice(0, rows).map((p, i) => `<tr><td class="t-body">${p}</td><td class="t-mono">${['NYK', 'BOS', 'DEN', 'LAL', 'MIA'][i % 5]}</td><td class="t-mono num">${(48.2 - i * 1.7).toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
+const figures = (n) => `<div class="m-figures">${[['Points', '1,284'], ['Rank', '3rd'], ['Win rate', '64%'], ['Trades', '12']].slice(0, n).map(([k, v]) => `<div class="m-stack"><span class="t-mono">${k}</span><span class="t-title">${v}</span></div>`).join('')}</div>`;
+
+const RENDER = [
+  // Expressive
+  (c, d) => {
+    const cards = c === 0 ? 1 : d && c === 2 ? 5 : 3;
+    const side = (cards - 1) / 2;
+    const card = (i) => `<div class="m-card${i === side ? '' : ' is-side'}"><span class="t-title">${i === side ? 'Side A — Episode 12' : 'Episode'}</span></div>`;
+    return { head: head(), main: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`, slot: nav('Design', 'Music', 1) };
+  },
+  // Showcase
+  (c, d) => {
+    const work = (t, y) => `<div class="m-media"><div class="m-stack m-center"><span class="t-label m-quiet">Introducing</span><span class="t-label">${t}</span></div></div><div class="m-stack m-center"><p class="t-body m-quiet">Visual refresh</p><p class="t-body m-quiet">Studio · ${y}</p></div>`;
+    const items = [['New Sans', 2026], ['Field Guide', 2025], ['Night Market', 2024]].slice(0, [1, 1, 3][c]);
+    return { head: head('About', c === 0 ? '' : 'Product designer, making tools and type.'), main: items.map(([t, y]) => work(t, y)).join(''), slot: nav('Design', 'Music', 0) };
+  },
+  // Page
+  (c) => {
+    const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
+    return {
+      head: `<div class="m-head"><span></span><span class="t-body m-quiet">Close</span></div>`,
+      main: `<div class="m-stack" style="gap: var(--m-section)"><p class="t-display">A product designer who makes small tools.</p>${c ? '<p class="t-display">Having fun with prototypes.</p>' : ''}</div>
+        <div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
+      slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
+    };
+  },
+  // Workspace
+  (c, d) => ({
+    head: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
+    main: `<div class="m-panel surface surface--rest"><span class="t-mono">Controls</span>${CHEV_DOWN}</div>
+      ${c ? figures(2) : ''}
+      <div class="m-split${d && c === 2 ? ' is-two' : ''}"><div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Hours by day</span>${chart(d ? 720 : 340, d ? 260 : 180)}</div>${c === 2 ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(6)}</div>` : ''}</div>`,
+    slot: '',
+  }),
+  // Tool
+  (c, d) => ({
+    head: `<div class="m-intro"><h4 class="t-display">What-if league</h4>${INFO}</div>`,
+    main: `${figures(4)}
+      <div class="m-split${d ? ' is-two' : ''}"><div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Projected points</span>${chart(d ? 620 : 340, d ? 240 : 160)}</div>
+      <div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Roster</span>${table([4, 10, 20][c])}</div></div>`,
+    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>`,
+  }),
+];
+
+const screen = document.getElementById('screen');
+const box = document.getElementById('screen-box');
+const stage = document.getElementById('stage');
+const fit = () => {
+  const [w, h] = SIZES[state.size];
+  const s = Math.min(1, stage.clientWidth / w);
+  screen.style.width = `${w}px`;
+  screen.style.height = `${h}px`;
+  screen.style.transform = `scale(${s})`;
+  box.style.width = `${w * s}px`;
+  box.style.height = `${h * s}px`;
 };
 
-// Natural heights, measured with every band open.
-let heights = [];
-let faceHeights = {};
-const measure = () => {
-  bands.forEach((b) => { b.style.height = 'auto'; });
-  heights = bands.map((b) => b.scrollHeight);
-  mock.querySelectorAll('[data-face]').forEach((f) => { faceHeights[f.dataset.face] = f.offsetHeight; });
-  render();
-};
-
-let r = 0;
 function render() {
-  mock.style.setProperty('--r', r);
-  bands.forEach((b, i) => {
-    const v = vis(b, r);
-    b.style.setProperty('--v', v);
-    if (b.dataset.mix) {
-      // One slot, two faces: crossfade, and the slot's height follows.
-      const [a, z] = b.dataset.mix.split(' ').map(Number);
-      const m = smooth(a, z, r);
-      b.querySelector('[data-face="tool"]').style.opacity = 1 - m;
-      b.querySelector('[data-face="occasion"]').style.opacity = m;
-      b.style.height = `${faceHeights.tool + (faceHeights.occasion - faceHeights.tool) * m}px`;
-    } else {
-      b.style.height = `${heights[i] * v}px`;
-    }
-    b.style.opacity = Math.min(1, v * 1.6); // stays legible while its height gives way
-    b.style.visibility = v < 0.01 ? 'hidden' : '';
-    b.classList.toggle('is-on', v > 0.5);
-    b.classList.toggle('is-full', v > 0.99);
-  });
+  const reg = REG[state.r], d = state.size === 'desktop', k = d ? 1 : 0;
+  const parts = RENDER[state.r](state.content, d);
+  screen.className = `screen is-${state.size}${state.space ? ' show-space' : ''}`;
+  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-section:${reg.section}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:${parts.slot ? 24 : 0}px`;
+  screen.innerHTML = `<div class="m${reg.fit ? ' is-fit' : ''}" style="${vars}">${parts.head}<div class="m-main">${parts.main}</div>${parts.slot ? `<div class="m-slot">${parts.slot}</div>` : ''}${parts.corner ? `<div class="m-corner">${parts.corner}</div>` : ''}</div>`;
+  screen.scrollTop = 0;
+  // Mark the distances for Show space.
+  const m = screen.querySelector('.m-main');
+  [...m.children].forEach((el, i) => { if (i) { el.dataset.gap = reg.section; el.style.setProperty('--gap-h', `${reg.section}px`); } });
+  const first = m.firstElementChild; if (first) { first.dataset.gap = reg.section; first.style.setProperty('--gap-h', `${reg.section}px`); }
+  readout(reg, k);
+}
 
-  const page = Math.round(48 + 48 * r);
-  document.getElementById('ro-page').textContent = `${page}px`;
-  document.getElementById('ro-gap').textContent = `${page}px`;
-  const name = r < 0.2 ? 'Tool' : r > 0.8 ? 'Occasion' : 'Between';
-  document.getElementById('register-name').textContent = name;
-  document.getElementById('register').setAttribute('aria-valuetext', name);
-  document.getElementById('ro-type').textContent = r < 0.5 ? 'Label, Body, mono figures' : 'Display, the Flat pair';
-  document.getElementById('ro-copy').textContent = r < 0.5 ? 'Names and values' : 'Sentences, second person';
-  document.getElementById('ro-motion').textContent = r < 0.5 ? 'Responses only' : 'An entrance, and a main object that answers the pointer';
-  document.getElementById('replay').disabled = r < 0.5;
-
-  // Counted after layout settles: groups that are on and start above the fold.
+function readout(reg, k) {
+  document.getElementById('register-out').textContent = reg.name;
+  document.getElementById('r-name').textContent = reg.name;
+  document.getElementById('r-note').textContent = reg.note;
+  const pairs = [['Between groups', reg.section], ['Sides', reg.inset[k]], ['Top and bottom', reg.block[k]], ['Inside a group', reg.inner], ['On screen', reg.things], ['Hero', reg.hero]];
+  document.getElementById('r-grid').innerHTML = pairs.map(([n, v]) => `<div class="pair"><span class="t-mono">${n}</span><span class="t-body">${v}</span></div>`).join('');
+  document.getElementById('r-carries').innerHTML = reg.carries.map(([n, v]) => `<li><span class="t-mono">${n}</span><span class="t-body">${v}</span></li>`).join('');
   requestAnimationFrame(() => {
-    const fold = 640;
-    const groups = new Set();
-    bands.forEach((b) => { if (vis(b, r) >= 0.45 && b.offsetTop < fold) groups.add(b.dataset.group); });
-    document.getElementById('ro-count').textContent = String(groups.size);
+    const over = screen.scrollHeight - screen.clientHeight;
+    const n = (screen.scrollHeight / screen.clientHeight);
+    document.getElementById('fold-note').textContent = over <= 1
+      ? (reg.fit ? 'Fits one screen · centred in the room left' : 'Fits one screen · top-aligned, a tool reads from the top')
+      : `${n.toFixed(1)} screens · scroll inside the screen`;
   });
 }
 
-document.getElementById('register').addEventListener('input', (e) => { r = Number(e.target.value) / 100; render(); });
-document.getElementById('show').addEventListener('segmented-change', (e) => specimen.classList.toggle('is-boxes', e.detail.value === 'boxes'));
+const swap = () => {
+  const m = screen.querySelector('.m');
+  if (!m) { render(); return; }
+  m.classList.add('is-swapping');
+  setTimeout(render, 160);
+};
 
-document.getElementById('replay').addEventListener('click', () => {
-  let k = 0;
-  bands.forEach((b) => { if (b.classList.contains('is-on')) b.style.setProperty('--i', k++); });
-  mock.classList.remove('is-entering');
-  void mock.offsetWidth;
-  mock.classList.add('is-entering');
-  setTimeout(() => mock.classList.remove('is-entering'), 500 + k * 80);
+document.getElementById('register').addEventListener('input', (e) => { state.r = Number(e.target.value); swap(); });
+document.getElementById('content').addEventListener('segmented-change', (e) => { state.content = Number(e.detail.value); swap(); });
+document.getElementById('screen-size').addEventListener('segmented-change', (e) => { state.size = e.detail.value; fit(); render(); });
+document.getElementById('show-space').addEventListener('segmented-change', (e) => { state.space = e.detail.value === 'on'; screen.classList.toggle('show-space', state.space); });
+new ResizeObserver(fit).observe(stage);
+fit();
+render();
+document.fonts?.ready.then(() => readout(REG[state.r], state.size === 'desktop' ? 1 : 0));
+
+function summarise() {
+  const ids = PROPOSALS.map((p) => p[0]);
+  const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
+  const a = by('approve'), dd = by('decline'), p = by('pending');
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${dd.length} declined, ${p.length} to decide.`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${dd.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+}
+document.getElementById('proposals').addEventListener('segmented-change', (e) => {
+  const item = e.target.closest('.proposal'); if (!item) return;
+  decisions[item.dataset.id] = e.detail.value;
+  try { localStorage.setItem('register-proposals', JSON.stringify(decisions)); } catch {}
+  item.classList.toggle('is-declined', e.detail.value === 'decline');
+  summarise();
 });
-
-// The main object leans toward the pointer, more the further into the occasion.
-const obj = document.getElementById('main-object');
-obj.addEventListener('pointermove', (e) => {
-  const k = Math.max(0, (r - 0.5) * 2);
-  const box = obj.getBoundingClientRect();
-  const x = (e.clientX - box.left) / box.width - 0.5, y = (e.clientY - box.top) / box.height - 0.5;
-  obj.style.transform = `rotateY(${x * 8 * k}deg) rotateX(${-y * 8 * k}deg)`;
-});
-obj.addEventListener('pointerleave', () => { obj.style.transform = ''; });
-
-document.getElementById('reply').addEventListener('click', (e) => {
-  const b = e.target.closest('button');
-  if (!b) return;
-  document.querySelectorAll('#reply button').forEach((x) => { x.classList.toggle('is-selected', x === b); x.setAttribute('aria-pressed', String(x === b)); });
-});
-
-// Re-measure only when the width changes; the height changes on every slide.
-let lastWidth = 0;
-new ResizeObserver(([entry]) => { const w = Math.round(entry.contentRect.width); if (w !== lastWidth) { lastWidth = w; measure(); } }).observe(specimen);
-measure();
+summarise();
 </script>
+</body>
+</html>
