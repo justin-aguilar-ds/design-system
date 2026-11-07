@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.4.1 */
+/* personal-styling · picker · v0.4.2 */
 
 // A button that opens a listbox (the "select-only combobox" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.
@@ -140,7 +140,20 @@ document.querySelectorAll('.picker').forEach((picker) => {
     if (match) setActive(match);
   };
 
-  trigger.addEventListener('click', () => (isOpen() ? close() : open()));
+  // A press on the trigger toggles from the state it found. On iOS a tap
+  // doesn't focus the button, so the list blurs to nothing and its focusout
+  // would close the menu just before the click reopened it: while the
+  // trigger is pressed, the click decides.
+  let pressedOpen = null;
+  trigger.addEventListener('pointerdown', () => { pressedOpen = isOpen(); });
+  const release = () => setTimeout(() => { pressedOpen = null; });
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+  trigger.addEventListener('click', () => {
+    const wasOpen = pressedOpen ?? isOpen();
+    pressedOpen = null;
+    if (wasOpen) close(); else open();
+  });
   trigger.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
@@ -175,7 +188,7 @@ document.querySelectorAll('.picker').forEach((picker) => {
     if (!picker.contains(event.target)) close({ focusTrigger: false });
   });
   list.addEventListener('focusout', (event) => {
-    if (!picker.contains(event.relatedTarget)) close({ focusTrigger: false });
+    if (pressedOpen === null && !picker.contains(event.relatedTarget)) close({ focusTrigger: false });
   });
 
   // A picker marked open in the markup (the sandbox's static state) shows its fill.
