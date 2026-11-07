@@ -1,0 +1,1599 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Typography Stage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=Anton&family=Playfair+Display:wght@400..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+      /* ============================================================
+         Personal styling tokens — v0.12 (copied verbatim from the
+         live design system; dark blocks included)
+         ============================================================ */
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      html { -webkit-tap-highlight-color: transparent; }
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
+      img, video, svg { display: block; max-width: 100%; }
+      [hidden] { display: none !important; }
+
+      :root {
+        --space-4: 4px;
+        --space-8: 8px;
+        --space-16: 16px;
+        --space-24: 24px;
+        --space-48: 48px;
+        --space-page: var(--space-24);
+        --space-page-block: var(--space-48);
+        --container: 1280px;
+
+        --color-text: #000000;
+        --color-text-secondary: rgba(0, 0, 0, 0.5);
+        --color-bg: #ffffff;
+        --color-surface: #ffffff;
+        --color-hairline: #ececec;
+        --color-hairline-strong: rgba(0, 0, 0, 0.12);
+        --color-fill-subtle: rgba(0, 0, 0, 0.04);
+        --color-divider: rgba(0, 0, 0, 0.08);
+        --color-overlay-backdrop: rgba(255, 255, 255, 0.8);
+
+        --color-range-track: rgba(0, 0, 0, 0.12);
+        --color-range-progress: var(--color-text);
+        --color-range-thumb: var(--color-bg);
+        --shadow-range-thumb: 0 1px 4px rgba(0, 0, 0, 0.24), 0 1px 1px rgba(0, 0, 0, 0.12);
+
+        --color-accent: #FCFF28;
+        --color-accent-ink: #000000;
+        --color-accent-soft: rgba(252, 255, 40, 0.42);
+
+        --color-gain-fill: rgba(52, 168, 83, 0.14);
+        --color-loss-fill: rgba(234, 67, 53, 0.12);
+
+        --color-fill-quiet: rgba(0, 0, 0, 0.06);
+        --color-fill-quiet-hover: rgba(0, 0, 0, 0.1);
+
+        --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+        --duration-fast: 160ms;
+        --duration-base: 250ms;
+        --duration-deliberate: 450ms;
+        --duration-entrance: 500ms;
+        --duration-slow: 800ms;
+        --duration-carousel: 1200ms;
+        --duration-instant: 0ms;
+        --duration-pop: 350ms;
+        --duration-reveal: 550ms;
+
+        --radius-card: 20px;
+        --radius-pill: 999px;
+        --pill-below: 60px;
+        --radius-row: calc(var(--pill-below) / 2);
+        --height-row: 50px;
+
+        --icon-mark: 10px;
+        --icon-inline: 16px;
+        --icon-control: 20px;
+
+        --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);
+        --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);
+        --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24);
+        --blur-surface: 20px;
+        --color-glass: rgba(255, 255, 255, 0.5);
+
+        --opacity-inactive: 0.2;
+        --opacity-label-inactive: 0.3;
+        --scale-inactive: 0.8;
+        --scale-enter: 0.95;
+        --scale-press: 0.85;
+        --scale-tap: 0.97;
+        --scale-lift: 1.03;
+      }
+
+      :focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+      body {
+        font-family: var(--font-display);
+        font-weight: 500;
+        letter-spacing: -0.1px;
+        color: var(--color-text-secondary);
+        background: var(--color-bg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .t-display { font-size: 56px; line-height: 64px; letter-spacing: -1px;   font-weight: 500; color: var(--color-text); }
+      .t-title   { font-size: 32px; line-height: 38px; letter-spacing: -0.6px; font-weight: 500; color: var(--color-text); }
+      .t-label   { font-size: 16px; line-height: 19px; letter-spacing: -0.1px; font-weight: 600; color: var(--color-text); }
+      .t-body    { font-size: 16px; line-height: 19px; letter-spacing: -0.1px; font-weight: 500; }
+      .t-caption { font-size: 14px; line-height: 18px; letter-spacing: -0.1px; font-weight: 500; }
+      .t-control { font-family: var(--font-display); font-size: 14px; line-height: 18px;
+                   letter-spacing: -0.1px; font-weight: 600; text-transform: none;
+                   color: var(--color-text); }
+      .t-mono    { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.5;
+                   letter-spacing: 0.3px; font-weight: 500; text-transform: uppercase;
+                   color: var(--color-text-secondary); }
+
+      @media (max-width: 630px) {
+        .t-display { font-size: 32px; line-height: 1.2; }
+        .t-title   { font-size: 24px; line-height: 1.2; }
+      }
+
+      .container { max-width: var(--container); margin-left: auto; margin-right: auto; }
+
+      .surface {
+        background: var(--color-surface);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-card);
+      }
+      .surface--rest { box-shadow: var(--shadow-rest); }
+
+      .control-field {
+        display: grid;
+        justify-items: start;
+        gap: var(--space-8);
+        min-width: 0;
+      }
+      .field-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--space-16);
+      }
+      .field-row > * { min-width: 0; }
+
+      .is-selected {
+        background: var(--color-fill-subtle);
+        color: var(--color-text);
+      }
+
+      .flag {
+        background: var(--color-accent);
+        color: var(--color-accent-ink);
+        padding: 0 4px;
+        border-radius: 4px;
+      }
+      ::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+
+      .scroll-hidden { scrollbar-width: none; -ms-overflow-style: none; }
+      .scroll-hidden::-webkit-scrollbar { display: none; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+        .surface--rest:active { scale: none !important; }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --color-text: #ffffff;
+          --color-text-secondary: rgba(255, 255, 255, 0.5);
+          --color-bg: #000000;
+          --color-surface: #0a0a0a;
+          --color-hairline: rgba(255, 255, 255, 0.16);
+          --color-hairline-strong: rgba(255, 255, 255, 0.24);
+          --color-fill-subtle: rgba(255, 255, 255, 0.06);
+          --color-divider: rgba(255, 255, 255, 0.1);
+          --color-accent-soft: rgba(252, 255, 40, 0.28);
+          --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+          --color-glass: rgba(0, 0, 0, 0.5);
+          --color-range-track: rgba(255, 255, 255, 0.24);
+          --color-gain-fill: rgba(48, 209, 88, 0.2);
+          --color-loss-fill: rgba(255, 69, 58, 0.2);
+          --color-fill-quiet: rgba(255, 255, 255, 0.1);
+          --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
+          --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
+          --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
+          --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
+        }
+      }
+
+      :root[data-theme="dark"] {
+        --color-text: #ffffff;
+        --color-text-secondary: rgba(255, 255, 255, 0.5);
+        --color-bg: #000000;
+        --color-surface: #0a0a0a;
+        --color-hairline: rgba(255, 255, 255, 0.16);
+        --color-hairline-strong: rgba(255, 255, 255, 0.24);
+        --color-fill-subtle: rgba(255, 255, 255, 0.06);
+        --color-divider: rgba(255, 255, 255, 0.1);
+        --color-accent-soft: rgba(252, 255, 40, 0.28);
+        --color-overlay-backdrop: rgba(0, 0, 0, 0.8);
+        --color-glass: rgba(0, 0, 0, 0.5);
+        --color-range-track: rgba(255, 255, 255, 0.24);
+        --color-gain-fill: rgba(48, 209, 88, 0.2);
+        --color-loss-fill: rgba(255, 69, 58, 0.2);
+        --color-fill-quiet: rgba(255, 255, 255, 0.1);
+        --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
+        --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
+        --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
+        --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
+      }
+
+      /* ============================================================
+         personal-styling · slider · v0.3.0 (copied from the library)
+         ============================================================ */
+      .slider-field { display: grid; gap: var(--space-8); }
+      .slider-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-8);
+      }
+      .slider-value { color: var(--color-text); }
+      .slider {
+        position: relative;
+        display: block;
+        height: 44px;
+        margin: calc((16px - 44px) / 2) 0;
+        touch-action: none;
+        overscroll-behavior-x: contain;
+      }
+      .slider-track {
+        position: absolute;
+        left: 0; right: 0;
+        top: calc(50% - 8px);
+        height: 16px;
+        border-radius: var(--radius-pill);
+        background: var(--color-range-track);
+        overflow: hidden;
+      }
+      .slider-progress {
+        position: absolute;
+        top: 0; bottom: 0; left: 0;
+        width: calc(16px + var(--slider-pct, 0) * (100% - 16px));
+        border-radius: var(--radius-pill);
+        background: var(--color-range-progress);
+        opacity: 0;
+        transition: opacity var(--duration-base) ease;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .slider:hover .slider-progress { opacity: var(--opacity-label-inactive); transition-duration: var(--duration-fast); }
+      }
+      .slider:has(.slider-input:focus-visible) .slider-progress { opacity: var(--opacity-label-inactive); transition-duration: var(--duration-fast); }
+      .slider.is-active .slider-track .slider-progress.slider-progress { opacity: 1; transition-duration: var(--duration-fast); }
+      .slider:has(.slider-input:disabled) .slider-progress { opacity: 0; }
+      .slider-input {
+        position: absolute;
+        top: 0; left: 2px;
+        width: calc(100% - 4px);
+        height: 100%;
+        margin: 0;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+      }
+      .slider-input:disabled { cursor: not-allowed; }
+      .slider:has(.slider-input:disabled) { opacity: var(--opacity-label-inactive); }
+      .slider-input:focus-visible { outline: none; }
+      .slider:has(.slider-input:focus-visible) .slider-track { outline: 2px solid var(--color-text); outline-offset: 2px; }
+      .slider-input::-webkit-slider-runnable-track { height: 44px; background: transparent; }
+      .slider-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px; height: 12px;
+        margin-top: calc((44px - 12px) / 2);
+        border: none;
+        border-radius: var(--radius-pill);
+        background: var(--color-range-thumb);
+        box-shadow: var(--shadow-range-thumb);
+        transition: transform var(--duration-base) var(--ease-out);
+      }
+      .slider-input::-moz-range-track { height: 44px; background: transparent; }
+      .slider-input::-moz-range-thumb {
+        width: 12px; height: 12px;
+        border: none;
+        border-radius: var(--radius-pill);
+        background: var(--color-range-thumb);
+        box-shadow: var(--shadow-range-thumb);
+        transition: transform var(--duration-base) var(--ease-out);
+      }
+      .slider.is-active .slider-input::-webkit-slider-thumb { transform: scale(var(--scale-press)); transition-duration: var(--duration-fast); }
+      .slider.is-active .slider-input::-moz-range-thumb { transform: scale(var(--scale-press)); transition-duration: var(--duration-fast); }
+
+      /* ============================================================
+         Page layout — canvas fills the whole screen, poster-style.
+         The stage is the viewport itself (100vw / 100dvh): no card
+         framing, border, or radius around it, so the wave line and
+         type use the full vertical space. The docked panel floats
+         over it and never resizes or reflows it.
+         ============================================================ */
+      html, body { height: 100%; }
+      body { overflow: hidden; }
+      main {
+        padding: 0;
+        max-width: none;
+        margin: 0;
+        width: 100vw;
+        height: 100dvh;
+      }
+
+      .tool {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .stage {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow: hidden;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        transition:
+          top var(--duration-deliberate) var(--ease-out),
+          right var(--duration-deliberate) var(--ease-out),
+          bottom var(--duration-deliberate) var(--ease-out),
+          left var(--duration-deliberate) var(--ease-out),
+          border-radius var(--duration-deliberate) var(--ease-out);
+      }
+      .stage canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        touch-action: none;
+      }
+      .stage canvas.can-drag { cursor: grab; }
+      .stage canvas.dragging { cursor: grabbing; }
+
+      /* Control panel — docked variant (control-panel v0.9.0,
+         .control-panel--docked): fixed to the bottom-right corner at
+         every width, floating over the full-screen canvas, never a
+         second column and never resizing the canvas. Closed it is a
+         pill only as wide as its label; open it is a 280px card that
+         grows upward from the corner, its fields stacked in one
+         column and scrolling inside itself when taller than the
+         screen. No handle/grabber — open and close via the
+         heading-row trigger only. touch-action: none keeps swipes
+         on the panel from navigating away mid-gesture.
+         Border-radius rule (tokens v0.12): a surface shorter than
+         --pill-below (60px) holds one row, so it is a pill; at or
+         above 60px it is a card. The collapsed pill corner is
+         --radius-row (30px — the finite half of --pill-below) and
+         the open card corner is --radius-card (20px), animating
+         between them on the accordion duration/ease. --radius-pill
+         (999px) is never used on this animating panel: it passes the
+         half-height cap at once and would snap instead of animating. */
+      .panel {
+        --pill-w: 150px;
+        position: fixed;
+        right: var(--space-16);
+        bottom: var(--space-16);
+        z-index: 50;
+        /* Width is always an explicit docked length — the pill width
+           (--pill-w, measured from the toggle in JS) closed, 280px
+           open — never max-content / 100% / 100vw. With the body
+           still in the tree during a close, max-content caps at the
+           viewport and the panel flashes full-width mid-animation;
+           an explicit target animates 280px -> pill in place. */
+        width: var(--pill-w);
+        max-width: 280px;
+        max-height: calc(100dvh - 32px);
+        overflow: hidden;
+        background: var(--color-glass);
+        -webkit-backdrop-filter: blur(var(--blur-surface));
+        backdrop-filter: blur(var(--blur-surface));
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-row);
+        box-shadow: var(--shadow-lift);
+        padding: 0 var(--space-16);
+        display: flex;
+        flex-direction: column;
+        touch-action: none;
+        overscroll-behavior: contain;
+        transition:
+          width var(--duration-deliberate) var(--ease-out),
+          border-radius var(--duration-deliberate) var(--ease-out),
+          padding-bottom var(--duration-deliberate) var(--ease-out);
+      }
+      .panel[data-open="true"] {
+        width: 280px;
+        border-radius: var(--radius-card);
+        padding-bottom: var(--space-16);
+      }
+      /* Boot / instant state changes never animate. */
+      .panel.no-transition, .panel.no-transition .panel-body-wrap,
+      .panel.no-transition .panel-body, .panel.no-transition .panel-chevron {
+        transition: none !important;
+      }
+      .panel-toggle {
+        display: flex;
+        align-items: center;
+        gap: var(--space-16);
+        width: 100%;
+        min-height: var(--height-row);
+        padding: var(--space-4) 0;
+        text-align: left;
+        border-radius: var(--radius-row);
+      }
+      .panel-toggle .t-label { flex: 1 1 auto; min-width: 0; }
+      /* Chevron points up while closed — the way the panel opens —
+         and rotates to point down while open. */
+      .panel-chevron {
+        flex: none;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-pill);
+        background: var(--color-fill-quiet);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform var(--duration-base) var(--ease-out), background var(--duration-fast) ease;
+      }
+      .panel-toggle:hover .panel-chevron { background: var(--color-fill-quiet-hover); }
+      .panel-chevron svg { width: 16px; height: 16px; display: block; }
+      .panel[data-open="true"] .panel-chevron { transform: rotate(180deg); }
+      .panel-body-wrap {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows var(--duration-deliberate) var(--ease-out);
+        /* The body keeps its open content width (280 - 32 padding)
+           for the whole animation, so it can never push the panel
+           wider as the panel's own width animates; the panel's
+           overflow: hidden clips it while it is narrower. */
+        width: 248px;
+        flex: none;
+        align-self: flex-start;
+      }
+      .panel[data-open="true"] .panel-body-wrap { grid-template-rows: 1fr; }
+      /* Once a close has settled (or when the panel starts closed),
+         the body leaves the tree entirely: the closed pill then sizes
+         to the heading row alone, and the hidden fields are not
+         rendered at all. Removed again before an open so the
+         grid-rows animation still runs. */
+      .panel.is-settled-closed .panel-body-wrap { display: none; }
+      .panel-body-clip { overflow: hidden; min-height: 0; }
+      .panel-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-24);
+        padding-top: var(--space-16);
+        width: 248px;
+        max-height: calc(100dvh - 130px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity var(--duration-base) ease, visibility 0s linear var(--duration-base);
+      }
+      /* Standalone playback / action row — Randomize and Animate
+         live here, apart from every property section. Both controls
+         share the pill-button height so their labels align. */
+      .action-row {
+        display: flex;
+        align-items: stretch;
+        gap: var(--space-8);
+      }
+      .action-row .button { flex: 1 1 0; padding: 0 var(--space-16); }
+      .action-row .button[aria-pressed="true"] {
+        background: var(--color-fill-subtle);
+        border-color: transparent;
+      }
+      .panel[data-open="true"] .panel-body {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity var(--duration-base) ease var(--duration-fast), visibility 0s;
+      }
+      .panel-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-16);
+        min-width: 0;
+      }
+      .panel-title { margin: 0; }
+
+      .input-field { display: grid; gap: var(--space-8); }
+      .text-input {
+        font-family: var(--font-display);
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.1px;
+        color: var(--color-text);
+        background: var(--color-surface);
+        border: 1px solid var(--color-hairline-strong);
+        border-radius: var(--radius-pill);
+        height: var(--height-row);
+        padding: 0 var(--space-16);
+        width: 100%;
+      }
+      .text-input:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+      .segmented {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        background: var(--color-surface);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-pill);
+        box-shadow: var(--shadow-rest);
+      }
+      .segmented button {
+        flex: 1 1 auto;
+        height: 36px;
+        padding: 0 var(--space-8);
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+      }
+      .segmented button[aria-pressed="true"] { background: var(--color-fill-subtle); }
+
+      .chip-row { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+      .chip {
+        height: 36px;
+        padding: 0 var(--space-16);
+        border: 1px solid var(--color-hairline-strong);
+        border-radius: var(--radius-pill);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-8);
+        transition: background var(--duration-fast) ease;
+      }
+      .chip[aria-pressed="true"] { background: var(--color-fill-subtle); border-color: transparent; }
+
+      .swatches { display: flex; gap: var(--space-8); align-items: center; }
+      .swatch {
+        width: 28px; height: 28px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--color-hairline-strong);
+        flex: none;
+      }
+      .swatch[aria-pressed="true"] { outline: 2px solid var(--color-text); outline-offset: 2px; }
+      .swatch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); }
+
+      .button {
+        height: var(--height-row);
+        padding: 0 var(--space-24);
+        border-radius: var(--radius-pill);
+        background: var(--color-surface);
+        border: 1px solid var(--color-hairline);
+        box-shadow: var(--shadow-rest);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow var(--duration-deliberate) ease, scale var(--duration-base) var(--ease-out);
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .button:hover { box-shadow: var(--shadow-lift); }
+      }
+      .button--primary { background: var(--color-text); border-color: transparent; }
+      .button--primary .t-control { color: var(--color-bg); }
+      .button--quiet {
+        background: none;
+        border-color: transparent;
+        box-shadow: none;
+        color: var(--color-text-secondary);
+      }
+      .button--quiet:hover { box-shadow: none; color: var(--color-text); }
+      .button--quiet .t-control { color: inherit; }
+      .export-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+      .export-row .button { flex: 1 1 auto; }
+      .export-row .button--quiet { flex: 0 0 auto; }
+
+
+      /* ============================================================
+         PROTOTYPE · stage and sheet (phones)
+         Opening the controls on a phone splits the screen into two
+         surfaces on a black ground: the stage shrinks into a card at
+         the top, the panel grows into a card below, 8px apart. The
+         gap says they are two surfaces. The stage's content re-fits
+         the smaller card, so nothing is covered while you adjust it.
+         The sheet's heading row resizes the split by drag, snapping
+         to set heights; a drag or flick down past the lowest closes
+         it. Above 630px the panel floats in the corner as before.
+         ============================================================ */
+      :root {
+        --color-split-ground: #000000;   /* the gap between the two surfaces, in both themes */
+        --split-gap: var(--space-8);
+        --sheet-h: 55vh;                 /* set by script from the snap points */
+      }
+      body { transition: background-color var(--duration-deliberate) var(--ease-out); }
+      @media (max-width: 630px) {
+        body.is-split { background: var(--color-split-ground); }
+        body.is-split .stage {
+          top: calc(var(--split-gap) + env(safe-area-inset-top, 0px));
+          left: var(--split-gap);
+          right: var(--split-gap);
+          bottom: calc(var(--sheet-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px));
+          border-radius: var(--radius-card);
+        }
+        /* Closed: the floating pill, its height fixed so it can animate. */
+        .panel {
+          height: calc(var(--height-row) + 2px);
+          max-height: none;
+          transition:
+            width var(--duration-deliberate) var(--ease-out),
+            height var(--duration-deliberate) var(--ease-out),
+            right var(--duration-deliberate) var(--ease-out),
+            bottom var(--duration-deliberate) var(--ease-out),
+            border-radius var(--duration-deliberate) var(--ease-out),
+            background-color var(--duration-deliberate) var(--ease-out),
+            box-shadow var(--duration-deliberate) var(--ease-out),
+            padding-bottom var(--duration-deliberate) var(--ease-out);
+        }
+        /* Open: the second surface, full width inside the gap. Solid,
+           because there is nothing behind it to see through. */
+        .panel[data-open="true"] {
+          width: calc(100vw - 2 * var(--split-gap));
+          max-width: none;
+          height: var(--sheet-h);
+          right: var(--split-gap);
+          bottom: calc(var(--split-gap) + env(safe-area-inset-bottom, 0px));
+          background: var(--color-surface);
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+          box-shadow: none;
+          touch-action: pan-y;           /* the sheet scrolls; only its heading row takes the drag */
+        }
+        .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: auto; align-self: stretch; }
+        /* The row is the sheet's height, not its content's, so the body scrolls. */
+        .panel[data-open="true"] .panel-body-wrap { grid-template-rows: minmax(0, 1fr); }
+        .panel-body-clip { height: 100%; }
+        .panel-body { width: auto; height: 100%; max-height: none; padding-bottom: var(--space-16); }
+        /* The heading row is the handle: drag to resize, tap to close. */
+        .panel[data-open="true"] .panel-toggle { cursor: grab; touch-action: none; }
+        body.is-resizing .panel-toggle { cursor: grabbing; }
+        /* While a finger drags the split, both surfaces follow it 1:1. */
+        body.is-resizing .stage,
+        body.is-resizing .panel { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body ontouchstart="">
+    <main>
+      <div class="tool">
+        <section class="stage" aria-label="Preview">
+          <canvas id="stage" width="1200" height="800"></canvas>
+        </section>
+      </div>
+    </main>
+
+    <aside class="panel" id="controlPanel" data-open="true" data-closed-below="630" aria-label="Controls">
+      <button type="button" class="panel-toggle" id="panelToggle" aria-expanded="true" aria-controls="panelBody">
+        <span class="t-label">Controls</span>
+        <span class="panel-chevron" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="panel-body-wrap">
+        <div class="panel-body-clip">
+          <div class="panel-body" id="panelBody">
+          <div class="panel-section panel-section--actions">
+            <div class="action-row">
+              <button type="button" class="button button--primary" id="randomizeBtn"><span class="t-control">Randomize</span></button>
+              <button type="button" class="button" id="animateChip" aria-pressed="false"><span class="t-control">Animate</span></button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h2 class="t-mono panel-title">Text</h2>
+            <div class="input-field">
+              <label class="t-label" for="textInput">Word or phrase</label>
+              <input class="text-input" id="textInput" type="text" value="Typography" maxlength="40" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="control-field">
+              <span class="t-label" id="fontLabel">Typeface</span>
+              <div class="segmented" role="group" aria-labelledby="fontLabel" id="fontSeg">
+                <button type="button" class="t-control" data-font="Archivo" aria-pressed="true">Archivo</button>
+                <button type="button" class="t-control" data-font="Anton" aria-pressed="false">Anton</button>
+                <button type="button" class="t-control" data-font="Playfair Display" aria-pressed="false">Serif</button>
+                <button type="button" class="t-control" data-font="Space Mono" aria-pressed="false">Mono</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h2 class="t-mono panel-title">Type</h2>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="weight">Weight</label>
+                <span class="t-mono slider-value" id="weightVal">900</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="weight" type="range" min="100" max="900" step="50" value="900" /></div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="size">Size</label>
+                <span class="t-mono slider-value" id="sizeVal">150</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="size" type="range" min="40" max="280" step="2" value="150" /></div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="spacing">Letter spacing</label>
+                <span class="t-mono slider-value" id="spacingVal">2</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="spacing" type="range" min="-20" max="80" step="1" value="2" /></div>
+            </div>
+          </div>
+
+          <div class="panel-section panel-section--path">
+            <h2 class="t-mono panel-title">Path</h2>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="curve">Curve</label>
+                <span class="t-mono slider-value" id="curveVal">150</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="curve" type="range" min="-240" max="240" step="2" value="150" /></div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="angle">Angle</label>
+                <span class="t-mono slider-value" id="angleVal">0°</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="angle" type="range" min="-180" max="180" step="1" value="0" /></div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="offset">Position on path</label>
+                <span class="t-mono slider-value" id="offsetVal">0</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="offset" type="range" min="-400" max="400" step="4" value="0" /></div>
+            </div>
+            <div class="chip-row">
+              <button type="button" class="chip t-control" id="flipChip" aria-pressed="false">Inside of curve</button>
+              <button type="button" class="chip t-control" id="guideChip" aria-pressed="true">Show path</button>
+            </div>
+            <p class="t-caption">Drag the dot on the canvas to bend the path directly.</p>
+          </div>
+
+          <div class="panel-section panel-section--path">
+            <h2 class="t-mono panel-title">Wave</h2>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="wavelength">Wavelength</label>
+                <span class="t-mono slider-value" id="wavelengthVal">1</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="wavelength" type="range" min="0.5" max="4" step="0.25" value="1" /></div>
+              <p class="t-caption">How many waves fit across the word.</p>
+            </div>
+            <div class="control-field">
+              <span class="t-label" id="waveformLabel">Waveform</span>
+              <div class="segmented" role="group" aria-labelledby="waveformLabel" id="waveformSeg">
+                <button type="button" class="t-control" data-waveform="sine" aria-pressed="true">Sine</button>
+                <button type="button" class="t-control" data-waveform="triangle" aria-pressed="false">Triangle</button>
+                <button type="button" class="t-control" data-waveform="square" aria-pressed="false">Square</button>
+                <button type="button" class="t-control" data-waveform="sawtooth" aria-pressed="false">Saw</button>
+              </div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="phase">Phase</label>
+                <span class="t-mono slider-value" id="phaseVal">0°</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="phase" type="range" min="-180" max="180" step="1" value="0" /></div>
+              <p class="t-caption">Slides the wave so the crest lands on a different letter.</p>
+            </div>
+            <div class="control-field">
+              <span class="t-label" id="envelopeLabel">Amplitude envelope</span>
+              <div class="segmented" role="group" aria-labelledby="envelopeLabel" id="envelopeSeg">
+                <button type="button" class="t-control" data-envelope="even" aria-pressed="true">Even</button>
+                <button type="button" class="t-control" data-envelope="grow" aria-pressed="false">Grow</button>
+                <button type="button" class="t-control" data-envelope="fade" aria-pressed="false">Fade</button>
+                <button type="button" class="t-control" data-envelope="peak" aria-pressed="false">Peak</button>
+              </div>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="interference">Second wave</label>
+                <span class="t-mono slider-value" id="interferenceVal">0%</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="interference" type="range" min="0" max="100" step="1" value="0" /></div>
+              <p class="t-caption">Layers a second, faster wave for a beating pattern.</p>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="sizePulse">Size pulse</label>
+                <span class="t-mono slider-value" id="sizePulseVal">0%</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="sizePulse" type="range" min="0" max="100" step="1" value="0" /></div>
+              <p class="t-caption">Letters grow on crests and shrink in troughs.</p>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="freqRamp">Frequency ramp</label>
+                <span class="t-mono slider-value" id="freqRampVal">0</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="freqRamp" type="range" min="-100" max="100" step="1" value="0" /></div>
+              <p class="t-caption">Positive tightens waves toward the end of the word.</p>
+            </div>
+            <div class="slider-field">
+              <div class="slider-head">
+                <label class="t-label" for="jitter">Noise / jitter</label>
+                <span class="t-mono slider-value" id="jitterVal">0%</span>
+              </div>
+              <div class="slider"><div class="slider-track"><div class="slider-progress"></div></div>
+                <input class="slider-input" id="jitter" type="range" min="0" max="100" step="1" value="0" /></div>
+              <p class="t-caption">A rough, hand-drawn wobble over the clean wave.</p>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h2 class="t-mono panel-title">Colour</h2>
+            <div class="swatch-row">
+              <span class="t-label">Background</span>
+              <div class="swatches" role="group" aria-label="Background colour" id="bgSwatches">
+                <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White background" aria-pressed="true"></button>
+                <button type="button" class="swatch" data-color="#000000" style="background:#000000" aria-label="Black background" aria-pressed="false"></button>
+                <button type="button" class="swatch" data-color="#FCFF28" style="background:#FCFF28" aria-label="Accent background" aria-pressed="false"></button>
+              </div>
+            </div>
+            <div class="swatch-row">
+              <span class="t-label">Ink</span>
+              <div class="swatches" role="group" aria-label="Ink colour" id="inkSwatches">
+                <button type="button" class="swatch" data-color="#000000" style="background:#000000" aria-label="Black ink" aria-pressed="true"></button>
+                <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White ink" aria-pressed="false"></button>
+                <button type="button" class="swatch" data-color="#FCFF28" style="background:#FCFF28" aria-label="Accent ink" aria-pressed="false"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section panel-section--export">
+            <div class="export-row">
+              <button type="button" class="button button--primary" id="pngBtn"><span class="t-control">Download PNG</span></button>
+              <button type="button" class="button" id="svgBtn"><span class="t-control">SVG</span></button>
+              <button type="button" class="button button--quiet" id="resetBtn"><span class="t-control">Reset</span></button>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <script>
+      (function () {
+        'use strict';
+
+        /* The poster fills the full-screen canvas (100vw / 100dvh),
+           but the composition lives in a reference space whose width
+           is always 1200: only the virtual height follows the screen
+           aspect (taller on a portrait phone, giving the poster its
+           vertical room). The whole layout — path span and the
+           absolute type size alike — is then scaled by one factor
+           (canvas CSS width / 1200), so the full word fits the
+           screen at phone widths and recentres/rescales on resize.
+           (Making the virtual width the raw viewport width shrank
+           the path span while the glyphs stayed 150px, clipping the
+           word on both edges at 390px.) */
+        var VW = 1200, VH = 800, CX = 600, CY = 400;
+        var CSSW = 1200, CSSH = 800;
+
+        function syncVirtualSize() {
+          var rect = null;
+          try { rect = canvas.getBoundingClientRect(); } catch (e) { rect = null; }
+          var w = (rect && rect.width) ? rect.width : (window.innerWidth || VW);
+          var h = (rect && rect.height) ? rect.height : (window.innerHeight || VH);
+          CSSW = Math.max(300, Math.round(w));
+          CSSH = Math.max(300, Math.round(h));
+          /* Fit the 1200 x 800 composition inside the stage: a short
+             stage (the split, with a tall sheet) widens the reference
+             space instead, so the word and its wave scale down whole
+             rather than running off the card. */
+          VW = Math.max(1200, Math.round(800 * CSSW / CSSH));
+          VH = Math.max(300, Math.round(VW * CSSH / CSSW));
+          CX = VW / 2;
+          CY = VH / 2;
+        }
+
+        /* The path keeps its 1000-unit span, centred however wide the
+           reference space gets. */
+        function pathMarginX() { return (VW - 1200) / 2 + 100; }
+        function pathSpanX() { return 1000; }
+
+        var DEFAULTS = {
+          text: 'Typography',
+          font: 'Archivo',
+          weight: 900,
+          size: 150,
+          spacing: 2,
+          shape: 'wave',
+          curve: 150,
+          angle: 0,
+          offset: 0,
+          wavelength: 1,
+          waveform: 'sine',
+          phase: 0,
+          envelope: 'even',
+          interference: 0,
+          sizePulse: 0,
+          freqRamp: 0,
+          jitter: 0,
+          animatePhase: false,
+          flip: false,
+          guide: true,
+          bg: '#ffffff',
+          ink: '#000000'
+        };
+        var state = {};
+        for (var k in DEFAULTS) state[k] = DEFAULTS[k];
+
+        var canvas = document.getElementById('stage');
+        var ctx = canvas.getContext('2d');
+        var measureCtx = document.createElement('canvas').getContext('2d');
+
+        function fontString(sizeOverride) {
+          var s = (typeof sizeOverride === 'number') ? sizeOverride : state.size;
+          return state.weight + ' ' + s + 'px "' + state.font + '"';
+        }
+
+        /* ---------- Wave engine ---------- */
+
+        var animPhaseCycles = 0;
+
+        function frac(x) { return x - Math.floor(x); }
+
+        function waveformValue(cycles) {
+          var f = frac(cycles);
+          if (state.waveform === 'triangle') {
+            if (f < 0.25) return 4 * f;
+            if (f < 0.75) return 2 - 4 * f;
+            return -4 + 4 * f;
+          }
+          if (state.waveform === 'square') {
+            var s = Math.sin(cycles * Math.PI * 2);
+            if (s > 0.3) return 1;
+            if (s < -0.3) return -1;
+            return s / 0.3;
+          }
+          if (state.waveform === 'sawtooth') {
+            return 2 * frac(cycles + 0.5) - 1;
+          }
+          return Math.sin(cycles * Math.PI * 2);
+        }
+
+        function envelopeAt(t) {
+          if (state.envelope === 'grow') return 0.15 + 0.85 * t;
+          if (state.envelope === 'fade') return 1 - 0.85 * t;
+          if (state.envelope === 'peak') return 0.15 + 0.85 * (1 - Math.pow(2 * t - 1, 2));
+          return 1;
+        }
+
+        /* Phase in cycles at t, integrating the frequency ramp so the
+           total cycle count across the word stays = wavelength. */
+        function phaseCyclesAt(t) {
+          var r = state.freqRamp / 100;
+          var integral = state.wavelength * (t + r * (t * t - t));
+          return integral + state.phase / 360 + animPhaseCycles;
+        }
+
+        /* Combined wave value at t (no jitter): primary waveform +
+           second-wave interference, shaped by the envelope. */
+        function waveAt(t) {
+          var cycles = phaseCyclesAt(t);
+          var primary = waveformValue(cycles);
+          var amt = state.interference / 100;
+          var second = 0;
+          if (amt > 0) {
+            var r2 = state.freqRamp / 100;
+            var integral = state.wavelength * (t + r2 * (t * t - t));
+            second = Math.sin((integral * 1.83 + 0.33 + state.phase / 360 + animPhaseCycles) * Math.PI * 2);
+          }
+          return (primary + amt * second) * envelopeAt(t);
+        }
+
+        function hashNoise(i) {
+          var s = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+          return (s - Math.floor(s)) * 2 - 1;
+        }
+        function noiseAt(t) {
+          var grid = 28, x = t * grid, i = Math.floor(x), f = x - i;
+          var u = f * f * (3 - 2 * f);
+          return hashNoise(i) + (hashNoise(i + 1) - hashNoise(i)) * u;
+        }
+
+        /* ---------- Path sampling ---------- */
+
+        function rawPoint(t) {
+          var y = CY - state.curve * waveAt(t) + noiseAt(t) * (state.jitter / 100) * 36;
+          return { x: pathMarginX() + pathSpanX() * t, y: y };
+        }
+
+        var sampler = null;
+        function buildSampler() {
+          var N = 800, pts = [], cum = [0], total = 0, i, p, q, d;
+          for (i = 0; i <= N; i++) pts.push(rawPoint(i / N));
+          for (i = 1; i <= N; i++) {
+            d = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+            total += d;
+            cum.push(total);
+          }
+          sampler = { pts: pts, cum: cum, total: total, n: N };
+        }
+
+        function pointAt(dist) {
+          var pts = sampler.pts, cum = sampler.cum, total = sampler.total, n = sampler.n;
+          var i, t, a, b, ang;
+          if (dist <= 0) {
+            a = pts[0]; b = pts[1];
+            ang = Math.atan2(b.y - a.y, b.x - a.x);
+            return { x: a.x + Math.cos(ang) * dist, y: a.y + Math.sin(ang) * dist, ang: ang };
+          }
+          if (dist >= total) {
+            a = pts[n - 1]; b = pts[n];
+            ang = Math.atan2(b.y - a.y, b.x - a.x);
+            return { x: b.x + Math.cos(ang) * (dist - total), y: b.y + Math.sin(ang) * (dist - total), ang: ang };
+          }
+          var lo = 0, hi = n;
+          while (lo < hi) {
+            var mid = (lo + hi) >> 1;
+            if (cum[mid] < dist) lo = mid + 1; else hi = mid;
+          }
+          i = Math.max(1, lo);
+          var segLen = cum[i] - cum[i - 1] || 1;
+          t = (dist - cum[i - 1]) / segLen;
+          a = pts[i - 1]; b = pts[i];
+          ang = Math.atan2(b.y - a.y, b.x - a.x);
+          return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, ang: ang };
+        }
+
+        function rotateAround(p, rad) {
+          var cos = Math.cos(rad), sin = Math.sin(rad);
+          var dx = p.x - CX, dy = p.y - CY;
+          return { x: CX + dx * cos - dy * sin, y: CY + dx * sin + dy * cos };
+        }
+
+        /* ---------- Layout: one glyph placement list, shared by canvas + SVG ---------- */
+
+        function computeLayout() {
+          buildSampler();
+          var glyphs = [];
+          var text = state.text;
+          if (!text) return { glyphs: glyphs, path: sampler.pts.slice() };
+          measureCtx.font = fontString();
+          var chars = text.split('');
+          var widths = chars.map(function (ch) { return measureCtx.measureText(ch).width; });
+          var total = 0, i;
+          for (i = 0; i < widths.length; i++) total += widths[i];
+          if (chars.length > 1) total += state.spacing * (chars.length - 1);
+          var start = (sampler.total - total) / 2 + state.offset;
+          var rot = state.angle * Math.PI / 180;
+          var acc = 0;
+          for (i = 0; i < chars.length; i++) {
+            var d = start + acc + widths[i] / 2;
+            var p;
+            if (state.flip) {
+              p = pointAt(sampler.total - d);
+              p = { x: p.x, y: p.y, ang: p.ang + Math.PI };
+            } else {
+              p = pointAt(d);
+            }
+            var rp = rotateAround(p, rot);
+            var tApprox = Math.max(0, Math.min(1, (p.x - pathMarginX()) / pathSpanX()));
+            var wv = waveAt(tApprox);
+            if (wv > 1.6) wv = 1.6; if (wv < -1.6) wv = -1.6;
+            var scale = 1 + (state.sizePulse / 100) * wv * 0.5;
+            if (scale < 0.35) scale = 0.35;
+            glyphs.push({ ch: chars[i], x: rp.x, y: rp.y, ang: p.ang + rot, scale: scale });
+            acc += widths[i] + state.spacing;
+          }
+          var pathPts = sampler.pts.map(function (pt) { return rotateAround(pt, rot); });
+          return { glyphs: glyphs, path: pathPts };
+        }
+
+        function handlePoint() {
+          var p = rawPoint(0.25);
+          var rp = rotateAround(p, state.angle * Math.PI / 180);
+          rp.raw = p;
+          return rp;
+        }
+
+        /* ---------- Drawing ---------- */
+
+        function draw(targetCtx, scale) {
+          var layout = computeLayout();
+          targetCtx.save();
+          targetCtx.scale(scale, scale);
+          targetCtx.fillStyle = state.bg;
+          targetCtx.fillRect(0, 0, VW, VH);
+
+          if (state.guide) {
+            targetCtx.beginPath();
+            layout.path.forEach(function (pt, i) {
+              if (i === 0) targetCtx.moveTo(pt.x, pt.y); else targetCtx.lineTo(pt.x, pt.y);
+            });
+            targetCtx.save();
+            targetCtx.globalAlpha = 0.35;
+            targetCtx.strokeStyle = state.ink;
+            targetCtx.lineWidth = 1.5;
+            targetCtx.setLineDash([6, 6]);
+            targetCtx.stroke();
+            targetCtx.restore();
+
+            var h = handlePoint();
+            if (h) {
+              targetCtx.beginPath();
+              targetCtx.arc(h.x, h.y, 11, 0, Math.PI * 2);
+              targetCtx.fillStyle = state.bg;
+              targetCtx.fill();
+              targetCtx.lineWidth = 2;
+              targetCtx.strokeStyle = state.ink;
+              targetCtx.stroke();
+              targetCtx.beginPath();
+              targetCtx.arc(h.x, h.y, 3, 0, Math.PI * 2);
+              targetCtx.fillStyle = state.ink;
+              targetCtx.fill();
+            }
+          }
+
+          targetCtx.fillStyle = state.ink;
+          targetCtx.textAlign = 'center';
+          targetCtx.textBaseline = 'middle';
+          layout.glyphs.forEach(function (g) {
+            targetCtx.save();
+            targetCtx.translate(g.x, g.y);
+            targetCtx.rotate(g.ang);
+            targetCtx.font = fontString(state.size * (g.scale || 1));
+            targetCtx.fillText(g.ch, 0, 0);
+            targetCtx.restore();
+          });
+          targetCtx.restore();
+          return layout;
+        }
+
+        function render() {
+          syncVirtualSize();
+          var dpr = window.devicePixelRatio || 1;
+          canvas.width = Math.round(CSSW * dpr);
+          canvas.height = Math.round(CSSH * dpr);
+          draw(ctx, canvas.width / VW);
+          updateDragCursor();
+        }
+
+        /* ---------- Controls wiring ---------- */
+
+        function $(id) { return document.getElementById(id); }
+
+        function setSliderFill(input) {
+          var pct = (parseFloat(input.value) - parseFloat(input.min)) / (parseFloat(input.max) - parseFloat(input.min));
+          input.closest('.slider').style.setProperty('--slider-pct', pct);
+        }
+
+        function bindSlider(id, valId, fmt, apply) {
+          var input = $(id), val = $(valId);
+          function update() {
+            setSliderFill(input);
+            val.textContent = fmt(parseFloat(input.value));
+            apply(parseFloat(input.value));
+            render();
+          }
+          input.addEventListener('input', update);
+          var wrap = input.closest('.slider');
+          input.addEventListener('pointerdown', function () { wrap.classList.add('is-active'); });
+          window.addEventListener('pointerup', function () { wrap.classList.remove('is-active'); });
+          input.addEventListener('keydown', function () { wrap.classList.add('is-active'); });
+          input.addEventListener('keyup', function () { wrap.classList.remove('is-active'); });
+          input.addEventListener('blur', function () { wrap.classList.remove('is-active'); });
+          setSliderFill(input);
+          return { input: input, refresh: function () { input.value = state[keyOf(id)]; setSliderFill(input); val.textContent = fmt(parseFloat(input.value)); } };
+        }
+        function keyOf(id) { return id; }
+
+        var sliders = {};
+        sliders.weight = bindSlider('weight', 'weightVal', function (v) { return String(v); }, function (v) { state.weight = v; ensureFont(); });
+        sliders.size = bindSlider('size', 'sizeVal', function (v) { return String(v); }, function (v) { state.size = v; });
+        sliders.spacing = bindSlider('spacing', 'spacingVal', function (v) { return String(v); }, function (v) { state.spacing = v; });
+        sliders.curve = bindSlider('curve', 'curveVal', function (v) { return String(v); }, function (v) { state.curve = v; });
+        sliders.angle = bindSlider('angle', 'angleVal', function (v) { return v + '°'; }, function (v) { state.angle = v; });
+        sliders.offset = bindSlider('offset', 'offsetVal', function (v) { return String(v); }, function (v) { state.offset = v; });
+        sliders.wavelength = bindSlider('wavelength', 'wavelengthVal', function (v) { return String(v); }, function (v) { state.wavelength = v; });
+        sliders.phase = bindSlider('phase', 'phaseVal', function (v) { return v + '°'; }, function (v) { state.phase = v; });
+        sliders.interference = bindSlider('interference', 'interferenceVal', function (v) { return v + '%'; }, function (v) { state.interference = v; });
+        sliders.sizePulse = bindSlider('sizePulse', 'sizePulseVal', function (v) { return v + '%'; }, function (v) { state.sizePulse = v; });
+        sliders.freqRamp = bindSlider('freqRamp', 'freqRampVal', function (v) { return String(v); }, function (v) { state.freqRamp = v; });
+        sliders.jitter = bindSlider('jitter', 'jitterVal', function (v) { return v + '%'; }, function (v) { state.jitter = v; });
+
+        $('textInput').addEventListener('input', function (e) {
+          state.text = e.target.value;
+          render();
+        });
+
+        function bindSegmented(id, attr, apply) {
+          var group = $(id);
+          group.addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            group.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+            btn.setAttribute('aria-pressed', 'true');
+            apply(btn.getAttribute(attr));
+            render();
+          });
+          return group;
+        }
+        var fontSeg = bindSegmented('fontSeg', 'data-font', function (v) { state.font = v; ensureFont(); });
+        var waveformSeg = bindSegmented('waveformSeg', 'data-waveform', function (v) { state.waveform = v; });
+        var envelopeSeg = bindSegmented('envelopeSeg', 'data-envelope', function (v) { state.envelope = v; });
+
+        function bindChip(id, apply) {
+          var chip = $(id);
+          chip.addEventListener('click', function () {
+            var on = chip.getAttribute('aria-pressed') !== 'true';
+            chip.setAttribute('aria-pressed', String(on));
+            apply(on);
+            render();
+          });
+          return chip;
+        }
+        var flipChip = bindChip('flipChip', function (on) { state.flip = on; });
+        var guideChip = bindChip('guideChip', function (on) { state.guide = on; });
+
+        /* Phase animation — ripples the wave by advancing phase over time. */
+        var animRaf = null, animLast = null;
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function animTick(ts) {
+          if (!state.animatePhase) { animRaf = null; return; }
+          if (animLast == null) animLast = ts;
+          var dt = Math.min(100, ts - animLast);
+          animLast = ts;
+          animPhaseCycles += dt / 1000 * 0.3;
+          render();
+          animRaf = requestAnimationFrame(animTick);
+        }
+        function startAnim() {
+          if (reduceMotion || animRaf != null) return;
+          animLast = null;
+          animRaf = requestAnimationFrame(animTick);
+        }
+        function stopAnim() {
+          if (animRaf != null) cancelAnimationFrame(animRaf);
+          animRaf = null; animLast = null;
+        }
+        var animateChip = bindChip('animateChip', function (on) {
+          state.animatePhase = on;
+          if (on) startAnim(); else stopAnim();
+        });
+
+        function bindSwatches(id, apply) {
+          var group = $(id);
+          group.addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            group.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+            btn.setAttribute('aria-pressed', 'true');
+            apply(btn.getAttribute('data-color'));
+            render();
+          });
+          return group;
+        }
+        var bgSw = bindSwatches('bgSwatches', function (c) { state.bg = c; });
+        var inkSw = bindSwatches('inkSwatches', function (c) { state.ink = c; });
+
+        function setPressed(group, attr, value) {
+          group.querySelectorAll('button').forEach(function (b) {
+            b.setAttribute('aria-pressed', String(b.getAttribute(attr) === String(value)));
+          });
+        }
+
+        /* ---------- Randomize — wave / path properties only ----------
+           Randomizes wavelength, waveform, phase, amplitude envelope,
+           second-wave interference, size pulse, frequency ramp,
+           noise/jitter, curve depth, angle, position on path, and the
+           inside-of-curve flip. It deliberately leaves TEXT (the typed
+           word/phrase), TYPE (typeface, size, weight, letter spacing),
+           background/ink colours, and the Animate on/off state alone. */
+        function randInt(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
+        function pickOne(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+        function randomizeWave() {
+          state.wavelength = 0.5 + Math.floor(Math.random() * 15) * 0.25;
+          state.waveform = pickOne(['sine', 'triangle', 'square', 'sawtooth']);
+          state.phase = randInt(-180, 180);
+          state.envelope = pickOne(['even', 'grow', 'fade', 'peak']);
+          state.interference = randInt(0, 100);
+          state.sizePulse = randInt(0, 100);
+          state.freqRamp = randInt(-100, 100);
+          state.jitter = randInt(0, 100);
+          state.curve = randInt(-120, 120) * 2;
+          state.angle = randInt(-180, 180);
+          state.offset = randInt(-100, 100) * 4;
+          state.flip = Math.random() < 0.5;
+          ['curve', 'angle', 'offset', 'wavelength', 'phase', 'interference', 'sizePulse', 'freqRamp', 'jitter'].forEach(function (id) { sliders[id].refresh(); });
+          setPressed(waveformSeg, 'data-waveform', state.waveform);
+          setPressed(envelopeSeg, 'data-envelope', state.envelope);
+          flipChip.setAttribute('aria-pressed', String(state.flip));
+          render();
+        }
+        $('randomizeBtn').addEventListener('click', randomizeWave);
+
+        /* ---------- Canvas drag handle ---------- */
+
+        var dragging = false;
+
+        function toVirtual(e) {
+          var rect = canvas.getBoundingClientRect();
+          return {
+            x: (e.clientX - rect.left) / rect.width * VW,
+            y: (e.clientY - rect.top) / rect.height * VH
+          };
+        }
+        function unrotate(p) {
+          var rad = -state.angle * Math.PI / 180;
+          var cos = Math.cos(rad), sin = Math.sin(rad);
+          var dx = p.x - CX, dy = p.y - CY;
+          return { x: CX + dx * cos - dy * sin, y: CY + dx * sin + dy * cos };
+        }
+        function nearHandle(e) {
+          if (!state.guide) return false;
+          var h = handlePoint();
+          if (!h) return false;
+          var p = toVirtual(e);
+          return Math.hypot(p.x - h.x, p.y - h.y) < 34;
+        }
+        function updateDragCursor() {
+          canvas.classList.toggle('can-drag', !!handlePoint() && state.guide);
+        }
+        canvas.addEventListener('pointerdown', function (e) {
+          if (nearHandle(e)) {
+            dragging = true;
+            canvas.classList.add('dragging');
+            canvas.setPointerCapture(e.pointerId);
+            dragTo(e);
+          }
+        });
+        canvas.addEventListener('pointermove', function (e) {
+          if (dragging) dragTo(e);
+        });
+        canvas.addEventListener('pointerup', function () {
+          dragging = false;
+          canvas.classList.remove('dragging');
+        });
+        canvas.addEventListener('pointercancel', function () {
+          dragging = false;
+          canvas.classList.remove('dragging');
+        });
+
+        function dragTo(e) {
+          var p = unrotate(toVirtual(e));
+          var w = waveAt(0.25);
+          var c = (Math.abs(w) < 0.25) ? (CY - p.y) : (CY - p.y) / w;
+          c = Math.max(-240, Math.min(240, Math.round(c / 2) * 2));
+          state.curve = c;
+          sliders.curve.input.value = c;
+          setSliderFill(sliders.curve.input);
+          $('curveVal').textContent = String(c);
+          render();
+        }
+
+        /* ---------- Export ---------- */
+
+        function slug() {
+          var s = (state.text || 'type').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          return s || 'type';
+        }
+        function download(url, name) {
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+
+        $('pngBtn').addEventListener('click', function () {
+          var out = document.createElement('canvas');
+          out.width = VW * 2;
+          out.height = VH * 2;
+          var octx = out.getContext('2d');
+          var keepGuide = state.guide;
+          state.guide = false;
+          draw(octx, 2);
+          state.guide = keepGuide;
+          render();
+          out.toBlob(function (blob) {
+            var url = URL.createObjectURL(blob);
+            download(url, slug() + '-on-a-path.png');
+            setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+          }, 'image/png');
+        });
+
+        function esc(s) {
+          return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        $('svgBtn').addEventListener('click', function () {
+          var layout = computeLayout();
+          var parts = [];
+          parts.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + VW + ' ' + VH + '" width="' + VW + '" height="' + VH + '">');
+          parts.push('<rect width="' + VW + '" height="' + VH + '" fill="' + state.bg + '"/>');
+          layout.glyphs.forEach(function (g) {
+            var deg = g.ang * 180 / Math.PI;
+            parts.push('<text x="0" y="0" font-family="' + esc(state.font) + '" font-weight="' + state.weight + '" font-size="' + (state.size * (g.scale || 1)).toFixed(1) + '" fill="' + state.ink + '" text-anchor="middle" dominant-baseline="middle" transform="translate(' + g.x.toFixed(1) + ' ' + g.y.toFixed(1) + ') rotate(' + deg.toFixed(2) + ')">' + esc(g.ch) + '</text>');
+          });
+          parts.push('</svg>');
+          var blob = new Blob([parts.join('\n')], { type: 'image/svg+xml' });
+          var url = URL.createObjectURL(blob);
+          download(url, slug() + '-on-a-path.svg');
+          setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        });
+
+        $('resetBtn').addEventListener('click', function () {
+          stopAnim();
+          animPhaseCycles = 0;
+          for (var key in DEFAULTS) state[key] = DEFAULTS[key];
+          $('textInput').value = state.text;
+          ['weight', 'size', 'spacing', 'curve', 'angle', 'offset', 'wavelength', 'phase', 'interference', 'sizePulse', 'freqRamp', 'jitter'].forEach(function (id) { sliders[id].refresh(); });
+          setPressed(fontSeg, 'data-font', state.font);
+          setPressed(waveformSeg, 'data-waveform', state.waveform);
+          setPressed(envelopeSeg, 'data-envelope', state.envelope);
+          flipChip.setAttribute('aria-pressed', 'false');
+          guideChip.setAttribute('aria-pressed', 'true');
+          animateChip.setAttribute('aria-pressed', 'false');
+          setPressed(bgSw, 'data-color', state.bg);
+          setPressed(inkSw, 'data-color', state.ink);
+          ensureFont();
+          render();
+        });
+
+        /* ---------- Docked control panel: open / close ----------
+           Starts closed below the width named by data-closed-below
+           (630px — phones), open at and above it. */
+
+        var panel = $('controlPanel');
+        var panelToggle = $('panelToggle');
+        var closeTimer = null;
+
+        /* The closed pill width is an explicit length, measured from
+           a hidden auto-width clone of the toggle (label + gap +
+           chevron) plus the panel's own horizontal padding and
+           border. The width transition therefore runs between two
+           fixed docked lengths — 280px open, this pill width closed —
+           at every frame, whatever the body is doing. */
+        function measurePillWidth() {
+          var clone = panelToggle.cloneNode(true);
+          clone.removeAttribute('id');
+          clone.style.position = 'absolute';
+          clone.style.visibility = 'hidden';
+          clone.style.width = 'auto';
+          clone.style.minHeight = '0';
+          panel.appendChild(clone);
+          var w = clone.offsetWidth + 34;
+          clone.remove();
+          if (w > 80 && w < 280) panel.style.setProperty('--pill-w', w + 'px');
+        }
+
+        /* ---------- Stage and sheet (phones) ---------- */
+        var phone = window.matchMedia('(max-width: 630px)');
+        var SNAPS = [0.4, 0.55, 0.75];      /* sheet heights, as a share of the screen */
+        var CLOSE_BELOW = 0.28;             /* let go lower than this and it closes */
+        var MIN_H = 0.2, MAX_H = 0.85;
+        var FLICK = 0.6;                    /* px per ms */
+        var sheetFrac = SNAPS[1];
+        function setSheet(frac) {
+          sheetFrac = Math.max(MIN_H, Math.min(MAX_H, frac));
+          document.documentElement.style.setProperty('--sheet-h', (sheetFrac * window.innerHeight) + 'px');
+        }
+        setSheet(sheetFrac);
+
+        function setPanelOpen(open, instant) {
+          if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+          document.body.classList.toggle('is-split', open);
+          if (instant) panel.classList.add('no-transition');
+          if (open) {
+            panel.classList.remove('is-settled-closed');
+            /* Reflow so the grid-rows transition runs from 0fr. */
+            void panel.offsetWidth;
+            panel.setAttribute('data-open', 'true');
+            panelToggle.setAttribute('aria-expanded', 'true');
+          } else {
+            panel.setAttribute('data-open', 'false');
+            panelToggle.setAttribute('aria-expanded', 'false');
+            if (instant) {
+              panel.classList.add('is-settled-closed');
+            } else {
+              closeTimer = setTimeout(function () {
+                if (panel.getAttribute('data-open') !== 'true') {
+                  panel.classList.add('is-settled-closed');
+                }
+              }, 500);
+            }
+          }
+          if (instant) {
+            /* Force the instant state to settle before transitions
+               are re-enabled, so the boot state never animates. */
+            void panel.offsetWidth;
+            panel.classList.remove('no-transition');
+          }
+        }
+        var sheetDrag = null, suppressClick = false;
+        panelToggle.addEventListener('pointerdown', function (e) {
+          suppressClick = false;   /* a drag that ended without a click mustn't swallow this tap */
+          if (!phone.matches || panel.getAttribute('data-open') !== 'true') return;
+          sheetDrag = { y: e.clientY, frac: sheetFrac, moved: false, lastY: e.clientY, lastT: performance.now(), v: 0 };
+          panelToggle.setPointerCapture(e.pointerId);
+        });
+        panelToggle.addEventListener('pointermove', function (e) {
+          if (!sheetDrag) return;
+          var dy = e.clientY - sheetDrag.y;
+          if (!sheetDrag.moved && Math.abs(dy) < 6) return;   /* still a tap */
+          sheetDrag.moved = true;
+          document.body.classList.add('is-resizing');
+          var now = performance.now();
+          sheetDrag.v = (e.clientY - sheetDrag.lastY) / Math.max(1, now - sheetDrag.lastT);
+          sheetDrag.lastY = e.clientY; sheetDrag.lastT = now;
+          setSheet(sheetDrag.frac - dy / window.innerHeight);
+        });
+        function endSheetDrag() {
+          if (!sheetDrag) return;
+          var d = sheetDrag; sheetDrag = null;
+          document.body.classList.remove('is-resizing');
+          if (!d.moved) return;
+          suppressClick = true;
+          if (sheetFrac < CLOSE_BELOW || d.v > FLICK) { setPanelOpen(false); setSheet(SNAPS[1]); return; }
+          /* A flick up goes to the next snap; otherwise the nearest. */
+          var target = SNAPS.reduce(function (a, b) { return Math.abs(b - sheetFrac) < Math.abs(a - sheetFrac) ? b : a; });
+          if (d.v < -FLICK) target = SNAPS.filter(function (s) { return s > d.frac + 0.01; })[0] || SNAPS[SNAPS.length - 1];
+          setSheet(target);
+        }
+        panelToggle.addEventListener('pointerup', endSheetDrag);
+        panelToggle.addEventListener('pointercancel', endSheetDrag);
+        panelToggle.addEventListener('click', function () {
+          if (suppressClick) { suppressClick = false; return; }
+          setPanelOpen(panel.getAttribute('data-open') !== 'true');
+        });
+        window.addEventListener('resize', function () { setSheet(sheetFrac); });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && panel.getAttribute('data-open') === 'true') {
+            setPanelOpen(false);
+            panelToggle.focus();
+          }
+        });
+        measurePillWidth();
+        var closedBelow = parseInt(panel.getAttribute('data-closed-below'), 10);
+        if (!isNaN(closedBelow)) {
+          var startOpen = window.innerWidth >= closedBelow;
+          setPanelOpen(startOpen, !startOpen);
+        }
+
+        /* ---------- Fonts + boot ---------- */
+
+        var fontTimer = null;
+        function ensureFont() {
+          if (!document.fonts || !document.fonts.load) return;
+          var spec = state.weight + ' ' + state.size + 'px "' + state.font + '"';
+          document.fonts.load(spec, state.text || 'Typography').then(function () { render(); });
+          clearTimeout(fontTimer);
+          fontTimer = setTimeout(render, 350);
+        }
+
+        /* The stage's box changes on every frame of the split, so the
+           poster re-fits as it moves, once per frame. */
+        var renderFrame = 0;
+        new ResizeObserver(function () {
+          cancelAnimationFrame(renderFrame);
+          renderFrame = requestAnimationFrame(render);
+        }).observe(document.querySelector('.stage'));
+
+        render();
+        ensureFont();
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+          /* The UI font loading can change the label's natural
+             width; re-measure the pill before rendering. */
+          measurePillWidth();
+          render();
+        });
+      })();
+    </script>
+  </body>
+</html>
