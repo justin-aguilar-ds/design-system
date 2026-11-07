@@ -328,15 +328,18 @@
          one gap apart on every frame and can never overlap. */
       .stage {
         position: fixed;
-        top: calc(var(--split) * (var(--split-gap) + env(safe-area-inset-top, 0px)));
-        left: calc(var(--split) * var(--split-gap));
-        right: calc(var(--split) * var(--split-gap));
+        top: calc(var(--split) * (var(--surface-inset) + env(safe-area-inset-top, 0px)));
+        left: calc(var(--split) * var(--surface-inset));
+        right: calc(var(--split) * var(--surface-inset));
         /* One gap above the sheet, less whatever hasn't separated yet:
-           merged, that's exactly the closed bar over a full-bleed stage,
-           so the overlap never exceeds the bar's own height. */
-        bottom: calc(var(--sheet-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px)
-                     - (1 - var(--split)) * (var(--bar-h) + 2 * var(--split-gap) + env(safe-area-inset-bottom, 0px)));
-        border-radius: calc(var(--split) * var(--radius-card));
+           merged, that's exactly the closed pill over a full-bleed stage. */
+        bottom: calc(var(--split) * (var(--surface-inset) + var(--split-gap) + env(safe-area-inset-bottom, 0px))
+                     + var(--sheet-h) - (1 - var(--split)) * var(--bar-h));
+        /* Inset: every corner rounds. Full width: only the corners that
+           face the sheet. */
+        border-radius:
+          calc(var(--split) * var(--stage-top-radius)) calc(var(--split) * var(--stage-top-radius))
+          calc(var(--split) * var(--radius-card)) calc(var(--split) * var(--radius-card));
         overflow: hidden;
         border: none;
         background: transparent;
@@ -605,12 +608,23 @@
         --bar-h: calc(var(--height-row) + 2px);
         --split: 0;
         --sheet-h: var(--bar-h);
+        /* Surfaces: inset (8px from every edge, all corners round) or
+           full width (edge to edge, only the facing corners round). */
+        --surface-inset: var(--split-gap);
+        --stage-top-radius: var(--radius-card);
+        --sheet-bottom-radius: var(--radius-card);
+
         /* Both surfaces, one move. */
         transition:
           --split var(--duration-deliberate) var(--ease-out),
           --sheet-h var(--duration-deliberate) var(--ease-out);
       }
       :root.is-resizing { transition: none; }
+      :root[data-surfaces="full"] { --surface-inset: 0px; --stage-top-radius: 0px; --sheet-bottom-radius: 0px; }
+      /* Where the closed pill sits: its left and right edges. Worked out
+         on the panel, where its measured --pill-w lives. */
+      .panel { --pill-left: calc(100vw - var(--space-16) - var(--pill-w)); --pill-right: var(--space-16); }
+      :root[data-pill="center"] .panel { --pill-left: calc((100vw - var(--pill-w)) / 2); --pill-right: calc((100vw - var(--pill-w)) / 2); }
 
       @media (max-width: 630px) {
         :root.is-ground body { background: var(--color-split-ground); }
@@ -618,17 +632,22 @@
         /* The sheet's whole box comes from the same two values as the
            stage (--split, --sheet-h), so the two surfaces are one shape
            changing on every frame. No width of its own to animate, and
-           no max-width to snap to: closed, its left edge sits a pill's
-           width from the right; open, a gap from the left. */
+           no max-width to snap to: closed, its edges are the pill's
+           (right or centre); open, the surface inset (8px, or 0 at full
+           width). */
         .panel {
-          left: calc(var(--split) * var(--split-gap) + (1 - var(--split)) * (100vw - var(--space-16) - var(--pill-w)));
-          right: calc(var(--space-16) - var(--split) * (var(--space-16) - var(--split-gap)));
-          bottom: calc(var(--space-16) - var(--split) * (var(--space-16) - var(--split-gap)) + env(safe-area-inset-bottom, 0px));
+          left: calc(var(--split) * var(--surface-inset) + (1 - var(--split)) * var(--pill-left));
+          right: calc(var(--split) * var(--surface-inset) + (1 - var(--split)) * var(--pill-right));
+          bottom: calc(var(--split) * var(--surface-inset) + (1 - var(--split)) * var(--space-16) + env(safe-area-inset-bottom, 0px));
           width: auto;
           max-width: none;
           height: var(--sheet-h);
           max-height: none;
-          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
+          border-radius:
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)));
           padding-bottom: 0;
           /* One material from pill to sheet: the solid surface. Glass
              would turn grey over the ground as the sheet closes. */
@@ -640,7 +659,11 @@
         .panel[data-open="true"] {
           width: auto;
           max-width: none;
-          border-radius: calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)));
+          border-radius:
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--radius-card)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)))
+            calc(var(--radius-row) - var(--split) * (var(--radius-row) - var(--sheet-bottom-radius)));
           box-shadow: none;
           touch-action: pan-y;
           padding-bottom: 0;
@@ -648,10 +671,11 @@
         /* The controls keep the open sheet's width, so the moving edge
            never re-flows them. They leave fast on close, before the edge
            reaches them, and arrive just behind the edge on open. */
-        .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: calc(100vw - 2 * var(--split-gap) - 2 * var(--space-16)); align-self: flex-start; grid-template-rows: minmax(0, 1fr); transition: none; }
+        .panel-body-wrap { flex: 1 1 auto; min-height: 0; width: calc(100vw - 2 * var(--surface-inset) - 2 * var(--space-16)); align-self: flex-start; grid-template-rows: minmax(0, 1fr); transition: none; }
         .panel-body-clip { height: 100%; }
         .panel-body { width: 100%; height: 100%; max-height: none; padding-bottom: var(--space-16); transition: opacity var(--duration-fast) ease, visibility 0s linear var(--duration-fast); }
-        .panel[data-open="true"] .panel-body { transition: opacity var(--duration-base) ease var(--duration-fast), visibility 0s; }
+        /* Open: the controls fade in a beat after both surfaces settle. */
+        .panel[data-open="true"] .panel-body { transition: opacity var(--duration-base) ease calc(var(--duration-deliberate) + var(--duration-fast) / 2), visibility 0s; }
 
         .panel[data-open="true"] .panel-toggle { cursor: grab; touch-action: none; }
         :root.is-resizing .panel-toggle { cursor: grabbing; }
@@ -678,6 +702,23 @@
       <div class="panel-body-wrap">
         <div class="panel-body-clip">
           <div class="panel-body" id="panelBody">
+          <div class="panel-section">
+            <h2 class="t-mono panel-title">Prototype</h2>
+            <div class="control-field">
+              <span class="t-label" id="pillLabel">Closed pill</span>
+              <div class="segmented" role="group" aria-labelledby="pillLabel" id="pillSeg">
+                <button type="button" class="t-control" data-pill="right" aria-pressed="true">Right</button>
+                <button type="button" class="t-control" data-pill="center" aria-pressed="false">Center</button>
+              </div>
+            </div>
+            <div class="control-field">
+              <span class="t-label" id="surfacesLabel">Surfaces</span>
+              <div class="segmented" role="group" aria-labelledby="surfacesLabel" id="surfacesSeg">
+                <button type="button" class="t-control" data-surfaces="inset" aria-pressed="true">Inset</button>
+                <button type="button" class="t-control" data-surfaces="full" aria-pressed="false">Full width</button>
+              </div>
+            </div>
+          </div>
           <div class="panel-section panel-section--actions">
             <div class="action-row">
               <button type="button" class="button button--primary" id="randomizeBtn"><span class="t-control">Randomize</span></button>
@@ -1590,6 +1631,30 @@
           setPanelOpen(!isOpen());
         });
         window.addEventListener('resize', function () { applySplit(isOpen(), true); });
+
+        /* Prototype options, kept in the hash (#center-full etc.) so a
+           reload keeps them. */
+        var opts = { pill: 'right', surfaces: 'inset' };
+        location.hash.slice(1).split('-').forEach(function (w) {
+          if (w === 'right' || w === 'center') opts.pill = w;
+          if (w === 'inset' || w === 'full') opts.surfaces = w;
+        });
+        function applyOpts() {
+          root.setAttribute('data-pill', opts.pill);
+          root.setAttribute('data-surfaces', opts.surfaces);
+          setPressed($('pillSeg'), 'data-pill', opts.pill);
+          setPressed($('surfacesSeg'), 'data-surfaces', opts.surfaces);
+          try { history.replaceState(null, '', '#' + opts.pill + '-' + opts.surfaces); } catch (err) {}
+        }
+        ['pill', 'surfaces'].forEach(function (key) {
+          $(key + 'Seg').addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            opts[key] = btn.getAttribute('data-' + key);
+            applyOpts();
+          });
+        });
+        applyOpts();
 
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && panel.getAttribute('data-open') === 'true') {
