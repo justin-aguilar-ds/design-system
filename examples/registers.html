@@ -11,47 +11,42 @@
 <link rel="stylesheet" href="lib/components/segmented/segmented.css">
 <link rel="stylesheet" href="lib/components/slider/slider.css">
 <link rel="stylesheet" href="lib/components/toast/toast.css">
-<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
-<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<link rel="stylesheet" href="lib/patterns/stage-sheet/stage-sheet.css">
 <style>
   /* A temporary tool: a register slider, and a screen that recomposes. */
   h1, h2, h3, h4, p { margin: 0; }
   body { background: var(--color-bg); }
-  .page {
-    max-width: var(--container);
-    margin-inline: auto;
-    padding-block: var(--space-page-block);
-    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-48);
-  }
-  .page > * { min-width: 0; }
-  .section { display: grid; gap: var(--space-24); }
-  .section-head { display: grid; gap: var(--space-8); }
-  .section-head .t-body { max-width: 60ch; color: var(--color-text-secondary); }
-
-  /* ---- The explorer: controls and readout beside the screen on a wide
-     screen, above and below it on a phone. */
-  .explorer { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24); align-items: start; }
-  @media (min-width: 900px) { .explorer { grid-template-columns: 320px minmax(0, 1fr); } }
-  .side { display: grid; gap: var(--space-24); align-content: start; }
-  .controls { display: grid; gap: var(--space-24); }
-  .control-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-16); }
+  /* The explorer is a stage and sheet: the screen is the stage, the
+     controls, readout and ideas are in the sheet. */
+  .sheet-section { display: grid; gap: var(--space-16); padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
   .slider-ends { display: flex; justify-content: space-between; }
-  .slider-ends .t-mono:last-child { text-align: right; }
-  .readout { display: grid; gap: var(--space-16); padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
   .readout-note { color: var(--color-text-secondary); }
   .readout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); }
   .pair { display: grid; gap: var(--space-4); }
   .pair .t-body { color: var(--color-text); }
   .carries { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-8); }
-  .carries li { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: var(--space-8); align-items: baseline; }
+  .carries li { display: grid; gap: var(--space-4); }
+  .carries .t-body { color: var(--color-text); }
 
-  /* ---- The stage: the screen at its real size, scaled to fit. */
-  .stage { min-width: 0; }
-  .screen-box { position: relative; margin-inline: auto; }
+  /* ---- The stage: the screen at its real size, scaled to fit the room
+     the stage has. On a wide screen the open sheet takes the corner, so
+     the screen fits the room beside it. */
+  .stage-host {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--space-24);
+    transition: padding var(--duration-deliberate) var(--ease-out);
+  }
+  @container stage-sheet (min-width: 631px) {
+    .stage-sheet.is-open .stage-host { padding-right: calc(280px + 2 * var(--space-page)); }
+  }
+  /* On a phone the closed pill sits over the stage: the screen ends above it. */
+  @container stage-sheet (max-width: 630px) {
+    .stage-sheet:not(.is-open) .stage-host { padding-bottom: calc(var(--height-slot) + 2 * var(--space-page)); }
+  }
+  .screen-box { position: relative; }
   .screen {
     position: absolute;
     top: 0;
@@ -65,11 +60,6 @@
     scrollbar-width: none;
   }
   .screen::-webkit-scrollbar { display: none; }
-  @media (max-width: 630px) {
-    .stage { margin-inline: calc(-1 * var(--space-page)); }
-    .screen.is-phone { border-inline: 0; border-radius: 0; }
-  }
-  .fold-note { margin-top: var(--space-8); text-align: center; color: var(--color-text-secondary); }
 
   /* The type in the screen follows the screen's size, not this window's. */
   .screen.is-phone .t-display { font-size: 32px; line-height: 1.2; }
@@ -173,8 +163,9 @@
   .show-space .m { box-shadow: inset var(--m-inset) 0 0 var(--color-accent-soft), inset calc(-1 * var(--m-inset)) 0 0 var(--color-accent-soft); }
 
   /* ---- The ideas. */
-  .proposals { margin: 0; padding: 0; list-style: none; max-width: 760px; }
-  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .proposals { margin: 0; padding: 0; list-style: none; }
+  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
+  .proposal:first-child { border-top: 0; padding-top: 0; }
   .proposal > .segmented { justify-self: start; }
   .proposal-copy { display: grid; gap: var(--space-8); }
   .proposal-copy .t-body { max-width: 60ch; }
@@ -183,88 +174,75 @@
 </style>
 </head>
 <body ontouchstart>
-<div class="page">
-  <header class="intro">
-    <div class="intro-title-row">
-      <h1 class="t-display">Registers</h1>
-      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
-        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
-      </button>
-      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
-        <p class="tooltip-text t-mono">A layout visualizer for the registers, from Expressive to Tool. The same system at every stop: what changes is space, layout and how many things share the screen. A temporary tool; the ideas at the end are proposals.</p>
-      </div>
-    </div>
-  </header>
-
-  <section class="explorer" aria-label="Explorer">
-    <div class="side">
-      <div class="controls">
-        <div class="slider-field">
-          <div class="slider-head">
-            <label class="t-label" for="register">Register</label>
-            <output class="slider-value t-mono" for="register" id="register-out">Expressive</output>
-          </div>
-          <span class="slider">
-            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
-            <input class="slider-input" id="register" type="range" min="0" max="4" step="1" value="0">
-          </span>
-          <div class="slider-ends"><span class="t-mono">Expressive</span><span class="t-mono">Tool</span></div>
-        </div>
-        <div class="control-row">
-          <span class="t-label" id="content-l">Content</span>
-          <div class="segmented" role="group" aria-labelledby="content-l" id="content">
-            <span class="segmented-indicator" aria-hidden="true"></span>
-            <button class="segmented-option t-control" type="button" aria-pressed="false" value="0">Little</button>
-            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="1">Some</button>
-            <button class="segmented-option t-control" type="button" aria-pressed="false" value="2">Lots</button>
-          </div>
-        </div>
-        <div class="control-row">
-          <span class="t-label" id="screen-l">Screen</span>
-          <div class="segmented" role="group" aria-labelledby="screen-l" id="screen-size">
-            <span class="segmented-indicator" aria-hidden="true"></span>
-            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="phone">Phone</button>
-            <button class="segmented-option t-control" type="button" aria-pressed="false" value="desktop">Desktop</button>
-          </div>
-        </div>
-        <div class="control-row">
-          <span class="t-label" id="space-l">Show space</span>
-          <div class="segmented" role="group" aria-labelledby="space-l" id="show-space">
-            <span class="segmented-indicator" aria-hidden="true"></span>
-            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="off">Off</button>
-            <button class="segmented-option t-control" type="button" aria-pressed="false" value="on">On</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="readout" aria-live="polite">
-        <h2 class="t-title" id="r-name">Expressive</h2>
-        <p class="t-body readout-note" id="r-note"></p>
-        <div class="readout-grid" id="r-grid"></div>
-        <ul class="carries" id="r-carries"></ul>
-      </div>
-    </div>
-
-    <div class="stage" id="stage">
+<div class="stage-sheet">
+  <section class="stage-sheet-stage" aria-label="Screen">
+    <div class="stage-host" id="stage">
       <div class="screen-box" id="screen-box">
         <div class="screen is-phone" id="screen"></div>
       </div>
-      <p class="t-mono fold-note" id="fold-note"></p>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="dec-h">
-    <div class="section-head">
-      <h2 class="t-title" id="dec-h">The ideas</h2>
-      <p class="t-body">What the explorer would put into the system. Approve or decline each.</p>
-    </div>
-    <ol class="proposals" id="proposals"></ol>
-    <div class="decisions-end">
-      <p class="t-body" id="decision-summary"></p>
-      <span class="toast-anchor">
-        <button class="button surface surface--rest surface--pill t-label" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
-        <span class="toast t-mono" role="status"></span>
-      </span>
+  <section class="stage-sheet-sheet" aria-label="Controls">
+    <button class="stage-sheet-toggle" type="button" aria-expanded="false" aria-controls="sheet-body">
+      <span class="stage-sheet-title t-mono">Controls</span>
+      <svg class="stage-sheet-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="stage-sheet-body" id="sheet-body">
+      <div class="slider-field">
+        <div class="slider-head">
+          <label class="t-mono" for="register">Register</label>
+          <output class="slider-value t-mono" for="register" id="register-out">Expressive</output>
+        </div>
+        <span class="slider">
+          <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+          <input class="slider-input" id="register" type="range" min="0" max="4" step="1" value="0">
+        </span>
+        <div class="slider-ends"><span class="t-mono">Expressive</span><span class="t-mono">Tool</span></div>
+      </div>
+      <div class="control-field">
+        <span class="t-mono" id="content-l">Content</span>
+        <div class="segmented" role="group" aria-labelledby="content-l" id="content">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="0">Little</button>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="1">Some</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="2">Lots</button>
+        </div>
+      </div>
+      <div class="control-field">
+        <span class="t-mono" id="screen-l">Screen</span>
+        <div class="segmented" role="group" aria-labelledby="screen-l" id="screen-size">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="phone">Phone</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="desktop">Desktop</button>
+        </div>
+      </div>
+      <div class="control-field">
+        <span class="t-mono" id="space-l">Show space</span>
+        <div class="segmented" role="group" aria-labelledby="space-l" id="show-space">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="off">Off</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="on">On</button>
+        </div>
+      </div>
+
+      <div class="sheet-section" aria-live="polite">
+        <h2 class="t-label" id="r-name">Expressive</h2>
+        <p class="t-body readout-note" id="r-note"></p>
+        <div class="readout-grid" id="r-grid"></div>
+        <ul class="carries" id="r-carries"></ul>
+        <p class="t-mono" id="fold-note"></p>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">The ideas</h2>
+        <ol class="proposals" id="proposals"></ol>
+        <p class="t-body readout-note" id="decision-summary"></p>
+        <span class="toast-anchor">
+          <button class="button surface surface--rest surface--pill t-control" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
+          <span class="toast t-mono" role="status"></span>
+        </span>
+      </div>
     </div>
   </section>
 </div>
@@ -296,7 +274,7 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
 <script src="lib/components/segmented/segmented.js"></script>
 <script src="lib/components/slider/slider.js"></script>
 <script src="lib/components/toast/toast.js"></script>
-<script src="lib/components/tooltip/tooltip.js"></script>
+<script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
 document.body.ontouchstart = () => {};
 
@@ -393,7 +371,10 @@ const box = document.getElementById('screen-box');
 const stage = document.getElementById('stage');
 const fit = () => {
   const [w, h] = SIZES[state.size];
-  const s = Math.min(1, stage.clientWidth / w);
+  const cs = getComputedStyle(stage);
+  const W = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const H = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const s = Math.max(0.05, Math.min(1, W / w, H / h));
   screen.style.width = `${w}px`;
   screen.style.height = `${h}px`;
   screen.style.transform = `scale(${s})`;
