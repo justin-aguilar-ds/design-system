@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Bottom Slot Proposals</title>
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<style>
+  h1, h2, h3, h4, p { margin: 0; }
+  body { background: var(--color-bg); }
+  .page {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page-block);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+  }
+  .page > * { min-width: 0; }
+  .section { display: grid; gap: var(--space-24); }
+  .section-head { display: grid; gap: var(--space-8); }
+  .section-head .t-body { max-width: 60ch; color: var(--color-text-secondary); }
+
+  /* ---- Today: the three things that already sit at the bottom, measured. */
+  .today { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-24); }
+  .today-item { display: grid; justify-items: start; gap: var(--space-8); }
+  .today-item .t-mono { color: var(--color-text-secondary); }
+  .today-item .t-mono b { color: var(--color-text); font-weight: 500; }
+  .row-pill { min-height: var(--height-row); padding: 0 var(--space-24); }
+  .sheet-pill { min-height: var(--height-row); padding: 0 var(--space-16); gap: var(--space-16); }
+  .sheet-pill svg { width: var(--icon-mark); height: var(--icon-mark); color: var(--color-text-secondary); transform: rotate(180deg); }
+
+  /* ============================================================
+     PROPOSED · H1 · the large size: everything in the slot is 50px
+     ============================================================ */
+  .segmented--large .segmented-option {
+    min-height: calc(var(--height-row) - 2 * var(--space-4) - 2px); /* 50px frame: 4px padding each side and the 1px border */
+    padding: 0 var(--space-24);
+  }
+  .picker--large .picker-trigger { min-height: var(--height-row); padding: 0 var(--space-24); }
+  .button--slot { justify-content: center; min-height: var(--height-row); padding: 0 var(--space-24); }
+  .mark { flex: none; width: var(--icon-mark); height: var(--icon-mark); }
+
+  /* ---- The mock screens. Full bleed on a phone, so the slot has the
+     width it would really have: the screen less the page inset. */
+  .pair-switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-16); }
+  .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-48) var(--space-24); }
+  .option { display: grid; gap: var(--space-16); align-content: start; min-width: 0; }
+  .option-head { display: grid; gap: var(--space-8); }
+  .option-head .t-body { max-width: 52ch; }
+  .screen {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    background: var(--color-bg);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+  @media (max-width: 630px) {
+    .options { grid-template-columns: minmax(0, 1fr); }
+    .screen {
+      margin-inline: calc(-1 * var(--space-page));
+      border-inline: 0;
+      border-radius: 0;
+    }
+  }
+  .screen-page { display: grid; gap: var(--space-16); align-content: start; padding: var(--space-48) var(--space-page); }
+  .screen-page .t-mono { color: var(--color-text-secondary); }
+  .screen-page .t-body { color: var(--color-text-secondary); max-width: 34ch; }
+  .screen-media { height: 160px; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
+
+  /* PROPOSED · S1 · the slot: one row, centred, the page inset from every edge. */
+  .slot {
+    position: absolute;
+    left: var(--space-page);
+    right: var(--space-page);
+    bottom: calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .slot > * { pointer-events: auto; }
+  .combo { display: inline-flex; align-items: center; max-width: 100%; }
+
+  /* In a combined control the options are 16 from their edges, not 24,
+     so pages and an action fit a phone. */
+  .combo .segmented--large .segmented-option,
+  .combo.segmented--large .segmented-option { padding: 0 var(--space-16); }
+
+  /* The indicator can be nowhere (a page that lives in the other half of a dock). */
+  .screen .segmented-indicator {
+    transition:
+      left var(--duration-deliberate) var(--ease-out),
+      top var(--duration-deliberate) var(--ease-out),
+      width var(--duration-deliberate) var(--ease-out),
+      height var(--duration-deliberate) var(--ease-out),
+      opacity var(--duration-base) ease;
+  }
+
+  /* PROPOSED · M · the action comes and goes with the page: its track
+     grows from nothing, so the control widens about its centre. */
+  .combo-extra {
+    display: grid;
+    grid-template-columns: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-columns var(--duration-deliberate) var(--ease-out),
+      opacity var(--duration-fast) ease;
+  }
+  .screen.has-action .combo-extra {
+    grid-template-columns: 1fr;
+    opacity: 1;
+    transition:
+      grid-template-columns var(--duration-deliberate) var(--ease-out),
+      opacity var(--duration-base) ease var(--duration-fast);
+  }
+  .combo-extra > * { display: flex; align-items: center; min-width: 0; overflow: hidden; }
+
+  /* A · Dock: two surfaces, 8 apart. The track carries room for the
+     button's shadow, given back by a negative margin. */
+  .v-a .combo-extra > * { padding: var(--space-24) var(--space-24) var(--space-24) calc(var(--space-24) + var(--space-8)); margin: calc(-1 * var(--space-24)); }
+  .v-a .dock-gap { width: var(--space-8); flex: none; }
+  .picker-trigger.is-current { background: var(--color-fill-subtle); }
+
+  /* B · Joined: one frame, a hairline between the pages and the action,
+     the action at full ink with a mark — never at 30%, never the fill. */
+  .combo-divider { flex: none; width: 1px; height: var(--space-24); margin-inline: var(--space-4); background: var(--color-hairline-strong); }
+  .combo-action {
+    -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: calc(var(--height-row) - 2 * var(--space-4) - 2px);
+    padding: 0 var(--space-16);
+    border-radius: var(--radius-pill);
+    color: var(--color-text);
+    white-space: nowrap;
+    transition: color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+  }
+  .combo-action:active { color: var(--color-text-secondary); transition-duration: var(--duration-instant); }
+
+  /* C · Joined, filled: the action is an ink pill inside the frame,
+     concentric with it, 4px in. */
+  .combo-action--filled { margin-left: var(--space-4); background: var(--color-text); color: var(--color-bg); }
+  .combo-action--filled:active { color: var(--color-bg); opacity: 0.8; }
+
+  /* The select as a segment: the picker's trigger without its own surface,
+     resting at 30% like the options beside it. */
+  .segmented .picker-trigger.segmented-option { gap: var(--space-8); background: none; border: 0; box-shadow: none; font: inherit; }
+  /* At the bottom the menu opens upward, so the chevron points up. */
+  .slot .picker-chevron { transform: rotate(180deg); }
+  .slot .picker.is-open .picker-chevron { transform: none; }
+  /* C's select: the menu belongs to the whole control, as wide as it. */
+  .v-c .picker { position: static; }
+  .v-c .picker.is-above .picker-menu { transform-origin: bottom center; }
+
+  /* ---- The ideas. */
+  .guide { display: grid; gap: 0; margin: 0; max-width: 760px; }
+  .guide-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-16); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
+  .guide-row dt { color: var(--color-text-secondary); }
+  .guide-row dd { margin: 0; }
+  .proposals { margin: 0; padding: 0; list-style: none; max-width: 760px; }
+  .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .proposal > .segmented { justify-self: start; }
+  .proposal-copy { display: grid; gap: var(--space-8); }
+  .proposal-copy .t-body { max-width: 60ch; }
+  .proposal.is-declined .proposal-copy { opacity: var(--opacity-label-inactive); }
+  .decisions-end { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-16); }
+</style>
+</head>
+<body ontouchstart>
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">The bottom of the screen</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">A system for what sits at the bottom of a screen: one slot, one height, rules for what goes in it, and three ways to put two controls in it as one. Approve or decline each idea at the end. Nothing here is in the skill yet.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="today-h">
+    <div class="section-head">
+      <h2 class="t-title" id="today-h">Today</h2>
+      <p class="t-body">Three things already live at the bottom, and they don’t agree: the page nav is taller than the large button and the sheet’s pill.</p>
+    </div>
+    <div class="today">
+      <div class="today-item">
+        <nav class="segmented segmented--nav" aria-label="Page nav, today">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-label is-active" type="button" aria-pressed="true">Work</button>
+          <button class="segmented-option t-label" type="button" aria-pressed="false">About</button>
+        </nav>
+        <span class="t-mono">Page nav · <b data-measure="0">—</b></span>
+      </div>
+      <div class="today-item">
+        <button class="button surface surface--rest surface--pill t-label row-pill" type="button">Get in touch</button>
+        <span class="t-mono">Large button · <b data-measure="1">—</b></span>
+      </div>
+      <div class="today-item">
+        <button class="button surface surface--rest surface--pill sheet-pill" type="button"><span class="t-mono">Controls</span><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="t-mono">Sheet pill · <b data-measure="2">—</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="opt-h">
+    <div class="section-head">
+      <h2 class="t-title" id="opt-h">Two controls as one</h2>
+      <p class="t-body">A small site: the nav at the bottom, and a page that needs one more thing. Tap through the pages in each screen. Everything in these slots is 50px.</p>
+    </div>
+    <div class="pair-switch">
+      <span class="t-label" id="pair-l">Pair the nav with</span>
+      <div class="segmented" role="group" aria-labelledby="pair-l" id="pair">
+        <span class="segmented-indicator" aria-hidden="true"></span>
+        <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="button">A button</button>
+        <button class="segmented-option t-control" type="button" aria-pressed="false" value="select">A select</button>
+      </div>
+    </div>
+    <div class="options" id="options"></div>
+  </section>
+
+  <section class="section" aria-labelledby="guide-h">
+    <div class="section-head">
+      <h2 class="t-title" id="guide-h">What goes in the slot</h2>
+      <p class="t-body">The rule set proposed as S2: one question, what is this screen for, and one answer per screen.</p>
+    </div>
+    <dl class="guide">
+      <div class="guide-row"><dt class="t-body">A small site, two or three pages</dt><dd class="t-body">The page nav</dd></div>
+      <div class="guide-row"><dt class="t-body">The screen exists for one action — RSVP, sign up, get in touch</dt><dd class="t-body">The large button, full width on a phone</dd></div>
+      <div class="guide-row"><dt class="t-body">A live canvas and its controls</dt><dd class="t-body">The sheet’s pill (stage and sheet). The nav moves to the top.</dd></div>
+      <div class="guide-row"><dt class="t-body">A site’s pages, and this page has one action</dt><dd class="t-body">The nav and the action, as one control</dd></div>
+      <div class="guide-row"><dt class="t-body">Four or more pages</dt><dd class="t-body">Two pages and a select for the rest</dd></div>
+      <div class="guide-row"><dt class="t-body">Anything else — filters, sort, a second action</dt><dd class="t-body">Not the slot. It goes in the page or the control panel.</dd></div>
+    </dl>
+  </section>
+
+  <section class="section" aria-labelledby="dec-h">
+    <h2 class="t-title" id="dec-h">The ideas</h2>
+    <ol class="proposals" id="proposals"></ol>
+    <div class="decisions-end">
+      <p class="t-body" id="decision-summary"></p>
+      <span class="toast-anchor">
+        <button class="button surface surface--rest surface--pill t-label" type="button" id="copy-decisions" data-copy="" data-toast="Copied">Copy my decisions</button>
+        <span class="toast t-mono" role="status"></span>
+      </span>
+    </div>
+  </section>
+</div>
+
+<script>
+// Decision switches first, so segmented.js binds them. The mock screens
+// come after it: they're driven by this page, so the select can take the
+// fill inside a frame.
+const PROPOSALS = [
+  ['H1', 'One height at the bottom: 50px', 'Everything in the bottom slot is --height-row, the height the large button and the sheet’s pill already are. The page nav drops from 61px to 50 (.segmented--nav becomes .segmented--large: 40px options, 4px frame), and the picker gets .picker--large to match. Compact controls stay 36px everywhere else.'],
+  ['S1', 'One bottom slot, as a pattern', 'A new pattern, patterns/bottom-slot/, owns the bottom of the screen: one row, centred, 24px (--space-page) from the bottom and sides plus the safe area, and room at the end of the page so content clears it. It holds one thing. The segmented README’s hand-written “pin it bottom-centre” moves here, and the large button’s pinning uses it.'],
+  ['S2', 'What goes in the slot', 'The guide above, as rules in the pattern’s README: decide by what the screen is for, one answer per screen. Never two things stacked at the bottom, never a nav at both the top and the bottom, never a row of icons.'],
+  ['A', 'Combined control · Dock', 'Two surfaces side by side, 8px apart, each its own control: the nav’s frame, then a large button or a large select. Simplest to build and to read; with a select, the current page can live in either half, so the nav’s fill has nowhere to be.'],
+  ['B', 'Combined control · Joined', 'One frame. The action sits after a hairline at full ink with an arrow — never at 30%, never the fill, because it isn’t a state. A select is just the last segment, with a chevron, and takes the fill when you’re on one of its pages.'],
+  ['C', 'Combined control · Joined, filled', 'One frame, the action an ink pill inside it, 4px in and concentric. The strongest call to action; with a select, the menu belongs to the whole control and opens as wide as it. Pick one of A, B or C.'],
+  ['M', 'The action comes and goes with the page', 'A page with an action adds it to the control; the others don’t carry it. The control widens about its centre on --duration-deliberate and the action fades in after, so the nav never jumps. Try About in the button screens.'],
+  ['O', 'Past three pages, a select', 'Two pages stay segments and the rest go into a select at the end, opening upward. The control never holds more than three parts, and each combination is checked at 390px.'],
+];
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem('bottom-proposals') || '{}'); } catch {}
+document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
+  <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
+    <div class="proposal-copy">
+      <span class="t-mono">${id}</span>
+      <h3 class="t-label">${title}</h3>
+      <p class="t-body">${body}</p>
+    </div>
+    <div class="segmented" role="group" aria-label="${id} decision">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      ${['pending', 'approve', 'decline'].map((val) => `<button class="segmented-option t-control${(decisions[id] || 'pending') === val ? ' is-active' : ''}" type="button" aria-pressed="${(decisions[id] || 'pending') === val}" value="${val}">${val[0].toUpperCase() + val.slice(1)}</button>`).join('')}
+    </div>
+  </li>`).join('');
+</script>
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+const PAGES = {
+  work: ['Work', 'Selected work', 'Interfaces for tools people use every day.'],
+  about: ['About', 'Hi, I design tools.', 'Ten years of products, systems and the odd typeface. Open to new work.', 'Get in touch'],
+  notes: ['Notes', 'Notes', 'Short writing on craft, motion and type.'],
+  talks: ['Talks', 'Talks', 'Slides and recordings from the last few years.'],
+  contact: ['Contact', 'Say hello', 'The quickest way is email.'],
+};
+const MORE = ['notes', 'talks', 'contact'];
+const ARROW = '<svg class="mark" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5.5 2.5 8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEVRON = '<svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+let uid = 0;
+const opt = (key) => `<button class="segmented-option t-label" type="button" aria-pressed="false" value="${key}">${PAGES[key][0]}</button>`;
+const picker = (asSegment) => {
+  const id = `more-${++uid}`;
+  const cls = asSegment ? 'picker-trigger segmented-option t-label' : 'picker-trigger button surface surface--rest surface--pill t-label';
+  return `
+  <div class="picker${asSegment ? '' : ' picker--large'}">
+    <button class="${cls}" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="${id}" aria-label="More pages">
+      <span class="picker-value">More</span>${CHEVRON}
+    </button>
+    <div class="picker-menu" hidden>
+      <ul class="picker-list" id="${id}" role="listbox" tabindex="-1" aria-label="More pages">
+        ${MORE.map((k) => `<li class="picker-option t-control" role="option" aria-selected="false" data-value="${k}">${PAGES[k][0]}</li>`).join('')}
+      </ul>
+    </div>
+  </div>`;
+};
+const frame = (inner) => `<nav class="segmented segmented--large combo-frame" aria-label="Pages"><span class="segmented-indicator" aria-hidden="true"></span>${inner}</nav>`;
+const SLOTS = {
+  a: {
+    button: `<div class="combo">${frame(opt('work') + opt('about'))}<div class="combo-extra"><div><button class="button surface surface--rest surface--pill t-label button--slot" type="button">Get in touch ${ARROW}</button></div></div></div>`,
+    select: `<div class="combo">${frame(opt('work') + opt('about'))}<span class="dock-gap"></span>${picker(false)}</div>`,
+  },
+  b: {
+    button: `<div class="combo">${frame(opt('work') + opt('about') + '<span class="combo-extra"><span><span class="combo-divider"></span><button class="combo-action t-label" type="button">Get in touch ' + ARROW + '</button></span></span>')}</div>`,
+    select: `<div class="combo">${frame(opt('work') + opt('about') + picker(true))}</div>`,
+  },
+  c: {
+    button: `<div class="combo">${frame(opt('work') + opt('about') + '<span class="combo-extra"><span><button class="combo-action combo-action--filled t-label" type="button">Get in touch ' + ARROW + '</button></span></span>')}</div>`,
+    select: `<div class="combo">${frame(opt('work') + opt('about') + picker(true))}</div>`,
+  },
+};
+const OPTIONS = [
+  ['a', 'A · Dock', 'Two surfaces, 8px apart.'],
+  ['b', 'B · Joined', 'One frame; the action after a hairline, at full ink.'],
+  ['c', 'C · Joined, filled', 'One frame; the action an ink pill inside it.'],
+];
+const screenHTML = (v, mode) => `
+  <div class="screen v-${v}" data-mode="${mode}"${mode === 'select' ? ' hidden' : ''}>
+    <div class="screen-page"></div>
+    <div class="slot">${SLOTS[v][mode]}</div>
+  </div>`;
+document.getElementById('options').innerHTML = OPTIONS.map(([v, title, body]) => `
+  <section class="option" aria-labelledby="${v}-h">
+    <div class="option-head">
+      <h3 class="t-label" id="${v}-h">${title}</h3>
+      <p class="t-body">${body}</p>
+    </div>
+    ${screenHTML(v, 'button')}${screenHTML(v, 'select')}
+  </section>`).join('');
+</script>
+<script src="lib/components/picker/picker.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+
+// Today, measured.
+const measure = () => {
+  const els = [document.querySelector('.today .segmented'), document.querySelector('.row-pill'), document.querySelector('.sheet-pill')];
+  els.forEach((el, i) => { document.querySelector(`[data-measure="${i}"]`).textContent = `${Math.round(el.getBoundingClientRect().height)}px`; });
+};
+measure();
+document.fonts?.ready.then(measure);
+
+// The mock screens.
+document.querySelectorAll('.screen').forEach((screen) => {
+  const pageEl = screen.querySelector('.screen-page');
+  const nav = screen.querySelector('.combo-frame');
+  const indicator = nav.querySelector('.segmented-indicator');
+  const opts = [...nav.querySelectorAll('.segmented-option')];
+  const pick = screen.querySelector('.picker');
+  const trigger = pick?.querySelector('.picker-trigger');
+  const valueEl = pick?.querySelector('.picker-value');
+  const extra = screen.querySelector('.combo-extra');
+  let active = opts[0];
+  let shown = null;
+
+  const place = (o) => {
+    if (!o) { indicator.style.opacity = '0'; return; }
+    indicator.style.opacity = '';
+    // From the frame's padding edge: the select's trigger sits inside its
+    // own positioned wrapper, so offsetLeft would measure from that.
+    const r = o.getBoundingClientRect(), n = nav.getBoundingClientRect();
+    indicator.style.left = `${r.left - n.left - nav.clientLeft}px`;
+    indicator.style.top = `${r.top - n.top - nav.clientTop}px`;
+    indicator.style.width = `${o.offsetWidth}px`;
+    indicator.style.height = `${o.offsetHeight}px`;
+  };
+  const indicate = (o) => { shown = o; opts.forEach((x) => x.classList.toggle('is-indicated', x === o)); place(o); };
+
+  const go = (key, o) => {
+    const [label, title, body, action] = PAGES[key];
+    pageEl.innerHTML = `<span class="t-mono">${label}</span><h4 class="t-title">${title}</h4><p class="t-body">${body}</p><div class="screen-media"></div>`;
+    active = o;
+    opts.forEach((x) => { x.classList.toggle('is-active', x === o); if (x.tagName === 'BUTTON' && !x.classList.contains('picker-trigger')) x.setAttribute('aria-pressed', String(x === o)); });
+    indicate(o);
+    screen.classList.toggle('has-action', !!action);
+    if (extra) extra.inert = !action;
+    if (trigger) {
+      const inMore = MORE.includes(key);
+      trigger.classList.toggle('is-current', inMore && !opts.includes(trigger));
+      if (!inMore) {
+        valueEl.textContent = 'More';
+        pick.querySelectorAll('[role="option"]').forEach((x) => x.setAttribute('aria-selected', 'false'));
+      }
+    }
+  };
+
+  opts.forEach((o) => {
+    o.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') indicate(o); });
+    if (o !== trigger) o.addEventListener('click', () => go(o.value, o));
+  });
+  nav.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') indicate(active); });
+  // The slot is at the bottom: the menu always opens upward.
+  trigger?.addEventListener('click', () => pick.classList.add('is-above'));
+  pick?.addEventListener('picker-change', (e) => go(e.detail.value, opts.includes(trigger) ? trigger : null));
+
+  indicator.style.transition = 'none';
+  go('work', opts[0]);
+  void indicator.offsetWidth;
+  indicator.style.transition = '';
+  new ResizeObserver(() => place(shown)).observe(nav);
+});
+
+document.getElementById('pair').addEventListener('segmented-change', (e) => {
+  document.querySelectorAll('.screen').forEach((s) => { s.hidden = s.dataset.mode !== e.detail.value; });
+});
+
+function summarise() {
+  const ids = PROPOSALS.map((p) => p[0]);
+  const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
+  const a = by('approve'), d = by('decline'), p = by('pending');
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide.`;
+  document.getElementById('copy-decisions').dataset.copy = `Approve: ${a.join(', ') || 'none'}\nDecline: ${d.join(', ') || 'none'}${p.length ? `\nUndecided: ${p.join(', ')}` : ''}`;
+}
+document.getElementById('proposals').addEventListener('segmented-change', (e) => {
+  const item = e.target.closest('.proposal'); if (!item) return;
+  decisions[item.dataset.id] = e.detail.value;
+  try { localStorage.setItem('bottom-proposals', JSON.stringify(decisions)); } catch {}
+  item.classList.toggle('is-declined', e.detail.value === 'decline');
+  summarise();
+});
+summarise();
+</script>
+</body>
+</html>
