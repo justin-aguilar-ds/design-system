@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.2.0 */
+/* personal-styling · carousel · v0.2.1 */
 
 /* One item at a time, centred, with its caption under it. Slides are the
    full width of the carousel, so moving the track by whole widths always
@@ -10,6 +10,7 @@
   min-width: 0;
 }
 .carousel-viewport {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   width: 100%;
   overflow-x: clip;             /* sideways only, so the frames' lift isn't cut off */
   touch-action: pan-y;          /* a vertical swipe still scrolls the page */
@@ -44,6 +45,7 @@
    comes up to full size and ink. Set --item-aspect-ratio and
    --item-width on a frame for a different shape. */
 .carousel-frame {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: grid;
   place-items: center;
   width: var(--item-width, min(360px, 70%));

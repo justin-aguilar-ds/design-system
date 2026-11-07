@@ -1,4 +1,4 @@
-/* personal-styling · sortable · v0.2.1 */
+/* personal-styling · sortable · v0.2.2 */
 
 /* A list you put in order by hand. Each item is a row on the one surface
    style, 16px from the next — rows are 16 apart — so each reads as a thing
@@ -17,6 +17,7 @@
    under --pill-below, so it's a pill; sortable.js measures, and an item
    that wraps keeps the card radius. */
 .sortable-item {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   position: relative;
   display: flex;
   align-items: center;

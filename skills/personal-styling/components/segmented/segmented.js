@@ -1,4 +1,4 @@
-/* personal-styling · segmented · v0.3.0 */
+/* personal-styling · segmented · v0.3.1 */
 
 // The indicator is placed on the "indicated" option: the active one, or the
 // one under a mouse as a preview of where a click would land. Buttons switch

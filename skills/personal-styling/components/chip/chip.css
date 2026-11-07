@@ -1,4 +1,4 @@
-/* personal-styling · chip · v0.4.0 */
+/* personal-styling · chip · v0.4.1 */
 
 .chip-row {
   display: flex;
@@ -7,6 +7,7 @@
 }
 
 .chip {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);          /* dot to label */

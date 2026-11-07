@@ -1,7 +1,8 @@
-/* personal-styling · tooltip · v0.6.0 */
+/* personal-styling · tooltip · v0.6.1 */
 
 /* ---- Inline information: the value itself is the trigger. ---- */
 .tooltip-trigger {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   color: inherit;
   transition: color var(--duration-fast) ease;
 }

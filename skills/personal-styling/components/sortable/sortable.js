@@ -1,4 +1,4 @@
-/* personal-styling · sortable · v0.2.1 */
+/* personal-styling · sortable · v0.2.2 */
 
 // A list put in order by hand. Pointer: press, then move, and the item
 // lifts and follows; the rest part to show where it will land; let go and

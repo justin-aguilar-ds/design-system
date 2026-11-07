@@ -1,9 +1,10 @@
-/* personal-styling · table · v1.0.0 */
+/* personal-styling · table · v1.0.1 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It always fills its container, and scrolls sideways rather than
    shrinking the type when its columns need more room. */
 .table-wrap {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   position: relative;
   /* CHANGED (v0.9): the wrap states its width — the container plus the
      16px bleed either side — instead of relying on a block's default.
@@ -203,6 +204,7 @@
    hovered or focused; sorted, it stays at full ink and points the way the
    column runs — down for descending, up for ascending. ---- */
 .table-sort {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);          /* label to icon */

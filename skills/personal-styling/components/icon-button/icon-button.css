@@ -1,9 +1,10 @@
-/* personal-styling · icon-button · v0.3.0 */
+/* personal-styling · icon-button · v0.3.1 */
 
 /* An icon alone as a control — back, more, share, close. A 40px circle:
    the visual and the touch target, the same as the intro's info button.
    The icon inside is --icon-control (20px), full ink. */
 .icon-button {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
   justify-content: center;

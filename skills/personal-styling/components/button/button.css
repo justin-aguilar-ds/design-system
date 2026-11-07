@@ -1,9 +1,10 @@
-/* personal-styling · button · v0.4.0 */
+/* personal-styling · button · v0.4.1 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
    only the metrics. Type is .t-label (primary) or .t-control (compact). */
 .button {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);          /* icon to text */
@@ -16,6 +17,7 @@
    the hover. Same box as the pill — transparent border included — so it
    takes the same room in a cluster. */
 .button-text {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: inline-flex;
   align-items: center;
   padding: var(--space-8) var(--space-16);

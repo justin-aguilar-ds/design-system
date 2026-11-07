@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.6.0 */
+/* personal-styling · tooltip · v0.6.1 */
 
 // Four declarative pieces:
 //   [data-tooltip="…"]         inline information — grows from the trigger on

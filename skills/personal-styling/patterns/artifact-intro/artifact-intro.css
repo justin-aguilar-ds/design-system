@@ -1,4 +1,4 @@
-/* personal-styling · artifact-intro · v0.3.0 */
+/* personal-styling · artifact-intro · v0.3.1 */
 
 /* The title is the only visible intro copy. The title row is a two-column
    grid: the heading takes the room, the info button sits in its own
@@ -19,6 +19,7 @@
    the description is open it holds the selected fill — state, not the
    accent. */
 .intro-info {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   display: flex;
   align-items: center;
   justify-content: center;

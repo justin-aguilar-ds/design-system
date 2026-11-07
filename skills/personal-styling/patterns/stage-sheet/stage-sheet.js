@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.1.0 */
+/* personal-styling · stage-sheet · v0.1.1 */
 
 // Opens and closes the sheet, splits the screen on phones, and lets the
 // sheet's heading resize the split by drag. Fires a bubbling

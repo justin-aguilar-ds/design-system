@@ -1,10 +1,11 @@
-/* personal-styling · line-chart · v0.1.0 */
+/* personal-styling · line-chart · v0.1.1 */
 
 /* Series over time, for comparing one against the rest. The quiet series
    are a solid grey, the focus is full ink on top, and the values come
    from a tooltip at the point rather than from axis labels. Drawn by
    line-chart.js at its real pixel width, so type stays true. */
 .line-chart {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   --line-chart-weight: 2.25;                    /* the quiet series; the focus is one step heavier */
   --line-chart-fade: var(--duration-base);      /* lines brightening and dimming */
   --line-chart-grow: var(--duration-pop);       /* the tooltip and its point appearing */
