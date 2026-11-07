@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.2.0 */
+/* personal-styling · stage-sheet · v0.3.0 */
 
 // Opens and closes the sheet, splits the screen on phones, and lets the
 // sheet's heading resize the split by drag. Fires a bubbling
@@ -21,6 +21,7 @@ document.querySelectorAll('.stage-sheet').forEach((root) => {
   const css = getComputedStyle(root);
   const px = (name) => parseFloat(css.getPropertyValue(name)) || 0;
   const ROW = px('--height-row') || 50;
+  const SLOT = px('--height-slot') || 64;   // the closed pill on a phone sits in the bottom slot
   const set = (name, value) => root.style.setProperty(name, value);
   const phone = () => root.clientWidth <= STAGE_SHEET_PHONE;
 
@@ -47,7 +48,7 @@ document.querySelectorAll('.stage-sheet').forEach((root) => {
     root.classList.toggle('is-ground', split);   // at once, both ways
     set('--open', open ? 1 : 0);
     set('--split', split ? 1 : 0);
-    set('--sheet-h', `${split ? frac * root.clientHeight : ROW}px`);
+    set('--sheet-h', `${split ? frac * root.clientHeight : phone() ? SLOT : ROW}px`);
     toggle.setAttribute('aria-expanded', String(open));
     body.inert = !open;
     if (instant) {

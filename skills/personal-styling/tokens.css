@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.15
+   Personal styling tokens — v0.16
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -123,8 +123,15 @@ img, video, svg { display: block; max-width: 100%; }
      animated to — it passes the half-height cap at once and snaps. */
   --radius-row: calc(var(--pill-below) / 2);
   /* NEW (v0.5): the height of a one-row surface people act on at full size —
-     a collapsed control panel, a large button — so the two always match. */
+     a collapsed control panel, the heading of an open sheet. (v0.16: the large button moved to --height-slot.) */
   --height-row: 50px;
+  /* NEW (v0.16): everything in the bottom slot — the page nav, a docked
+     action, a select beside them, the large button, the sheet's closed pill
+     on a phone — is this tall, so whatever sits at the bottom of a screen
+     is one height. A fixed one-row height, so it is a pill whatever
+     --pill-below says; --radius-slot rounds it fully with a finite value. */
+  --height-slot: 64px;
+  --radius-slot: calc(var(--height-slot) / 2);
   /* NEW (v0.15): every compact control — button, segmented control, picker,
      input, chip, icon button, the intro's info button — is this tall, set
      here rather than left to padding plus line height, so the type inside

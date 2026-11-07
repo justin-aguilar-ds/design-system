@@ -1,0 +1,40 @@
+/* personal-styling · bottom-slot · v0.1.0 */
+
+/* The bottom of the screen: one row, centred, the page inset from the
+   bottom and the sides, within reach of a thumb wherever the page is
+   scrolled. It holds one thing — the page nav, the large button, or the
+   nav docked beside one action or one select — and everything in it is
+   --height-slot (64px), so whatever sits at the bottom is one height. */
+.bottom-slot {
+  position: fixed;
+  left: max(var(--space-page), env(safe-area-inset-left, 0px));
+  right: max(var(--space-page), env(safe-area-inset-right, 0px));
+  bottom: calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);          /* docked: two surfaces, each its own control */
+  pointer-events: none;         /* the empty sides of the row don't block the page */
+}
+.bottom-slot > * { min-width: 0; pointer-events: auto; }
+
+/* Room at the end of the page for the slot's footprint — the row and the
+   inset under it. The page's own --space-page-block then clears it. */
+body:has(.bottom-slot) { padding-bottom: calc(var(--height-slot) + var(--space-page)); }
+
+/* The slot places the large button; it doesn't pin itself in here. Alone
+   on a phone it runs the full width, as it does on its own. */
+.bottom-slot .button--large { position: static; }
+@media (max-width: 630px) {
+  .bottom-slot > .button--large:only-child { flex: 1; }
+}
+
+/* Docked: with two parts, the nav's options come in to 16px from their
+   edges, so pages and an action fit a 390px phone. */
+.bottom-slot:has(> :nth-child(2)) .segmented-option { padding-inline: var(--space-16); }
+
+/* A select here opens upward (data-side="above"), so its chevron points
+   up while closed and turns down as the menu opens. */
+.bottom-slot .picker-chevron { transform: rotate(180deg); }
+.bottom-slot .picker.is-open .picker-chevron { transform: none; }

@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.4.2 */
+/* personal-styling · picker · v0.5.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -14,6 +14,12 @@
   display: inline-flex;
 }
 .picker-trigger { justify-content: space-between; -webkit-tap-highlight-color: transparent; }
+/* NEW (v0.5): Large — beside the page nav in the bottom slot, the same
+   --height-slot (64px) as the large button and segmented control. */
+.picker--large .picker-trigger {
+  min-height: var(--height-slot);
+  padding: 0 var(--space-24);
+}
 .picker.is-placeholder .picker-value { color: var(--color-text-secondary); }
 
 /* The chevron is the only distinguishing mark. It turns with the menu,

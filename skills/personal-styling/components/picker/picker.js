@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.4.2 */
+/* personal-styling · picker · v0.5.0 */
 
 // A button that opens a listbox (the "select-only combobox" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.
@@ -98,8 +98,9 @@ document.querySelectorAll('.picker').forEach((picker) => {
     if (!trigger.style.minWidth) fitWidth();
     menu.hidden = false;
     // Open below, or above when there isn't room below the trigger.
+    // data-side="above" always opens upward (a picker in the bottom slot).
     const roomBelow = innerHeight - trigger.getBoundingClientRect().bottom;
-    picker.classList.toggle('is-above', roomBelow < menu.offsetHeight + PICKER_GAP);
+    picker.classList.toggle('is-above', picker.dataset.side === 'above' || roomBelow < menu.offsetHeight + PICKER_GAP);
     trigger.setAttribute('aria-expanded', 'true');
     setActive(selected() || enabled()[0], { instant: true });
     requestAnimationFrame(() => picker.classList.add('is-open'));

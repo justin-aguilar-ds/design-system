@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.11.0 */
+/* personal-styling · control-panel · v0.12.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -94,13 +94,13 @@
 .control-panel--docked .accordion-item.is-settled .accordion-content { overflow-y: auto; }
 .control-panel--docked .accordion-content { max-height: calc(100vh - 2 * var(--space-page) - var(--height-row)); } /* minus the heading row */
 
-/* A large button pins itself to the bottom edge on phones; the panel
-   rises 16px above it rather than covering it, and its open card is
-   shortened by the button and the gap. */
+/* A large button pins itself to the bottom edge on phones, and the bottom
+   slot holds the nav there; the panel rises 16px above either rather than
+   covering it, and its open card is shortened by the slot and the gap. */
 @media (max-width: 630px) {
-  body:has(.button--large) .control-panel--docked { bottom: calc(var(--space-page) + var(--height-row) + var(--space-16)); }
-  body:has(.button--large) .control-panel--docked .accordion-content {
-    max-height: calc(100vh - 2 * var(--space-page) - 2 * var(--height-row) - var(--space-16));
+  body:has(.button--large, .bottom-slot) .control-panel--docked { bottom: calc(var(--space-page) + var(--height-slot) + var(--space-16)); }
+  body:has(.button--large, .bottom-slot) .control-panel--docked .accordion-content {
+    max-height: calc(100vh - 2 * var(--space-page) - var(--height-row) - var(--height-slot) - var(--space-16));
   }
 }
 

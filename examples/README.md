@@ -10,7 +10,7 @@ links the skill's own files through `lib/` (a symlink to
 - `typography-stage.html` — prototype of the stage and sheet pattern for phones, on the typography-on-a-path tool: opening the controls splits the screen into two surfaces on a black ground, and the canvas re-fits above the sheet.
 - `data-proposals.html` — proposals for a line chart and table v1.0, awaiting approval: each has an approve/decline switch that turns its feature on or off in the live demos. Nothing here is in the skill yet.
 - `panel-proposals.html` — ways to calm a long control panel (mono field labels, separators, full-width or inline controls), awaiting approval. Nothing here is in the skill yet.
-- `bottom-proposals.html` — a system for the bottom of the screen (one slot, one 50px height, what goes in it) and three ways to combine the nav with a button or a select, as live mock screens, awaiting approval. Nothing here is in the skill yet.
+- `bottom-proposals.html` — a system for the bottom of the screen (one slot, one 50px height, what goes in it) and three ways to combine the nav with a button or a select, as live mock screens. Decided: H1 at 64px, S1, S2, A and O approved and moved into the skill as `patterns/bottom-slot/`; B, C and M declined.
 - `dinners.html` — a week of dinners: a sortable week beside fixed nights, an ideas list, a small form.
 
 Open one through a local server from this folder, or publish it with its `lib/` files.

@@ -1,0 +1,49 @@
+<!-- personal-styling · bottom-slot · v0.1.0 -->
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">A small site: the page nav alone.</p>
+    <div class="bottom-slot-frame">
+      <div class="bottom-slot">
+        <nav class="segmented segmented--large" aria-label="Pages">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-label is-active" type="button" aria-pressed="true">Work</button>
+          <button class="segmented-option t-label" type="button" aria-pressed="false">About</button>
+          <button class="segmented-option t-label" type="button" aria-pressed="false">Notes</button>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">A screen for one action: the large button, full width on a phone.</p>
+    <div class="bottom-slot-frame">
+      <div class="bottom-slot">
+        <button class="button button--large surface surface--rest surface--pill t-label" type="button">RSVP</button>
+      </div>
+    </div>
+  </div>
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Docked: two pages and the four-or-more pages’ select.</p>
+    <div class="bottom-slot-frame">
+      <div class="bottom-slot">
+        <nav class="segmented segmented--large" aria-label="Pages">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-label is-active" type="button" aria-pressed="true">Work</button>
+          <button class="segmented-option t-label" type="button" aria-pressed="false">About</button>
+        </nav>
+        <div class="picker picker--large" data-side="above">
+          <button class="picker-trigger button surface surface--rest surface--pill t-label" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="slot-more" aria-label="More pages">
+            <span class="picker-value">More</span>
+            <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="picker-menu" hidden>
+            <ul class="picker-list" id="slot-more" role="listbox" tabindex="-1" aria-label="More pages">
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="notes">Notes</li>
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="talks">Talks</li>
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="contact">Contact</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

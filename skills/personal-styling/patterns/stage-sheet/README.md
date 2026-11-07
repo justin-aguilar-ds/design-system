@@ -14,7 +14,7 @@ From building a typography tool on a phone: the docked control panel covered the
 - **No delays, no separate width.** Staging the separation before the growth felt slow; a sheet whose width animated on its own lagged behind its height and snapped to a maximum on close. Every edge comes from the shared values.
 - **The ground switches at once, both ways.** On as the open is asked for, while the stage still covers the screen; back as the close is asked for. Never animated, so it never fades through grey.
 - **The closed pill sits bottom centre**, the page inset from the bottom edge. `data-pill="right"` moves it to the corner. From the centre the sheet grows evenly on both sides; from the corner it grows out of it.
-- **The pill is the control panel's heading.** Mono title, `16px`, a bare `10px` chevron that points up while closed. No fill behind the chevron: an icon inside a control is a mark. `50px` tall with even `16px` insets.
+- **The pill is the control panel's heading.** Mono title, `16px`, a bare `10px` chevron that points up while closed. No fill behind the chevron: an icon inside a control is a mark. On a phone the closed pill is in the bottom slot, so it is `64px` (`--height-slot`) and fully round; it settles to the `50px` heading row as the sheet opens. On a wide screen it is the docked panel's `50px` row throughout. Even `16px` insets.
 - **One material.** The sheet is the solid surface from pill to card. Glass would turn grey over the ground mid-move. It lifts while it floats as a pill and loses its shadow once it's a surface in the layout.
 - **The controls arrive last.** They keep the open width, so the moving edge clips them rather than re-flowing them. They leave at once on close and fade in a beat after both surfaces settle on open.
 - **The heading is the handle.** Drag it to resize the split: both surfaces follow the finger 1:1. Let go and it snaps to 40%, 55% or 75% of the screen; a flick up jumps to the next height. Dragging below about a quarter of the screen, or flicking down, closes it. A tap closes it too. The sheet's contents scroll inside it.
@@ -33,6 +33,11 @@ From building a typography tool on a phone: the docked control panel covered the
 ## Open question
 
 - The stage takes the page colour, so it always stands out from the ground: a white stage on black in light, a black stage on white in dark. Content that paints its own background (a poster canvas set to white, say) can match the ground in dark mode, and then the stage's edge disappears and only the sheet shows the split. Undecided: give the stage a hairline when its content matches the ground, or accept it.
+
+
+## Changes in v0.3.0
+
+- On a phone the closed pill is 64px (`--height-slot`), the height of everything in the bottom slot, and shrinks to the 50px heading as it opens.
 
 ## Changes in v0.2.0
 

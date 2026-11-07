@@ -1,4 +1,4 @@
-/* personal-styling · segmented · v0.4.0 */
+/* personal-styling · segmented · v0.5.0 */
 
 /* One truth at a time. The frame is the one surface style plus the rest
    shadow, and lifts on hover like a button. Default metrics land on the
@@ -56,8 +56,15 @@
 .segmented-option.is-indicated,
 .segmented-option:focus-visible { opacity: 1; }
 
-/* The page nav — a site's top-level pages: the same control at nav size. */
-.segmented--nav .segmented-option { padding: var(--space-16) var(--space-24); }
+/* Large — the page nav, and anything in the bottom slot: the frame is
+   --height-slot (64px), so it matches the large button and select beside
+   it. 4px frame padding and the 1px border make up the rest. --nav is
+   the old name, kept as an alias. */
+.segmented--large .segmented-option,
+.segmented--nav .segmented-option {
+  min-height: calc(var(--height-slot) - 2 * var(--space-4) - 2px);
+  padding: 0 var(--space-24);
+}
 
 /* The list: one truth at a time down a column — the section you're
    reading, the item you're viewing. It sits on the page, so no frame and

@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.2.0 */
+/* personal-styling · stage-sheet · v0.3.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -159,6 +159,16 @@
   /* Open, nothing floats: the sheet is a surface in the layout, not above it. */
   .stage-sheet.is-open .stage-sheet-sheet { box-shadow: none; touch-action: pan-y; }
   .stage-sheet-body { width: calc(100cqw - 2 * var(--sheet-gap) - 2 * var(--space-16)); }
+  /* NEW (v0.3): closed, the pill is in the bottom slot, so it is the slot's
+     64px and fully round; it settles to the 50px heading row and the card
+     radius as it opens, on the same shared value. The stage's merged edge
+     follows the taller pill. */
+  .stage-sheet-stage {
+    bottom: calc(var(--split) * (2 * var(--sheet-gap) + env(safe-area-inset-bottom, 0px))
+                 + var(--sheet-h) - (1 - var(--split)) * var(--height-slot));
+  }
+  .stage-sheet-sheet { --radius-sheet: calc(var(--radius-slot) - var(--open) * (var(--radius-slot) - var(--radius-card))); }
+  .stage-sheet-toggle { min-height: calc(var(--height-slot) - var(--open) * (var(--height-slot) - var(--height-row)) - 2px); }
   /* The heading is the handle: drag to resize, tap to close. */
   .stage-sheet.is-open .stage-sheet-toggle { cursor: grab; touch-action: none; }
   .stage-sheet.is-resizing .stage-sheet-toggle { cursor: grabbing; }

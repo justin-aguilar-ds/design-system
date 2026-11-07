@@ -21,7 +21,7 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 
 - **For the main action of a screen** — the one thing the page exists to do. Above all on a phone, where it's the easiest target to reach.
 - **It's the pill, larger.** Same surface, rest shadow, hover lift and Label type. Add `.button--large` to a button that already has the pill classes.
-- **Its height is `--height-row` (50px)**, the height of a collapsed control panel, so a large button and a closed panel line up as one family.
+- **Its height is `--height-slot` (64px)** at every width: the height of everything in the bottom slot, so it matches a page nav or select beside it. In the bottom slot (`patterns/bottom-slot/`) the slot places it; alone, it places itself as below.
 - **Pinned to the bottom on a phone**, full width inside the page inset and `24px` from the bottom edge, so it's within reach wherever the page is scrolled. The page gets room at its end so the last content scrolls clear of it. Above 630px it sits in the page, as wide as its label plus `24px` either side.
 - **It shares the bottom edge with a docked control panel.** When both are on a phone screen, the panel's pill rises `16px` above the button.
 - **One per screen.** If two actions both look large, one of them isn't the main action.
@@ -32,6 +32,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Always a real `<button type="button">`, or `type="submit"` in a form.
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
+
+## Changes in v0.6.0
+
+- The large button is 64px (`--height-slot`), not 50: whatever sits at the bottom of a screen is one height. It no longer matches a collapsed control panel (50px), which is a panel row, not a slot.
 
 ## Changes in v0.5.0
 

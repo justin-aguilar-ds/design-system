@@ -22,6 +22,7 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 - `data-value` on each option is what goes into the hidden `<input>` and the `picker-change` event (`detail.value`, `detail.option`). Without it, the option's text is used.
 - For a picker with no visible label, such as in a toolbar, drop the label `<span>` and give the trigger and list an `aria-label` instead.
 - Type: `.t-control` for compact pickers, `.t-label` beside primary buttons. Options stay `.t-control`.
+- `.picker--large` on `.picker` makes the trigger 64px (`--height-slot`), with `.t-label`, for the bottom slot beside a large segmented control or button. Give it `data-side="above"` and it always opens upward; the bottom slot turns its chevron to point up.
 - Needs `button.css` for the trigger.
 
 ## Keyboard
@@ -34,6 +35,11 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | A letter | — | jumps to the first option that starts with it |
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
+
+## Changes in v0.5.0
+
+- `.picker--large`: a 64px trigger for the bottom slot.
+- `data-side="above"` on `.picker` always opens the menu upward.
 
 ## Changes in v0.4.2
 
