@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.12
+   Personal styling tokens — v0.13
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -65,6 +65,11 @@ img, video, svg { display: block; max-width: 100%; }
      take --color-fill-subtle. Always a fill under black text; never a text
      colour on the ground, never a data series, never decoration. If two
      things are accented at once, the rule is already broken. */
+  /* NEW (v0.13): GROUND — what shows between two surfaces when a screen
+     splits (patterns/stage-sheet/): the opposite of the page, black in
+     light, white in dark. It is the text colour, so it flips with it. */
+  --color-ground: var(--color-text);
+
   --color-accent: #FCFF28;
   --color-accent-ink: #000000;
   --color-accent-soft: rgba(252, 255, 40, 0.42);

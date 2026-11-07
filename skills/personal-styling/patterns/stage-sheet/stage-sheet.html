@@ -1,0 +1,45 @@
+<!-- personal-styling · stage-sheet · v0.1.0 -->
+<!-- The whole page: the stage is the work, the sheet holds its controls.
+     Size the stage's content to the stage — its box changes on every
+     frame of the split (a canvas: observe .stage-sheet-stage and redraw). -->
+<div class="stage-sheet">
+  <section class="stage-sheet-stage" aria-label="Preview">
+    <div style="display: grid; place-items: center; height: 100%;">
+      <p class="t-display">Ripple</p>
+    </div>
+  </section>
+
+  <section class="stage-sheet-sheet" aria-label="Controls">
+    <button class="stage-sheet-toggle" type="button" aria-expanded="false" aria-controls="sheet-body">
+      <span class="t-mono">Controls</span>
+      <svg class="stage-sheet-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="stage-sheet-body" id="sheet-body">
+      <div class="slider-field">
+        <div class="slider-head">
+          <label class="t-label" for="sheet-size">Size</label>
+          <output class="slider-value t-mono" for="sheet-size">56</output>
+        </div>
+        <span class="slider">
+          <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+          <input class="slider-input" id="sheet-size" type="range" min="16" max="120" value="56">
+        </span>
+      </div>
+      <div class="control-field">
+        <span class="t-label" id="sheet-weight-label">Weight</span>
+        <div class="segmented" role="group" aria-labelledby="sheet-weight-label">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option is-active t-control" type="button" aria-pressed="true">Medium</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false">Semibold</button>
+        </div>
+      </div>
+      <div class="control-field">
+        <span class="t-label" id="sheet-effects-label">Effects</span>
+        <div class="chip-row" role="group" aria-labelledby="sheet-effects-label">
+          <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Wave</button>
+          <button class="chip t-control" type="button" aria-pressed="false"><span class="chip-dot" aria-hidden="true"></span>Jitter</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

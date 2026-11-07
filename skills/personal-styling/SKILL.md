@@ -280,6 +280,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Control panel | a tool has controls that change the content below them, or docked to the corner — or a long page needs a contents list | `patterns/control-panel/` |
 | Type pairs | two pieces of text need a hierarchy — a title and a line, a number and its name, a page's opening | `patterns/type-pairs/` |
 | Carousel | one piece of content at a time — projects, photos, videos — each with a caption | `patterns/carousel/` |
+| Stage and sheet | a phone tool whose controls change something you need to watch — the controls split the screen instead of covering it | `patterns/stage-sheet/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the

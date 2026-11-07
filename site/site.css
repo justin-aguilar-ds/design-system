@@ -138,6 +138,21 @@ body { min-height: 100vh; }
   border-top: 1px solid var(--color-divider);
   border-bottom: 1px solid var(--color-divider);
 }
+/* Stage and sheet fills the screen, so in the sandbox it plays in a
+   phone-sized frame. Paint containment makes the frame its screen: the
+   pattern's fixed box fills the frame, not the window. */
+.pattern-stage:has(> .stage-sheet),
+.stage-sheet-frame {
+  position: relative;
+  contain: paint;
+  width: 100%;
+  max-width: 390px;
+  height: 720px;
+  margin-inline: auto;
+  padding: 0;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+}
 .pattern-demo-stack { display: flex; flex-direction: column; gap: var(--space-48); }
 .pattern-demo { display: flex; flex-direction: column; gap: var(--space-16); }
 /* Room under an open intro description. */

@@ -1,0 +1,164 @@
+/* personal-styling · stage-sheet · v0.1.0 */
+
+/* A live canvas and the controls that change it. On a phone, opening the
+   controls splits the screen into two surfaces on the ground: the stage
+   shrinks into a card at the top and its content re-fits, the closed pill
+   grows into a sheet below, 8px apart. On a wide screen the stage keeps
+   the page and the sheet opens as a 280px card in the corner.
+
+   Everything moves from three animated values on the root, so the two
+   surfaces are one shape changing on every frame:
+     --open     0 → 1   the sheet, pill to card
+     --split    0 → 1   the surfaces separating (phones only)
+     --sheet-h          the sheet's height on a phone (drag resizes it)
+   The pattern reads its own width, not the window's, so it works as the
+   whole page and inside a framed demo alike. */
+@property --open { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --split { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --sheet-h { syntax: '<length>'; inherits: true; initial-value: 50px; }
+
+.stage-sheet {
+  --sheet-gap: var(--space-8);          /* between the surfaces, and from every edge */
+  --sheet-pill-w: 120px;                /* measured by stage-sheet.js */
+  --sheet-card-h: 400px;                /* wide screens: the open card's height, measured */
+  --open: 0;
+  --split: 0;
+  --sheet-h: var(--height-row);
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  container: stage-sheet / size;
+  background: var(--color-bg);
+  /* Both surfaces, one move: one duration, one curve. */
+  transition:
+    --open var(--duration-deliberate) var(--ease-out),
+    --split var(--duration-deliberate) var(--ease-out),
+    --sheet-h var(--duration-deliberate) var(--ease-out);
+}
+/* A finger on the sheet's heading moves both surfaces 1:1. */
+.stage-sheet.is-resizing { transition: none; }
+/* The ground: on while split, and it switches at once both ways — on as
+   the open is asked for (the stage still covers it), back as the close is
+   asked for. Never animated, so it never passes through grey. */
+.stage-sheet.is-ground { background: var(--color-ground); }
+
+/* ---- The stage: whatever is being made. Its bottom edge is one gap
+   above the sheet, less whatever hasn't separated yet: merged, that is
+   exactly the closed pill over a full-bleed stage, so the two edges can
+   never cross by more than the pill's own height. */
+.stage-sheet-stage {
+  --radius-stage: calc(var(--split) * var(--radius-card));
+  position: absolute;
+  top: calc(var(--split) * (var(--sheet-gap) + env(safe-area-inset-top, 0px)));
+  left: calc(var(--split) * var(--sheet-gap));
+  right: calc(var(--split) * var(--sheet-gap));
+  bottom: calc(var(--split) * (2 * var(--sheet-gap) + env(safe-area-inset-bottom, 0px))
+               + var(--sheet-h) - (1 - var(--split)) * var(--height-row));
+  overflow: hidden;
+  background: var(--color-bg);          /* a surface of its own: the ground must never show through */
+  border-radius: var(--radius-stage);
+}
+
+/* ---- The sheet: one surface from pill to card. Solid, because glass
+   turns grey over the ground. Wide screens: the docked control panel's
+   corner (see patterns/control-panel/), growing from pill to 280px card. */
+.stage-sheet-sheet {
+  --radius-sheet: calc(var(--radius-row) - var(--open) * (var(--radius-row) - var(--radius-card)));
+  position: absolute;
+  right: var(--space-page);
+  bottom: calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--sheet-pill-w) + var(--open) * (280px - var(--sheet-pill-w)));
+  height: calc(var(--height-row) + var(--open) * (var(--sheet-card-h) - var(--height-row)));
+  padding: 0 var(--space-16);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-lift);
+  transition: box-shadow var(--duration-deliberate) var(--ease-out);
+}
+
+/* The heading row is the control panel's: mono title, 16px, a bare 10px
+   chevron at the far edge. No fill behind the chevron — an icon inside a
+   control is a mark. 50px with the border, 16px padding: even insets. */
+.stage-sheet-toggle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  width: 100%;
+  min-height: calc(var(--height-row) - 2px);
+  text-align: left;
+}
+.stage-sheet-toggle > * { transition: color var(--duration-fast) ease; }
+.stage-sheet-toggle .t-mono { white-space: nowrap; }
+/* Closed it points up, the way it opens. Lifted 1px to centre on the
+   capitals of the mono title, not its line box. */
+.stage-sheet-chevron {
+  flex: none;
+  width: var(--icon-mark);
+  height: var(--icon-mark);
+  color: var(--color-text-secondary);
+  translate: 0 -1px;
+  transform: rotate(180deg);
+  transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
+}
+.stage-sheet.is-open .stage-sheet-chevron { transform: none; }
+@media (hover: hover) and (pointer: fine) {
+  .stage-sheet-toggle:hover > * { color: var(--color-text); }
+}
+@media (hover: none) {
+  .stage-sheet-toggle:active > * { color: var(--color-text); transition-duration: var(--duration-instant); }
+}
+
+/* The controls keep the open width, so the moving edge clips them rather
+   than re-flowing them. They leave at once on close and arrive a beat
+   after both surfaces have settled on open. */
+.stage-sheet-body {
+  display: grid;
+  flex: 1 1 auto;
+  align-content: start;
+  gap: var(--space-24);
+  width: calc(280px - 2 * var(--space-16));
+  min-height: 0;
+  padding: var(--space-8) 0 var(--space-16);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duration-fast) ease, visibility var(--duration-instant) linear var(--duration-fast);
+}
+.stage-sheet.is-open .stage-sheet-body {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--duration-base) ease calc(var(--duration-deliberate) + var(--duration-fast) / 2), visibility var(--duration-instant);
+}
+
+/* ---- Phones: the split. The closed pill sits bottom centre (or right,
+   with data-pill="right"), the page inset from the bottom; open, the
+   sheet is a card 8px from the sides and bottom, as tall as --sheet-h. */
+@container stage-sheet (max-width: 630px) {
+  .stage-sheet-sheet {
+    --pill-left: calc((100cqw - var(--sheet-pill-w)) / 2);
+    --pill-right: calc((100cqw - var(--sheet-pill-w)) / 2);
+    left: calc(var(--open) * var(--sheet-gap) + (1 - var(--open)) * var(--pill-left));
+    right: calc(var(--open) * var(--sheet-gap) + (1 - var(--open)) * var(--pill-right));
+    bottom: calc(var(--open) * var(--sheet-gap) + (1 - var(--open)) * var(--space-page) + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    height: var(--sheet-h);
+  }
+  .stage-sheet[data-pill="right"] .stage-sheet-sheet {
+    --pill-left: calc(100cqw - var(--space-page) - var(--sheet-pill-w));
+    --pill-right: var(--space-page);
+  }
+  /* Open, nothing floats: the sheet is a surface in the layout, not above it. */
+  .stage-sheet.is-open .stage-sheet-sheet { box-shadow: none; touch-action: pan-y; }
+  .stage-sheet-body { width: calc(100cqw - 2 * var(--sheet-gap) - 2 * var(--space-16)); }
+  /* The heading is the handle: drag to resize, tap to close. */
+  .stage-sheet.is-open .stage-sheet-toggle { cursor: grab; touch-action: none; }
+  .stage-sheet.is-resizing .stage-sheet-toggle { cursor: grabbing; }
+}

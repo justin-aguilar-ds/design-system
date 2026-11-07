@@ -23,6 +23,7 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **Docking changes where it sits, not what it is.** The same surface, persistent shadow, mono title and pill-to-card corner as the panel above a tool.
 - **Closed, a pill only as wide as its label; open, a `280px` card** (the tooltip's width) that grows upward from the corner. The chevron points up while closed, because that's the way it opens. It opens by default on wide screens; start it closed on phones with `data-closed-below="630"` on the accordion item.
 - **Taller than the screen, it scrolls inside itself.** Fields stack in one column.
+- **On a phone, when the controls change something you need to watch** (a canvas, a preview), the docked panel would cover it. Use the stage and sheet pattern instead (`patterns/stage-sheet/`): opening the controls splits the screen into two surfaces, so the work stays in view.
 - **If the page has a large button**, which pins itself to the bottom edge on phones, the panel rises `16px` above it.
 - **A contents list is a segmented list** (`.segmented--list`) inside a docked panel: one section is current at a time, so it takes the gliding fill, not an ink change.
 - Keep the content clear of the corner where it matters: the open card covers the bottom right of whatever scrolls under it.
