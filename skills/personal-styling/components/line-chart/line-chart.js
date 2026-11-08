@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.2.0 */
+/* personal-styling · line-chart · v0.2.1 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }

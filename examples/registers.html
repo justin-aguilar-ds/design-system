@@ -340,6 +340,7 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
   </li>`).join('');
 </script>
 <script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/line-chart/line-chart.js"></script>
 <script src="lib/components/slider/slider.js"></script>
 <script src="lib/components/picker/picker.js"></script>
 <script src="lib/components/toast/toast.js"></script>
@@ -385,12 +386,19 @@ const head = (right = 'About', sub = '') => `<div class="m-head"><div class="m-s
 
 // A chart: one series in ink, two quiet ones in the series grey.
 const chart = (w, h) => {
-  const line = (seed, amp) => { let d = ''; for (let i = 0; i <= 12; i++) { const x = (i / 12) * w, y = h * 0.55 - Math.sin(i * 0.7 + seed) * amp - i * (h * 0.02); d += `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`; } return d; };
+  // Forty weeks a series, drawn through the line chart's own monotone curve
+  // (lineChartPath, components/line-chart/): smooth, never overshooting.
+  const N = 40;
+  const series = (seed, amp, lift) => Array.from({ length: N }, (_, i) => {
+    const t = i / (N - 1);
+    return h * 0.7 - (Math.sin(t * 8 + seed) * amp + Math.sin(t * 19 + seed * 1.7) * amp * 0.35 + Math.sin(t * 3 + seed * 0.5) * amp * 0.6) - t * h * lift;
+  });
+  const path = (ys) => lineChartPath(ys.map((y, i) => [(i * w) / (N - 1), y]), true);
   return `<svg class="m-chart" viewBox="0 0 ${w} ${h}" aria-hidden="true">
     ${[0.25, 0.5, 0.75].map((f) => `<line x1="0" x2="${w}" y1="${h * f}" y2="${h * f}" stroke="var(--color-hairline-strong)" stroke-dasharray="0 4" stroke-linecap="round"/>`).join('')}
-    <path d="${line(2, h * 0.12)}" stroke="var(--color-series)" stroke-width="2.25"/>
-    <path d="${line(4, h * 0.1)}" stroke="var(--color-series)" stroke-width="2.25"/>
-    <path d="${line(0, h * 0.18)}" stroke="var(--color-text)" stroke-width="3.25"/></svg>`;
+    <path d="${path(series(2, h * 0.11, 0.18))}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${path(series(4, h * 0.1, 0.1))}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${path(series(0, h * 0.14, 0.34))}" stroke="var(--color-text)" stroke-width="3.25"/></svg>`;
 };
 const PEOPLE = ['Ana Ruiz', 'Ben Okafor', 'Chloe Park', 'Dev Shah', 'Eli Moreau', 'Fay Lin', 'Gus Romero', 'Hana Ito', 'Ivo Petrov', 'Jun Ahn', 'Kai Berg', 'Lia Costa', 'Max Ross', 'Nia Cole', 'Omar Haddad', 'Pia Lund', 'Quinn Ray', 'Rex Hale', 'Sol Vega', 'Tao Wen'];
 const table = (rows) => `<table class="m-table"><thead><tr><th class="t-label">Player</th><th class="t-label">Team</th><th class="t-label num">Pts</th></tr></thead><tbody>${PEOPLE.slice(0, rows).map((p, i) => `<tr><td class="t-body">${p}</td><td class="t-mono">${['NYK', 'BOS', 'DEN', 'LAL', 'MIA'][i % 5]}</td><td class="t-mono num">${(48.2 - i * 1.7).toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
@@ -434,7 +442,7 @@ PAGE_RENDER.media = (c) => {
 };
 PAGE_RENDER.chart = (c, d) => ({ head: '',
   title: `<div class="m-intro"><h4 class="t-display">My team</h4>${INFO}</div>`,
-  hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Projected this week</span><span class="t-title">1,310</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
+  hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Projected this week</span><span class="t-title">1,310</span></div>${chart(d ? 1200 : 300, d ? 440 : 380)}</div>`,
   support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Roster</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
   corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` });
 const RENDER = [
