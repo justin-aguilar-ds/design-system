@@ -17,11 +17,11 @@
 <link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Register: Tool. The host works through data (a guest table with
-     filters and search, settings), so it is dense from the top: the title,
-     then everything at the tool gap of 24; guests beside the running order
-     on a wide screen; settings docked to the corner; the one action is the
-     large button (pinned on phones). */
+  /* A tool: the host works through data (a guest table with filters and
+     search, settings), so it is dense from the top — the title, then
+     everything at the gap of 48; guests beside the running order on a wide
+     screen; settings docked to the corner; the one action is the large
+     button (pinned on phones). */
   .page {
     max-width: var(--container);
     margin-inline: auto;
@@ -32,8 +32,8 @@
     flex-direction: column;
     gap: var(--space-24);
   }
-  .content { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24); align-items: start; }
-  .side { display: flex; flex-direction: column; gap: var(--space-24); min-width: 0; }
+  .content { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-48); align-items: start; }
+  .side { display: flex; flex-direction: column; gap: var(--space-48); min-width: 0; }
   @media (min-width: 900px) {
     .content { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
     .content > .span { grid-column: 1 / -1; }

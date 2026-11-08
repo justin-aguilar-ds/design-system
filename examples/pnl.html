@@ -14,10 +14,10 @@
 <link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Register: Tool. The person works through data (figures, two charts,
-     two sortable tables), so it is dense from the top: the title, then
-     everything at the tool gap of 24, the controls docked to the corner,
-     two columns where the screen allows. */
+  /* A tool: the person works through data (figures, two charts, two
+     sortable tables), so it is dense from the top — the title, then
+     everything at the gap of 48, the controls docked to the corner, two
+     columns where the screen allows. */
   .page {
     max-width: var(--container);
     margin-inline: auto;
@@ -26,7 +26,7 @@
     padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
     display: flex;
     flex-direction: column;
-    gap: var(--space-24);
+    gap: var(--space-48);
   }
   .page > * { min-width: 0; }
   .head { display: flex; flex-direction: column; gap: var(--space-24); }

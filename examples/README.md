@@ -6,7 +6,7 @@ links the skill's own files through `lib/` (a symlink to
 
 - `pnl.html` — a trading P&L dashboard: control panel, figures, two charts, sortable tables.
 - `party.html` — a party host's page: docked settings, guest table, running order, large button.
-- `registers.html` — a stage and sheet: a temporary layout visualizer for the registers, Expressive to Tool: a phone or desktop screen recomposes at each stop, with content amount, a space overlay, and proposals to approve or decline.
+- `registers.html` — a stage and sheet: the layout visualizer behind Page composition in SKILL.md (page or tool, the four heroes, Top, the gap and the room, the widths). Its rules were adopted; the page stays as a way to see them.
 - `typography-stage.html` — prototype of the stage and sheet pattern for phones, on the typography-on-a-path tool: opening the controls splits the screen into two surfaces on a black ground, and the canvas re-fits above the sheet.
 - `data-proposals.html` — proposals for a line chart and table v1.0, awaiting approval: each has an approve/decline switch that turns its feature on or off in the live demos. Nothing here is in the skill yet.
 - `panel-proposals.html` — ways to calm a long control panel (mono field labels, separators, full-width or inline controls), awaiting approval. Nothing here is in the skill yet.

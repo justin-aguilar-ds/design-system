@@ -11,12 +11,13 @@
 <link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Register: Page. One main view you come back to: the week is the
-     hero, right under the title, then its numbers, then the ideas, all at
-     the page gap of 48. The nights stay put down the left, the dinners
-     move beside them. */
+  /* A page: one main view you come back to. The week is the hero, right
+     under the title, then its numbers, then the ideas, all at the gap of
+     48, in the reading width — a list of short rows scanned down one
+     column. The nights stay put down the left, the dinners move beside
+     them. */
   .page {
-    max-width: 880px;
+    max-width: var(--container-read);
     margin-inline: auto;
     padding-block: var(--space-page-block);
     padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));

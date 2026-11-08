@@ -309,10 +309,10 @@ const PROPOSALS = [
   ['R2', 'A page is a title, a hero, then content', 'Page covers everything that isn’t a tool. The title opens it; the hero sits under it in the first screen; the content follows. The hero can be an object to look at or play with (few words), a statement (the title is the hero), media with its text as one block (the text the gap below the media), or the main chart in a card. What differs is the hero, not the layout.'],
   ['R3', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. A chart page or a tool may carry the info button beside its title, nothing more.'],
   ['R4', 'Top is the default composition', 'The title at the top and the hero right under it. With little content the rest is anchored to the bottom (above the bottom slot when there is one) and the room left sits between; with lots, the rest follows at the gap and the page scrolls. Centre and Bottom are for a single object that should float.'],
-  ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed: 48 at Page, 24 at Tool, between groups; 24 or 16 inside them. No new spacing step: the room supplies any extra air. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
+  ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed at 48 between groups, on pages and tools alike; 24 or 16 inside them. No new spacing step: the room supplies any extra air. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
   ['R6', 'The hero is sized from the screen', 'A share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a chart in a card about half the screen tall. It fills a phone and a desktop alike.'],
   ['R7', 'A reading width only where there is reading', 'A page with paragraphs centres its title and content in a 720px column on a wide screen, a new --container-read. A statement and a list run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
-  ['R8', 'Tools are dense from the top', 'Tool has no composition: fixed 24 gaps, read from the title down, the panel docked to the corner, table rows at their tightest, two columns on a wide screen. Precision is its expression.'],
+  ['R8', 'Tools are dense from the top', 'Tool has no composition: the gap of 48, read from the title down, the panel docked to the corner, table rows at their tightest, two columns on a wide screen. Precision is its expression.'],
   ['R9', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same in both registers. Expression in a tool comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
@@ -343,10 +343,10 @@ const REG = [
   { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: [48, 48], inner: 16, rowPad: 16,
     note: 'A title, a hero in the first screen, content below it. A type toy, an about page, a post, a tracker you check: one register, four kinds of hero.',
     things: '', hero: '', carries: [] },
-  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: [24, 24], inner: 16, rowPad: 8,
+  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: [48, 48], inner: 16, rowPad: 8,
     note: 'You work through data: many figures, a table, many controls. A league tool, a dashboard, a ledger. Precision is the expression.',
     things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
-    carries: [['Space', '24 between sections, the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as a page']] },
+    carries: [['Space', '48 between groups, like a page; the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as a page']] },
 ];
 // Page's three heroes: the same register, the same composition.
 const PAGE_HERO = {
@@ -410,13 +410,13 @@ const PAGE_RENDER = {
     return { head: '',
       title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
       // The media and its text are one block: the text always sits the gap below the media.
-      hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+      hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
       support: c === 2 ? `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
       slot: '' };
   },
   chart: (c, d) => ({ head: '',
     title: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
-    hero: `<div class="m-hero-card surface surface--rest"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
+    hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
     support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
     corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` }),
 };

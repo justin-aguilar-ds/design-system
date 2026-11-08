@@ -5,7 +5,7 @@ description: House style for personal software — monochrome with one accent, f
 
 # Personal Styling
 
-A distilled house style, extracted from a personal portfolio site and then deliberately tightened. The aesthetic is **monochrome with one accent, typographically flat, heavily motion-tuned**: five spacing steps, three type styles to a card, and the entire personality carried by timing and easing rather than decoration.
+A distilled house style, extracted from a personal portfolio site and then deliberately tightened. The aesthetic is **monochrome with one accent, typographically flat, composed with space**: five spacing steps, three type styles to a card, one hero under the title. Expression comes from space, layout and the hero, never from decoration; motion and interaction are the constant underneath, the same on every page.
 
 Everything this skill needs sits next to this file: `tokens.css`, the `components/` library and the `patterns/` that arrange them. The repository this skill lives in also builds a sandbox site that renders every component and its states.
 
@@ -16,6 +16,10 @@ Everything this skill needs sits next to this file: `tokens.css`, the `component
 Build the boilerplate first: semantic HTML, default browser styles, no
 tokens, no surfaces, no accent, no custom type. Get the structure and the
 content right before a single styling decision exists.
+
+Then decide whether it is a **page or a tool** (see Page composition):
+does the person work through data, or look, read and check? That decides
+the layout before any styling does.
 
 Then add design only from this skill, one decision at a time, and only
 when something on the page earns it:
@@ -49,8 +53,8 @@ Every page is built for a form factor: the device the person is prompting from, 
 ## The six rules that matter most
 
 1. **Monochrome plus one accent, spent sparingly.** Black text, 50%-black secondary text, white ground, and `#FCFF28` for *attention* — never for state. If two things on screen are accented, the rule is already broken.
-2. **Five spacing steps: 4, 8, 16, 24, 48.** Everything lands on one. `4` is the inner padding of a small control only — never a gap between blocks. A value off the scale is a mistake, not a nuance.
-3. **Three type styles to a card.** A title, body copy, and one emphasis — the large number *or* the mono detail, never both. One headline to a view, with no eyebrow above it.
+2. **Five spacing steps: 4, 8, 16, 24, 48, and the room.** Every gap lands on a step: `48` between groups, on every page. `4` is the inner padding of a small control only — never a gap between blocks. The one distance that isn't a step is the room: the height left over below the hero, given to the page on purpose. Any other value off the scale is a mistake, not a nuance.
+3. **Lead with the title; three type styles to a card.** The title is the first thing on the screen, with nothing small above it. A card takes a title, body copy, and one emphasis — the large number *or* the mono detail, never both.
 4. **Lists live on the page; surfaces are for content.** Dividers carry structure. A card is for an image, a chart, a demo, or a real card being shown — not for wrapping a list of rows. There is exactly **one** surface style: white fill + `#ececec` hairline, with `0 2px 14px rgba(0,0,0,.04)` added only if it lifts on hover. Buttons are the exception: every button-shaped control carries that shadow at rest — see Buttons.
 5. **Two easing curves.** `cubic-bezier(0.23, 1, 0.32, 1)` for things entering or leaving the screen; plain `ease` for hover and colour. Never mix them up.
 6. **Slower than feels right.** Overlays take 800ms. Nav takes 450ms. Default AI output lands at 200–300ms for everything; that's the single biggest tell.
@@ -155,8 +159,13 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **Mono is for values and identifiers, and nothing else**: a figure in a table, a tick on an axis, a timestamp, an ID, a hex code, a year range. Uppercase, `+0.3px`, secondary, 10.5px, weight 500. **Table content defaults to 10.5 mono** — tables do not inherit font sizes for mono; every data cell is 10.5 mono (see `components/table/`). Weight is always 500.
 - **Mono is always weight 500 — never bold.** Set the weight explicitly on the mono role so heading/title semantics, inherited control styles, and browser defaults can never promote it to 600 or 700. The collapsible control-panel title exception changes mono’s role, not its weight.
 - **Rule of thumb: a number is often mono, a word almost never is.** If the mono text you're about to write is a phrase, it belongs in Caption or Label.
-- **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Three exceptions, and only three: the title and field labels inside a control panel, the tooltip, and the name above a figure in a type pair (`patterns/type-pairs/`) — a figure's name is closer to an axis label than a heading. Budget mono like the accent: if a view is speckled with small caps, cut it back.
+- **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Three exceptions, and only three: the title and field labels inside a control panel, the tooltip, and the name above a figure in a type pair (`patterns/type-pairs/`) — a figure's name is closer to an axis label than a heading. (A stage and sheet's title is mono only while it docks like a panel on a wide screen; on a phone, where it is a 64px pill in the bottom slot, it is Label like the large button.) Budget mono like the accent: if a view is speckled with small caps, cut it back.
 - The one exception the source documents is a **label under the cursor** — the hover-cursor pill is `-0.25px` and full black, because it has to read instantly at pointer speed.
+
+## Controls: heights and insets
+
+- **Every control is 36px, so any control can sit beside any other.** The button (either type), segmented control, picker, input, chip, icon button and the intro's info button all take `--height-control`, set as a height rather than left to padding plus line height. A large icon button and a collapsed panel are `--height-row`, 50px. **Whatever sits at the bottom of the screen is 64px** (`--height-slot`): the page nav (`.segmented--large`), the large button, a large select and a phone sheet's closed pill, all in the one bottom slot (see `patterns/bottom-slot/`). Put a group in `.field-row`: it wraps, keeps `16px` between controls, and lines them up along the bottom.
+- **Every control is spaced inside by three distances.** A label sits `--inset-control` (16) from a 36px control's edge and `--inset-slot` (24) from a 64px one's, whether it's on the surface or in a fill. A fill sits `--inset-fill` (4) inside its frame at both sizes: a segment's fill, a menu's options. A chevron, arrow, check or dot sits `--gap-mark` (8) from its label. A label inside a fill pads by edge − fill, so a segment's label lines up with a button's beside it and a menu's options line up under the trigger. A control that hugs its label keeps these exact; never stretch a control so its chevron drifts to the far edge.
 
 ## Icons
 
@@ -169,20 +178,38 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 ## Space & layout
 
 - **Five steps, and nothing between them: `4 / 8 / 16 / 24 / 48`.**
-  - `4` — inner padding of a small control (pill, chip, segment button). Never a gap between blocks.
-  - `8` — label to value, icon to text.
-  - `16` — inside a card, between fields.
-  - `24` — the page's side inset, the inset of anything pinned to an edge, and card to card.
-  - `48` — section to section, and the top and bottom of the page.
-- **The page is `48` top and bottom, `24` at the sides.** `--space-page-block` (48) opens and closes the page flow: the air above the intro is a section's worth, twice the sides, which gives the opening its weight. `--space-page` (24) is the side inset and the inset of everything pinned to an edge — a docked panel, the large button, a nav pill — on every side. Both are roles that point at existing steps; there is no sixth step.
-- **Cap reading content at `1280px` and centre it.**
-- **Layout is binary per surface.** Centred at a max-width (reading surfaces) *or* full-width with the `24px` page inset (data-dense tools, wide tables). A surface that is neither — content that looks centred but isn't constrained, a wide table floating in an unconstrained frame — is a defect. Pick one and hold it; never let a container drift between the two.
-- **Derived positions are written as `calc()` with a comment explaining the arithmetic**, never as a hardcoded magic number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
-- Layout is **fixed-position chrome over a full-viewport content layer**, not a document that scrolls. `height: 100vh; overflow: hidden` on the page, content pinned to the edges, the middle given over to the main object.
+  - `4` — inner padding of a small control (pill, chip, segment button), and a frame to the fill inside it. Never a gap between blocks.
+  - `8` — label to value, icon to text, a label to its mark.
+  - `16` — inside a card, between fields, a label to a compact control's edge.
+  - `24` — the page's side inset, the inset of anything pinned to an edge, card to card, a label to a 64px control's edge.
+  - `48` — **the gap**: between groups on every page, tools included, and the top and bottom of the page.
+- **Two kinds of space: the gap and the room.** Every distance between groups is one of two things. The gap is fixed at `48`. The room is whatever height is left once everything is placed: there is one, below the hero, and with a lot of content it is zero and the page flows at the gap. Write the room as `margin-top: auto` on what follows the hero, never as a number. **Nothing is ever padded to push content down**: a section given a min-height or a spacer to fill the screen is the mistake the room exists to avoid.
+- **The page is `48` top and bottom, `24` at the sides.** `--space-page-block` (48) opens and closes the page flow: the air above the title is a section's worth, twice the sides, which gives the opening its weight. `--space-page` (24) is the side inset and the inset of everything pinned to an edge — a docked panel, the bottom slot — on every side. Both are roles that point at existing steps; there is no sixth step.
+- **Derived values are roles, written as `calc()`.** A segment's label pads by edge − fill (`calc(var(--inset-control) - var(--inset-fill))`, 12); a position below a line of type adds its line height. Write the arithmetic, with a comment, never the resulting number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
+- **Three widths, and a page holds one.**
+  - `--container-read` (720px), centred — a page someone reads or scans down one column: paragraphs, a list of short rows.
+  - Full width inside the `24px` inset, capped at `--container` (1280px) and centred — a statement that should stay on one line, media at its size, and every tool.
+  - Never content that looks centred but isn't constrained, or a wide table floating in an unconstrained frame. Pick one and hold it; never let a container drift between the two.
+- **A page scrolls; its first screen is composed.** The title, the hero and the room are arranged to fill the first screen, then the rest of the page follows at the gap. The only fixed things are the bottom slot (`patterns/bottom-slot/`), a docked control panel, and a stage and sheet, which is the one layout that fills the viewport (`patterns/stage-sheet/`).
 - **One breakpoint: `630px`.** Don't build a four-tier responsive system.
 - Every grid and flex item that can hold a chart, a table or a long string needs `min-width: 0`, or its content will widen the column instead of scrolling inside it.
 - A floating detail card over a canvas (a map, a diagram) is `position: absolute` within a positioned parent, `max-height: calc(100% - 48px)`, with its own `overflow-y: auto`.
-- Content ends are masked with a **gradient fade to the ground colour**; scrollbars are hidden (`scrollbar-width: none` + the webkit pseudo-element).
+- Inside a canvas or a scrolling surface, ends are masked with a **gradient fade to the ground colour** and scrollbars are hidden (`scrollbar-width: none` + the webkit pseudo-element). The page itself keeps the browser's scrollbar.
+
+## Page composition
+
+How a screen is arranged. Decide it before any styling.
+
+- **Page or tool.** Ask one question: does the person work through data — many figures, a table they sort, filter or compare, five or more controls? Then it is a **tool**. Anything else — something to look at, play with, read or check — is a **page**. The topic and the words in the brief don't decide it: a "plant dashboard" with three plants is a page. Say which in the first reply ("A page: one view you check weekly"), so it can be corrected before anything is built. Components keep their sizes and uses on both; only the arrangement changes.
+- **A page is a title, a hero, then content.** The title opens it. The hero sits right under it in the first screen. The hero is one of four things:
+  - **an object** to look at or play with, with few words — a carousel card, a type toy (on a phone with controls, a stage and sheet);
+  - **a statement** — the title is the hero, and a list or details follow;
+  - **media with its text**, one block, the text `48` below the media;
+  - **the main view in a card** — a chart, a week — about half the screen tall, its numbers after it.
+- **Top is the default composition.** The title at the top, the hero right under it at the gap. With little content, the rest is anchored to the bottom — above the bottom slot when there is one — and the room sits between; with a lot, the rest follows at the gap and the page scrolls. Centre (the hero midway) and Bottom (the hero down with its support) are only for a single object that should float.
+- **The hero is sized from the screen**, not a fixed number: a share of its width or height (a card about two-thirds of the width, media at the column's full width, a chart card about half the screen tall), so it fills a phone and a desktop alike.
+- **A tool is dense from the top.** No composition and no room: the title, then everything at the gap, read from the top. Figures, charts and tables; the controls docked to the corner (`patterns/control-panel/`); two columns on a wide screen where the content allows; full width.
+- **Expression lives in the arrangement.** A page feels designed because of its space, its hero and what's left out; a tool because of its precision. Neither gets a different button, a louder colour or more motion.
 
 ## Surfaces
 
@@ -192,24 +219,24 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **One quiet fill, for secondary controls only.** `--color-fill-quiet` is the surface of a secondary control — a secondary icon button: grey, no edge, no shadow, deepening to `--color-fill-quiet-hover` on hover. It is never a container and never state; selection keeps `--color-fill-subtle`.
 - `--color-fill-subtle` has one job: the **selected state** (a pressed segment, the current nav item, a chip that's on). It is not a background, not a well, not a panel, not a demo stage. If you are filling an area to group it, use a divider or nothing.
 - The hairline is the constant.
-- **The shadow is conditional, not part of the recipe.** `0 2px 14px rgba(0,0,0,.04)` goes on things that lift on hover — the nav pill, a floating call to action. Buttons are excepted: every button-shaped control carries the rest shadow at rest (see Buttons). There are two persistent-elevation exceptions. The collapsible control panel near the top of an artifact carries a shadow that establishes the control layer above the content. A carousel item always carries the lift shadow, because it's the object you pick up and move (see `patterns/carousel/`). The tooltip, the toast and the cursor pill carry the hairline alone. Shipping a shadow on any other surface that can't be hovered is the mistake, not shipping one without a shadow.
+- **The shadow is conditional, not part of the recipe.** `0 2px 14px rgba(0,0,0,.04)` goes on things that lift on hover — the nav pill, a floating call to action. Buttons are excepted: every button-shaped control carries the rest shadow at rest (see Buttons). There are two persistent-elevation exceptions. The collapsible control panel near the top of an artifact carries a shadow that establishes the control layer above the content. A carousel item always carries the lift shadow, because it's the object you pick up and move (see `patterns/carousel/`). The tooltip, the toast and the cursor pill carry the hairline alone, and so does a page's hero card: it is content, not something that lifts. Shipping a shadow on any other surface that can't be hovered is the mistake, not shipping one without a shadow.
 - **Radius reads binary**: `20px` for cards and media; fully round for pills and buttons. Nothing in the 4–12px range.
 - **Nested shapes are concentric.** When a filled shape has to sit inside a rounded one (a segment's fill in its frame, an option's fill in a menu), its inset is the same on every side it's near, and its radius is the outer radius minus that inset. Inside a pill that means the inset is `(outer height − inner height) / 2` on the top, the bottom and the near end. A shape that can't keep an even inset doesn't belong inside: drop its fill and let it be a mark.
 - **Optical alignment: centre on what the eye sees.** A mark beside text centres on the text's capitals, not its line box. Uppercase mono sits 1px high in its line, so a `10px` mark beside it lifts 1px (`translate: 0 -1px`, which survives a rotation). Padding is even from the surface's edge to the ink, at both ends of a pill.
 - **Rows decide the radius; 60px is the test.** A surface that holds one row — one line of text, or one row of controls — is a pill. Two rows or more, it's a card. When unsure, measure: under `--pill-below` (60px) is one row. The number is `20 + 20 + 20`, the least height where the straight side is as long as a card corner; between 40 and 60px a 20px radius makes a near-pill that matches nothing else in the system.
-  - Fixed surfaces are decided in the markup: a toast is always one row, so always a pill; a picker menu is always several, so always a card.
+  - Fixed surfaces are decided in the markup: a toast is always one row, so always a pill; a picker menu is always several, so always a card. A control with a fixed one-row height is a pill whatever that height is: the 64px controls in the bottom slot are over 60px and still fully round (`--radius-slot`).
   - Surfaces whose content or state varies — a tooltip of unknown length, a table row that might wrap, a panel that collapses — are measured by their script once their height is known, and take `.is-pill` under the threshold.
   - When a surface changes rows in motion — a panel collapsing — animate the corner with the height, on the same duration and curve, from `--radius-card` to `--radius-row` (30px, half of `--pill-below`). A one-row surface is under 60px, so 30px always renders fully round, and since the browser draws the smaller of the corner and half the height, the shape changes continuously. Never animate toward `999px`: it passes the half-height cap within a few frames and reads as a snap. (The source actually uses 20, 50, 80, 110 and 999px — every value over 20px exceeds its own box height, so they all render the same. Use 20px or `999px`.)
 - Three shadow levels only: rest `0 2px 14px/.04`, hover-lift `0 6px 20px/.18`, media `0 14px 34px/.24`.
 - `backdrop-filter: blur(20px)` over a 50%-white fill — used once, on the floating cursor pill. It's a garnish, not a theme.
 - `box-shadow`, not `filter: drop-shadow`, on anything transform-animated (iOS Safari smears the latter).
 
-## Composition
+## Card composition
 
 The constraint that does the most work in practice.
 
 - **Three type styles to a card, maximum.** A title (Label), body copy (Body), and one emphasis — the large number (Display/Title) *or* the mono detail. Picking both is the mistake. Chart internals — axis ticks, tooltips, legends — sit outside the budget.
-- **One headline to a view.** No eyebrow above it, no kicker below it, **and nothing on the line beside it.** A heading followed by a `<span>` descriptor — `## Colour · seven greys and one accent` — is the same mistake wearing a different hat: it turns the heading into a label and buries the summary in chrome. Say `Relay`, then describe it in body copy on its own line; not `RELAY · DELIVERY PLATFORM` stacked over `Overview`, and not `Colour` with a trailing gloss.
+- **One headline to a view, and it leads.** Nothing small sits above it: no eyebrow, no name-and-About header, no Close link, no mono label. Navigation and the one action go in the bottom slot. The only thing allowed beside it is the info button (`patterns/artifact-intro/`). No kicker below it either, **and nothing on the line beside it.** A heading followed by a `<span>` descriptor — `## Colour · seven greys and one accent` — is the same mistake wearing a different hat: it turns the heading into a label and buries the summary in chrome. Say `Relay`, then describe it in body copy on its own line; not `RELAY · DELIVERY PLATFORM` stacked over `Overview`, and not `Colour` with a trailing gloss.
 - If the descriptor is worth reading, it is a sentence under the heading. If it isn't, delete it. Usually it isn't — see Labels.
 - **If a card needs a second line, it is body copy**, not a smaller heading and not mono.
 - A four-style card is the commonest failure: eyebrow, title, number, mono footer. Drop the eyebrow and turn the footer into a sentence.
@@ -225,8 +252,6 @@ The heading names the section and the content names itself. Most labels are a se
 - **Label when the value alone is ambiguous.** A number ("40" means nothing without "Capacity"), a slider, an on/off pair like Shown / Hidden, a field someone types into. A placeholder never labels a field someone fills in, because it vanishes as they type. The one exception is a single field with a button beside it that names it ("Add guest").
 - **Never label twice.** A control under a heading that already names it takes no label of its own. "Invite link" over a field labelled "Link" is one name said twice.
 - **A group is all labelled or all bare.** Controls side by side (a filter bar, a form row, a control panel) either all have a label above them or none do. One labelled field beside bare ones pushes its control off the shared line and the row breaks. If one control in a group needs a label, they all get one.
-- **Every control is 36px, so any control can sit beside any other.** The button (either type), segmented control, picker, input, chip, icon button and the intro's info button all take `--height-control`, set as a height rather than left to padding plus line height. A large icon button and a collapsed panel are `--height-row`, 50px. **Whatever sits at the bottom of the screen is 64px** (`--height-slot`): the page nav (`.segmented--large`), the large button, a large select and a phone sheet's closed pill, all in the one bottom slot (see `patterns/bottom-slot/`). Put a group in `.field-row`: it wraps, keeps `16px` between controls, and lines them up along the bottom.
-- **Every control is spaced inside by three distances.** A label sits `--inset-control` (16) from a 36px control's edge and `--inset-slot` (24) from a 64px one's, whether it's on the surface or in a fill. A fill sits `--inset-fill` (4) inside its frame at both sizes: a segment's fill, a menu's options. A chevron, arrow, check or dot sits `--gap-mark` (8) from its label. A label inside a fill pads by edge − fill, so a segment's label lines up with a button's beside it and a menu's options line up under the trigger. A control that hugs its label keeps these exact; never stretch a control so its chevron drifts to the far edge.
 - **A label is Label, `8px` above its control, in a field** — except inside a control panel (or a stage and sheet's sheet), where it is mono and sits on the left with its control on the right (see `patterns/control-panel/`). The input, picker and slider bring their own (`.input-field`, `.picker-field`, `.slider-field`); a segmented control or chip row goes in `.control-field`. All four are the same shape.
 - **Values keep their names.** A figure still takes its mono name above it (see `patterns/type-pairs/`), because a number with no name is a guess. These rules are about chrome, not data.
 
@@ -279,8 +304,8 @@ For a tool, reach for the patterns first, then fill them with components.
 
 | Pattern | Reach for it when | Folder |
 |---|---|---|
-| Artifact intro | a tool opens with a title and needs to say what it is | `patterns/artifact-intro/` |
-| Control panel | a tool has controls that change the content below them, or docked to the corner — or a long page needs a contents list | `patterns/control-panel/` |
+| Artifact intro | a page or tool opens with its title, and the info button beside it says what it is | `patterns/artifact-intro/` |
+| Control panel | a tool's controls, docked to the corner — or a long page needs a contents list | `patterns/control-panel/` |
 | Type pairs | two pieces of text need a hierarchy — a title and a line, a number and its name, a page's opening | `patterns/type-pairs/` |
 | Carousel | one piece of content at a time — projects, photos, videos — each with a caption | `patterns/carousel/` |
 | Bottom slot | something pinned to the bottom of the screen — the page nav, the main action, or the nav docked beside one action or one select | `patterns/bottom-slot/` |
@@ -333,7 +358,7 @@ the values and leave the vocabulary alone.
   edge doesn't run through the text. Caption or mono, secondary ink.
 - Hit targets: at least `24px`, separate from the drawn mark.
 
-## Motion — where the personality lives
+## Motion — the constant
 
 **Durations**
 
@@ -428,10 +453,10 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | `line-height: 1.5` / `1.6` on headings and UI | Tight px line-heights |
 | `font-weight: 600`/`700` headings | 500 |
 | Grey-100/200 borders and `shadow-lg` cards | `#ececec` hairline, shadow only if it lifts |
-| Three-column feature grid with icon circles | One object, centred, with chrome pinned to the edges |
+| Three-column feature grid with icon circles | One hero under the title, sized from the screen |
 | Emoji in headings or labels | Nothing, or uppercase mono |
 | Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black — polarity fills excepted (see Colour) |
-| Centred hero: big title, subtitle, two CTAs | A short name block in the top-left corner and one nav pill |
+| Centred hero: big title, subtitle, two CTAs | The title first, the hero under it, the nav in the bottom slot |
 | Glassmorphism throughout | One blurred element, at most |
 | Tailwind utility soup with arbitrary values | The tokens in `tokens.css` |
 | Mono as a subtitle, section header, column header or button label | Label for subtitles and headers, Interactive for controls |
@@ -442,10 +467,12 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | A coloured status badge, or status by opacity | Glyph + word at full ink |
 | A card with four type styles | Title + body + one emphasis |
 | `gap: 10px`, `padding: 13px`, odd one-off values | 4 / 8 / 16 / 24 / 48, no exceptions |
-| Content running the full width of a 2560px monitor | `--container: 1280px`, centred |
+| Content running the full width of a 2560px monitor | `--container` (1280px), or `--container-read` (720px) for reading, centred |
 | A list, table or feed wrapped in a card | A heading and dividers on the page |
 | A `fill-subtle` box used as a quieter card | Nothing, or a divider. One surface style only |
 | A shadow on a card that can't be hovered | Hairline alone; shadow means it lifts |
+| A name, an About link or a Close link above the title | The title first; links in the bottom slot |
+| A min-height or spacer to push content to the bottom | `margin-top: auto`: the room, not padding |
 
 ## Common mistakes
 
@@ -461,3 +488,6 @@ The point of this skill is output that doesn't read as model-generated. These ar
 - **Inventing a second container by filling it.** `fill-subtle` as a panel background is a card wearing a disguise.
 - **Speeding motion up** because 800ms feels slow in isolation. It doesn't in context.
 - **Skipping the reduced-motion block.**
+- **Padding to fill the screen.** A section given a min-height, or a spacer, so the next one lands below the fold. The room does that job, and only when there's room to give.
+- **Putting small things above the title.** A name, a breadcrumb, a Close link: they make the title read weaker and take the room the composition needs.
+- **Calling it a tool because of the topic.** "Dashboard", "tracker" and "planner" don't make a tool; working through data does.

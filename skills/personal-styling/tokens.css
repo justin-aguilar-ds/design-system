@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.17
+   Personal styling tokens — v0.18
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -50,6 +50,10 @@ img, video, svg { display: block; max-width: 100%; }
      viewport with no scrolling body). 1280px is the industry-standard
      ceiling. CHANGED (v0.5): the 890px prose measure is removed. */
   --container: 1280px;
+  /* NEW (v0.18): the reading width — a page someone reads or scans down one
+     column (paragraphs, a list of short rows), centred. --container stays
+     the outer limit for everything else. */
+  --container-read: 720px;
 
   /* COLOUR */
   --color-text: #000000;
