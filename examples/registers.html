@@ -148,8 +148,8 @@
   /* Workspace: the first screen is the title, the hero card and its
      numbers; the hero card takes the room left, and anything more sits
      below the fold by design. */
-  .m-first { box-sizing: border-box; display: flex; flex-direction: column; gap: var(--m-gap-inner); min-height: var(--m-first-h, auto); }
-  .m-hero-card { flex: 1; display: grid; align-content: space-between; gap: var(--space-16); min-height: 240px; padding: var(--space-24); }
+  .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
+  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 52cqh; padding: var(--space-24); }
   .m-hero-card .m-chart { align-self: end; }
   .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
@@ -241,14 +241,14 @@
         <span class="t-mono" id="comp-l">Composition</span>
         <div class="picker" id="comp">
           <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="comp-list" aria-labelledby="comp-l comp-v">
-            <span class="picker-value" id="comp-v">Centre</span>
+            <span class="picker-value" id="comp-v">Top</span>
             <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="picker-menu" hidden>
             <ul class="picker-list" id="comp-list" role="listbox" tabindex="-1" aria-labelledby="comp-l">
               <li class="picker-option t-control" role="option" aria-selected="false" data-value="stack">Stack</li>
-              <li class="picker-option t-control" role="option" aria-selected="true" data-value="centre">Centre</li>
-              <li class="picker-option t-control" role="option" aria-selected="false" data-value="top">Top</li>
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="centre">Centre</li>
+              <li class="picker-option t-control" role="option" aria-selected="true" data-value="top">Top</li>
               <li class="picker-option t-control" role="option" aria-selected="false" data-value="bottom">Bottom</li>
             </ul>
           </div>
@@ -295,19 +295,18 @@
 
 <script>
 const PROPOSALS = [
-  ['R1', 'Five registers, Expressive to Tool', 'Expressive, Showcase, Page, Workspace and Tool, each a layout recipe in SKILL.md: what it is for, how many things share the screen, its distances, and its hero. A brief names its register before anything is built; the register picks the recipe, the components stay the same.'],
-  ['R2', 'A 96 step, for the expressive end', 'A sixth spacing step, --space-96, used only between groups at Expressive and Showcase. And a role token, --space-section, that the register sets: 96, 96, 48, 48, 24. Components never read 96; layouts do.'],
-  ['R3', 'Wider sides on a wide screen, at the expressive end', 'Expressive, Showcase and Page take 48 at the sides on a wide screen, so the work sits inside a frame of air. Workspace and Tool keep 24 for the room. Phones keep 24 at every register.'],
-  ['R4', 'Fit to the screen', 'When the content fits one screen, the main group centres in the room between the header and the bottom slot, so a page with little on it reads as composed, not unfinished. Expressive, Showcase and Page fit; Workspace and Tool stay top-aligned, because a tool is read from the top. Try Page with Little content.'],
-  ['R5', 'One hero, front and centre', 'The expressive end has exactly one hero: the tool’s focus, a component, or display type. It is sized from the screen (a share of its width and height), not a fixed number, so it fills a phone and a desktop alike. Everything else steps back to secondary ink.'],
-  ['R7', 'Compose the room: title, hero, support', 'At the expressive end a screen is composed in three parts: a title at the top, the hero, and its supporting content at the bottom. The space between them isn’t a token: it is the room left between the header and the bottom slot, shared out by the composition. Centre puts the hero midway; Top keeps the title and hero together with the support at the bottom; Bottom brings the hero down to its support. --space-section is the least it can shrink to. Tools always stack. Try them with Composition.'],
-  ['R8', 'A reading width for text at the expressive end', 'On a wide screen, a register with text to read (Showcase, Page) centres its head and content in a 720px column, a new --container-read; --container (1280) stays the outer limit for everything. Expressive heroes and tools run the full width inside the inset. Phones are narrower than both, so nothing changes there.'],
-  ['R9', 'Lead with the title', 'At every register but Tool, nothing small sits above the title: no name-and-About header, no Close link, no mono eyebrow. The title is the first and strongest thing on the screen; navigation goes in the bottom slot. Small links above a title make the content under them read weaker, and they eat the room the composition needs.'],
-  ['R10', 'A workspace’s hero owns the first screen', 'At Workspace the main view sits in a card that grows to fill the first screen, with its numbers under it. Anything more (a table, a list) starts below the fold on purpose, so the hero breathes; scroll for the rest. A tool is the opposite: dense from the top, everything in reach.'],
-  ['R6', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
+  ['R1', 'Name the register first', 'Five registers from Expressive to Tool: Expressive, Showcase, Page, Workspace, Tool. A brief names its register before anything is built, and the register picks the layout recipe. The components never change between registers; space, layout and how many things share the screen do.'],
+  ['R2', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. At Workspace and Tool the title may carry the info button beside it, nothing more.'],
+  ['R3', 'Top is the default composition', 'The title at the top, the hero right under it at the register’s section gap, the supporting content anchored to the bottom (above the bottom slot when there is one). Read from the top, the title and hero land together; the support waits at the bottom. Centre and Bottom are for a single object that should float, like a type toy.'],
+  ['R4', 'Two kinds of space: the gap and the room', 'Every distance on a screen is one of two things. The gap is fixed by the register: 96 at Expressive and Showcase, 48 at Page and Workspace, 24 at Tool between groups, 24 or 16 inside them. The room is variable: whatever height is left once everything is placed, and there is only one, below the hero. With lots of content the room is zero and the page flows at the gaps; nothing is padded to push content down.'],
+  ['R5', 'The hero is sized from the screen', 'The hero takes a share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a workspace’s main chart in a card about half the screen tall. It fills a phone and a desktop alike, and whatever follows it sits at the gap.'],
+  ['R6', 'A reading width only where there is reading', 'A screen with paragraphs (Showcase) centres its title and content in a 720px column, a new --container-read, on a wide screen. A statement and a list (Page) run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
+  ['R7', 'Tools are dense from the top', 'Workspace and Tool have no composition: fixed gaps, read from the title down, the panel docked to the corner. Tool is the tightest (24 between groups, 8 around a table row) and splits into two columns on a wide screen. Precision is its expression.'],
+  ['R8', 'A 96 step and wider sides, for the expressive end only', 'A sixth spacing step, --space-96, used only as the gap at Expressive and Showcase, set through a --space-section role the register controls. Those two and Page take 48 at the sides on a wide screen; Workspace and Tool keep 24; phones keep 24 everywhere.'],
+  ['R9', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
-try { decisions = JSON.parse(localStorage.getItem('register-proposals') || '{}'); } catch {}
+try { decisions = JSON.parse(localStorage.getItem('register-rules') || '{}'); } catch {}
 document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
   <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
     <div class="proposal-copy">
@@ -334,18 +333,18 @@ const REG = [
   { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
     note: 'One thing, front and centre. Personal software with a single job: a type toy, a mix, a card. The layout is the design.',
     things: 'A title, the hero, a caption, the nav', hero: 'A component, sized from the screen',
-    carries: [['Layout', 'The hero fills the screen between the header and the nav'], ['Space', '96 around the hero; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
+    carries: [['Layout', 'The hero right under the title; the room left falls below it'], ['Space', '96 around the hero; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
   { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
     note: 'One piece of work at a time, with a caption. A portfolio page, a launch, a single result.',
     things: 'A title, the work, a paragraph', hero: 'A piece of media, as wide as the column',
-    carries: [['Layout', 'The work centred, the caption under it'], ['Space', '96 between the header, the work and the caption'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
+    carries: [['Layout', 'Title, the work at the column’s width, then the text'], ['Space', '96 between the title, the work and the text'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
   { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: 48, inner: 16, rowPad: 16,
     note: 'Something to read and one thing to do. An about page, an invitation, a menu.',
     things: 'A statement and a list, one action', hero: 'The statement, in display type',
     carries: [['Type', 'A display statement carries the page'], ['Space', '48 between groups, 16 inside the list'], ['Layout', 'With little content it centres; with lots it reads from the top']] },
   { name: 'Workspace', fit: false, inset: [24, 24], block: [48, 48], section: 48, inner: 24, rowPad: 16,
     note: 'A tool with one main view. A planner, a calculator, a tracker you check.',
-    things: 'A title, the hero card, its numbers; more below the fold', hero: 'The main chart, in a card that fills the first screen',
+    things: 'A title, the hero card, its numbers, then more', hero: 'The main chart, in a card about half the screen tall',
     carries: [['Layout', 'Top-aligned: read from the title down'], ['Space', '48 between sections, 24 inside them'], ['Interaction', 'Hover, tooltips and focus carry the feel']] },
   { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: 24, inner: 16, rowPad: 8,
     note: 'Dense and precise, still designed. A league tool, a dashboard, a ledger. Precision is the expression.',
@@ -353,9 +352,9 @@ const REG = [
     carries: [['Space', '24 between sections, the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as Expressive']] },
 ];
 const SIZES = { phone: [390, 844], desktop: [1440, 900] };
-const state = { r: 0, content: 1, size: 'phone', space: false, comp: 'centre', maxw: 0 };
+const state = { r: 0, content: 1, size: 'phone', space: false, comp: 'top', maxw: 0 };
 // The max width each register suggests; the control follows the register.
-const MAXW = [0, 720, 720, 0, 0];
+const MAXW = [0, 720, 0, 0, 0];
 const COMP_NOTE = { stack: 'Fixed gaps; the group centred in the room', centre: 'Title at the top, support at the bottom, the hero centred between', top: 'Title and hero at the top; support at the bottom', bottom: 'Title at the top; hero and support at the bottom' };
 
 const CHEV = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -459,20 +458,7 @@ function render() {
 // The space between each group and the one before it, measured: a fixed
 // gap reads as its number, a gap that takes the room left over as auto.
 let gaps = [];
-function sizeFirst() {
-  const first = screen.querySelector('.m-first');
-  if (!first) return;
-  const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
-  const top = (first.getBoundingClientRect().top - screen.getBoundingClientRect().top) / k + screen.scrollTop;
-  const pad = parseFloat(getComputedStyle(screen.querySelector('.m')).paddingBottom);
-  // The first screen runs to the fold; its numbers end clear of the docked
-  // pill, and whatever follows starts below the fold.
-  const room = screen.querySelector('.m-corner') ? 50 + 24 + 16 : pad;
-  first.style.setProperty('--m-first-h', `${Math.max(0, screen.clientHeight - top)}px`);
-  first.style.paddingBottom = `${room}px`;
-}
 function markGaps() {
-  sizeFirst();
   const reg = REG[state.r];
   const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
   const main = screen.querySelector('.m-main');
@@ -504,8 +490,8 @@ function readout(reg, k) {
     const over = screen.scrollHeight - screen.clientHeight;
     const n = (screen.scrollHeight / screen.clientHeight);
     document.getElementById('fold-note').textContent = over <= 1
-      ? (reg.fit ? 'Fits one screen · centred in the room left' : 'Fits one screen · top-aligned, a tool reads from the top')
-      : state.r === 3 ? `${n.toFixed(1)} screens · the hero fills the first; the rest is below the fold by design` : `${n.toFixed(1)} screens · scroll inside the screen`;
+      ? (reg.fit ? `Fits one screen · ${state.comp === 'stack' ? 'the group centred' : state.comp === 'top' ? 'the room left falls below the hero' : state.comp === 'centre' ? 'the hero midway' : 'the hero down with its support'}` : 'Fits one screen · read from the top')
+      : `${n.toFixed(1)} screens · scroll inside the screen`;
   });
 }
 
@@ -545,7 +531,7 @@ function summarise() {
 document.getElementById('proposals').addEventListener('segmented-change', (e) => {
   const item = e.target.closest('.proposal'); if (!item) return;
   decisions[item.dataset.id] = e.detail.value;
-  try { localStorage.setItem('register-proposals', JSON.stringify(decisions)); } catch {}
+  try { localStorage.setItem('register-rules', JSON.stringify(decisions)); } catch {}
   item.classList.toggle('is-declined', e.detail.value === 'decline');
   summarise();
 });
