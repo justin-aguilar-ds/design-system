@@ -91,7 +91,8 @@
      title, the hero and the supporting content is what's left over. */
   .m.is-fit.comp-stack .m-main { margin-block: auto; }
   .m.is-fit:not(.comp-stack) .m-main { flex: 1; }
-  .m.is-fit.comp-centre .m-main { display: grid; grid-template-rows: auto 1fr auto; }
+  .m.is-fit.comp-centre .m-main:has(> [data-role="hero"]) { display: grid; grid-template-rows: auto 1fr auto; }
+  .m.is-fit:not(.comp-stack) .m-main:not(:has(> [data-role="hero"])) [data-role="support"] { margin-top: auto; }
   .m.is-fit.comp-centre [data-role="hero"] { align-self: center; }
   .m.is-fit.comp-top [data-role="support"] { margin-top: auto; }
   .m.is-fit.comp-bottom [data-role="hero"] { margin-top: auto; }
@@ -102,13 +103,13 @@
   .m-center { text-align: center; justify-items: center; }
 
   /* Expressive: the carousel, sized from the screen. */
-  .m-carousel { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+  .m-carousel { display: flex; align-items: start; justify-content: flex-start; gap: var(--space-16); margin-right: calc(-1 * var(--m-inset)); overflow: visible; }
   .m-card {
     flex: none;
     display: grid;
     align-content: start;
     padding: var(--space-24);
-    width: min(60cqw, 28cqh);
+    width: min(64cqw, 32cqh);
     aspect-ratio: 4 / 5;
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
@@ -116,12 +117,13 @@
     box-shadow: var(--shadow-lift);
     transition: translate var(--duration-pop) var(--ease-out), rotate var(--duration-pop) var(--ease-out);
   }
-  .m-card.is-side { opacity: 0.2; width: min(40cqw, 20cqh); box-shadow: none; }
+  .m-card.is-side { opacity: 0.2; box-shadow: none; }
   .m-card:not(.is-side):hover { translate: 0 calc(-1 * var(--space-4)); rotate: -1deg; }
 
   /* Showcase: one piece of work. */
   .m-media { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
-  .is-desktop .m-media { width: min(100%, 720px); margin-inline: auto; }
+  .m-prose { display: grid; gap: var(--space-16); }
+  .m-prose p { color: var(--color-text-secondary); }
 
   /* Page: a statement, then a list on dividers. */
   .m-list { display: grid; }
@@ -143,6 +145,12 @@
   .m-table th { border-top: 0; }
   .m-table .num { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
   .m-split { display: grid; gap: var(--m-section); }
+  /* Workspace: the first screen is the title, the hero card and its
+     numbers; the hero card takes the room left, and anything more sits
+     below the fold by design. */
+  .m-first { box-sizing: border-box; display: flex; flex-direction: column; gap: var(--m-gap-inner); min-height: var(--m-first-h, auto); }
+  .m-hero-card { flex: 1; display: grid; align-content: space-between; gap: var(--space-16); min-height: 240px; padding: var(--space-24); }
+  .m-hero-card .m-chart { align-self: end; }
   .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
   /* The bottom slot, drawn in the screen (the real one is fixed to the window). */
@@ -294,6 +302,8 @@ const PROPOSALS = [
   ['R5', 'One hero, front and centre', 'The expressive end has exactly one hero: the tool’s focus, a component, or display type. It is sized from the screen (a share of its width and height), not a fixed number, so it fills a phone and a desktop alike. Everything else steps back to secondary ink.'],
   ['R7', 'Compose the room: title, hero, support', 'At the expressive end a screen is composed in three parts: a title at the top, the hero, and its supporting content at the bottom. The space between them isn’t a token: it is the room left between the header and the bottom slot, shared out by the composition. Centre puts the hero midway; Top keeps the title and hero together with the support at the bottom; Bottom brings the hero down to its support. --space-section is the least it can shrink to. Tools always stack. Try them with Composition.'],
   ['R8', 'A reading width for text at the expressive end', 'On a wide screen, a register with text to read (Showcase, Page) centres its head and content in a 720px column, a new --container-read; --container (1280) stays the outer limit for everything. Expressive heroes and tools run the full width inside the inset. Phones are narrower than both, so nothing changes there.'],
+  ['R9', 'Lead with the title', 'At every register but Tool, nothing small sits above the title: no name-and-About header, no Close link, no mono eyebrow. The title is the first and strongest thing on the screen; navigation goes in the bottom slot. Small links above a title make the content under them read weaker, and they eat the room the composition needs.'],
+  ['R10', 'A workspace’s hero owns the first screen', 'At Workspace the main view sits in a card that grows to fill the first screen, with its numbers under it. Anything more (a table, a list) starts below the fold on purpose, so the hero breathes; scroll for the rest. A tool is the opposite: dense from the top, everything in reach.'],
   ['R6', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
@@ -323,19 +333,19 @@ document.body.ontouchstart = () => {};
 const REG = [
   { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
     note: 'One thing, front and centre. Personal software with a single job: a type toy, a mix, a card. The layout is the design.',
-    things: '1 hero, a header line, the nav', hero: 'A component, sized from the screen',
+    things: 'A title, the hero, a caption, the nav', hero: 'A component, sized from the screen',
     carries: [['Layout', 'The hero fills the screen between the header and the nav'], ['Space', '96 around the hero; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
   { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
     note: 'One piece of work at a time, with a caption. A portfolio page, a launch, a single result.',
-    things: '1 hero, a caption, a header, the nav', hero: 'A piece of media, as wide as the column',
+    things: 'A title, the work, a paragraph', hero: 'A piece of media, as wide as the column',
     carries: [['Layout', 'The work centred, the caption under it'], ['Space', '96 between the header, the work and the caption'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
   { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: 48, inner: 16, rowPad: 16,
     note: 'Something to read and one thing to do. An about page, an invitation, a menu.',
-    things: 'A statement, a list, one action', hero: 'Display type',
+    things: 'A statement and a list, one action', hero: 'The statement, in display type',
     carries: [['Type', 'A display statement carries the page'], ['Space', '48 between groups, 16 inside the list'], ['Layout', 'With little content it centres; with lots it reads from the top']] },
   { name: 'Workspace', fit: false, inset: [24, 24], block: [48, 48], section: 48, inner: 24, rowPad: 16,
     note: 'A tool with one main view. A planner, a calculator, a tracker you check.',
-    things: 'Intro, panel, figures, a chart', hero: 'The main view: a chart or a list',
+    things: 'A title, the hero card, its numbers; more below the fold', hero: 'The main chart, in a card that fills the first screen',
     carries: [['Layout', 'Top-aligned: read from the title down'], ['Space', '48 between sections, 24 inside them'], ['Interaction', 'Hover, tooltips and focus carry the feel']] },
   { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: 24, inner: 16, rowPad: 8,
     note: 'Dense and precise, still designed. A league tool, a dashboard, a ledger. Precision is the expression.',
@@ -370,34 +380,29 @@ const figures = (n) => `<div class="m-figures">${[['Points', '1,284'], ['Rank', 
 
 const RENDER = [
   // Expressive
-  (c, d) => {
-    const cards = c === 0 ? 1 : d && c === 2 ? 5 : 3;
-    const side = (cards - 1) / 2;
-    const card = (i) => `<div class="m-card${i === side ? '' : ' is-side'}"><span class="t-title">${i === side ? 'Episode 12' : 'Episode'}</span></div>`;
-    return { head: head(),
-      title: `<div class="m-stack"><span class="t-mono">Side A</span><span class="t-title">Stay Home Radio</span></div>`,
+  (c) => {
+    const cards = c === 0 ? 1 : c === 2 ? 4 : 3;
+    const card = (i) => `<div class="m-card${i ? ' is-side' : ''}"><span class="t-title">Episode ${12 - i}</span></div>`;
+    return { head: '',
+      title: `<h4 class="t-display">Stay Home Radio</h4>`,
       hero: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`,
-      support: `<div class="m-stack m-center"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
+      support: `<div class="m-stack"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
       slot: nav('Design', 'Music', 1) };
   },
   // Showcase
   (c) => {
-    const media = (t) => `<div class="m-media"><div class="m-stack m-center"><span class="t-label m-quiet">Introducing</span><span class="t-label">${t}</span></div></div>`;
-    const caption = (y) => `<div class="m-stack m-center"><p class="t-body m-quiet">Visual refresh</p><p class="t-body m-quiet">Studio · ${y}</p></div>`;
-    const more = c === 2 ? [['Field Guide', 2025], ['Night Market', 2024]].map(([t, y]) => media(t) + caption(y)).join('') : '';
-    return { head: head(),
-      title: `<p class="t-body m-quiet">${c ? 'Product designer, making tools and type for people who read closely.' : 'Product designer.'}</p>`,
-      hero: media('New Sans'),
-      support: `<div class="m-stack" style="gap: var(--m-section)">${caption(2026)}${more}</div>`,
-      slot: nav('Design', 'Music', 0) };
+    const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
+    return { head: '',
+      title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
+      hero: `<div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div>`,
+      support: `<div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}${c === 2 ? `<div class="m-prose" style="padding-top: var(--m-gap-inner)"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : ''}</div>`,
+      slot: '' };
   },
   // Page
   (c) => {
     const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
-    return {
-      head: `<div class="m-head"><span></span><span class="t-body m-quiet">Close</span></div>`,
-      title: `<span class="t-mono">About</span>`,
-      hero: `<div class="m-stack" style="gap: var(--m-gap-inner)"><p class="t-display">A product designer who makes small tools.</p>${c ? '<p class="t-display">Having fun with prototypes.</p>' : ''}</div>`,
+    return { head: '',
+      title: `<h4 class="t-display">A product designer who makes small tools.</h4>`,
       support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
       slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
     };
@@ -405,10 +410,12 @@ const RENDER = [
   // Workspace
   (c, d) => ({
     head: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
-    main: `<div class="m-panel surface surface--rest"><span class="t-mono">Controls</span>${CHEV_DOWN}</div>
-      ${c ? figures(2) : ''}
-      <div class="m-split${d && c === 2 ? ' is-two' : ''}"><div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Hours by day</span>${chart(d ? 720 : 340, d ? 260 : 180)}</div>${c === 2 ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(6)}</div>` : ''}</div>`,
-    slot: '',
+    main: `<div class="m-first">
+        <div class="m-hero-card surface surface--rest"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>
+        ${figures(d ? 4 : 2)}
+      </div>
+      ${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}`,
+    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>`,
   }),
   // Tool
   (c, d) => ({
@@ -439,7 +446,7 @@ const fit = () => {
 function render() {
   const reg = REG[state.r], d = state.size === 'desktop', k = d ? 1 : 0;
   const parts = RENDER[state.r](state.content, d);
-  const main = parts.main ?? ['title', 'hero', 'support'].map((r) => `<div class="m-part" data-role="${r}">${parts[r]}</div>`).join('');
+  const main = parts.main ?? ['title', 'hero', 'support'].filter((r) => parts[r]).map((r) => `<div class="m-part" data-role="${r}">${parts[r]}</div>`).join('');
   screen.className = `screen is-${state.size}${state.space ? ' show-space' : ''}`;
   // A bottom slot is always the page inset from the bottom edge, whatever the register's block.
   const padB = parts.slot ? 24 : reg.block[k];
@@ -452,7 +459,20 @@ function render() {
 // The space between each group and the one before it, measured: a fixed
 // gap reads as its number, a gap that takes the room left over as auto.
 let gaps = [];
+function sizeFirst() {
+  const first = screen.querySelector('.m-first');
+  if (!first) return;
+  const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
+  const top = (first.getBoundingClientRect().top - screen.getBoundingClientRect().top) / k + screen.scrollTop;
+  const pad = parseFloat(getComputedStyle(screen.querySelector('.m')).paddingBottom);
+  // The first screen runs to the fold; its numbers end clear of the docked
+  // pill, and whatever follows starts below the fold.
+  const room = screen.querySelector('.m-corner') ? 50 + 24 + 16 : pad;
+  first.style.setProperty('--m-first-h', `${Math.max(0, screen.clientHeight - top)}px`);
+  first.style.paddingBottom = `${room}px`;
+}
 function markGaps() {
+  sizeFirst();
   const reg = REG[state.r];
   const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
   const main = screen.querySelector('.m-main');
@@ -460,7 +480,8 @@ function markGaps() {
   let prev = screen.querySelector('.m-head, .m-intro');
   gaps = [];
   [...main.children].forEach((el) => {
-    const g = prev ? Math.round((el.getBoundingClientRect().top - prev.getBoundingClientRect().bottom) / k) : reg.section;
+    if (!prev) { delete el.dataset.gap; prev = el; return; }
+    const g = Math.round((el.getBoundingClientRect().top - prev.getBoundingClientRect().bottom) / k);
     const auto = reg.fit && state.comp !== 'stack' ? g > reg.section + 1 : g > reg.section * 2 + 1;
     el.dataset.gap = auto ? `auto · ${g}` : g;
     el.style.setProperty('--gap-h', `${g}px`);
@@ -484,7 +505,7 @@ function readout(reg, k) {
     const n = (screen.scrollHeight / screen.clientHeight);
     document.getElementById('fold-note').textContent = over <= 1
       ? (reg.fit ? 'Fits one screen · centred in the room left' : 'Fits one screen · top-aligned, a tool reads from the top')
-      : `${n.toFixed(1)} screens · scroll inside the screen`;
+      : state.r === 3 ? `${n.toFixed(1)} screens · the hero fills the first; the rest is below the fold by design` : `${n.toFixed(1)} screens · scroll inside the screen`;
   });
 }
 
