@@ -4,30 +4,87 @@
 h1, h2, h3, p, ul, ol, pre { margin: 0; }
 body { min-height: 100vh; }
 
-/* A reading surface: centred at --container; 48 top and bottom, 24 at the sides. */
-.site { padding: var(--space-page-block) var(--space-page); }
+/* Every page leads with its title — nothing above it; the nav waits in the
+   bottom slot. Centred at --container, 48 top and bottom, 24 at the sides,
+   and every group 48 apart: the gap. */
+.site {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-48);
+  padding: var(--space-page-block) var(--space-page);
+}
+.site > * { min-width: 0; }
+/* A page someone reads holds to the reading width (the rules). */
+.site--read { max-width: var(--container-read); }
 
-/* The header: the name top-left in secondary ink, like a short
-   name block; the nav pill and the quiet theme action on the right. */
-.site-header {
+/* A quiet footer: what this is, and the theme — an infrequent action, so
+   the text treatment. On a divider, at the end of the page. */
+.site-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-16);
-}
-.site-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
+  padding-top: var(--space-24);
+  border-top: 1px solid var(--color-divider);
 }
 
-.site-main {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-48);
-  padding-top: var(--space-48);
+/* Rows on the page: a name, a sentence, and sometimes a value. Lists live
+   on the page, on dividers, never in cards. */
+.row-list { list-style: none; padding: 0; }
+.row-list > li { border-top: 1px solid var(--color-divider); }
+.row-list > li:first-child { border-top: 0; }
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) calc(var(--space-48) + var(--space-24)); /* the last column fits a mono word like Explorer */
+  gap: var(--space-8) var(--space-24);
+  align-items: baseline;
+  padding: var(--space-16) 0;
 }
+.row-list > li:first-child > .row, .row-list > li.row:first-child { padding-top: 0; }
+.row > .t-mono:last-child { text-align: right; }
+.row--two { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+.row--two > .t-mono:first-child { text-align: left; }
+.row .t-body { color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
+.row code { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--color-text); }
+@media (hover: hover) and (pointer: fine) {
+  .row--link:hover .t-body { color: var(--color-text); }
+}
+@media (hover: none) {
+  .row--link:active .t-body { color: var(--color-text); transition-duration: var(--duration-instant); }
+}
+@media (max-width: 630px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row > .t-body { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* A component's page: what it is, shown right under the title, on a hero
+   card that lifts like the page's object. */
+.demo--hero { box-shadow: var(--shadow-lift); }
+
+/* Space: the five steps drawn as bars, and the room as what's left. */
+.space-scale { list-style: none; padding: 0; }
+.space-scale li {
+  display: grid;
+  grid-template-columns: var(--space-48) minmax(0, 120px) minmax(0, 1fr);
+  gap: var(--space-24);
+  align-items: center;
+  padding: var(--space-16) 0;
+  border-top: 1px solid var(--color-divider);
+}
+.space-scale li:first-child { border-top: 0; padding-top: 0; }
+.space-bar { display: block; height: var(--space-8); background: var(--color-text); border-radius: var(--radius-pill); }
+.space-bar--room { width: var(--space-48); height: var(--space-8); background: none; border: 1px dashed var(--color-hairline-strong); }
+@media (max-width: 630px) {
+  .space-scale li { grid-template-columns: var(--space-48) minmax(0, 1fr); }
+  .space-scale .t-caption { grid-column: 2; }
+}
+
+/* Controls: the two heights, live. */
+.specimen-list-wide { list-style: none; padding: 0; display: grid; gap: var(--space-48); }
+.specimen-list-wide > li { display: grid; gap: var(--space-16); }
+.specimen-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.specimen-slot-button { min-height: var(--height-slot); padding: 0 var(--inset-slot); }
 .site-section {
   display: flex;
   flex-direction: column;

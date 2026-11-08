@@ -114,6 +114,50 @@
 </section>
 
 <section class="site-section">
+  <h2 class="t-label">Space</h2>
+  <p class="t-body">Five steps, and the room. Every gap lands on a step; the one distance that isn’t a step is the height left below the hero.</p>
+  <ul class="space-scale">
+    <li><span class="space-bar" style="width: var(--space-4)"></span><span class="t-mono" data-token="--space-4"></span><span class="t-caption">Inside a small control; a frame to its fill</span></li>
+    <li><span class="space-bar" style="width: var(--space-8)"></span><span class="t-mono" data-token="--space-8"></span><span class="t-caption">Label to value, icon to text, a label to its mark</span></li>
+    <li><span class="space-bar" style="width: var(--space-16)"></span><span class="t-mono" data-token="--space-16"></span><span class="t-caption">Inside a card; a label to a compact control’s edge</span></li>
+    <li><span class="space-bar" style="width: var(--space-24)"></span><span class="t-mono" data-token="--space-24"></span><span class="t-caption">The page’s sides; card to card; a label to a 64px control’s edge</span></li>
+    <li><span class="space-bar" style="width: var(--space-48)"></span><span class="t-mono" data-token="--space-48"></span><span class="t-caption">The gap: between groups, on every page</span></li>
+    <li><span class="space-bar space-bar--room"></span><span class="t-mono">The room · auto</span><span class="t-caption">What’s left below the hero — margin-top: auto, never padding</span></li>
+  </ul>
+</section>
+
+<section class="site-section">
+  <h2 class="t-label">Controls</h2>
+  <p class="t-body">Two heights, so any control sits beside any other, and three distances inside them.</p>
+  <ul class="specimen-list-wide">
+    <li>
+      <div class="specimen-controls">
+        <button class="button surface surface--rest surface--pill t-control" type="button">Export</button>
+        <div class="segmented" role="group" aria-label="Range, example">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true">Week</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false">Season</button>
+        </div>
+        <span class="button surface surface--rest surface--pill t-control" aria-hidden="true">All teams <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Guards</button>
+      </div>
+      <div class="type-pair"><span class="t-label">Compact</span><span class="t-caption">Every control in the page — labels 16 from the edge, marks 8 from the label</span><span class="t-mono" data-token="--height-control"></span></div>
+    </li>
+    <li>
+      <div class="specimen-controls">
+        <div class="segmented segmented--large" role="group" aria-label="Pages, example">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-label is-active" type="button" aria-pressed="true">Draft</button>
+          <button class="segmented-option t-label" type="button" aria-pressed="false">Board</button>
+        </div>
+        <span class="button surface surface--rest surface--pill t-label specimen-slot-button" aria-hidden="true">Join the league</span>
+      </div>
+      <div class="type-pair"><span class="t-label">The bottom slot</span><span class="t-caption">Whatever sits at the bottom of the screen — labels 24 from the edge</span><span class="t-mono" data-token="--height-slot"></span></div>
+    </li>
+  </ul>
+</section>
+
+<section class="site-section">
   <h2 class="t-label">Surfaces</h2>
   <p class="t-body">Most things sit on the page. One surface style, for content; a shadow only on what lifts.</p>
   <ul class="specimen-grid">
@@ -190,5 +234,18 @@
       <div class="specimen-stage"><span class="icon-button icon-button--secondary"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="15.5" cy="10" r="1.5" fill="currentColor"/></svg></span></div>
       <div class="type-pair"><span class="t-label">Secondary</span><span class="t-caption">The quiet fill — no edge, no shadow</span></div>
     </li>
+  </ul>
+</section>
+
+<section class="site-section">
+  <h2 class="t-label">Motion</h2>
+  <p class="t-body">Slower than feels right, and the same on every page. A strong ease-out for what enters or leaves; plain ease for hover and colour.</p>
+  <ul class="row-list">
+    <li class="row row--two"><span class="t-mono" data-token="--duration-fast"></span><p class="t-body">Hover, colour, a fade that should feel instant</p></li>
+    <li class="row row--two"><span class="t-mono" data-token="--duration-base"></span><p class="t-body">Small things scaling, a fill moving over dense targets</p></li>
+    <li class="row row--two"><span class="t-mono" data-token="--duration-pop"></span><p class="t-body">A tooltip or toast growing from its point</p></li>
+    <li class="row row--two"><span class="t-mono" data-token="--duration-deliberate"></span><p class="t-body">The nav, a fill moving over a few large targets</p></li>
+    <li class="row row--two"><span class="t-mono" data-token="--duration-entrance"></span><p class="t-body">A container appearing; the groups of a page arriving</p></li>
+    <li class="row row--two"><span class="t-mono" data-token="--duration-slow"></span><p class="t-body">A full-surface takeover</p></li>
   </ul>
 </section>

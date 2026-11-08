@@ -1,0 +1,163 @@
+/* The hero section: the two screens, then the steps under them. */
+.showcase { display: grid; gap: var(--space-24); }
+
+/* The System page's hero: the system recomposing itself, from a page with
+   an object as its hero to a tool, on a desktop and a phone screen. The
+   same mock pages as examples/expression.html. Site chrome, linted like a
+   component. */
+
+/* The hero: the same step on a desktop and a phone, at their real sizes,
+   scaled to share one height. On a phone, the phone screen alone. */
+.showcase-screens { display: flex; justify-content: center; align-items: flex-end; gap: var(--space-24); }
+@media (max-width: 630px) { .showcase-screens .is-desktop-box { display: none; } }
+
+/* The steps: anchored to the bottom (the room sits above them). */
+.showcase-steps { margin-top: auto; display: grid; justify-items: center; gap: var(--space-16); text-align: center; }
+.showcase-steps .segmented-option { padding-inline: calc(var(--inset-control) - var(--inset-fill)); }
+.showcase-scale { display: grid; gap: var(--space-8); }   /* the ends sit under the control, as wide as it */
+.showcase-ends { display: flex; justify-content: space-between; padding-inline: var(--space-16); }
+
+.screen-box { position: relative; }
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  overflow: hidden auto;
+  container: screen / size;
+  background: var(--color-bg);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen { overflow: hidden; }
+
+/* The type in the screen follows the screen's size, not this window's. */
+.screen.is-phone .t-display { font-size: 32px; line-height: 1.2; }
+.screen.is-phone .t-title { font-size: 24px; line-height: 1.2; }
+.screen.is-desktop .t-display { font-size: 56px; line-height: 64px; }
+.screen.is-desktop .t-title { font-size: 32px; line-height: 38px; }
+
+/* ============================================================
+   THE MOCK PAGE. Every distance comes from the register:
+   --m-inset (sides), --m-block (top and bottom), --m-section (between
+   groups). The main group centres in the room left over when the
+   register fits to the screen and the content allows it.
+   ============================================================ */
+.m {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: var(--m-block) var(--m-inset) var(--m-pad-b);
+  transition: opacity var(--duration-fast) ease;
+}
+.m.is-swapping { opacity: 0; }
+.m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-gap-inner); }
+/* Max width: the head and main sit in a centred column; the slot keeps the screen. */
+.m-head, .m-intro, .m-main { width: 100%; max-width: var(--m-maxw, none); margin-inline: auto; }
+
+/* Compositions. Stack: fixed gaps, the group centred. The others fill
+   the room between the header and the slot, and the space between the
+   title, the hero and the supporting content is what's left over. */
+.m.is-fit.comp-stack .m-main { margin-block: auto; }
+.m.is-fit:not(.comp-stack) .m-main { flex: 1; }
+.m.is-fit.comp-centre .m-main:has(> [data-role="hero"]) { display: grid; grid-template-rows: auto 1fr auto; }
+.m.is-fit:not(.comp-stack) .m-main:not(:has(> [data-role="hero"])) [data-role="support"] { margin-top: auto; }
+.m.is-fit.comp-centre [data-role="hero"] { align-self: center; }
+.m.is-fit.comp-top [data-role="support"] { margin-top: auto; }
+.m.is-fit.comp-bottom [data-role="hero"] { margin-top: auto; }
+.m-head { display: flex; justify-content: space-between; align-items: start; gap: var(--space-16); }
+.m-head p { max-width: 30ch; }
+.m-quiet { color: var(--color-text-secondary); }
+.m-stack { display: grid; gap: var(--space-8); }
+.m-center { text-align: center; justify-items: center; }
+
+/* The object hero: a carousel, sized from the screen. */
+.m-carousel { display: flex; align-items: start; justify-content: flex-start; gap: var(--space-16); margin-right: calc(-1 * var(--m-inset)); overflow: visible; }
+.m-card {
+  flex: none;
+  display: grid;
+  align-content: start;
+  padding: var(--space-24);
+  width: min(64cqw, 32cqh);
+  aspect-ratio: 4 / 5;
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lift);
+}
+.m-card.is-side { opacity: 0.2; box-shadow: none; }
+
+/* Showcase: one piece of work. */
+.m-media { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
+.m-prose { display: grid; gap: var(--space-16); }
+.m-prose p { color: var(--color-text-secondary); }
+
+/* Page: a statement, then a list on dividers. */
+.m-list { display: grid; }
+.m-row { display: grid; gap: var(--space-4); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
+.m-row:first-child { border-top: 0; padding-top: 0; }
+
+/* Workspace and tool: intro, panel row, figures, chart, table. */
+.m-intro { display: flex; justify-content: space-between; align-items: center; gap: var(--space-16); }
+.m-info { flex: none; width: var(--height-control); height: var(--height-control); display: grid; place-items: center; border-radius: var(--radius-pill); }
+.m-info svg { width: var(--icon-inline); height: var(--icon-inline); }
+.m-panel { display: flex; align-items: center; justify-content: space-between; min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+.m-panel svg, .m-pill svg { width: var(--icon-mark); height: var(--icon-mark); color: var(--color-text-secondary); }
+.m-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--m-gap-inner); }
+.is-desktop .m-figures { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-chart { width: 100%; height: auto; display: block; }
+.m-chart path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.m-table { width: 100%; border-collapse: collapse; }
+.m-table th, .m-table td { text-align: left; padding: var(--m-row-pad) var(--space-8) var(--m-row-pad) 0; border-top: 1px solid var(--color-divider); }
+.m-table th { border-top: 0; }
+.m-table .num { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+.m-split { display: grid; gap: var(--m-section); }
+/* Workspace: the first screen is the title, the hero card and its
+   numbers; the hero card takes the room left, and anything more sits
+   below the fold by design. */
+.m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
+.m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 70cqh; padding: var(--space-24); }
+.m-hero-card .m-chart { align-self: end; }
+.is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+
+/* The bottom slot, drawn in the screen (the real one is fixed to the window). */
+.m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
+.m-slot > * { pointer-events: auto; }
+.m.is-fit .m-slot { margin-top: 0; }
+.m .segmented-option.is-indicated { opacity: 1; background: var(--color-fill-subtle); }
+.m-big { min-height: var(--height-slot); padding: 0 var(--inset-slot); justify-content: center; }
+.is-phone .m-slot .m-big:only-child { flex: 1; }
+.m-pill { display: inline-flex; align-items: center; gap: var(--gap-mark); min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+.m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
+
+
+/* ---- Showcase overrides. */
+/* The object is the carousel as the system ships it: the current item
+   centred, the others either side at 0.2. Each item is a draft card — the
+   ground's opposite with the page's ink — so it reads as media, not an
+   empty box. */
+.m-carousel { justify-content: center; align-items: center; margin: 0 calc(-1 * var(--m-inset)); }
+.m-card { display: grid; align-content: space-between; background: var(--color-ground); border-color: var(--color-ground); color: var(--color-bg); }
+.m-card .t-mono, .m-card .t-display { color: inherit; }
+.m-card .t-mono { opacity: 0.6; }
+.m-wave { display: block; width: 100%; height: auto; color: inherit; }
+/* The hero's card is the page's object, so it carries the lift shadow,
+   like a carousel item. */
+.m-media, .m-hero-card { box-shadow: var(--shadow-lift); }
+
+/* ---- The motion. Out: the old step fades on --duration-fast. In: each
+   group rises 16px and fades in on the entrance curve, staggered 100ms
+   from the top, so the composition reads as built in order. */
+.m.is-leaving { opacity: 0; transition: opacity var(--duration-fast) ease; }
+.m .is-in { opacity: 0; translate: 0 var(--space-16); }
+.m .is-in.is-shown {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity var(--duration-entrance) var(--ease-out), translate var(--duration-entrance) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .m .is-in { translate: none; }
+  .m .is-in.is-shown, .m.is-leaving { transition-duration: var(--duration-instant); }
+}

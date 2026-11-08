@@ -12,7 +12,7 @@ links the skill's own files through `lib/` (a symlink to
 - `panel-proposals.html` — ways to calm a long control panel (mono field labels, separators, full-width or inline controls), awaiting approval. Nothing here is in the skill yet.
 - `bottom-proposals.html` — a system for the bottom of the screen (one slot, one 50px height, what goes in it) and three ways to combine the nav with a button or a select, as live mock screens. Decided: H1 at 64px, S1, S2, A and O approved and moved into the skill as `patterns/bottom-slot/`; B, C and M declined.
 - `spacing-proposals.html` — an audit of the space inside controls at 36 and 64 (label to edge, frame to fill, label to mark), with a Today / Proposed switch and live measurements. Decided: F2, F3, F4, P1 and T approved and moved into the skill (tokens v0.17); F1 declined, P2 not taken.
-- `expression.html` — a short looping showcase: the same system recomposing from a page (an object, a statement, media, a chart) to a tool, on a desktop and a phone screen side by side. Built from the register explorer's mock pages.
+- `expression.html` — a short looping showcase: the same system recomposing from a page (an object, a statement, media, a chart) to a tool, on a desktop and a phone screen side by side. Built from the register explorer's mock pages; the same steps are the hero of the sandbox's System page (`site/showcase.*`).
 - `dinners.html` — a week of dinners: a sortable week beside fixed nights, an ideas list, a small form.
 
 Every proposals page and explorer from here on is built as a stage and sheet (`patterns/stage-sheet/`): the live specimen is the stage; the controls, readout and approve/decline decisions go in the sheet. `registers.html` is the reference. The earlier proposals pages predate this.

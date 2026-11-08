@@ -151,8 +151,11 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 writeFileSync(join(out, 'tokens.css'), forceStates(read(join(skill, 'tokens.css'))));
+const tokensVersion = (read(join(skill, 'tokens.css')).match(/tokens — (v[\d.]+)/) || [])[1] || '';
 copyFileSync(join(root, 'site/site.css'), join(out, 'site.css'));
 copyFileSync(join(root, 'site/site.js'), join(out, 'site.js'));
+copyFileSync(join(root, 'site/showcase.css'), join(out, 'showcase.css'));
+copyFileSync(join(root, 'site/showcase.js'), join(out, 'showcase.js'));
 for (const c of all) {
   mkdirSync(join(out, c.tier, c.name), { recursive: true });
   if (c.css) writeFileSync(join(out, c.tier, c.name, `${c.name}.css`), forceStates(c.css));
@@ -168,14 +171,17 @@ const scripts = all.filter((c) => c.js).map((c) => `<script src="${c.tier}/${c.n
 const CHEVRON = '<svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const INFO = '<svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>';
 
-// The nav is the segmented control at its default size: one truth at a time.
-const navOption = (label, href, on) => `<a class="segmented-option t-control${on ? ' is-active' : ''}" href="${href}"${on ? ' aria-current="page"' : ''}>${label}</a>`;
-const nav = (active) => `<nav class="segmented" aria-label="Site">
-      <span class="segmented-indicator" aria-hidden="true"></span>
-      ${navOption('Library', 'index.html', active === 'library')}
-      ${navOption('Foundations', 'foundations.html', active === 'foundations')}
-      ${navOption('Rules', 'rules.html', active === 'rules')}
-    </nav>`;
+// The nav sits in the bottom slot: the large segmented control, three
+// pages, nothing above any page's title (see Page composition in SKILL.md).
+const navOption = (label, href, on) => `<a class="segmented-option t-label${on ? ' is-active' : ''}" href="${href}"${on ? ' aria-current="page"' : ''}>${label}</a>`;
+const nav = (active) => `<div class="bottom-slot">
+  <nav class="segmented segmented--large" aria-label="Site">
+    <span class="segmented-indicator" aria-hidden="true"></span>
+    ${navOption('System', 'index.html', active === 'system')}
+    ${navOption('Library', 'library.html', active === 'library')}
+    ${navOption('Rules', 'rules.html', active === 'rules')}
+  </nav>
+</div>`;
 
 // Every page opens with the artifact intro pattern.
 const intro = (title, description) => `<header class="intro">
@@ -192,7 +198,10 @@ const accordionItem = (id, title, body, { open = false, level = 3 } = {}) => `<d
   <div class="accordion-panel" id="${id}" role="region" aria-labelledby="${id}-trigger"${open ? '' : ' inert'}><div class="accordion-content"><div class="accordion-body">${body}</div></div></div>
 </div>`;
 
-const page = (title, body, active = 'library') => `<!doctype html>
+// Every page: the title first, then the page, then a quiet footer; the
+// nav in the bottom slot. { read: true } holds the page to the reading
+// width. { head, scripts } add a page's own files.
+const page = (title, body, { active = 'library', read = false, head = '', tail = '' } = {}) => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -202,21 +211,19 @@ const page = (title, body, active = 'library') => `<!doctype html>
 <link rel="stylesheet" href="tokens.css">
 ${styles}
 <link rel="stylesheet" href="site.css">
+${head}
 </head>
 <body ontouchstart>
-<div class="site container">
-  <header class="site-header">
-    <a class="t-body link-quiet" href="index.html">Personal styling</a>
-    <div class="site-actions">
-    ${nav(active)}
-    <button class="button-text link-quiet t-control" type="button" id="theme-toggle">Dark</button>
-    </div>
-  </header>
-  <main class="site-main">
+<main class="site container${read ? ' site--read' : ''}">
 ${body}
-  </main>
-</div>
+  <footer class="site-footer">
+    <span class="t-mono">Personal styling · tokens ${tokensVersion}</span>
+    <button class="button-text link-quiet t-control" type="button" id="theme-toggle">Dark</button>
+  </footer>
+</main>
+${nav(active)}
 ${scripts}
+${tail}
 <script src="site.js"></script>
 </body>
 </html>
@@ -228,17 +235,22 @@ ${items.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span c
 
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
 
+// System: the system itself as the hero, recomposing from a page to a
+// tool; then how it comes to life, the foundations as specimens (site.js
+// reads every value from the live tokens), what's built with it, and how to
+// use it.
+const system = read(join(root, 'site/system.html')).replace('<!-- FOUNDATIONS -->', read(join(root, 'site/foundations.html')));
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
-${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange components; components are single controls.')}
+${intro('Personal styling', 'A house style for personal software, and the library that builds it. Everything on this site is made from the files the skill ships: the same tokens, components and patterns.')}
+${system}`, { active: 'system', head: '<link rel="stylesheet" href="showcase.css">', tail: '<script src="showcase.js"></script>' }));
+
+writeFileSync(join(out, 'library.html'), page('Library — Personal styling', `
+${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange a piece of a page; components are single controls.')}
 ${section('Patterns', list(patterns))}
 ${section('Components', list(components))}`));
 
-// Foundations: the colour, type and surface rules as specimens. The page
-// body is site/foundations.html; site.js fills in values from the live
-// tokens, so it can never disagree with tokens.css.
-writeFileSync(join(out, 'foundations.html'), page('Foundations — Personal styling', `
-${intro('Foundations', 'Colour, type and surfaces, drawn rather than described. Every value is read from the tokens as the page loads.')}
-${read(join(root, 'site/foundations.html'))}`, 'foundations'));
+// The old Foundations page lives on the System page now.
+writeFileSync(join(out, 'foundations.html'), '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=index.html"><title>Personal styling</title><a href="index.html">Personal styling</a>');
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 const toc = [];
@@ -260,14 +272,14 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
       <div class="accordion-panel" id="toc" role="region" aria-labelledby="toc-trigger"><div class="accordion-content"><div class="accordion-body">${contents}</div></div></div>
     </div>
   </section>
-</div>`, 'rules'));
+</div>`, { active: 'rules', read: true }));
 
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card
 // would be the defect the rules warn about.
-const stage = (c, html) => (c.tier === 'patterns'
+const stage = (c, html, hero = false) => (c.tier === 'patterns'
   ? `<div class="pattern-stage">${html}</div>`
-  : `<div class="surface demo">${html}</div>`);
+  : `<div class="surface demo${hero ? ' demo--hero' : ''}">${html}</div>`);
 
 for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
@@ -275,7 +287,7 @@ for (const c of all) {
   const rest = c.rest.replace(/^Requires: (.+)$/m, (_, names) => `Requires: ${names.split(',').map((n) => n.trim()).map((n) => (titleOf[n] ? `[${titleOf[n]}](${n}.html)` : n)).join(', ')}`);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 ${intro(inline(c.title), inline(c.summary))}
-${c.html ? section('As shipped', stage(c, c.html)) : ''}
+${c.html ? stage(c, c.html, true) : ''}
 ${c.demo ? `<div class="accordion">${accordionItem('states', 'States', stage(c, c.demo), { level: 2 })}</div>` : ''}
 ${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
 ${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));
