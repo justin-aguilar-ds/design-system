@@ -14,6 +14,6 @@ links the skill's own files through `lib/` (a symlink to
 - `spacing-proposals.html` — an audit of the space inside controls at 36 and 64 (label to edge, frame to fill, label to mark), with a Today / Proposed switch and live measurements. Decided: F2, F3, F4, P1 and T approved and moved into the skill (tokens v0.17); F1 declined, P2 not taken.
 - `dinners.html` — a week of dinners: a sortable week beside fixed nights, an ideas list, a small form.
 
-An explorer with a live preview and controls that change it is built as a stage and sheet (`patterns/stage-sheet/`): the preview is the stage, the controls, readout and decisions go in the sheet.
+Every proposals page and explorer from here on is built as a stage and sheet (`patterns/stage-sheet/`): the live specimen is the stage; the controls, readout and approve/decline decisions go in the sheet. `registers.html` is the reference. The earlier proposals pages predate this.
 
 Open one through a local server from this folder, or publish it with its `lib/` files.

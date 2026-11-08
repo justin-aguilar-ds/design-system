@@ -9,3 +9,4 @@ This repo is a design system, not an app. The skill in `skills/personal-styling/
 - Run `npm run check` before committing. It must pass.
 - Build output (`dist/`) is not committed.
 - Check work in the form factor the person is prompting from (see "Check it where they'll see it" in `SKILL.md`): feedback from a phone is reproduced and fixed at phone width with touch, then checked on desktop.
+- Proposal and explorer pages in `examples/` are built as a stage and sheet (`patterns/stage-sheet/`): the live specimen is the stage; the controls, readout and approve/decline decisions go in the sheet. Check them on a phone with the sheet closed and open.
