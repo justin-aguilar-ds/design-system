@@ -172,13 +172,12 @@ const CHEVRON = '<svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden=
 const INFO = '<svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>';
 
 // The nav sits in the bottom slot: the large segmented control, three
-// pages, nothing above any page's title (see Page composition in SKILL.md).
+// two pages, nothing above any page's title (see Page composition in SKILL.md).
 const navOption = (label, href, on) => `<a class="segmented-option t-label${on ? ' is-active' : ''}" href="${href}"${on ? ' aria-current="page"' : ''}>${label}</a>`;
 const nav = (active) => `<div class="bottom-slot">
   <nav class="segmented segmented--large" aria-label="Site">
     <span class="segmented-indicator" aria-hidden="true"></span>
-    ${navOption('System', 'index.html', active === 'system')}
-    ${navOption('Library', 'library.html', active === 'library')}
+    ${navOption('Library', 'index.html', active === 'library')}
     ${navOption('Rules', 'rules.html', active === 'rules')}
   </nav>
 </div>`;
@@ -237,22 +236,19 @@ ${items.map((c) => `  <li><a class="row row--link" href="${c.name}.html"><span c
 
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
 
-// System: the system itself as the hero, recomposing from a page to a
-// tool; then how it comes to life, the foundations as specimens (site.js
-// reads every value from the live tokens), what's built with it, and how to
-// use it.
-const system = read(join(root, 'site/system.html')).replace('<!-- FOUNDATIONS -->', read(join(root, 'site/foundations.html')));
+// Library, the home page: the system recomposing from a page to a tool as
+// the hero, then the patterns and components, then what's built with them.
+// Agents read SKILL.md and the READMEs; this page is for seeing it at work.
+const libraryBody = read(join(root, 'site/library.html')).replace('<!-- LISTS -->', `${section('Patterns', list(patterns))}
+${section('Components', list(components))}`);
 writeFileSync(join(out, 'index.html'), page('Personal styling', `
-${intro('Personal styling', 'A house style for personal software, and the library that builds it. Everything on this site is made from the files the skill ships: the same tokens, components and patterns.')}
-${system}`, { active: 'system', head: '<link rel="stylesheet" href="showcase.css">', tail: '<script src="showcase.js"></script>' }));
+${intro('Library', 'Personal styling: a house style for personal software, and the library that builds it. Every pattern and component here is rendered from the files the skill ships.')}
+${libraryBody}`, { active: 'library', head: '<link rel="stylesheet" href="showcase.css">', tail: '<script src="showcase.js"></script>' }));
 
-writeFileSync(join(out, 'library.html'), page('Library — Personal styling', `
-${intro('Library', 'Every pattern and component in the skill, rendered from the files it ships. Patterns arrange a piece of a page; components are single controls.')}
-${section('Patterns', list(patterns))}
-${section('Components', list(components))}`));
-
-// The old Foundations page lives on the System page now.
-writeFileSync(join(out, 'foundations.html'), '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=index.html"><title>Personal styling</title><a href="index.html">Personal styling</a>');
+// Old addresses: the library and foundations both live on the home page now.
+const redirect = '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=index.html"><title>Personal styling</title><a href="index.html">Personal styling</a>';
+writeFileSync(join(out, 'library.html'), redirect);
+writeFileSync(join(out, 'foundations.html'), redirect);
 
 const skillBody = read(join(skill, 'SKILL.md')).replace(/^---[\s\S]*?---\s*/, '').replace(/^#\s+.+\n/, '');
 const toc = [];
@@ -274,7 +270,7 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
       <div class="accordion-panel" id="toc" role="region" aria-labelledby="toc-trigger"><div class="accordion-content"><div class="accordion-body">${contents}</div></div></div>
     </div>
   </section>
-</div>`, { active: 'rules', read: true }));
+</div>`, { active: 'rules' }));
 
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card
@@ -298,7 +294,7 @@ ${intro(inline(c.title), inline(c.summary))}
 ${c.html ? hero(c, c.html) : ''}
 ${c.demo ? `<div class="accordion">${accordionItem('states', 'States', stage(c, c.demo), { level: 2 })}</div>` : ''}
 ${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
-${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`, { read: true }));
+${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));
 }
 
 console.log(`build: ${components.length} components, ${patterns.length} patterns → ${out}`);

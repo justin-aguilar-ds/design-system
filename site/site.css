@@ -14,6 +14,7 @@ body { min-height: 100vh; }
   padding: var(--space-page-block) var(--space-page);
 }
 .site > * { min-width: 0; }
+.site { container-type: inline-size; }   /* the hero stage sizes from the column */
 /* A page someone reads holds to the reading width (the rules). */
 .site--read { max-width: var(--container-read); }
 
@@ -77,12 +78,15 @@ body { min-height: 100vh; }
 .hero-stage {
   display: grid;
   place-items: center;
-  aspect-ratio: 16 / 10;          /* the media page's hero: full column width, 16:10 */
+  /* As large as a media hero, at the page's own width (so nothing jumps
+     between pages): 16:10 of the column (4:5 on a phone), up to 70% of the
+     screen; taller pieces make it taller. */
+  min-height: min(62.5cqw, 70svh);
   padding: var(--space-48) var(--space-24);
   background: var(--color-stage);
   border-radius: var(--radius-card);
 }
-@media (max-width: 630px) { .hero-stage { aspect-ratio: 4 / 5; } }   /* portrait on a phone; it grows when the piece is taller */
+@media (max-width: 630px) { .hero-stage { min-height: min(125cqw, 70svh); } }
 .hero-stage > * { max-width: 100%; }
 /* A wide piece fills the stage inside its padding. */
 .hero-stage > :is(.table-wrap, .line-chart, .accordion, .sortable, .pattern-stage) { width: 100%; }
@@ -142,6 +146,7 @@ body { min-height: 100vh; }
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
+  max-width: var(--container-read);   /* a reading measure inside the page's column; the column itself doesn't change */
   min-width: 0;
 }
 /* Section to section is 48px. The prose already has a 16px gap between
