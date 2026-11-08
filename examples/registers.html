@@ -305,10 +305,10 @@
 <script>
 const PROPOSALS = [
   ['R1', 'Three registers, picked by the job', 'Expressive, Page and Tool. Ask in order and stop at the first yes: does the person work through data (many figures, a table, five or more controls)? Tool. Is it one object to look at or play with, with few words? Expressive. Anything else is a Page. The agent says which in its first reply. Components keep their sizes and uses in every register; only layout and space change.'],
-  ['R2', 'A page is a title, a hero, then content', 'Page covers what were Page, Showcase and Workspace. The title opens it; the hero sits under it in the first screen; the content follows. The hero can be a statement (the title is the hero), media, or the main chart in a card. What differs is the hero, not the layout.'],
+  ['R2', 'A page is a title, a hero, then content', 'Page covers what were Page, Showcase and Workspace. The title opens it; the hero sits under it in the first screen; the content follows. The hero can be a statement (the title is the hero), media with its text as one block (the text the gap below the media), or the main chart in a card. What differs is the hero, not the layout.'],
   ['R3', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. A chart page or a tool may carry the info button beside its title, nothing more.'],
   ['R4', 'Top is the default composition', 'The title at the top and the hero right under it. With little content the rest is anchored to the bottom (above the bottom slot when there is one) and the room left sits between; with lots, the rest follows at the gap and the page scrolls. Centre and Bottom are for a single object that should float.'],
-  ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed: 80 at Expressive, 48 on a phone and 80 on a wide screen at Page, 24 at Tool, between groups; 24 or 16 inside them. 80 is the most a gap ever is. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
+  ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed: 80 at Expressive, 48 at Page at every width, 24 at Tool, between groups; 24 or 16 inside them. 80 is the most a gap ever is. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
   ['R6', 'The hero is sized from the screen', 'A share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a chart in a card about half the screen tall. It fills a phone and a desktop alike.'],
   ['R7', 'A reading width only where there is reading', 'A page with paragraphs centres its title and content in a 720px column on a wide screen, a new --container-read. A statement and a list run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
   ['R8', 'Tools are dense from the top', 'Tool has no composition: fixed 24 gaps, read from the title down, the panel docked to the corner, table rows at their tightest, two columns on a wide screen. Precision is its expression.'],
@@ -343,7 +343,7 @@ const REG = [
     note: 'One object to look at or play with, and few words. A type toy, a mix, a card. The layout is the design.',
     things: 'A title, the hero, a caption, the nav', hero: 'An object, sized from the screen',
     carries: [['Layout', 'The hero right under the title; the room left falls below it'], ['Space', '80 under the title; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
-  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: [48, 80], inner: 16, rowPad: 16,
+  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: [48, 48], inner: 16, rowPad: 16,
     note: 'A title, a hero in the first screen, content below it. An about page, a post, a tracker you check: one register, three kinds of hero.',
     things: '', hero: '', carries: [] },
   { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: [24, 24], inner: 16, rowPad: 8,
@@ -356,7 +356,7 @@ const PAGE_HERO = {
   statement: { things: 'A statement, a list, one action', hero: 'The statement itself, in display type',
     carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
   media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
-    carries: [['Layout', 'Title, then the media; the text at the bottom or after the gap'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
+    carries: [['Layout', 'Title, then the media with its text the gap below, as one block'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
   chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about half the screen tall',
     carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
 };
@@ -401,8 +401,9 @@ const PAGE_RENDER = {
     const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
     return { head: '',
       title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
-      hero: `<div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div>`,
-      support: `<div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}${c === 2 ? `<div class="m-prose" style="padding-top: var(--m-gap-inner)"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : ''}</div>`,
+      // The media and its text are one block: the text always sits the gap below the media.
+      hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+      support: c === 2 ? `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
       slot: '' };
   },
   chart: (c, d) => ({ head: '',
