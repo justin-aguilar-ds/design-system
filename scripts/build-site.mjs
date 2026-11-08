@@ -229,8 +229,10 @@ ${tail}
 </html>
 `;
 
-const list = (items) => `<ul class="component-list">
-${items.map((c) => `  <li><a class="component-row" href="${c.name}.html"><span class="t-label">${inline(c.title)}</span><span class="t-body component-summary">${inline(c.summary)}</span></a></li>`).join('\n')}
+// The library: a two-column list on the three-column grid — the name in
+// the first third, what it's for in the other two.
+const list = (items) => `<ul class="row-list row-list--2">
+${items.map((c) => `  <li><a class="row row--link" href="${c.name}.html"><span class="row-name t-label">${inline(c.title)}</span><span class="row-text t-body">${inline(c.summary)}</span></a></li>`).join('\n')}
 </ul>`;
 
 const section = (heading, content) => `<section class="site-section"><h2 class="t-label">${heading}</h2>${content}</section>`;
@@ -280,12 +282,12 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
 const stage = (c, html) => (c.tier === 'patterns'
   ? `<div class="pattern-stage">${html}</div>`
   : `<div class="surface demo">${html}</div>`);
-// A component's hero: centred on the stage, unless it's naturally full
-// width — then it sits on the page, like a pattern.
-const FULL_WIDTH = new Set(['table', 'line-chart', 'accordion', 'sortable']);
-const hero = (c, html) => (c.tier === 'patterns' || FULL_WIDTH.has(c.name)
-  ? `<div class="pattern-stage">${html}</div>`
-  : `<div class="hero-stage">${html}</div>`);
+// A page's hero is laid out like media: the stage at the column's full
+// width and 16:10 (4:5 on a phone), the piece centred on it, its guidance
+// 48 below. Wide pieces (a table, a chart, a pattern) fill the stage inside
+// its padding; framed patterns (stage and sheet, bottom slot) sit on it in
+// their phone frame.
+const hero = (c, html) => `<div class="hero-stage">${c.tier === 'patterns' ? `<div class="pattern-stage">${html}</div>` : html}</div>`;
 
 for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
@@ -296,7 +298,7 @@ ${intro(inline(c.title), inline(c.summary))}
 ${c.html ? hero(c, c.html) : ''}
 ${c.demo ? `<div class="accordion">${accordionItem('states', 'States', stage(c, c.demo), { level: 2 })}</div>` : ''}
 ${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
-${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));
+${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`, { read: true }));
 }
 
 console.log(`build: ${components.length} components, ${patterns.length} patterns → ${out}`);

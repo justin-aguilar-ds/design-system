@@ -3,9 +3,14 @@
      as specimens, what's been built with it, and how to use it. The
      foundations sections are site/foundations.html, inserted by the build. -->
 <section class="showcase" aria-label="The system, from page to tool">
-  <div class="showcase-screens" id="showcase-screens" aria-hidden="true">
-    <div class="screen-box is-desktop-box"><div class="screen is-desktop" data-size="desktop"></div></div>
-    <div class="screen-box is-phone-box"><div class="screen is-phone" data-size="phone"></div></div>
+  <div class="showcase-screens" id="showcase-screens">
+    <div class="segmented showcase-device" role="group" aria-label="Screen" id="showcase-device">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="phone">Phone</button>
+      <button class="segmented-option t-control" type="button" aria-pressed="false" value="desktop">Desktop</button>
+    </div>
+    <div class="screen-box is-desktop-box" aria-hidden="true"><div class="screen is-desktop" data-size="desktop"></div></div>
+    <div class="screen-box is-phone-box" aria-hidden="true"><div class="screen is-phone" data-size="phone"></div></div>
   </div>
   <div class="showcase-steps">
     <div class="showcase-scale">
@@ -24,12 +29,12 @@
 
 <section class="site-section" aria-labelledby="life-h">
   <h2 class="t-label" id="life-h">How it comes to life</h2>
-  <ul class="row-list">
-    <li class="row"><span class="t-label">Page or tool</span><p class="t-body">One question decides the layout: does the person work through data? Then it’s a tool, dense from the top. Anything else is a page.</p></li>
-    <li class="row"><span class="t-label">Lead with the title</span><p class="t-body">The title is the first thing on the screen, with nothing small above it. Navigation and the one action wait in the bottom slot.</p></li>
-    <li class="row"><span class="t-label">A hero sized from the screen</span><p class="t-body">An object, a statement, media or the main view in a card, right under the title, taking a share of the screen rather than a fixed size.</p></li>
-    <li class="row"><span class="t-label">The gap and the room</span><p class="t-body">48 between groups, everywhere. Whatever height is left goes below the hero, so a short page reads as composed, never padded.</p></li>
-    <li class="row"><span class="t-label">Interaction is the constant</span><p class="t-body">Hover, tooltips and timing are the same on every page. A tool’s expression is its precision, never louder colour or more motion.</p></li>
+  <ul class="row-list row-list--2">
+    <li class="row"><span class="row-name t-label">Page or tool</span><p class="row-text t-body">One question decides the layout: does the person work through data? Then it’s a tool, dense from the top. Anything else is a page.</p></li>
+    <li class="row"><span class="row-name t-label">Lead with the title</span><p class="row-text t-body">The title is the first thing on the screen, with nothing small above it. Navigation and the one action wait in the bottom slot.</p></li>
+    <li class="row"><span class="row-name t-label">A hero sized from the screen</span><p class="row-text t-body">An object, a statement, media or the main view in a card, right under the title, taking a share of the screen rather than a fixed size.</p></li>
+    <li class="row"><span class="row-name t-label">The gap and the room</span><p class="row-text t-body">48 between groups, everywhere. Whatever height is left goes below the hero, so a short page reads as composed, never padded.</p></li>
+    <li class="row"><span class="row-name t-label">Interaction is the constant</span><p class="row-text t-body">Hover, tooltips and timing are the same on every page. A tool’s expression is its precision, never louder colour or more motion.</p></li>
   </ul>
 </section>
 
@@ -37,22 +42,22 @@
 
 <section class="site-section" aria-labelledby="built-h">
   <h2 class="t-label" id="built-h">Built with it</h2>
-  <ul class="row-list">
-    <li><a class="row row--link" href="https://claude.ai/artifact/ByH7NETQmyCRGEF1WyPUNd" target="_blank" rel="noopener"><span class="t-label">Desk P&amp;L</span><p class="t-body">A trading desk’s year: figures, two charts, open positions and closed trades.</p><span class="t-mono">Tool</span></a></li>
-    <li><a class="row row--link" href="https://claude.ai/artifact/JBPv5Y8vnkTmgozFxUPDRn" target="_blank" rel="noopener"><span class="t-label">Rooftop, Nov 14</span><p class="t-body">A host’s view of one party: guests, the running order and the invite.</p><span class="t-mono">Tool</span></a></li>
-    <li><a class="row row--link" href="https://claude.ai/artifact/4kXtxNxLkRaahdDfhfSmz8" target="_blank" rel="noopener"><span class="t-label">Dinners, Nov 2–8</span><p class="t-body">A week of dinners to drag between nights, and the ideas to fill it.</p><span class="t-mono">Page</span></a></li>
-    <li><a class="row row--link" href="https://claude.ai/artifact/2Hb48nSu6PG3nF63Y3NEsn" target="_blank" rel="noopener"><span class="t-label">Home workout</span><p class="t-body">The routine as it stands, and the exercises rotated out of it.</p><span class="t-mono">Page</span></a></li>
-    <li><a class="row row--link" href="https://claude.ai/artifact/V7EkZk8UfLsSHzr2UYfLHA" target="_blank" rel="noopener"><span class="t-label">Layout explorer</span><p class="t-body">Every hero, page to tool, with its gaps and room marked on the screen.</p><span class="t-mono">Explorer</span></a></li>
+  <ul class="row-list row-list--2">
+    <li><a class="row row--link" href="https://claude.ai/artifact/ByH7NETQmyCRGEF1WyPUNd" target="_blank" rel="noopener"><div class="row-name type-pair"><span class="t-mono">Tool</span><span class="t-label">Desk P&amp;L</span></div><p class="row-text t-body">A trading desk’s year: figures, two charts, open positions and closed trades.</p></a></li>
+    <li><a class="row row--link" href="https://claude.ai/artifact/JBPv5Y8vnkTmgozFxUPDRn" target="_blank" rel="noopener"><div class="row-name type-pair"><span class="t-mono">Tool</span><span class="t-label">Rooftop, Nov 14</span></div><p class="row-text t-body">A host’s view of one party: guests, the running order and the invite.</p></a></li>
+    <li><a class="row row--link" href="https://claude.ai/artifact/4kXtxNxLkRaahdDfhfSmz8" target="_blank" rel="noopener"><div class="row-name type-pair"><span class="t-mono">Page</span><span class="t-label">Dinners, Nov 2–8</span></div><p class="row-text t-body">A week of dinners to drag between nights, and the ideas to fill it.</p></a></li>
+    <li><a class="row row--link" href="https://claude.ai/artifact/2Hb48nSu6PG3nF63Y3NEsn" target="_blank" rel="noopener"><div class="row-name type-pair"><span class="t-mono">Page</span><span class="t-label">Home workout</span></div><p class="row-text t-body">The routine as it stands, and the exercises rotated out of it.</p></a></li>
+    <li><a class="row row--link" href="https://claude.ai/artifact/V7EkZk8UfLsSHzr2UYfLHA" target="_blank" rel="noopener"><div class="row-name type-pair"><span class="t-mono">Explorer</span><span class="t-label">Layout explorer</span></div><p class="row-text t-body">Every hero, page to tool, with its gaps and room marked on the screen.</p></a></li>
   </ul>
 </section>
 
 <section class="site-section" aria-labelledby="use-h">
   <h2 class="t-label" id="use-h">Use it</h2>
-  <ol class="row-list">
-    <li class="row"><span class="t-label">Copy the tokens</span><p class="t-body">Start every project with <code>tokens.css</code>, verbatim. Every value on this site comes from it.</p></li>
-    <li class="row"><span class="t-label">Build it plain, then decide</span><p class="t-body">Semantic HTML first, no styling. Then ask the one question: a page or a tool?</p></li>
-    <li class="row"><span class="t-label">Give the hero the first screen</span><p class="t-body">The title, the hero under it, the room below. The rest follows at the gap.</p></li>
-    <li class="row"><span class="t-label">Reach for a pattern, then components</span><p class="t-body">Patterns arrange a piece of a page; components fill it. Copy them from the <a class="prose-link" href="library.html">library</a> as they ship.</p></li>
-    <li class="row"><span class="t-label">Check it where it will be seen</span><p class="t-body">A phone at 390px with touch, or a desktop with a mouse — whichever the person is using.</p></li>
+  <ol class="row-list row-list--2">
+    <li class="row"><div class="row-name type-pair"><span class="t-mono">Step 1</span><span class="t-label">Copy the tokens</span></div><p class="row-text t-body">Start every project with <code>tokens.css</code>, verbatim. Every value on this site comes from it.</p></li>
+    <li class="row"><div class="row-name type-pair"><span class="t-mono">Step 2</span><span class="t-label">Build it plain, then decide</span></div><p class="row-text t-body">Semantic HTML first, no styling. Then ask the one question: a page or a tool?</p></li>
+    <li class="row"><div class="row-name type-pair"><span class="t-mono">Step 3</span><span class="t-label">Give the hero the first screen</span></div><p class="row-text t-body">The title, the hero under it, the room below. The rest follows at the gap.</p></li>
+    <li class="row"><div class="row-name type-pair"><span class="t-mono">Step 4</span><span class="t-label">Reach for a pattern, then components</span></div><p class="row-text t-body">Patterns arrange a piece of a page; components fill it. Copy them from the <a class="prose-link" href="library.html">library</a> as they ship.</p></li>
+    <li class="row"><div class="row-name type-pair"><span class="t-mono">Step 5</span><span class="t-label">Check it where it will be seen</span></div><p class="row-text t-body">A phone at 390px with touch, or a desktop with a mouse — whichever the person is using.</p></li>
   </ol>
 </section>

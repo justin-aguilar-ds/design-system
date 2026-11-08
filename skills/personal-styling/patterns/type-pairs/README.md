@@ -1,6 +1,6 @@
 # Type pairs
 
-Seven ways to put two type styles together, from subtle to expressive. Pick the quietest one that does the job.
+Eight ways to put two type styles together, from subtle to expressive. Pick the quietest one that does the job.
 
 Requires: none
 
@@ -15,12 +15,13 @@ Requires: none
 | 5 | Big number | Mono label → Display number | `8px` | one figure is the reason the screen exists | one |
 | 6 | Statement | Display → Body | `16px` | a page opens and the title needs a sentence of context | one |
 | 7 | Flat | Display → Display | `0` | a page opens with a statement, not a name | one |
+| 8 | Row | Mono label → Label name | `8px` | a name in a list or a grid needs what kind of thing it is — a category, a step, a year | any |
 
 ## Rules
 
 - **Pairs are at their best with numbers.** A figure under its name is the clearest hierarchy two styles can make. Reach for Detail, Figure and Big number first; the text pairs are for headings and rows.
 - **A name sits above what it names.** Detail, Figure and Big number put the small label first and the value under it, the way a reader asks the question before reading the answer. A heading still sits above its sentence, and nothing small sits above a page headline — that's an eyebrow, and it's still out.
-- **Mono is the label of a figure.** The name above a value is the third place mono labels something, after the control panel title and the tooltip: uppercase, `10.5px`, secondary ink — like an axis label, it names rather than informs. The value under it is full ink. Keep the name to two or three words.
+- **Mono is the label of a figure, and the kind of a row.** The name above a value, and the kind above a row's name (the Row pair), are where mono labels something outside the control panel and the tooltip: uppercase, `10.5px`, secondary ink — like an axis label, it names rather than informs. The value under it is full ink. Keep the name to two or three words.
 - **A heading is usually enough.** The Section and Statement pairs are for the rare sentence the content can't say itself — a caveat, a rule. A sentence that restates what the section shows ("Cumulative P&L, day by day" under "Equity curve") goes, and the heading stands alone.
 - **Subtle to expressive is a budget, not a menu.** Most of a page is 1, 2 and 3. Use 4 to structure it, and at most one of 5, 6 or 7 on a view. Two loud pairs on one view cancel each other out.
 - **Pairs only combine existing roles.** No new sizes, weights or tracking. If a pair you want needs a new style, the pair is wrong, not the scale.
@@ -34,6 +35,10 @@ Requires: none
 - A value that isn't a number takes `.type-pair-value` — Body at full ink.
 - The Big number pair is what a stat tile would use; there's no stat component yet.
 - Edit the spectrum here first. The table is the source the pairs follow.
+
+## Changes in v0.4.0
+
+- The Row pair: a mono label above a Label name, for a name in a list or grid that needs its kind — so a list doesn't spend a column on it.
 
 ## Changes in v0.3.0
 

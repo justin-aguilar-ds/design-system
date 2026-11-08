@@ -29,8 +29,16 @@ body { min-height: 100vh; }
   border-top: 1px solid var(--color-divider);
 }
 
-/* Rows on the page: a name, a sentence, and sometimes a value. Lists live
-   on the page, on dividers, never in cards. */
+/* ---- One grid: three columns, 24 apart; one on a phone. Tiles take a
+   column each; small tiles (swatches) split one in two. Lists sit on the
+   same three columns, so a second column starts at the same place in
+   every list on the page. ---- */
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); }
+@media (max-width: 630px) { .grid-3 { grid-template-columns: minmax(0, 1fr); } }
+
+/* Lists live on the page, on dividers, never in cards. A row has up to
+   three parts: .row-name (a Label, or the Row pair — its kind in mono
+   above it), .row-text (the sentence) and .row-value (a mono value). */
 .row-list { list-style: none; padding: 0; }
 .row-list > li { border-top: 1px solid var(--color-divider); }
 .row-list > li:first-child { border-top: 0; }
@@ -41,17 +49,26 @@ body { min-height: 100vh; }
   align-items: baseline;
   padding: var(--space-16) 0;
 }
-/* One column: the name on the first line, its value at the right of that
-   line, the sentence under both. Nothing starts wherever a row ends. */
-.row > .t-body { grid-column: 1 / -1; grid-row: 2; color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
-.row > .t-mono:last-child:not(:first-child) { grid-column: 2; grid-row: 1; text-align: right; }
 .row-list > li:first-child > .row, .row-list > li.row:first-child { padding-top: 0; }
+/* One column, the default: the name, its value at the right of that line,
+   the sentence under both. */
+.row-text { grid-column: 1 / -1; grid-row: 2; color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
+.row-value { grid-column: 2; grid-row: 1; text-align: right; }
+/* Two columns: the name in the first third, the description in the other two. */
+@media (min-width: 631px) {
+  .row-list--2 .row, .row-list--3 .row { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+  .row-list--2 .row-name { grid-column: 1; grid-row: 1; }
+  .row-list--2 .row-text { grid-column: 2 / -1; grid-row: 1; }
+  /* Three columns: a third each — the least common shape. */
+  .row-list--3 .row-text { grid-column: 2; grid-row: 1; }
+  .row-list--3 .row-value { grid-column: 3; grid-row: 1; text-align: left; }
+}
 .row code { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--color-text); }
 @media (hover: hover) and (pointer: fine) {
-  .row--link:hover .t-body { color: var(--color-text); }
+  .row--link:hover .row-text { color: var(--color-text); }
 }
 @media (hover: none) {
-  .row--link:active .t-body { color: var(--color-text); transition-duration: var(--duration-instant); }
+  .row--link:active .row-text { color: var(--color-text); transition-duration: var(--duration-instant); }
 }
 
 /* A component's page: what it is, centred on the stage right under the
@@ -60,27 +77,23 @@ body { min-height: 100vh; }
 .hero-stage {
   display: grid;
   place-items: center;
-  min-height: calc(var(--space-48) * 7);   /* 336: room for a menu or a toast to open */
+  aspect-ratio: 16 / 10;          /* the media page's hero: full column width, 16:10 */
   padding: var(--space-48) var(--space-24);
   background: var(--color-stage);
   border-radius: var(--radius-card);
 }
+@media (max-width: 630px) { .hero-stage { aspect-ratio: 4 / 5; } }   /* portrait on a phone; it grows when the piece is taller */
 .hero-stage > * { max-width: 100%; }
+/* A wide piece fills the stage inside its padding. */
+.hero-stage > :is(.table-wrap, .line-chart, .accordion, .sortable, .pattern-stage) { width: 100%; }
+/* A pattern on the stage loses its page dividers; framed ones keep their phone frame. */
+.hero-stage > .pattern-stage:not(:has(> .stage-sheet, > .bottom-slot)) { padding: 0; border: 0; }
 .hero-stage > :is(.slider-field, .input-field, .picker-field, .input-wrap) { width: min(100%, calc(var(--space-48) * 8)); }
 
 /* Space: the five steps drawn as bars, and the room as what's left. */
 .space-scale { list-style: none; padding: 0; }
-.space-scale li {
-  display: grid;
-  grid-template-columns: var(--space-48) minmax(0, 1fr);
-  gap: var(--space-8) var(--space-16);
-  align-items: center;
-  padding: var(--space-16) 0;
-  border-top: 1px solid var(--color-divider);
-}
-.space-scale li:first-child { border-top: 0; padding-top: 0; }
-.space-scale .t-caption { grid-column: 1 / -1; }
-.space-bar { display: block; height: var(--space-8); background: var(--color-text); border-radius: var(--radius-pill); }
+.space-name { display: flex; align-items: center; gap: var(--space-16); }
+.space-bar { display: block; flex: none; height: var(--space-8); background: var(--color-text); border-radius: var(--radius-pill); }
 .space-bar--room { width: var(--space-48); background: none; border: 1px dashed var(--color-hairline-strong); }
 
 /* Controls: the two heights, live. */
@@ -95,25 +108,11 @@ body { min-height: 100vh; }
   min-width: 0;
 }
 
-/* Component index: a list, so it sits on the page with dividers. */
-.component-list { list-style: none; padding: 0; }
-.component-list li { border-top: 1px solid var(--color-divider); }
-.component-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: var(--space-24);
-  padding: var(--space-16) 0;
-}
-.component-summary { transition: color var(--duration-fast) ease; }
-@media (hover: hover) and (pointer: fine) {
-  .component-row:hover .component-summary { color: var(--color-text); }
-}
-
 /* A demo is content, so it earns the one surface. */
 .demo { padding: var(--space-16); min-width: 0; } /* inside a card: 16 */
 .demo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* the grid: a demo per column */
   gap: var(--space-24);
 }
 .demo-cell {
@@ -178,9 +177,6 @@ body { min-height: 100vh; }
 /* Markdown tables use the table component, which gives every cell one
    size; nothing here overrides it. */
 
-@media (max-width: 630px) {
-  .component-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
-}
 
 /* Toast demos: room above the control for the toast to grow into. */
 .demo-toast-room { padding-top: var(--space-48); }
@@ -288,7 +284,7 @@ body { min-height: 100vh; }
 .specimen-list { list-style: none; padding: 0; }
 .swatch-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* two across on a phone */
+  grid-template-columns: repeat(6, minmax(0, 1fr)); /* small tiles: a column split in two */
   gap: var(--space-24);         /* item to item, card to card */
 }
 .swatch { display: grid; gap: var(--space-16); align-content: start; }
@@ -303,17 +299,22 @@ body { min-height: 100vh; }
    the left at its real size; its name, use and live metrics on the right. */
 .type-specimens li {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);   /* one column: the specimen, then its name */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-8);
   padding: var(--space-16) 0;   /* a row, like a table row */
   border-top: 1px solid var(--color-divider);
+}
+@media (min-width: 631px) {
+  .type-specimens li { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); align-items: center; }
+  .type-specimens li > .type-pair { grid-column: 1; grid-row: 1; }
+  .type-specimens li > :first-child { grid-column: 2 / -1; grid-row: 1; }
 }
 
 /* Specimens: each rule shown in a fixed-height area so their captions line
    up, with no box of its own — the specimen inside is the subject. */
 .specimen-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));   /* tiles of one width that wrap */
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* the grid: a tile per column */
   gap: var(--space-24);         /* item to item, card to card */
 }
 
@@ -373,3 +374,9 @@ body { min-height: 100vh; }
 .icon-sizes { display: flex; align-items: flex-end; gap: var(--space-24); } /* item to item */
 .icon-size { display: grid; justify-items: start; gap: var(--space-16); }
 .icon-size svg { color: var(--color-text); }
+
+/* The grid on a phone: one column; small tiles two across. */
+@media (max-width: 630px) {
+  .specimen-grid, .demo-grid { grid-template-columns: minmax(0, 1fr); }
+  .swatch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -189,6 +189,11 @@ document.getElementById('showcase-steps').addEventListener('segmented-change', (
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(timer); else play(); });
 
+// The screen toggle: the phone by default, the desktop on request.
+document.getElementById('showcase-device')?.addEventListener('segmented-change', (e) => {
+  document.getElementById('showcase-screens').classList.toggle('is-desktop', e.detail.value === 'desktop');
+  fit();
+});
 new ResizeObserver(fit).observe(document.getElementById('showcase-screens'));
 fit();
 show(0);

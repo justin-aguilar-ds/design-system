@@ -16,12 +16,14 @@
   background: var(--color-stage);   /* the hero, centred on the stage */
   border-radius: var(--radius-card);
 }
-/* One screen at a time: the desktop on a wide screen, the phone on a phone. */
-.showcase-screens .is-phone-box { display: none; }
-@media (max-width: 630px) {
-  .showcase-screens .is-desktop-box { display: none; }
-  .showcase-screens .is-phone-box { display: block; }
-}
+/* One screen at a time: the phone by default; on a wide screen a toggle in
+   the stage's corner shows the desktop instead. */
+.showcase-screens { position: relative; }
+.showcase-screens .is-desktop-box,
+.showcase-screens.is-desktop .is-phone-box { display: none; }
+.showcase-screens.is-desktop .is-desktop-box { display: block; }
+.showcase-device { position: absolute; top: var(--space-24); right: var(--space-24); z-index: 1; }
+@media (max-width: 630px) { .showcase-device { display: none; } }
 
 /* The steps: anchored to the bottom (the room sits above them). */
 .showcase-steps { margin-top: auto; display: grid; justify-items: center; gap: var(--space-16); text-align: center; }
