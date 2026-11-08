@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="lib/components/button/button.css">
 <link rel="stylesheet" href="lib/components/segmented/segmented.css">
 <link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
 <link rel="stylesheet" href="lib/components/toast/toast.css">
 <link rel="stylesheet" href="lib/patterns/stage-sheet/stage-sheet.css">
 <style>
@@ -77,12 +78,23 @@
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    padding: var(--m-block) var(--m-inset) calc(var(--m-block) + var(--m-slot, 0px));
+    padding: var(--m-block) var(--m-inset) var(--m-pad-b);
     transition: opacity var(--duration-fast) ease;
   }
   .m.is-swapping { opacity: 0; }
-  .m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-section); }
-  .m.is-fit .m-main { margin-block: auto; }
+  .m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-gap-inner); }
+  /* Max width: the head and main sit in a centred column; the slot keeps the screen. */
+  .m-head, .m-intro, .m-main { width: 100%; max-width: var(--m-maxw, none); margin-inline: auto; }
+
+  /* Compositions. Stack: fixed gaps, the group centred. The others fill
+     the room between the header and the slot, and the space between the
+     title, the hero and the supporting content is what's left over. */
+  .m.is-fit.comp-stack .m-main { margin-block: auto; }
+  .m.is-fit:not(.comp-stack) .m-main { flex: 1; }
+  .m.is-fit.comp-centre .m-main { display: grid; grid-template-rows: auto 1fr auto; }
+  .m.is-fit.comp-centre [data-role="hero"] { align-self: center; }
+  .m.is-fit.comp-top [data-role="support"] { margin-top: auto; }
+  .m.is-fit.comp-bottom [data-role="hero"] { margin-top: auto; }
   .m-head { display: flex; justify-content: space-between; align-items: start; gap: var(--space-16); }
   .m-head p { max-width: 30ch; }
   .m-quiet { color: var(--color-text-secondary); }
@@ -96,7 +108,7 @@
     display: grid;
     align-content: start;
     padding: var(--space-24);
-    width: min(64cqw, 44cqh);
+    width: min(60cqw, 28cqh);
     aspect-ratio: 4 / 5;
     background: var(--color-surface);
     border: 1px solid var(--color-hairline);
@@ -104,7 +116,7 @@
     box-shadow: var(--shadow-lift);
     transition: translate var(--duration-pop) var(--ease-out), rotate var(--duration-pop) var(--ease-out);
   }
-  .m-card.is-side { opacity: 0.2; width: min(40cqw, 32cqh); box-shadow: none; }
+  .m-card.is-side { opacity: 0.2; width: min(40cqw, 20cqh); box-shadow: none; }
   .m-card:not(.is-side):hover { translate: 0 calc(-1 * var(--space-4)); rotate: -1deg; }
 
   /* Showcase: one piece of work. */
@@ -217,6 +229,32 @@
           <button class="segmented-option t-control" type="button" aria-pressed="false" value="desktop">Desktop</button>
         </div>
       </div>
+      <div class="picker-field">
+        <span class="t-mono" id="comp-l">Composition</span>
+        <div class="picker" id="comp">
+          <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="comp-list" aria-labelledby="comp-l comp-v">
+            <span class="picker-value" id="comp-v">Centre</span>
+            <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="picker-menu" hidden>
+            <ul class="picker-list" id="comp-list" role="listbox" tabindex="-1" aria-labelledby="comp-l">
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="stack">Stack</li>
+              <li class="picker-option t-control" role="option" aria-selected="true" data-value="centre">Centre</li>
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="top">Top</li>
+              <li class="picker-option t-control" role="option" aria-selected="false" data-value="bottom">Bottom</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="control-field">
+        <span class="t-mono" id="maxw-l">Max width</span>
+        <div class="segmented" role="group" aria-labelledby="maxw-l" id="maxw">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="0">Off</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="1280">1280</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="720">720</button>
+        </div>
+      </div>
       <div class="control-field">
         <span class="t-mono" id="space-l">Show space</span>
         <div class="segmented" role="group" aria-labelledby="space-l" id="show-space">
@@ -254,6 +292,8 @@ const PROPOSALS = [
   ['R3', 'Wider sides on a wide screen, at the expressive end', 'Expressive, Showcase and Page take 48 at the sides on a wide screen, so the work sits inside a frame of air. Workspace and Tool keep 24 for the room. Phones keep 24 at every register.'],
   ['R4', 'Fit to the screen', 'When the content fits one screen, the main group centres in the room between the header and the bottom slot, so a page with little on it reads as composed, not unfinished. Expressive, Showcase and Page fit; Workspace and Tool stay top-aligned, because a tool is read from the top. Try Page with Little content.'],
   ['R5', 'One hero, front and centre', 'The expressive end has exactly one hero: the tool’s focus, a component, or display type. It is sized from the screen (a share of its width and height), not a fixed number, so it fills a phone and a desktop alike. Everything else steps back to secondary ink.'],
+  ['R7', 'Compose the room: title, hero, support', 'At the expressive end a screen is composed in three parts: a title at the top, the hero, and its supporting content at the bottom. The space between them isn’t a token: it is the room left between the header and the bottom slot, shared out by the composition. Centre puts the hero midway; Top keeps the title and hero together with the support at the bottom; Bottom brings the hero down to its support. --space-section is the least it can shrink to. Tools always stack. Try them with Composition.'],
+  ['R8', 'A reading width for text at the expressive end', 'On a wide screen, a register with text to read (Showcase, Page) centres its head and content in a 720px column, a new --container-read; --container (1280) stays the outer limit for everything. Expressive heroes and tools run the full width inside the inset. Phones are narrower than both, so nothing changes there.'],
   ['R6', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
@@ -273,6 +313,7 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
 </script>
 <script src="lib/components/segmented/segmented.js"></script>
 <script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/picker/picker.js"></script>
 <script src="lib/components/toast/toast.js"></script>
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
@@ -301,8 +342,11 @@ const REG = [
     things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
     carries: [['Space', '24 between sections, the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as Expressive']] },
 ];
-const SIZES = { phone: [390, 844], desktop: [1280, 800] };
-const state = { r: 0, content: 1, size: 'phone', space: false };
+const SIZES = { phone: [390, 844], desktop: [1440, 900] };
+const state = { r: 0, content: 1, size: 'phone', space: false, comp: 'centre', maxw: 0 };
+// The max width each register suggests; the control follows the register.
+const MAXW = [0, 720, 720, 0, 0];
+const COMP_NOTE = { stack: 'Fixed gaps; the group centred in the room', centre: 'Title at the top, support at the bottom, the hero centred between', top: 'Title and hero at the top; support at the bottom', bottom: 'Title at the top; hero and support at the bottom' };
 
 const CHEV = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const CHEV_DOWN = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -329,22 +373,32 @@ const RENDER = [
   (c, d) => {
     const cards = c === 0 ? 1 : d && c === 2 ? 5 : 3;
     const side = (cards - 1) / 2;
-    const card = (i) => `<div class="m-card${i === side ? '' : ' is-side'}"><span class="t-title">${i === side ? 'Side A — Episode 12' : 'Episode'}</span></div>`;
-    return { head: head(), main: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`, slot: nav('Design', 'Music', 1) };
+    const card = (i) => `<div class="m-card${i === side ? '' : ' is-side'}"><span class="t-title">${i === side ? 'Episode 12' : 'Episode'}</span></div>`;
+    return { head: head(),
+      title: `<div class="m-stack"><span class="t-mono">Side A</span><span class="t-title">Stay Home Radio</span></div>`,
+      hero: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`,
+      support: `<div class="m-stack m-center"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
+      slot: nav('Design', 'Music', 1) };
   },
   // Showcase
-  (c, d) => {
-    const work = (t, y) => `<div class="m-media"><div class="m-stack m-center"><span class="t-label m-quiet">Introducing</span><span class="t-label">${t}</span></div></div><div class="m-stack m-center"><p class="t-body m-quiet">Visual refresh</p><p class="t-body m-quiet">Studio · ${y}</p></div>`;
-    const items = [['New Sans', 2026], ['Field Guide', 2025], ['Night Market', 2024]].slice(0, [1, 1, 3][c]);
-    return { head: head('About', c === 0 ? '' : 'Product designer, making tools and type.'), main: items.map(([t, y]) => work(t, y)).join(''), slot: nav('Design', 'Music', 0) };
+  (c) => {
+    const media = (t) => `<div class="m-media"><div class="m-stack m-center"><span class="t-label m-quiet">Introducing</span><span class="t-label">${t}</span></div></div>`;
+    const caption = (y) => `<div class="m-stack m-center"><p class="t-body m-quiet">Visual refresh</p><p class="t-body m-quiet">Studio · ${y}</p></div>`;
+    const more = c === 2 ? [['Field Guide', 2025], ['Night Market', 2024]].map(([t, y]) => media(t) + caption(y)).join('') : '';
+    return { head: head(),
+      title: `<p class="t-body m-quiet">${c ? 'Product designer, making tools and type for people who read closely.' : 'Product designer.'}</p>`,
+      hero: media('New Sans'),
+      support: `<div class="m-stack" style="gap: var(--m-section)">${caption(2026)}${more}</div>`,
+      slot: nav('Design', 'Music', 0) };
   },
   // Page
   (c) => {
     const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
     return {
       head: `<div class="m-head"><span></span><span class="t-body m-quiet">Close</span></div>`,
-      main: `<div class="m-stack" style="gap: var(--m-section)"><p class="t-display">A product designer who makes small tools.</p>${c ? '<p class="t-display">Having fun with prototypes.</p>' : ''}</div>
-        <div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
+      title: `<span class="t-mono">About</span>`,
+      hero: `<div class="m-stack" style="gap: var(--m-gap-inner)"><p class="t-display">A product designer who makes small tools.</p>${c ? '<p class="t-display">Having fun with prototypes.</p>' : ''}</div>`,
+      support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
       slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
     };
   },
@@ -385,22 +439,44 @@ const fit = () => {
 function render() {
   const reg = REG[state.r], d = state.size === 'desktop', k = d ? 1 : 0;
   const parts = RENDER[state.r](state.content, d);
+  const main = parts.main ?? ['title', 'hero', 'support'].map((r) => `<div class="m-part" data-role="${r}">${parts[r]}</div>`).join('');
   screen.className = `screen is-${state.size}${state.space ? ' show-space' : ''}`;
-  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-section:${reg.section}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:${parts.slot ? 24 : 0}px`;
-  screen.innerHTML = `<div class="m${reg.fit ? ' is-fit' : ''}" style="${vars}">${parts.head}<div class="m-main">${parts.main}</div>${parts.slot ? `<div class="m-slot">${parts.slot}</div>` : ''}${parts.corner ? `<div class="m-corner">${parts.corner}</div>` : ''}</div>`;
+  // A bottom slot is always the page inset from the bottom edge, whatever the register's block.
+  const padB = parts.slot ? 24 : reg.block[k];
+  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-pad-b:${padB}px;--m-section:${reg.section}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:24px${state.maxw ? `;--m-maxw:${state.maxw}px` : ''}`;
+  screen.innerHTML = `<div class="m${reg.fit ? ' is-fit' : ''} comp-${state.comp}" style="${vars}">${parts.head}<div class="m-main">${main}</div>${parts.slot ? `<div class="m-slot">${parts.slot}</div>` : ''}${parts.corner ? `<div class="m-corner">${parts.corner}</div>` : ''}</div>`;
   screen.scrollTop = 0;
-  // Mark the distances for Show space.
-  const m = screen.querySelector('.m-main');
-  [...m.children].forEach((el, i) => { if (i) { el.dataset.gap = reg.section; el.style.setProperty('--gap-h', `${reg.section}px`); } });
-  const first = m.firstElementChild; if (first) { first.dataset.gap = reg.section; first.style.setProperty('--gap-h', `${reg.section}px`); }
-  readout(reg, k);
+  requestAnimationFrame(() => { markGaps(); readout(reg, k); });
 }
+
+// The space between each group and the one before it, measured: a fixed
+// gap reads as its number, a gap that takes the room left over as auto.
+let gaps = [];
+function markGaps() {
+  const reg = REG[state.r];
+  const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
+  const main = screen.querySelector('.m-main');
+  if (!main) return;
+  let prev = screen.querySelector('.m-head, .m-intro');
+  gaps = [];
+  [...main.children].forEach((el) => {
+    const g = prev ? Math.round((el.getBoundingClientRect().top - prev.getBoundingClientRect().bottom) / k) : reg.section;
+    const auto = reg.fit && state.comp !== 'stack' ? g > reg.section + 1 : g > reg.section * 2 + 1;
+    el.dataset.gap = auto ? `auto · ${g}` : g;
+    el.style.setProperty('--gap-h', `${g}px`);
+    gaps.push([el.dataset.role || 'group', g, auto]);
+    prev = el;
+  });
+}
+const refresh = () => { markGaps(); readout(REG[state.r], state.size === 'desktop' ? 1 : 0); };
 
 function readout(reg, k) {
   document.getElementById('register-out').textContent = reg.name;
   document.getElementById('r-name').textContent = reg.name;
   document.getElementById('r-note').textContent = reg.note;
-  const pairs = [['Between groups', reg.section], ['Sides', reg.inset[k]], ['Top and bottom', reg.block[k]], ['Inside a group', reg.inner], ['On screen', reg.things], ['Hero', reg.hero]];
+  const comp = reg.fit ? COMP_NOTE[state.comp] : 'Tools stack: fixed gaps, read from the top';
+  const measured = gaps.filter(([r]) => r !== 'group' && r !== 'title').map(([r, g, a]) => `${r === 'hero' ? 'Above the hero' : 'Above the support'} ${a ? `${g} (room left)` : g}`).join(' · ');
+  const pairs = [['Between groups', reg.fit && state.comp !== 'stack' ? `${reg.section} at least, then the room left` : reg.section], ['Sides', reg.inset[k]], ['Top and bottom', reg.block[k]], ['Max width', state.maxw ? `${state.maxw}, centred` : 'None: the inset only'], ['On screen', reg.things], ['Hero', reg.hero], ['Composition', comp], ['Measured', measured || '—']];
   document.getElementById('r-grid').innerHTML = pairs.map(([n, v]) => `<div class="pair"><span class="t-mono">${n}</span><span class="t-body">${v}</span></div>`).join('');
   document.getElementById('r-carries').innerHTML = reg.carries.map(([n, v]) => `<li><span class="t-mono">${n}</span><span class="t-body">${v}</span></li>`).join('');
   requestAnimationFrame(() => {
@@ -419,11 +495,21 @@ const swap = () => {
   setTimeout(render, 160);
 };
 
-document.getElementById('register').addEventListener('input', (e) => { state.r = Number(e.target.value); swap(); });
+document.getElementById('register').addEventListener('input', (e) => {
+  state.r = Number(e.target.value);
+  // The max width follows the register's suggestion.
+  const want = String(MAXW[state.r]);
+  const opt = document.querySelector(`#maxw .segmented-option[value="${want}"]`);
+  state.maxw = MAXW[state.r];
+  if (opt && !opt.classList.contains('is-active')) document.getElementById('maxw').dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
+  swap();
+});
+document.getElementById('comp').addEventListener('picker-change', (e) => { state.comp = e.detail.value; render(); });
+document.getElementById('maxw').addEventListener('segmented-change', (e) => { const v = Number(e.detail.value); if (v !== state.maxw) { state.maxw = v; render(); } });
 document.getElementById('content').addEventListener('segmented-change', (e) => { state.content = Number(e.detail.value); swap(); });
 document.getElementById('screen-size').addEventListener('segmented-change', (e) => { state.size = e.detail.value; fit(); render(); });
 document.getElementById('show-space').addEventListener('segmented-change', (e) => { state.space = e.detail.value === 'on'; screen.classList.toggle('show-space', state.space); });
-new ResizeObserver(fit).observe(stage);
+new ResizeObserver(() => { fit(); requestAnimationFrame(refresh); }).observe(stage);
 fit();
 render();
 document.fonts?.ready.then(() => readout(REG[state.r], state.size === 'desktop' ? 1 : 0));
