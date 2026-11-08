@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>From Page to Tool</title>
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
+<link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
+<style>
+  /* A page whose hero is an object: the system recomposing itself, from a
+     page with an object as its hero to a tool. The title, the hero (two
+     screens), and the steps at the bottom, the room between. */
+  h1, h2, h3, h4, h5, p { margin: 0; }
+  body { background: var(--color-bg); }
+  .page {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-48);
+    min-height: 100svh;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-block: var(--space-page-block);
+    padding-left: max(var(--space-page), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
+  }
+  .page > * { min-width: 0; }
+
+  /* The hero: the same step on a desktop and a phone, at their real sizes,
+     scaled to share one height. On a phone, the phone screen alone. */
+  .screens { display: flex; justify-content: center; align-items: flex-end; gap: var(--space-24); }
+  @media (max-width: 630px) { .screens .is-desktop-box { display: none; } }
+
+  /* The steps: anchored to the bottom (the room sits above them). */
+  .steps { margin-top: auto; display: grid; justify-items: center; gap: var(--space-16); text-align: center; }
+  .steps .segmented-option { padding-inline: calc(var(--inset-control) - var(--inset-fill)); }
+  .scale { display: grid; gap: var(--space-8); }   /* the ends sit under the control, as wide as it */
+  .scale-ends { display: flex; justify-content: space-between; padding-inline: var(--space-16); }
+  .caption { color: var(--color-text-secondary); max-width: 40ch; min-height: calc(2 * 19px); /* two lines of Body: the caption never moves the steps */ }
+
+  .screen-box { position: relative; }
+  .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+    overflow: hidden auto;
+    container: screen / size;
+    background: var(--color-bg);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen { overflow: hidden; }
+
+  /* The type in the screen follows the screen's size, not this window's. */
+  .screen.is-phone .t-display { font-size: 32px; line-height: 1.2; }
+  .screen.is-phone .t-title { font-size: 24px; line-height: 1.2; }
+  .screen.is-desktop .t-display { font-size: 56px; line-height: 64px; }
+  .screen.is-desktop .t-title { font-size: 32px; line-height: 38px; }
+
+  /* ============================================================
+     THE MOCK PAGE. Every distance comes from the register:
+     --m-inset (sides), --m-block (top and bottom), --m-section (between
+     groups). The main group centres in the room left over when the
+     register fits to the screen and the content allows it.
+     ============================================================ */
+  .m {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: var(--m-block) var(--m-inset) var(--m-pad-b);
+    transition: opacity var(--duration-fast) ease;
+  }
+  .m.is-swapping { opacity: 0; }
+  .m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-gap-inner); }
+  /* Max width: the head and main sit in a centred column; the slot keeps the screen. */
+  .m-head, .m-intro, .m-main { width: 100%; max-width: var(--m-maxw, none); margin-inline: auto; }
+
+  /* Compositions. Stack: fixed gaps, the group centred. The others fill
+     the room between the header and the slot, and the space between the
+     title, the hero and the supporting content is what's left over. */
+  .m.is-fit.comp-stack .m-main { margin-block: auto; }
+  .m.is-fit:not(.comp-stack) .m-main { flex: 1; }
+  .m.is-fit.comp-centre .m-main:has(> [data-role="hero"]) { display: grid; grid-template-rows: auto 1fr auto; }
+  .m.is-fit:not(.comp-stack) .m-main:not(:has(> [data-role="hero"])) [data-role="support"] { margin-top: auto; }
+  .m.is-fit.comp-centre [data-role="hero"] { align-self: center; }
+  .m.is-fit.comp-top [data-role="support"] { margin-top: auto; }
+  .m.is-fit.comp-bottom [data-role="hero"] { margin-top: auto; }
+  .m-head { display: flex; justify-content: space-between; align-items: start; gap: var(--space-16); }
+  .m-head p { max-width: 30ch; }
+  .m-quiet { color: var(--color-text-secondary); }
+  .m-stack { display: grid; gap: var(--space-8); }
+  .m-center { text-align: center; justify-items: center; }
+
+  /* The object hero: a carousel, sized from the screen. */
+  .m-carousel { display: flex; align-items: start; justify-content: flex-start; gap: var(--space-16); margin-right: calc(-1 * var(--m-inset)); overflow: visible; }
+  .m-card {
+    flex: none;
+    display: grid;
+    align-content: start;
+    padding: var(--space-24);
+    width: min(64cqw, 32cqh);
+    aspect-ratio: 4 / 5;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-lift);
+    transition: translate var(--duration-pop) var(--ease-out), rotate var(--duration-pop) var(--ease-out);
+  }
+  .m-card.is-side { opacity: 0.2; box-shadow: none; }
+  .m-card:not(.is-side):hover { translate: 0 calc(-1 * var(--space-4)); rotate: -1deg; }
+
+  /* Showcase: one piece of work. */
+  .m-media { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
+  .m-prose { display: grid; gap: var(--space-16); }
+  .m-prose p { color: var(--color-text-secondary); }
+
+  /* Page: a statement, then a list on dividers. */
+  .m-list { display: grid; }
+  .m-row { display: grid; gap: var(--space-4); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
+  .m-row:first-child { border-top: 0; padding-top: 0; }
+
+  /* Workspace and tool: intro, panel row, figures, chart, table. */
+  .m-intro { display: flex; justify-content: space-between; align-items: center; gap: var(--space-16); }
+  .m-info { flex: none; width: var(--height-control); height: var(--height-control); display: grid; place-items: center; border-radius: var(--radius-pill); }
+  .m-info svg { width: var(--icon-inline); height: var(--icon-inline); }
+  .m-panel { display: flex; align-items: center; justify-content: space-between; min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+  .m-panel svg, .m-pill svg { width: var(--icon-mark); height: var(--icon-mark); color: var(--color-text-secondary); }
+  .m-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--m-gap-inner); }
+  .is-desktop .m-figures { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .m-chart { width: 100%; height: auto; display: block; }
+  .m-chart path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .m-table { width: 100%; border-collapse: collapse; }
+  .m-table th, .m-table td { text-align: left; padding: var(--m-row-pad) var(--space-8) var(--m-row-pad) 0; border-top: 1px solid var(--color-divider); }
+  .m-table th { border-top: 0; }
+  .m-table .num { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+  .m-split { display: grid; gap: var(--m-section); }
+  /* Workspace: the first screen is the title, the hero card and its
+     numbers; the hero card takes the room left, and anything more sits
+     below the fold by design. */
+  .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
+  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 52cqh; padding: var(--space-24); }
+  .m-hero-card .m-chart { align-self: end; }
+  .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+
+  /* The bottom slot, drawn in the screen (the real one is fixed to the window). */
+  .m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
+  .m-slot > * { pointer-events: auto; }
+  .m.is-fit .m-slot { margin-top: 0; }
+  .m .segmented-option.is-indicated { opacity: 1; background: var(--color-fill-subtle); }
+  .m-big { min-height: var(--height-slot); padding: 0 var(--inset-slot); justify-content: center; }
+  .is-phone .m-slot .m-big:only-child { flex: 1; }
+  .m-pill { display: inline-flex; align-items: center; gap: var(--gap-mark); min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
+  .m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
+
+
+  /* ---- The motion. Out: the old step fades on --duration-fast. In: each
+     group rises 16px and fades in on the entrance curve, staggered 100ms
+     from the top, so the composition reads as built in order. */
+  .m.is-leaving { opacity: 0; transition: opacity var(--duration-fast) ease; }
+  .m .is-in { opacity: 0; translate: 0 var(--space-16); }
+  .m .is-in.is-shown {
+    opacity: 1;
+    translate: 0 0;
+    transition: opacity var(--duration-entrance) var(--ease-out), translate var(--duration-entrance) var(--ease-out);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m .is-in { translate: none; }
+    .m .is-in.is-shown, .m.is-leaving { transition-duration: 1ms; }
+  }
+</style>
+</head>
+<body ontouchstart>
+<div class="page">
+  <header class="intro">
+    <div class="intro-title-row">
+      <h1 class="t-display">From page to tool</h1>
+      <button class="intro-info surface surface--rest surface--pill" type="button" aria-label="About this page" aria-expanded="false" aria-controls="intro-about" data-tooltip-toggle="intro-about">
+        <svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      </button>
+      <div class="intro-about tooltip tooltip--anchored" id="intro-about" hidden>
+        <p class="tooltip-text t-mono">The same components and the same timing at every step. What changes is the arrangement: the hero under the title, the gap of 48, the room below, and how many things share the screen.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="screens" id="screens" aria-hidden="true">
+    <div class="screen-box is-desktop-box"><div class="screen is-desktop" data-size="desktop"></div></div>
+    <div class="screen-box is-phone-box"><div class="screen is-phone" data-size="phone"></div></div>
+  </div>
+
+  <div class="steps">
+    <div class="scale">
+    <div class="segmented" role="group" aria-label="Step" id="steps">
+      <span class="segmented-indicator" aria-hidden="true"></span>
+      <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="0">Object</button>
+      <button class="segmented-option t-control" type="button" aria-pressed="false" value="1">Text</button>
+      <button class="segmented-option t-control" type="button" aria-pressed="false" value="2">Media</button>
+      <button class="segmented-option t-control" type="button" aria-pressed="false" value="3">Chart</button>
+      <button class="segmented-option t-control" type="button" aria-pressed="false" value="4">Tool</button>
+    </div>
+    <div class="scale-ends"><span class="t-mono">Page</span><span class="t-mono">Tool</span></div>
+    </div>
+    <p class="t-body caption" id="caption" aria-live="polite"></p>
+  </div>
+</div>
+
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/tooltip/tooltip.js"></script>
+<script>
+document.body.ontouchstart = () => {};
+const state = { hero: 'object' };
+const REG = [
+  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: [48, 48], inner: 16, rowPad: 16,
+    note: 'A title, a hero in the first screen, content below it. A type toy, an about page, a post, a tracker you check: one register, four kinds of hero.',
+    things: '', hero: '', carries: [] },
+  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: [48, 48], inner: 16, rowPad: 8,
+    note: 'You work through data: many figures, a table, many controls. A league tool, a dashboard, a ledger. Precision is the expression.',
+    things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
+    carries: [['Space', '48 between groups, like a page; the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as a page']] },
+];
+// Page's three heroes: the same register, the same composition.
+const PAGE_HERO = {
+  object: { things: 'A title, the object, a caption, the nav', hero: 'An object to look at or play with, sized from the screen',
+    carries: [['Layout', 'The object right under the title; the caption at the bottom'], ['Words', 'Few: the object carries the page'], ['Motion', 'The object lifts and sways under a finger']] },
+  statement: { things: 'A statement, a list, one action', hero: 'The statement itself, in display type',
+    carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
+  media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
+    carries: [['Layout', 'Title, then the media with its text the gap below, as one block'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
+  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about half the screen tall',
+    carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
+};
+const sec = (reg, k) => reg.section[k];
+// The max width each register suggests; the control follows the register.
+
+const CHEV = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEV_DOWN = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ARROW = '<svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M2 5h6M5.5 2.5 8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const INFO = '<span class="m-info surface surface--rest" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="4.25" r="1.25" fill="currentColor"/><path d="M8 7.25v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>';
+const nav = (a, b, on = 0) => `<div class="segmented segmented--large" aria-hidden="true"><span class="segmented-indicator" style="opacity:0"></span><span class="segmented-option t-label${on === 0 ? ' is-indicated' : ''}">${a}</span><span class="segmented-option t-label${on === 1 ? ' is-indicated' : ''}">${b}</span></div>`;
+const head = (right = 'About', sub = '') => `<div class="m-head"><div class="m-stack"><span class="t-body m-quiet">Studio Folio</span>${sub ? `<p class="t-body m-quiet">${sub}</p>` : ''}</div><span class="t-body m-quiet">${right}</span></div>`;
+
+// A chart: one series in ink, two quiet ones in the series grey.
+const chart = (w, h) => {
+  const line = (seed, amp) => { let d = ''; for (let i = 0; i <= 12; i++) { const x = (i / 12) * w, y = h * 0.55 - Math.sin(i * 0.7 + seed) * amp - i * (h * 0.02); d += `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`; } return d; };
+  return `<svg class="m-chart" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    ${[0.25, 0.5, 0.75].map((f) => `<line x1="0" x2="${w}" y1="${h * f}" y2="${h * f}" stroke="var(--color-hairline-strong)" stroke-dasharray="0 4" stroke-linecap="round"/>`).join('')}
+    <path d="${line(2, h * 0.12)}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${line(4, h * 0.1)}" stroke="var(--color-series)" stroke-width="2.25"/>
+    <path d="${line(0, h * 0.18)}" stroke="var(--color-text)" stroke-width="3.25"/></svg>`;
+};
+const PEOPLE = ['Ana Ruiz', 'Ben Okafor', 'Chloe Park', 'Dev Shah', 'Eli Moreau', 'Fay Lin', 'Gus Romero', 'Hana Ito', 'Ivo Petrov', 'Jun Ahn', 'Kai Berg', 'Lia Costa', 'Max Ross', 'Nia Cole', 'Omar Haddad', 'Pia Lund', 'Quinn Ray', 'Rex Hale', 'Sol Vega', 'Tao Wen'];
+const table = (rows) => `<table class="m-table"><thead><tr><th class="t-label">Player</th><th class="t-label">Team</th><th class="t-label num">Pts</th></tr></thead><tbody>${PEOPLE.slice(0, rows).map((p, i) => `<tr><td class="t-body">${p}</td><td class="t-mono">${['NYK', 'BOS', 'DEN', 'LAL', 'MIA'][i % 5]}</td><td class="t-mono num">${(48.2 - i * 1.7).toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
+const figures = (n) => `<div class="m-figures">${[['Points', '1,284'], ['Rank', '3rd'], ['Win rate', '64%'], ['Trades', '12']].slice(0, n).map(([k, v]) => `<div class="m-stack"><span class="t-mono">${k}</span><span class="t-title">${v}</span></div>`).join('')}</div>`;
+
+const PAGE_RENDER = {
+  object: (c) => {
+    const cards = c === 0 ? 1 : c === 2 ? 4 : 3;
+    const card = (i) => `<div class="m-card${i ? ' is-side' : ''}"><span class="t-title">Episode ${12 - i}</span></div>`;
+    return { head: '',
+      title: `<h4 class="t-display">Stay Home Radio</h4>`,
+      hero: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`,
+      support: `<div class="m-stack"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
+      slot: nav('Design', 'Music', 1) };
+  },
+  statement:   (c) => {
+    const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
+    return { head: '',
+      title: `<h4 class="t-display">A product designer who makes small tools.</h4>`,
+      support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
+      slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
+    };
+  },
+  media:   (c) => {
+    const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
+    return { head: '',
+      title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
+      // The media and its text are one block: the text always sits the gap below the media.
+      hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+      support: c === 2 ? `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
+      slot: '' };
+  },
+  chart: (c, d) => ({ head: '',
+    title: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
+    hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
+    support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
+    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` }),
+};
+const RENDER = [
+  // Page
+  (c, d) => PAGE_RENDER[state.hero](c, d),
+  // Tool
+    (c, d) => ({
+    head: `<div class="m-intro"><h4 class="t-display">What-if league</h4>${INFO}</div>`,
+    main: `${figures(4)}
+      <div class="m-split${d ? ' is-two' : ''}"><div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Projected points</span>${chart(d ? 620 : 340, d ? 240 : 160)}</div>
+      <div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Roster</span>${table([4, 10, 20][c])}</div></div>`,
+    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>`,
+  }),
+
+];
+
+
+// The five steps: four heroes of a page, then a tool.
+const STEPS = [
+  { r: 0, hero: 'object', caption: 'A page with an object as its hero. Few words; the room falls below it.' },
+  { r: 0, hero: 'statement', caption: 'A page where the title is the hero, and a list waits at the bottom.' },
+  { r: 0, hero: 'media', caption: 'Media and its text as one block, in the reading width on a wide screen.' },
+  { r: 0, hero: 'chart', caption: 'The main view in a card, about half the screen. Its numbers follow.' },
+  { r: 1, hero: null, caption: 'A tool: dense from the top, the controls docked to the corner.' },
+];
+const SIZES = { phone: [390, 844], desktop: [1440, 900] };
+const STEP_MS = 3600;                 // a beat to land, a beat to read
+const screens = [...document.querySelectorAll('.screen')];
+let step = 0, timer = null;
+
+// Both screens share one height; together they fit the column.
+const fit = () => {
+  const host = document.getElementById('screens');
+  const W = host.clientWidth;
+  // The screens take the height the title and the steps leave: the whole
+  // page fits one screen, the steps anchored to its bottom.
+  const block = 2 * 48 + 2 * 48;      // --space-page-block top and bottom, and the two gaps
+  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.steps').offsetHeight - block;
+  const H = Math.max(240, Math.min(free, 640));
+  const showDesk = getComputedStyle(document.querySelector('.is-desktop-box')).display !== 'none';
+  const ratio = (s) => SIZES[s][0] / SIZES[s][1];
+  const gap = 24;
+  let h = H;
+  const total = (hh) => (showDesk ? ratio('desktop') * hh + gap : 0) + ratio('phone') * hh;
+  if (total(h) > W) h = (W - (showDesk ? gap : 0)) / ((showDesk ? ratio('desktop') : 0) + ratio('phone'));
+  screens.forEach((el) => {
+    const [w, hh] = SIZES[el.dataset.size];
+    const k = h / hh;
+    el.style.width = `${w}px`; el.style.height = `${hh}px`; el.style.transform = `scale(${k})`;
+    el.parentElement.style.width = `${w * k}px`; el.parentElement.style.height = `${h}px`;
+  });
+};
+
+const build = (el) => {
+  const s = STEPS[step], d = el.dataset.size === 'desktop', k = d ? 1 : 0;
+  if (s.hero) state.hero = s.hero;
+  const reg = REG[s.r];
+  const parts = RENDER[s.r](1, d);
+  const main = parts.main ?? ['title', 'hero', 'support'].filter((r) => parts[r]).map((r) => `<div class="m-part" data-role="${r}">${parts[r]}</div>`).join('');
+  const maxw = s.hero === 'media' && d ? 720 : 0;
+  const padB = parts.slot ? 24 : reg.block[k];
+  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-pad-b:${padB}px;--m-section:${sec(reg, k)}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:24px${maxw ? `;--m-maxw:${maxw}px` : ''}`;
+  el.innerHTML = `<div class="m${reg.fit ? ' is-fit' : ''} comp-top" style="${vars}">${parts.head}<div class="m-main">${main}</div>${parts.slot ? `<div class="m-slot">${parts.slot}</div>` : ''}${parts.corner ? `<div class="m-corner">${parts.corner}</div>` : ''}</div>`;
+  // Stagger the groups in, top first: JS sets the order, CSS the motion.
+  const groups = [...el.querySelectorAll('.m > .m-head, .m > .m-intro, .m-main > *, .m-slot, .m-corner')];
+  groups.forEach((g) => g.classList.add('is-in'));
+  requestAnimationFrame(() => requestAnimationFrame(() => groups.forEach((g, i) => setTimeout(() => g.classList.add('is-shown'), i * 100))));
+};
+
+const show = (n) => {
+  step = n;
+  document.getElementById('caption').textContent = STEPS[step].caption;
+  const opt = document.querySelector(`#steps .segmented-option[value="${step}"]`);
+  if (!opt.classList.contains('is-active')) document.getElementById('steps').dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
+  screens.forEach((el) => {
+    const m = el.querySelector('.m');
+    if (!m) { build(el); return; }
+    m.classList.add('is-leaving');
+    setTimeout(() => build(el), 160);   // mirrors --duration-fast
+  });
+};
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const play = (delay = STEP_MS) => {
+  clearTimeout(timer);
+  if (reduced) return;                // with reduced motion, the steps wait for a tap
+  timer = setTimeout(() => { show((step + 1) % STEPS.length); play(); }, delay);
+};
+
+// A tap on a step jumps there and holds it a little longer before moving on.
+document.getElementById('steps').addEventListener('segmented-change', (e) => {
+  const n = Number(e.detail.value);
+  if (n !== step) show(n);
+  play(STEP_MS * 2);
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(timer); else play(); });
+
+new ResizeObserver(fit).observe(document.getElementById('screens'));
+fit();
+show(0);
+play();
+</script>
+</body>
+</html>
