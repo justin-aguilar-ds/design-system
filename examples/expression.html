@@ -111,10 +111,8 @@
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-lift);
-    transition: translate var(--duration-pop) var(--ease-out), rotate var(--duration-pop) var(--ease-out);
   }
   .m-card.is-side { opacity: 0.2; box-shadow: none; }
-  .m-card:not(.is-side):hover { translate: 0 calc(-1 * var(--space-4)); rotate: -1deg; }
 
   /* Showcase: one piece of work. */
   .m-media { width: 100%; aspect-ratio: 16 / 10; display: grid; place-items: center; border: 1px solid var(--color-hairline); border-radius: var(--radius-card); }
@@ -145,7 +143,7 @@
      numbers; the hero card takes the room left, and anything more sits
      below the fold by design. */
   .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
-  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 52cqh; padding: var(--space-24); }
+  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 70cqh; padding: var(--space-24); }
   .m-hero-card .m-chart { align-self: end; }
   .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
@@ -160,10 +158,11 @@
   .m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
 
 
-  /* ---- Showcase overrides. The object is the carousel as the system
-     ships it: the current item centred, the others either side at 0.2.
-     Each item is a cover — the ground's opposite with the page's ink —
-     so it reads as media, not an empty box. */
+  /* ---- Showcase overrides. */
+  /* The object is the carousel as the system ships it: the current item
+     centred, the others either side at 0.2. Each item is a draft card — the
+     ground's opposite with the page's ink — so it reads as media, not an
+     empty box. */
   .m-carousel { justify-content: center; align-items: center; margin: 0 calc(-1 * var(--m-inset)); }
   .m-card { display: grid; align-content: space-between; background: var(--color-ground); border-color: var(--color-ground); color: var(--color-bg); }
   .m-card .t-mono, .m-card .t-display { color: inherit; }
@@ -240,12 +239,12 @@ const REG = [
 // Page's three heroes: the same register, the same composition.
 const PAGE_HERO = {
   object: { things: 'A title, the object, a caption, the nav', hero: 'An object to look at or play with, sized from the screen',
-    carries: [['Layout', 'The object right under the title; the caption at the bottom'], ['Words', 'Few: the object carries the page'], ['Motion', 'The object lifts and sways under a finger']] },
+    carries: [['Layout', 'The object right under the title; the caption at the bottom'], ['Words', 'Few: the object carries the page'], ['Motion', 'The object is picked up and carried, never tilted on hover']] },
   statement: { things: 'A statement, a list, one action', hero: 'The statement itself, in display type',
     carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
   media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
     carries: [['Layout', 'Title, then the media with its text the gap below, as one block'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
-  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about half the screen tall',
+  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about 70% of the screen tall',
     carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
 };
 const sec = (reg, k) => reg.section[k];
@@ -271,39 +270,7 @@ const PEOPLE = ['Ana Ruiz', 'Ben Okafor', 'Chloe Park', 'Dev Shah', 'Eli Moreau'
 const table = (rows) => `<table class="m-table"><thead><tr><th class="t-label">Player</th><th class="t-label">Team</th><th class="t-label num">Pts</th></tr></thead><tbody>${PEOPLE.slice(0, rows).map((p, i) => `<tr><td class="t-body">${p}</td><td class="t-mono">${['NYK', 'BOS', 'DEN', 'LAL', 'MIA'][i % 5]}</td><td class="t-mono num">${(48.2 - i * 1.7).toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
 const figures = (n) => `<div class="m-figures">${[['Points', '1,284'], ['Rank', '3rd'], ['Win rate', '64%'], ['Trades', '12']].slice(0, n).map(([k, v]) => `<div class="m-stack"><span class="t-mono">${k}</span><span class="t-title">${v}</span></div>`).join('')}</div>`;
 
-const PAGE_RENDER = {
-  object: (c) => {
-    const cards = c === 0 ? 1 : c === 2 ? 4 : 3;
-    const card = (i) => `<div class="m-card${i ? ' is-side' : ''}"><span class="t-title">Episode ${12 - i}</span></div>`;
-    return { head: '',
-      title: `<h4 class="t-display">Stay Home Radio</h4>`,
-      hero: `<div class="m-carousel">${Array.from({ length: cards }, (_, i) => card(i)).join('')}</div>`,
-      support: `<div class="m-stack"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
-      slot: nav('Design', 'Music', 1) };
-  },
-  statement:   (c) => {
-    const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
-    return { head: '',
-      title: `<h4 class="t-display">A product designer who makes small tools.</h4>`,
-      support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
-      slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
-    };
-  },
-  media:   (c) => {
-    const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
-    return { head: '',
-      title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
-      // The media and its text are one block: the text always sits the gap below the media.
-      hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
-      support: c === 2 ? `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
-      slot: '' };
-  },
-  chart: (c, d) => ({ head: '',
-    title: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
-    hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
-    support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
-    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` }),
-};
+const PAGE_RENDER = {};  // filled below: one story, a fantasy basketball league
 const RENDER = [
   // Page
   (c, d) => PAGE_RENDER[state.hero](c, d),
@@ -327,30 +294,46 @@ const STEPS = [
   { r: 0, hero: 'chart' },
   { r: 1, hero: null },
 ];
-const wave = () => {
-  // A deterministic waveform: the played part in full ink, the rest at 35%.
-  let x = 0, out = '';
-  for (let i = 0; i < 28; i++) { const h = 6 + Math.round(Math.abs(Math.sin(i * 1.7) * 18 + Math.sin(i * 0.6) * 10)); out += `<rect x="${x}" y="${40 - h}" width="3" height="${h}" rx="1.5" fill="currentColor"${i > 10 ? ' opacity="0.35"' : ''}/>`; x += 6; }
-  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true">${out}</svg>`;
+// ---- One story: a fantasy basketball league, from draft night to the trade tool.
+const spark = (seed) => {
+  // A player's points over the last ten weeks, drawn like the table's sparkline.
+  const v = Array.from({ length: 10 }, (_, i) => 10 + Math.round(Math.abs(Math.sin(i * 0.9 + seed) * 14 + Math.sin(i * 0.4 + seed) * 6)));
+  const max = Math.max(...v);
+  const pts = v.map((n, i) => `${(i * 168 / 9).toFixed(1)},${(36 - (n / max) * 32).toFixed(1)}`).join(' ');
+  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 };
-PAGE_RENDER.object = () => {
-  const card = (n, side) => `<div class="m-card${side ? ' is-side' : ''}"><span class="t-mono">Side A · Episode</span><div class="m-stack" style="gap: var(--space-16)"><span class="t-display">${n}</span>${wave()}</div></div>`;
+PAGE_RENDER.object = (c) => {
+  const picks = [[2, 'Ben Okafor', 'Forward'], [3, 'Chloe Park', 'Centre'], [4, 'Dev Shah', 'Guard'], [5, 'Eli Moreau', 'Guard'], [6, 'Fay Lin', 'Forward']];
+  const shown = c === 0 ? picks.slice(2, 3) : picks;
+  const card = ([n, name, pos]) => `<div class="m-card${n === 4 ? '' : ' is-side'}"><span class="t-mono">Round 1 · ${pos}</span><div class="m-stack" style="gap: var(--space-8)"><span class="t-display">${n}</span><span class="t-label" style="color: inherit">${name}</span>${spark(n)}</div></div>`;
   return { head: '',
-    title: `<h4 class="t-display">Stay Home Radio</h4>`,
-    hero: `<div class="m-carousel">${card(10, true)}${card(11, true)}${card(12, false)}${card(13, true)}${card(14, true)}</div>`,
-    support: `<div class="m-stack m-center"><p class="t-body m-quiet">Episode 12 · 58 min</p><p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p></div>`,
-    slot: nav('Design', 'Music', 1) };
+    title: `<h4 class="t-display">Draft night</h4>`,
+    hero: `<div class="m-carousel">${shown.map(card).join('')}</div>`,
+    support: `<div class="m-stack m-center"><p class="t-body m-quiet">Round 1 of 13 · you’re on the clock</p>${c ? '<p class="t-body m-quiet">Picks lock in 90 seconds</p>' : ''}</div>`,
+    slot: nav('Draft', 'Board', 0) };
 };
-// Media: a long read under the image.
-PAGE_RENDER.media = () => {
-  const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'Each note is short: what we saw, why it stuck, and what we’d borrow from it.'];
-  const Q = ['We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'It also gives the quieter decisions a place to live — the spacing that took a week, the animation we cut, the label we argued about.', 'So we’re starting a journal. One note at a time, whenever there’s something worth keeping.'];
+PAGE_RENDER.statement = (c) => {
+  const rows = [['2025 champion', 'Chloe Park'], ['2024 champion', 'Dev Shah'], ['2023 champion', 'Chloe Park'], ['2022 champion', 'Ana Ruiz'], ['2021 champion', 'Gus Romero'], ['2020 champion', 'Ben Okafor'], ['2019 champion', 'Hana Ito'], ['2018 champion', 'Fay Lin']].slice(0, [2, 4, 8][c]);
   return { head: '',
-    title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
-    hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
-    support: `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${Q.map((t) => `<p class="t-body">${t}</p>`).join('')}</div>`,
+    title: `<h4 class="t-display">Twelve friends, one league, since 2014.</h4>`,
+    support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
+    slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy invite link</button>`,
+  };
+};
+PAGE_RENDER.media = (c) => {
+  const P = ['Twelve teams, thirteen rounds, one long winter. The draft is Sunday at eight, and the board below is where it starts.', 'Last season came down to the final week and a single free throw. This year the waiver order resets, trades close at the deadline, and the playoffs move to six teams.', 'Keepers are due Friday. Each team holds two, and a keeper costs the round they were drafted in, one earlier each season.'];
+  const Q = ['Blocks and steals now count double, and turnovers cost a point. Big men get a little more valuable; careless guards a little less.', 'Three-pointers made stay at one point, but a made three no longer also counts as a field goal. Shooters lose a point a game on average.', 'The changes were voted in at the end of last season, nine to three. They apply from the draft on.'];
+  return { head: '',
+    title: `<h4 class="t-display">The 2026 season preview</h4>`,
+    hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Draft board</span></div><div class="m-prose">${P.slice(0, [1, 2, 3][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+    support: c ? `<div class="m-prose"><h5 class="t-label">Scoring changes</h5>${Q.slice(0, c === 2 ? 3 : 1).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
     slot: '' };
 };
+PAGE_RENDER.chart = (c, d) => ({ head: '',
+  title: `<div class="m-intro"><h4 class="t-display">My team</h4>${INFO}</div>`,
+  hero: `<div class="m-hero-card surface"><div class="m-stack"><span class="t-mono">Projected this week</span><span class="t-title">1,310</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
+  support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Roster</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
+  corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` });
 const SIZES = { phone: [390, 844], desktop: [1440, 900] };
 const STEP_MS = 3600;                 // a beat to land, a beat to read
 const screens = [...document.querySelectorAll('.screen')];
@@ -383,7 +366,7 @@ const build = (el) => {
   const s = STEPS[step], d = el.dataset.size === 'desktop', k = d ? 1 : 0;
   if (s.hero) state.hero = s.hero;
   const reg = REG[s.r];
-  const parts = RENDER[s.r](1, d);
+  const parts = RENDER[s.r](s.hero === 'media' ? 2 : 1, d);   // the media page is a long read
   const main = parts.main ?? ['title', 'hero', 'support'].filter((r) => parts[r]).map((r) => `<div class="m-part" data-role="${r}">${parts[r]}</div>`).join('');
   const maxw = s.hero === 'media' && d ? 720 : 0;
   const padB = parts.slot ? 24 : reg.block[k];

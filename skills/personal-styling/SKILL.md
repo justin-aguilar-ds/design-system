@@ -205,9 +205,9 @@ How a screen is arranged. Decide it before any styling.
   - **an object** to look at or play with, with few words — a carousel card, a type toy (on a phone with controls, a stage and sheet);
   - **a statement** — the title is the hero, and a list or details follow;
   - **media with its text**, one block, the text `48` below the media;
-  - **the main view in a card** — a chart, a week — about half the screen tall, its numbers after it.
+  - **the main view in a card** — a chart, a week — about 70% of the screen tall, its numbers after it.
 - **Top is the default composition.** The title at the top, the hero right under it at the gap. With little content, the rest is anchored to the bottom — above the bottom slot when there is one — and the room sits between; with a lot, the rest follows at the gap and the page scrolls. Centre (the hero midway) and Bottom (the hero down with its support) are only for a single object that should float.
-- **The hero is sized from the screen**, not a fixed number: a share of its width or height (a card about two-thirds of the width, media at the column's full width, a chart card about half the screen tall), so it fills a phone and a desktop alike.
+- **The hero is sized from the screen**, not a fixed number: a share of its width or height (a card about two-thirds of the width, media at the column's full width, a chart card about 70% of the screen tall), so it fills a phone and a desktop alike.
 - **A tool is dense from the top.** No composition and no room: the title, then everything at the gap, read from the top. Figures, charts and tables; the controls docked to the corner (`patterns/control-panel/`); two columns on a wide screen where the content allows; full width.
 - **Expression lives in the arrangement.** A page feels designed because of its space, its hero and what's left out; a tool because of its precision. Neither gets a different button, a louder colour or more motion.
 

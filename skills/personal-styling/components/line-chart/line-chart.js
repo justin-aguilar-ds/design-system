@@ -1,9 +1,10 @@
-/* personal-styling · line-chart · v0.1.1 */
+/* personal-styling · line-chart · v0.2.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
 // Options as data attributes on the figure (defaults first):
-//   data-labels   off | on            axis labels
+//   data-labels   auto | on | off     axis labels: auto shows them once the
+//                                     chart is wider than the 630px breakpoint
 //   data-guides   grid | base | none  dotted guides
 //   data-density  few | more          how many guides (about 4 or 8)
 //   data-curve    rounded | straight
@@ -18,6 +19,7 @@
 const LINE_CHART_HEIGHT = 240;        // px, phones
 const LINE_CHART_HEIGHT_WIDE = 280;   // px, from 500px wide
 const LINE_CHART_GAP = 16;            // px between labels and the data
+const LINE_CHART_WIDE = 630;          // the system's one breakpoint: wider than this, labels show
 const LINE_CHART_DIGIT = 7;           // px, a mono 10.5 digit
 const LINE_CHART_NEAR = 16;           // px from a line that counts as near, mouse
 const LINE_CHART_NEAR_TOUCH = 28;     // px, finger
@@ -93,7 +95,10 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   function draw() {
     const W = svg.clientWidth || fig.clientWidth || 320;
     const H = W < 500 ? LINE_CHART_HEIGHT : LINE_CHART_HEIGHT_WIDE;
-    const labels = opt('labels', 'off') === 'on';
+    // Labels by width: a wide chart is read for figures, a narrow one for
+    // its shape (the tooltip still gives every value). Redrawn on resize.
+    const mode = opt('labels', 'auto');
+    const labels = mode === 'on' || (mode === 'auto' && W > LINE_CHART_WIDE);
     const guides = opt('guides', 'grid');
     const yMax = Math.max(...series.flatMap((s) => s.values));
     const ticks = niceTicks(yMax, opt('density', 'few') === 'more' ? 8 : 4);
