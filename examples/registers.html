@@ -149,6 +149,7 @@
      numbers; the hero card takes the room left, and anything more sits
      below the fold by design. */
   .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
+  .m-media, .m-hero-card { box-shadow: var(--shadow-lift); }   /* a hero card is the page's object */
   .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 52cqh; padding: var(--space-24); }
   .m-hero-card .m-chart { align-self: end; }
   .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }

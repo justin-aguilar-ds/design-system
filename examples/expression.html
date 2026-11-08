@@ -41,7 +41,6 @@
   .steps .segmented-option { padding-inline: calc(var(--inset-control) - var(--inset-fill)); }
   .scale { display: grid; gap: var(--space-8); }   /* the ends sit under the control, as wide as it */
   .scale-ends { display: flex; justify-content: space-between; padding-inline: var(--space-16); }
-  .caption { color: var(--color-text-secondary); max-width: 40ch; min-height: calc(2 * 19px); /* two lines of Body: the caption never moves the steps */ }
 
   .screen-box { position: relative; }
   .screen {
@@ -161,6 +160,19 @@
   .m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
 
 
+  /* ---- Showcase overrides. The object is the carousel as the system
+     ships it: the current item centred, the others either side at 0.2.
+     Each item is a cover — the ground's opposite with the page's ink —
+     so it reads as media, not an empty box. */
+  .m-carousel { justify-content: center; align-items: center; margin: 0 calc(-1 * var(--m-inset)); }
+  .m-card { display: grid; align-content: space-between; background: var(--color-ground); border-color: var(--color-ground); color: var(--color-bg); }
+  .m-card .t-mono, .m-card .t-display { color: inherit; }
+  .m-card .t-mono { opacity: 0.6; }
+  .m-wave { display: block; width: 100%; height: auto; color: inherit; }
+  /* The hero's card is the page's object, so it carries the lift shadow,
+     like a carousel item. */
+  .m-media, .m-hero-card { box-shadow: var(--shadow-lift); }
+
   /* ---- The motion. Out: the old step fades on --duration-fast. In: each
      group rises 16px and fades in on the entrance curve, staggered 100ms
      from the top, so the composition reads as built in order. */
@@ -206,9 +218,8 @@
       <button class="segmented-option t-control" type="button" aria-pressed="false" value="3">Chart</button>
       <button class="segmented-option t-control" type="button" aria-pressed="false" value="4">Tool</button>
     </div>
-    <div class="scale-ends"><span class="t-mono">Page</span><span class="t-mono">Tool</span></div>
+    <div class="scale-ends"><span class="t-mono">Expressive</span><span class="t-mono">Tool</span></div>
     </div>
-    <p class="t-body caption" id="caption" aria-live="polite"></p>
   </div>
 </div>
 
@@ -310,12 +321,36 @@ const RENDER = [
 
 // The five steps: four heroes of a page, then a tool.
 const STEPS = [
-  { r: 0, hero: 'object', caption: 'A page with an object as its hero. Few words; the room falls below it.' },
-  { r: 0, hero: 'statement', caption: 'A page where the title is the hero, and a list waits at the bottom.' },
-  { r: 0, hero: 'media', caption: 'Media and its text as one block, in the reading width on a wide screen.' },
-  { r: 0, hero: 'chart', caption: 'The main view in a card, about half the screen. Its numbers follow.' },
-  { r: 1, hero: null, caption: 'A tool: dense from the top, the controls docked to the corner.' },
+  { r: 0, hero: 'object' },
+  { r: 0, hero: 'statement' },
+  { r: 0, hero: 'media' },
+  { r: 0, hero: 'chart' },
+  { r: 1, hero: null },
 ];
+const wave = () => {
+  // A deterministic waveform: the played part in full ink, the rest at 35%.
+  let x = 0, out = '';
+  for (let i = 0; i < 28; i++) { const h = 6 + Math.round(Math.abs(Math.sin(i * 1.7) * 18 + Math.sin(i * 0.6) * 10)); out += `<rect x="${x}" y="${40 - h}" width="3" height="${h}" rx="1.5" fill="currentColor"${i > 10 ? ' opacity="0.35"' : ''}/>`; x += 6; }
+  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true">${out}</svg>`;
+};
+PAGE_RENDER.object = () => {
+  const card = (n, side) => `<div class="m-card${side ? ' is-side' : ''}"><span class="t-mono">Side A · Episode</span><div class="m-stack" style="gap: var(--space-16)"><span class="t-display">${n}</span>${wave()}</div></div>`;
+  return { head: '',
+    title: `<h4 class="t-display">Stay Home Radio</h4>`,
+    hero: `<div class="m-carousel">${card(10, true)}${card(11, true)}${card(12, false)}${card(13, true)}${card(14, true)}</div>`,
+    support: `<div class="m-stack m-center"><p class="t-body m-quiet">Episode 12 · 58 min</p><p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p></div>`,
+    slot: nav('Design', 'Music', 1) };
+};
+// Media: a long read under the image.
+PAGE_RENDER.media = () => {
+  const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'Each note is short: what we saw, why it stuck, and what we’d borrow from it.'];
+  const Q = ['We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'It also gives the quieter decisions a place to live — the spacing that took a week, the animation we cut, the label we argued about.', 'So we’re starting a journal. One note at a time, whenever there’s something worth keeping.'];
+  return { head: '',
+    title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
+    hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media surface"><span class="t-label m-quiet">Media</span></div><div class="m-prose">${P.map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+    support: `<div class="m-prose"><h5 class="t-label">Writing helps us learn</h5>${Q.map((t) => `<p class="t-body">${t}</p>`).join('')}</div>`,
+    slot: '' };
+};
 const SIZES = { phone: [390, 844], desktop: [1440, 900] };
 const STEP_MS = 3600;                 // a beat to land, a beat to read
 const screens = [...document.querySelectorAll('.screen')];
@@ -362,7 +397,6 @@ const build = (el) => {
 
 const show = (n) => {
   step = n;
-  document.getElementById('caption').textContent = STEPS[step].caption;
   const opt = document.querySelector(`#steps .segmented-option[value="${step}"]`);
   if (!opt.classList.contains('is-active')) document.getElementById('steps').dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
   screens.forEach((el) => {
