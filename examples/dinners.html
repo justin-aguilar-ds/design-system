@@ -11,8 +11,10 @@
 <link rel="stylesheet" href="lib/patterns/artifact-intro/artifact-intro.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Layout: one centred column. The week is the main object: the nights
-     stay put down the left, the dinners move beside them. */
+  /* Register: Page. One main view you come back to: the week is the
+     hero, right under the title, then its numbers, then the ideas, all at
+     the page gap of 48. The nights stay put down the left, the dinners
+     move beside them. */
   .page {
     max-width: 880px;
     margin-inline: auto;
@@ -70,13 +72,6 @@
     </div>
   </header>
 
-  <section class="figures" aria-label="This week">
-    <div class="type-pair"><span class="t-mono">Cooking</span><span class="t-title tnum" id="fig-cook">–</span></div>
-    <div class="type-pair"><span class="t-mono">Ordering in</span><span class="t-title tnum" id="fig-order">–</span></div>
-    <div class="type-pair"><span class="t-mono">Delivery spend</span><span class="t-title tnum" id="fig-spend">–</span></div>
-    <div class="type-pair"><span class="t-mono">Time cooking</span><span class="t-title tnum" id="fig-time">–</span></div>
-  </section>
-
   <section class="section">
     <div class="section-head">
       <h2 class="t-label">This week</h2>
@@ -89,6 +84,13 @@
       <ol class="nights" aria-hidden="true" id="nights"></ol>
       <ul class="sortable" aria-label="Dinners by night" id="meals"></ul>
     </div>
+  </section>
+
+  <section class="figures" aria-label="This week">
+    <div class="type-pair"><span class="t-mono">Cooking</span><span class="t-title tnum" id="fig-cook">–</span></div>
+    <div class="type-pair"><span class="t-mono">Ordering in</span><span class="t-title tnum" id="fig-order">–</span></div>
+    <div class="type-pair"><span class="t-mono">Delivery spend</span><span class="t-title tnum" id="fig-spend">–</span></div>
+    <div class="type-pair"><span class="t-mono">Time cooking</span><span class="t-title tnum" id="fig-time">–</span></div>
   </section>
 
   <section class="section">

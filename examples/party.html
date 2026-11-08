@@ -17,8 +17,11 @@
 <link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Layout: the content column with the settings docked beside it; the
-     main action is the large button at the end (pinned on phones). */
+  /* Register: Tool. The host works through data (a guest table with
+     filters and search, settings), so it is dense from the top: the title,
+     then everything at the tool gap of 24; guests beside the running order
+     on a wide screen; settings docked to the corner; the one action is the
+     large button (pinned on phones). */
   .page {
     max-width: var(--container);
     margin-inline: auto;
@@ -29,7 +32,12 @@
     flex-direction: column;
     gap: var(--space-24);
   }
-  .content { display: flex; flex-direction: column; gap: var(--space-48); }
+  .content { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24); align-items: start; }
+  .side { display: flex; flex-direction: column; gap: var(--space-24); min-width: 0; }
+  @media (min-width: 900px) {
+    .content { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+    .content > .span { grid-column: 1 / -1; }
+  }
   .section { display: flex; flex-direction: column; gap: var(--space-16); }
   .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-24); }
   .figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
@@ -40,7 +48,7 @@
   .filters .search { flex: 0 1 280px; }
   .order-list { max-width: 560px; }
   .message { max-width: 65ch; }
-  .content > .toast-anchor { align-self: flex-start; } /* the toast centres on its button, not the column */
+  .content > .toast-anchor { justify-self: start; grid-column: 1 / -1; } /* the toast centres on its button, not the column */
 </style>
 
 <div class="page">
@@ -61,29 +69,18 @@
   <div class="control-dock">
     <div class="content">
 
-      <section class="details" aria-label="Details">
+      <section class="details span" aria-label="Details">
         <div class="type-pair"><span class="t-mono">When</span><span class="t-body type-pair-value">Sat, Nov 14 · 7:00 PM</span></div>
         <div class="type-pair"><span class="t-mono">Where</span><span class="t-body type-pair-value">220 Kent Ave, roof deck</span></div>
         <div class="type-pair"><span class="t-mono">Bring</span><span class="t-body type-pair-value">Something to share</span></div>
         <div class="type-pair"><span class="t-mono">Reply by</span><span class="t-body type-pair-value">Mon, Nov 9</span></div>
       </section>
 
-      <section class="figures" aria-label="Replies">
+      <section class="figures span" aria-label="Replies">
         <div class="type-pair"><span class="t-mono">Going</span><span class="t-title tnum" id="fig-going">–</span></div>
         <div class="type-pair"><span class="t-mono">Maybe</span><span class="t-title tnum" id="fig-maybe">–</span></div>
         <div class="type-pair"><span class="t-mono">No reply</span><span class="t-title tnum" id="fig-none">–</span></div>
         <div class="type-pair"><span class="t-mono">Spots left</span><span class="t-title tnum" id="fig-left">–</span></div>
-      </section>
-
-      <section class="section">
-        <h2 class="t-label" id="invite-heading">Invite link</h2>
-        <div class="field-row inline-form">
-          <input class="input" id="invite-link" type="text" value="rsvp.example/rooftop-nov-14" readonly aria-labelledby="invite-heading">
-          <span class="toast-anchor">
-            <button class="button surface surface--rest surface--pill t-control" type="button" data-copy="https://rsvp.example/rooftop-nov-14" data-toast="Link copied">Copy link</button>
-            <span class="toast t-mono" role="status"></span>
-          </span>
-        </div>
       </section>
 
       <section class="section">
@@ -121,6 +118,18 @@
         </form>
       </section>
 
+      <div class="side">
+      <section class="section">
+        <h2 class="t-label" id="invite-heading">Invite link</h2>
+        <div class="field-row inline-form">
+          <input class="input" id="invite-link" type="text" value="rsvp.example/rooftop-nov-14" readonly aria-labelledby="invite-heading">
+          <span class="toast-anchor">
+            <button class="button surface surface--rest surface--pill t-control" type="button" data-copy="https://rsvp.example/rooftop-nov-14" data-toast="Link copied">Copy link</button>
+            <span class="toast t-mono" role="status"></span>
+          </span>
+        </div>
+      </section>
+
       <section class="section">
         <h2 class="t-label">Running order</h2>
         <ul class="sortable order-list" aria-label="Running order" id="order">
@@ -137,6 +146,8 @@
         <h2 class="t-label">The invite</h2>
         <p class="t-body message" id="message"></p>
       </section>
+
+      </div>
 
       <span class="toast-anchor">
         <button class="button surface surface--rest surface--pill t-label button--large" type="button" id="remind">Remind everyone</button>
@@ -157,7 +168,7 @@
             <div class="control-panel-fields">
               <div class="slider-field">
                 <div class="slider-head">
-                  <label class="t-label" for="capacity">Capacity</label>
+                  <label class="t-mono" for="capacity">Capacity</label>
                   <output class="slider-value t-mono" for="capacity">40</output>
                 </div>
                 <span class="slider">
@@ -167,7 +178,7 @@
               </div>
 
               <div class="picker-field">
-                <span class="t-label" id="plus-label">Plus-ones</span>
+                <span class="t-mono" id="plus-label">Plus-ones</span>
                 <div class="picker" id="plus">
                   <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
                           aria-haspopup="listbox" aria-expanded="false" aria-controls="plus-list"
@@ -186,7 +197,7 @@
               </div>
 
               <div class="control-field">
-                <span class="t-label" id="vis-label">Guest list</span>
+                <span class="t-mono" id="vis-label">Guest list</span>
                 <div class="segmented" role="group" aria-labelledby="vis-label" id="visibility">
                   <span class="segmented-indicator" aria-hidden="true"></span>
                   <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="shown">Shown</button>

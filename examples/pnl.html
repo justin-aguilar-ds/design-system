@@ -14,8 +14,10 @@
 <link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <style>
-  /* Layout: one centred column at the container width; summary, then the
-     two charts, then the tables. Everything else comes from the library. */
+  /* Register: Tool. The person works through data (figures, two charts,
+     two sortable tables), so it is dense from the top: the title, then
+     everything at the tool gap of 24, the controls docked to the corner,
+     two columns where the screen allows. */
   .page {
     max-width: var(--container);
     margin-inline: auto;
@@ -24,7 +26,7 @@
     padding-right: max(var(--space-page), env(safe-area-inset-right, 0px));
     display: flex;
     flex-direction: column;
-    gap: var(--space-48);
+    gap: var(--space-24);
   }
   .page > * { min-width: 0; }
   .head { display: flex; flex-direction: column; gap: var(--space-24); }
@@ -93,8 +95,8 @@
       </div>
     </header>
 
-    <section class="control-panel surface accordion" aria-label="Controls">
-      <div class="accordion-item is-open">
+    <section class="control-panel control-panel--docked surface accordion" aria-label="Controls">
+      <div class="accordion-item is-open" data-closed-below="630">
         <h2 class="accordion-heading">
           <button class="accordion-trigger" type="button" id="controls-trigger" aria-expanded="true" aria-controls="controls-body">
             <span class="t-mono">Controls</span>
@@ -103,16 +105,20 @@
         </h2>
         <div class="accordion-panel" id="controls-body" role="region" aria-labelledby="controls-trigger">
           <div class="accordion-content"><div class="accordion-body">
-            <div class="field-row">
-                <div class="segmented" role="group" aria-label="Period" id="period">
+            <div class="control-panel-fields">
+              <div class="control-field">
+                <span class="t-mono" id="period-label">Period</span>
+                <div class="segmented" role="group" aria-labelledby="period-label" id="period">
                   <span class="segmented-indicator" aria-hidden="true"></span>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="5">1W</button>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="21">1M</button>
                   <button class="segmented-option t-control" type="button" aria-pressed="false" value="63">3M</button>
                   <button class="segmented-option is-active t-control" type="button" aria-pressed="true" value="all">YTD</button>
                 </div>
+              </div>
 
-                <span id="account-label" hidden>Account</span>
+              <div class="picker-field">
+                <span class="t-mono" id="account-label">Account</span>
                 <div class="picker" id="account">
                   <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
                           aria-haspopup="listbox" aria-expanded="false" aria-controls="account-list"
@@ -129,11 +135,16 @@
                   </div>
                 </div>
 
-                <div class="chip-row" role="group" aria-label="Asset class" id="assets">
+              </div>
+
+              <div class="control-field">
+                <span class="t-mono" id="assets-label">Assets</span>
+                <div class="chip-row" role="group" aria-labelledby="assets-label" id="assets">
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Equities"><span class="chip-dot" aria-hidden="true"></span>Equities</button>
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Options"><span class="chip-dot" aria-hidden="true"></span>Options</button>
                   <button class="chip t-control" type="button" aria-pressed="true" data-asset="Futures"><span class="chip-dot" aria-hidden="true"></span>Futures</button>
                 </div>
+              </div>
             </div>
           </div></div>
         </div>
