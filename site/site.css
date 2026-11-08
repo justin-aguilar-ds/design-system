@@ -36,16 +36,16 @@ body { min-height: 100vh; }
 .row-list > li:first-child { border-top: 0; }
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) calc(var(--space-48) + var(--space-24)); /* the last column fits a mono word like Explorer */
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-8) var(--space-24);
   align-items: baseline;
   padding: var(--space-16) 0;
 }
+/* One column: the name on the first line, its value at the right of that
+   line, the sentence under both. Nothing starts wherever a row ends. */
+.row > .t-body { grid-column: 1 / -1; grid-row: 2; color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
+.row > .t-mono:last-child:not(:first-child) { grid-column: 2; grid-row: 1; text-align: right; }
 .row-list > li:first-child > .row, .row-list > li.row:first-child { padding-top: 0; }
-.row > .t-mono:last-child { text-align: right; }
-.row--two { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
-.row--two > .t-mono:first-child { text-align: left; }
-.row .t-body { color: var(--color-text-secondary); transition: color var(--duration-fast) ease; }
 .row code { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--color-text); }
 @media (hover: hover) and (pointer: fine) {
   .row--link:hover .t-body { color: var(--color-text); }
@@ -53,32 +53,35 @@ body { min-height: 100vh; }
 @media (hover: none) {
   .row--link:active .t-body { color: var(--color-text); transition-duration: var(--duration-instant); }
 }
-@media (max-width: 630px) {
-  .row { grid-template-columns: minmax(0, 1fr) auto; }
-  .row > .t-body { grid-column: 1 / -1; grid-row: 2; }
-}
 
-/* A component's page: what it is, shown right under the title, on a hero
-   card that lifts like the page's object. */
-.demo--hero { box-shadow: var(--shadow-lift); }
+/* A component's page: what it is, centred on the stage right under the
+   title, as a page whose hero is media. Something naturally full width
+   (a table, a chart, an accordion) sits on the page instead. */
+.hero-stage {
+  display: grid;
+  place-items: center;
+  min-height: calc(var(--space-48) * 7);   /* 336: room for a menu or a toast to open */
+  padding: var(--space-48) var(--space-24);
+  background: var(--color-stage);
+  border-radius: var(--radius-card);
+}
+.hero-stage > * { max-width: 100%; }
+.hero-stage > :is(.slider-field, .input-field, .picker-field, .input-wrap) { width: min(100%, calc(var(--space-48) * 8)); }
 
 /* Space: the five steps drawn as bars, and the room as what's left. */
 .space-scale { list-style: none; padding: 0; }
 .space-scale li {
   display: grid;
-  grid-template-columns: var(--space-48) minmax(0, 120px) minmax(0, 1fr);
-  gap: var(--space-24);
+  grid-template-columns: var(--space-48) minmax(0, 1fr);
+  gap: var(--space-8) var(--space-16);
   align-items: center;
   padding: var(--space-16) 0;
   border-top: 1px solid var(--color-divider);
 }
 .space-scale li:first-child { border-top: 0; padding-top: 0; }
+.space-scale .t-caption { grid-column: 1 / -1; }
 .space-bar { display: block; height: var(--space-8); background: var(--color-text); border-radius: var(--radius-pill); }
-.space-bar--room { width: var(--space-48); height: var(--space-8); background: none; border: 1px dashed var(--color-hairline-strong); }
-@media (max-width: 630px) {
-  .space-scale li { grid-template-columns: var(--space-48) minmax(0, 1fr); }
-  .space-scale .t-caption { grid-column: 2; }
-}
+.space-bar--room { width: var(--space-48); background: none; border: 1px dashed var(--color-hairline-strong); }
 
 /* Controls: the two heights, live. */
 .specimen-list-wide { list-style: none; padding: 0; display: grid; gap: var(--space-48); }
@@ -300,9 +303,8 @@ body { min-height: 100vh; }
    the left at its real size; its name, use and live metrics on the right. */
 .type-specimens li {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-24);
+  grid-template-columns: minmax(0, 1fr);   /* one column: the specimen, then its name */
+  gap: var(--space-8);
   padding: var(--space-16) 0;   /* a row, like a table row */
   border-top: 1px solid var(--color-divider);
 }
@@ -311,7 +313,7 @@ body { min-height: 100vh; }
    up, with no box of its own — the specimen inside is the subject. */
 .specimen-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));   /* tiles of one width that wrap */
   gap: var(--space-24);         /* item to item, card to card */
 }
 
@@ -326,13 +328,15 @@ body { min-height: 100vh; }
 .specimen-stage {
   height: 176px;
   display: grid;
-  align-items: center;
-  justify-items: start;
+  place-items: center;
+  padding: var(--space-24);
+  background: var(--color-stage);   /* every specimen on a tile of one size */
+  border-radius: var(--radius-card);
 }
-.specimen-stage--row { display: flex; align-items: center; gap: var(--space-24); }
-.specimen-stage--stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--space-24); } /* card to card */
-.specimen-card { display: grid; gap: var(--space-16); padding: var(--space-16); width: 220px; } /* inside a card: 16 */
-.specimen-box { display: grid; place-items: center; width: 220px; height: 128px; }
+.specimen-stage--row { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+.specimen-stage--stack { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-24); } /* card to card */
+.specimen-card { display: grid; gap: var(--space-16); padding: var(--space-16); width: 100%; } /* inside a card: 16 */
+.specimen-box { display: grid; place-items: center; width: 100%; height: 100%; }
 .specimen-pill { padding: var(--space-8) var(--space-24); }
 .specimen-corner { width: 96px; height: 96px; }
 .specimen-one-row {
@@ -348,12 +352,11 @@ body { min-height: 100vh; }
   width: 220px;
   padding: var(--space-16);
 }
-.specimen-list { width: 220px; }
+.specimen-list { width: 100%; }
 .specimen-list li { padding: var(--space-8) 0; border-top: 1px solid var(--color-divider); }
 .specimen-list li:first-child { border-top: 0; }
 
 @media (max-width: 630px) {
-  .type-specimens li { grid-template-columns: minmax(0, 1fr); gap: var(--space-16); }
 }
 
 /* Icon button demo: a phone's top bar. */

@@ -33,8 +33,10 @@
 
   /* The hero: the same step on a desktop and a phone, at their real sizes,
      scaled to share one height. On a phone, the phone screen alone. */
-  .screens { display: flex; justify-content: center; align-items: flex-end; gap: var(--space-24); }
-  @media (max-width: 630px) { .screens .is-desktop-box { display: none; } }
+  .screens { display: flex; justify-content: center; align-items: center; padding: var(--space-48) var(--space-24); background: var(--color-stage); border-radius: var(--radius-card); }
+  /* One screen at a time, centred on the stage: the desktop on a wide screen, the phone on a phone. */
+  .screens .is-phone-box { display: none; }
+  @media (max-width: 630px) { .screens .is-desktop-box { display: none; } .screens .is-phone-box { display: block; } }
 
   /* The steps: anchored to the bottom (the room sits above them). */
   .steps { margin-top: auto; display: grid; justify-items: center; gap: var(--space-16); text-align: center; }
@@ -304,11 +306,12 @@ const STEPS = [
 ];
 // ---- One story: a fantasy basketball league, from draft night to the trade tool.
 const spark = (seed) => {
-  // A player's points over the last ten weeks, drawn like the table's sparkline.
-  const v = Array.from({ length: 10 }, (_, i) => 10 + Math.round(Math.abs(Math.sin(i * 0.9 + seed) * 14 + Math.sin(i * 0.4 + seed) * 6)));
-  const max = Math.max(...v);
-  const pts = v.map((n, i) => `${(i * 168 / 9).toFixed(1)},${(36 - (n / max) * 32).toFixed(1)}`).join(' ');
-  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  // A player's points over the season, through the line chart's monotone curve.
+  const N = 24;
+  const v = Array.from({ length: N }, (_, i) => 18 + Math.sin(i * 0.45 + seed) * 9 + Math.sin(i * 1.1 + seed * 2) * 4);
+  const max = Math.max(...v), min = Math.min(...v);
+  const pts = v.map((n, i) => [(i * 168) / (N - 1), 36 - ((n - min) / (max - min || 1)) * 30]);
+  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><path d="${lineChartPath(pts, true)}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 };
 PAGE_RENDER.object = (c) => {
   const picks = [[2, 'Ben Okafor', 'Forward'], [3, 'Chloe Park', 'Centre'], [4, 'Dev Shah', 'Guard'], [5, 'Eli Moreau', 'Guard'], [6, 'Fay Lin', 'Forward']];
@@ -349,24 +352,20 @@ let step = 0, timer = null;
 
 // Both screens share one height; together they fit the column.
 const fit = () => {
+  // One screen shows: it takes the stage's room, less its padding, and the
+  // height the title and the steps leave.
   const host = document.getElementById('screens');
-  const W = host.clientWidth;
-  // The screens take the height the title and the steps leave: the whole
-  // page fits one screen, the steps anchored to its bottom.
+  const cs = getComputedStyle(host);
+  const W = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
   const block = 2 * 48 + 2 * 48;      // --space-page-block top and bottom, and the two gaps
-  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.steps').offsetHeight - block;
-  const H = Math.max(240, Math.min(free, 640));
-  const showDesk = getComputedStyle(document.querySelector('.is-desktop-box')).display !== 'none';
-  const ratio = (s) => SIZES[s][0] / SIZES[s][1];
-  const gap = 24;
-  let h = H;
-  const total = (hh) => (showDesk ? ratio('desktop') * hh + gap : 0) + ratio('phone') * hh;
-  if (total(h) > W) h = (W - (showDesk ? gap : 0)) / ((showDesk ? ratio('desktop') : 0) + ratio('phone'));
+  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.steps').offsetHeight - block - padY;
+  const H = Math.max(200, Math.min(free, 600));
   screens.forEach((el) => {
     const [w, hh] = SIZES[el.dataset.size];
-    const k = h / hh;
+    const k = Math.min(H / hh, W / w);
     el.style.width = `${w}px`; el.style.height = `${hh}px`; el.style.transform = `scale(${k})`;
-    el.parentElement.style.width = `${w * k}px`; el.parentElement.style.height = `${h}px`;
+    el.parentElement.style.width = `${w * k}px`; el.parentElement.style.height = `${hh * k}px`;
   });
 };
 

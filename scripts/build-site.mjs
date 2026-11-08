@@ -277,9 +277,15 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card
 // would be the defect the rules warn about.
-const stage = (c, html, hero = false) => (c.tier === 'patterns'
+const stage = (c, html) => (c.tier === 'patterns'
   ? `<div class="pattern-stage">${html}</div>`
-  : `<div class="surface demo${hero ? ' demo--hero' : ''}">${html}</div>`);
+  : `<div class="surface demo">${html}</div>`);
+// A component's hero: centred on the stage, unless it's naturally full
+// width — then it sits on the page, like a pattern.
+const FULL_WIDTH = new Set(['table', 'line-chart', 'accordion', 'sortable']);
+const hero = (c, html) => (c.tier === 'patterns' || FULL_WIDTH.has(c.name)
+  ? `<div class="pattern-stage">${html}</div>`
+  : `<div class="hero-stage">${html}</div>`);
 
 for (const c of all) {
   const sources = [[`${c.name}.html`, c.html], [`${c.name}.css`, c.css], [`${c.name}.js`, c.js]].filter(([, src]) => src);
@@ -287,7 +293,7 @@ for (const c of all) {
   const rest = c.rest.replace(/^Requires: (.+)$/m, (_, names) => `Requires: ${names.split(',').map((n) => n.trim()).map((n) => (titleOf[n] ? `[${titleOf[n]}](${n}.html)` : n)).join(', ')}`);
   writeFileSync(join(out, `${c.name}.html`), page(`${c.title} — Personal styling`, `
 ${intro(inline(c.title), inline(c.summary))}
-${c.html ? stage(c, c.html, true) : ''}
+${c.html ? hero(c, c.html) : ''}
 ${c.demo ? `<div class="accordion">${accordionItem('states', 'States', stage(c, c.demo), { level: 2 })}</div>` : ''}
 ${rest ? section('Guidance', `<div class="prose">${markdown(rest)}</div>`) : ''}
 ${section('Source', `<div class="accordion">${sources.map(([name, src], i) => accordionItem(`source-${i}`, name, `<pre class="surface code"><code>${escapeHtml(src)}</code></pre>`)).join('')}</div>`)}`));

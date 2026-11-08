@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.18
+   Personal styling tokens — v0.19
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -106,6 +106,10 @@ img, video, svg { display: block; max-width: 100%; }
      as a secondary icon button. Never a container and never state:
      selection keeps --color-fill-subtle. */
   --color-fill-quiet: rgba(0, 0, 0, 0.06);
+  /* NEW (v0.19): the stage — one quiet, solid ground for featuring: a hero's
+     backdrop, a specimen's tile. Not a card and not state: no hairline, no
+     shadow; things sit on it with their own. */
+  --color-stage: #f5f5f5;
   --color-fill-quiet-hover: rgba(0, 0, 0, 0.1);
 
   /* TYPE — two families */
@@ -365,6 +369,7 @@ body {
     --color-gain-fill: rgba(48, 209, 88, 0.2);
     --color-loss-fill: rgba(255, 69, 58, 0.2);
     --color-fill-quiet: rgba(255, 255, 255, 0.1);
+    --color-stage: #141414;
     --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
     --color-series: #3a3a3a;
     --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);
@@ -389,6 +394,7 @@ body {
   --color-gain-fill: rgba(48, 209, 88, 0.2);
   --color-loss-fill: rgba(255, 69, 58, 0.2);
   --color-fill-quiet: rgba(255, 255, 255, 0.1);
+  --color-stage: #141414;
   --color-fill-quiet-hover: rgba(255, 255, 255, 0.16);
   --color-series: #3a3a3a;
   --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.5);

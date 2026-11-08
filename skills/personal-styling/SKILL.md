@@ -77,7 +77,7 @@ Effectively monochrome. The palette is a ground, a text colour, a half-strength 
 - **The accent is for attention, not state.** The whole budget is three things: a value that needs the reader's eye (`.flag`), the text they have selected (`::selection`), and the single point under the pointer on a chart. That's it.
 - **A selected tab, a current nav item, a pressed segment are state** — they take `--color-fill-subtle`. Selection is structure; the accent is emphasis. Painting every active control with it is the mistake, and it's an easy one: the controls are the things you notice building a page, so they're the first place the colour lands.
 - Always a *fill* under black text. Never a text colour on the ground (yellow on white is unreadable), never a data series, never decoration. Anything sitting on it takes `--color-accent-ink`.
-- There is no placeholder grey. An empty box is `--color-fill-subtle` with a hairline.
+- There is no placeholder grey beyond the stage: an empty media slot is `--color-stage` (see Surfaces).
 - **Quiet data takes a solid grey.** The background series in a chart are `--color-series`, never black at an opacity: translucent lines stack darker where they cross. The one in focus is full ink.
 - `--color-overlay-backdrop` is declared and unused. Leave it that way.
 - De-emphasis is done with **opacity, not grey**: inactive nav labels sit at `0.3`, off-centre media at `0.2`.
@@ -186,6 +186,8 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **Two kinds of space: the gap and the room.** Every distance between groups is one of two things. The gap is fixed at `48`. The room is whatever height is left once everything is placed: there is one, below the hero, and with a lot of content it is zero and the page flows at the gap. Write the room as `margin-top: auto` on what follows the hero, never as a number. **Nothing is ever padded to push content down**: a section given a min-height or a spacer to fill the screen is the mistake the room exists to avoid.
 - **The page is `48` top and bottom, `24` at the sides.** `--space-page-block` (48) opens and closes the page flow: the air above the title is a section's worth, twice the sides, which gives the opening its weight. `--space-page` (24) is the side inset and the inset of everything pinned to an edge — a docked panel, the bottom slot — on every side. Both are roles that point at existing steps; there is no sixth step.
 - **Derived values are roles, written as `calc()`.** A segment's label pads by edge − fill (`calc(var(--inset-control) - var(--inset-fill))`, 12); a position below a line of type adds its line height. Write the arithmetic, with a comment, never the resulting number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
+- **A row is one column.** A list row is the name on its first line, its sentence under it, and a value at the far right of the first line when there is one. When a specimen leads the row (a type sample, a bar, a token), the specimen is the first line and the name and sentence follow under it. No middle column: a second column that starts wherever its row's content ends gives every list a different grid. Tables are the exception — columns of values are what a table is for.
+- **Side by side means equals.** Items shown in a grid (swatches, specimens, icons, examples) sit in tiles of one size, in columns of one width that wrap, each with its name and sentence under it. A grid whose items set their own widths or heights is a list pretending to be a grid; make it a list.
 - **Three widths, and a page holds one.**
   - `--container-read` (720px), centred — a page someone reads or scans down one column: paragraphs, a list of short rows.
   - Full width inside the `24px` inset, capped at `--container` (1280px) and centred — a statement that should stay on one line, media at its size, and every tool.
@@ -216,6 +218,7 @@ How a screen is arranged. Decide it before any styling.
 - **Default to no surface.** The page is the ground and most things belong directly on it, separated by `1px solid var(--color-divider)`. Reach for a card only when the thing inside is *content*: an image, a chart, a live demo, or a card you are literally demonstrating.
 - **A list is never a card.** A table, a feed, a spec list, a set of rows — those get a heading and dividers on the page. Wrapping each one in a card is the fastest way to turn a calm page into a deck of floating boxes.
 - **There is exactly one surface style.** `background: #fff` + `1px solid #ececec`. No second, quieter container — a box of `--color-fill-subtle` is not a softer card, it is a *second card style*, and two is one too many.
+- **The stage: one quiet ground, for featuring.** `--color-stage` is a solid grey ground at the `20px` radius, with no hairline and no shadow; whatever sits on it keeps its own. It has two jobs. A **hero's backdrop**: one component, object or piece of media centred on it under the title, as on a page whose hero is media — it makes the thing the page is about stand out. And a **specimen's tile**: things shown side by side as equals (surfaces, icons, sizes) each on a tile of the same size, so the eye gets a rhythm and every item a frame. It is a ground, not a card: it never wraps a list, never groups controls or a form, and holds no text but its object. Something naturally full width — a table, a chart, an accordion — never goes on a stage; it sits on the page.
 - **One quiet fill, for secondary controls only.** `--color-fill-quiet` is the surface of a secondary control — a secondary icon button: grey, no edge, no shadow, deepening to `--color-fill-quiet-hover` on hover. It is never a container and never state; selection keeps `--color-fill-subtle`.
 - `--color-fill-subtle` has one job: the **selected state** (a pressed segment, the current nav item, a chip that's on). It is not a background, not a well, not a panel, not a demo stage. If you are filling an area to group it, use a divider or nothing.
 - The hairline is the constant.
@@ -470,6 +473,8 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | Content running the full width of a 2560px monitor | `--container` (1280px), or `--container-read` (720px) for reading, centred |
 | A list, table or feed wrapped in a card | A heading and dividers on the page |
 | A `fill-subtle` box used as a quieter card | Nothing, or a divider. One surface style only |
+| A grey box around a list, a form or a group of controls | The page. The stage features one object |
+| A list with a second column that starts wherever each row ends | One column: name, sentence under it, value at the right |
 | A shadow on a card that can't be hovered | Hairline alone; shadow means it lifts |
 | A name, an About link or a Close link above the title | The title first; links in the bottom slot |
 | A min-height or spacer to push content to the bottom | `margin-top: auto`: the room, not padding |
@@ -485,7 +490,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 - **Yellow text, or yellow on a coloured fill.** The accent is a fill under black ink. Full stop.
 - **Shipping a shadow on something that doesn't lift.** The hairline is unconditional; the shadow earns its place by being hoverable.
 - **Reaching for a card to group things.** Grouping is what a heading and a divider are for. The card is for content.
-- **Inventing a second container by filling it.** `fill-subtle` as a panel background is a card wearing a disguise.
+- **Inventing a second container by filling it.** `fill-subtle` as a panel background is a card wearing a disguise. The stage is the only filled ground, and only to feature one object or tile a specimen.
 - **Speeding motion up** because 800ms feels slow in isolation. It doesn't in context.
 - **Skipping the reduced-motion block.**
 - **Padding to fill the screen.** A section given a min-height, or a spacer, so the next one lands below the fold. The room does that job, and only when there's room to give.

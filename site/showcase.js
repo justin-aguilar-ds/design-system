@@ -81,11 +81,12 @@ const STEPS = [
 ];
 // ---- One story: a fantasy basketball league, from draft night to the trade tool.
 const spark = (seed) => {
-  // A player's points over the last ten weeks, drawn like the table's sparkline.
-  const v = Array.from({ length: 10 }, (_, i) => 10 + Math.round(Math.abs(Math.sin(i * 0.9 + seed) * 14 + Math.sin(i * 0.4 + seed) * 6)));
-  const max = Math.max(...v);
-  const pts = v.map((n, i) => `${(i * 168 / 9).toFixed(1)},${(36 - (n / max) * 32).toFixed(1)}`).join(' ');
-  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  // A player's points over the season, through the line chart's monotone curve.
+  const N = 24;
+  const v = Array.from({ length: N }, (_, i) => 18 + Math.sin(i * 0.45 + seed) * 9 + Math.sin(i * 1.1 + seed * 2) * 4);
+  const max = Math.max(...v), min = Math.min(...v);
+  const pts = v.map((n, i) => [(i * 168) / (N - 1), 36 - ((n - min) / (max - min || 1)) * 30]);
+  return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><path d="${lineChartPath(pts, true)}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 };
 PAGE_RENDER.object = (c) => {
   const picks = [[2, 'Ben Okafor', 'Forward'], [3, 'Chloe Park', 'Centre'], [4, 'Dev Shah', 'Guard'], [5, 'Eli Moreau', 'Guard'], [6, 'Fay Lin', 'Forward']];
@@ -126,31 +127,22 @@ let step = 0, timer = null;
 
 // Both screens share one height; together they fit the column.
 const fit = () => {
+  // One screen shows: it takes the stage's room, less the stage's padding,
+  // and the height the title, the steps and the bottom slot leave.
   const host = document.getElementById('showcase-screens');
-  const W = host.clientWidth;
-  // The screens take the height the title and the steps leave: the whole
-  // page fits one screen, the steps anchored to its bottom.
-  // --space-page-block top and bottom, the two gaps, and the bottom slot's
-  // footprint (64 + its 24 inset), which the page leaves room for.
-  // On the System page the hero isn't the last thing, so below it there is
-  // only the bottom slot to clear: 48 above the title, 48 under it, 24
-  // between the screens and the steps, then the slot (64 + its 24 inset)
-  // and 16 of air above it.
+  const cs = getComputedStyle(host);
+  const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  const W = host.clientWidth - padX;
   const slot = document.querySelector('.bottom-slot');
   const block = slot ? 48 + 48 + 24 + 64 + 24 + 16 : 2 * 48 + 2 * 48;
-  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.showcase-steps').offsetHeight - block;
-  const H = Math.max(240, Math.min(free, 640));
-  const showDesk = getComputedStyle(document.querySelector('.is-desktop-box')).display !== 'none';
-  const ratio = (s) => SIZES[s][0] / SIZES[s][1];
-  const gap = 24;
-  let h = H;
-  const total = (hh) => (showDesk ? ratio('desktop') * hh + gap : 0) + ratio('phone') * hh;
-  if (total(h) > W) h = (W - (showDesk ? gap : 0)) / ((showDesk ? ratio('desktop') : 0) + ratio('phone'));
+  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.showcase-steps').offsetHeight - block - padY;
+  const H = Math.max(200, Math.min(free, 600));
   screens.forEach((el) => {
     const [w, hh] = SIZES[el.dataset.size];
-    const k = h / hh;
+    const k = Math.min(H / hh, W / w);
     el.style.width = `${w}px`; el.style.height = `${hh}px`; el.style.transform = `scale(${k})`;
-    el.parentElement.style.width = `${w * k}px`; el.parentElement.style.height = `${h}px`;
+    el.parentElement.style.width = `${w * k}px`; el.parentElement.style.height = `${hh * k}px`;
   });
 };
 
