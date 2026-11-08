@@ -216,9 +216,18 @@
         </div>
         <span class="slider">
           <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
-          <input class="slider-input" id="register" type="range" min="0" max="4" step="1" value="0">
+          <input class="slider-input" id="register" type="range" min="0" max="2" step="1" value="0">
         </span>
         <div class="slider-ends"><span class="t-mono">Expressive</span><span class="t-mono">Tool</span></div>
+      </div>
+      <div class="control-field" id="hero-field" hidden>
+        <span class="t-mono" id="hero-l">Hero</span>
+        <div class="segmented" role="group" aria-labelledby="hero-l" id="hero">
+          <span class="segmented-indicator" aria-hidden="true"></span>
+          <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="statement">Statement</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="media">Media</button>
+          <button class="segmented-option t-control" type="button" aria-pressed="false" value="chart">Chart</button>
+        </div>
       </div>
       <div class="control-field">
         <span class="t-mono" id="content-l">Content</span>
@@ -295,17 +304,18 @@
 
 <script>
 const PROPOSALS = [
-  ['R1', 'Name the register first', 'Five registers from Expressive to Tool: Expressive, Showcase, Page, Workspace, Tool. A brief names its register before anything is built, and the register picks the layout recipe. The components never change between registers; space, layout and how many things share the screen do.'],
-  ['R2', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. At Workspace and Tool the title may carry the info button beside it, nothing more.'],
-  ['R3', 'Top is the default composition', 'The title at the top, the hero right under it at the register’s section gap, the supporting content anchored to the bottom (above the bottom slot when there is one). Read from the top, the title and hero land together; the support waits at the bottom. Centre and Bottom are for a single object that should float, like a type toy.'],
-  ['R4', 'Two kinds of space: the gap and the room', 'Every distance on a screen is one of two things. The gap is fixed by the register: 80 at Expressive and Showcase (the most it ever is), 48 at Page and Workspace, 24 at Tool between groups, 24 or 16 inside them. Anything more is the room. The room is variable: whatever height is left once everything is placed, and there is only one, below the hero. With lots of content the room is zero and the page flows at the gaps; nothing is padded to push content down.'],
-  ['R5', 'The hero is sized from the screen', 'The hero takes a share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a workspace’s main chart in a card about half the screen tall. It fills a phone and a desktop alike, and whatever follows it sits at the gap.'],
-  ['R6', 'A reading width only where there is reading', 'A screen with paragraphs (Showcase) centres its title and content in a 720px column, a new --container-read, on a wide screen. A statement and a list (Page) run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
-  ['R7', 'Tools are dense from the top', 'Workspace and Tool have no composition: fixed gaps, read from the title down, the panel docked to the corner. Tool is the tightest (24 between groups, 8 around a table row) and splits into two columns on a wide screen. Precision is its expression.'],
-  ['R8', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
+  ['R1', 'Three registers, picked by the job', 'Expressive, Page and Tool. Ask in order and stop at the first yes: does the person work through data (many figures, a table, five or more controls)? Tool. Is it one object to look at or play with, with few words? Expressive. Anything else is a Page. The agent says which in its first reply. Components keep their sizes and uses in every register; only layout and space change.'],
+  ['R2', 'A page is a title, a hero, then content', 'Page covers what were Page, Showcase and Workspace. The title opens it; the hero sits under it in the first screen; the content follows. The hero can be a statement (the title is the hero), media, or the main chart in a card. What differs is the hero, not the layout.'],
+  ['R3', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. A chart page or a tool may carry the info button beside its title, nothing more.'],
+  ['R4', 'Top is the default composition', 'The title at the top and the hero right under it. With little content the rest is anchored to the bottom (above the bottom slot when there is one) and the room left sits between; with lots, the rest follows at the gap and the page scrolls. Centre and Bottom are for a single object that should float.'],
+  ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed: 80 at Expressive, 48 on a phone and 80 on a wide screen at Page, 24 at Tool, between groups; 24 or 16 inside them. 80 is the most a gap ever is. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
+  ['R6', 'The hero is sized from the screen', 'A share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a chart in a card about half the screen tall. It fills a phone and a desktop alike.'],
+  ['R7', 'A reading width only where there is reading', 'A page with paragraphs centres its title and content in a 720px column on a wide screen, a new --container-read. A statement and a list run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
+  ['R8', 'Tools are dense from the top', 'Tool has no composition: fixed 24 gaps, read from the title down, the panel docked to the corner, table rows at their tightest, two columns on a wide screen. Precision is its expression.'],
+  ['R9', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
-try { decisions = JSON.parse(localStorage.getItem('register-rules') || '{}'); } catch {}
+try { decisions = JSON.parse(localStorage.getItem('register-rules-3') || '{}'); } catch {}
 document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body]) => `
   <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}">
     <div class="proposal-copy">
@@ -329,31 +339,33 @@ document.body.ontouchstart = () => {};
 
 // ---- The registers. Distances are in px; phone | desktop where they differ.
 const REG = [
-  { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 80, inner: 24, rowPad: 16,
-    note: 'One thing, front and centre. Personal software with a single job: a type toy, a mix, a card. The layout is the design.',
-    things: 'A title, the hero, a caption, the nav', hero: 'A component, sized from the screen',
+  { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: [80, 80], inner: 24, rowPad: 16,
+    note: 'One object to look at or play with, and few words. A type toy, a mix, a card. The layout is the design.',
+    things: 'A title, the hero, a caption, the nav', hero: 'An object, sized from the screen',
     carries: [['Layout', 'The hero right under the title; the room left falls below it'], ['Space', '80 under the title; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
-  { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 80, inner: 24, rowPad: 16,
-    note: 'One piece of work at a time, with a caption. A portfolio page, a launch, a single result.',
-    things: 'A title, the work, a paragraph', hero: 'A piece of media, as wide as the column',
-    carries: [['Layout', 'Title, the work at the column’s width, then the text'], ['Space', '80 between the title, the work and the text'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
-  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: 48, inner: 16, rowPad: 16,
-    note: 'Something to read and one thing to do. An about page, an invitation, a menu.',
-    things: 'A statement and a list, one action', hero: 'The statement, in display type',
-    carries: [['Type', 'A display statement carries the page'], ['Space', '48 between groups, 16 inside the list'], ['Layout', 'With little content it centres; with lots it reads from the top']] },
-  { name: 'Workspace', fit: false, inset: [24, 24], block: [48, 48], section: 48, inner: 24, rowPad: 16,
-    note: 'A tool with one main view. A planner, a calculator, a tracker you check.',
-    things: 'A title, the hero card, its numbers, then more', hero: 'The main chart, in a card about half the screen tall',
-    carries: [['Layout', 'Top-aligned: read from the title down'], ['Space', '48 between sections, 24 inside them'], ['Interaction', 'Hover, tooltips and focus carry the feel']] },
-  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: 24, inner: 16, rowPad: 8,
-    note: 'Dense and precise, still designed. A league tool, a dashboard, a ledger. Precision is the expression.',
+  { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: [48, 80], inner: 16, rowPad: 16,
+    note: 'A title, a hero in the first screen, content below it. An about page, a post, a tracker you check: one register, three kinds of hero.',
+    things: '', hero: '', carries: [] },
+  { name: 'Tool', fit: false, inset: [24, 24], block: [48, 48], section: [24, 24], inner: 16, rowPad: 8,
+    note: 'You work through data: many figures, a table, many controls. A league tool, a dashboard, a ledger. Precision is the expression.',
     things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
     carries: [['Space', '24 between sections, the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as Expressive']] },
 ];
+// Page's three heroes: the same register, the same composition.
+const PAGE_HERO = {
+  statement: { things: 'A statement, a list, one action', hero: 'The statement itself, in display type',
+    carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
+  media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
+    carries: [['Layout', 'Title, then the media; the text at the bottom or after the gap'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
+  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about half the screen tall',
+    carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
+};
+const sec = (reg, k) => reg.section[k];
 const SIZES = { phone: [390, 844], desktop: [1440, 900] };
-const state = { r: 0, content: 1, size: 'phone', space: false, comp: 'top', maxw: 0 };
+const state = { r: 0, content: 1, size: 'phone', space: false, comp: 'top', maxw: 0, hero: 'statement' };
 // The max width each register suggests; the control follows the register.
-const MAXW = [0, 720, 0, 0, 0];
+// A reading column only where there are paragraphs.
+const suggestMaxw = () => (state.r === 1 && state.hero === 'media' ? 720 : 0);
 const COMP_NOTE = { stack: 'Fixed gaps; the group centred in the room', centre: 'Title at the top, support at the bottom, the hero centred between', top: 'Title and hero at the top; support at the bottom', bottom: 'Title at the top; hero and support at the bottom' };
 
 const CHEV = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 6.5 5 3.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -376,9 +388,32 @@ const PEOPLE = ['Ana Ruiz', 'Ben Okafor', 'Chloe Park', 'Dev Shah', 'Eli Moreau'
 const table = (rows) => `<table class="m-table"><thead><tr><th class="t-label">Player</th><th class="t-label">Team</th><th class="t-label num">Pts</th></tr></thead><tbody>${PEOPLE.slice(0, rows).map((p, i) => `<tr><td class="t-body">${p}</td><td class="t-mono">${['NYK', 'BOS', 'DEN', 'LAL', 'MIA'][i % 5]}</td><td class="t-mono num">${(48.2 - i * 1.7).toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
 const figures = (n) => `<div class="m-figures">${[['Points', '1,284'], ['Rank', '3rd'], ['Win rate', '64%'], ['Trades', '12']].slice(0, n).map(([k, v]) => `<div class="m-stack"><span class="t-mono">${k}</span><span class="t-title">${v}</span></div>`).join('')}</div>`;
 
+const PAGE_RENDER = {
+  statement:   (c) => {
+    const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
+    return { head: '',
+      title: `<h4 class="t-display">A product designer who makes small tools.</h4>`,
+      support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
+      slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
+    };
+  },
+  media:   (c) => {
+    const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
+    return { head: '',
+      title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
+      hero: `<div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div>`,
+      support: `<div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}${c === 2 ? `<div class="m-prose" style="padding-top: var(--m-gap-inner)"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : ''}</div>`,
+      slot: '' };
+  },
+  chart: (c, d) => ({ head: '',
+    title: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
+    hero: `<div class="m-hero-card surface surface--rest"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>`,
+    support: `<div class="m-stack" style="gap: var(--m-section)">${figures(d ? 4 : 2)}${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}</div>`,
+    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>` }),
+};
 const RENDER = [
   // Expressive
-  (c) => {
+    (c) => {
     const cards = c === 0 ? 1 : c === 2 ? 4 : 3;
     const card = (i) => `<div class="m-card${i ? ' is-side' : ''}"><span class="t-title">Episode ${12 - i}</span></div>`;
     return { head: '',
@@ -387,42 +422,17 @@ const RENDER = [
       support: `<div class="m-stack"><p class="t-body m-quiet">Episode 12 · 58 min</p>${c ? '<p class="t-body m-quiet">Soul, jazz and late-night instrumentals</p>' : ''}</div>`,
       slot: nav('Design', 'Music', 1) };
   },
-  // Showcase
-  (c) => {
-    const P = ['We talk about design a lot. Our work, other people’s work, a small interaction, a useful tool, something that’s just good.', 'Sometimes we get deep into it; other times it’s a passing comment. Either way we forget most of it. This is a place to write some of it down.', 'We move quickly and don’t always look back. Writing slows us down: what happened, what mattered, what we’d do differently now.', 'So we’re starting a journal. One note at a time.'];
-    return { head: '',
-      title: `<h4 class="t-display">Welcome to Margin Notes</h4>`,
-      hero: `<div class="m-media surface surface--rest"><span class="t-label m-quiet">Media</span></div>`,
-      support: `<div class="m-prose">${P.slice(0, [1, 2, 2][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}${c === 2 ? `<div class="m-prose" style="padding-top: var(--m-gap-inner)"><h5 class="t-label">Writing helps us learn</h5>${P.slice(2).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : ''}</div>`,
-      slot: '' };
-  },
   // Page
-  (c) => {
-    const rows = [['2023—Present', 'North Studio'], ['2021—2022', 'Court Labs'], ['2018—2021', 'Market Co'], ['2015—2018', 'Paper Works'], ['2013—2015', 'Field Office'], ['2011—2013', 'Line & Grid'], ['2010—2011', 'Small Press'], ['2009—2010', 'First Desk']].slice(0, [2, 4, 8][c]);
-    return { head: '',
-      title: `<h4 class="t-display">A product designer who makes small tools.</h4>`,
-      support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
-      slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy email</button>`,
-    };
-  },
-  // Workspace
-  (c, d) => ({
-    head: `<div class="m-intro"><h4 class="t-display">Weekly plan</h4>${INFO}</div>`,
-    main: `<div class="m-first">
-        <div class="m-hero-card surface surface--rest"><div class="m-stack"><span class="t-mono">Hours this week</span><span class="t-title">31.5</span></div>${chart(d ? 1200 : 300, d ? 300 : 200)}</div>
-        ${figures(d ? 4 : 2)}
-      </div>
-      ${c ? `<div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">This week</span>${table(c === 2 ? 10 : 4)}</div>` : ''}`,
-    corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>`,
-  }),
+  (c, d) => PAGE_RENDER[state.hero](c, d),
   // Tool
-  (c, d) => ({
+    (c, d) => ({
     head: `<div class="m-intro"><h4 class="t-display">What-if league</h4>${INFO}</div>`,
     main: `${figures(4)}
       <div class="m-split${d ? ' is-two' : ''}"><div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Projected points</span>${chart(d ? 620 : 340, d ? 240 : 160)}</div>
       <div class="m-stack" style="gap: var(--m-gap-inner)"><span class="t-label">Roster</span>${table([4, 10, 20][c])}</div></div>`,
     corner: `<span class="m-pill surface surface--rest"><span class="t-mono">Controls</span>${CHEV}</span>`,
   }),
+
 ];
 
 const screen = document.getElementById('screen');
@@ -448,7 +458,7 @@ function render() {
   screen.className = `screen is-${state.size}${state.space ? ' show-space' : ''}`;
   // A bottom slot is always the page inset from the bottom edge, whatever the register's block.
   const padB = parts.slot ? 24 : reg.block[k];
-  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-pad-b:${padB}px;--m-section:${reg.section}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:24px${state.maxw ? `;--m-maxw:${state.maxw}px` : ''}`;
+  const vars = `--m-inset:${reg.inset[k]}px;--m-block:${reg.block[k]}px;--m-pad-b:${padB}px;--m-section:${sec(reg, k)}px;--m-gap-inner:${reg.inner}px;--m-row-pad:${reg.rowPad}px;--m-inset-b:24px${state.maxw ? `;--m-maxw:${state.maxw}px` : ''}`;
   screen.innerHTML = `<div class="m${reg.fit ? ' is-fit' : ''} comp-${state.comp}" style="${vars}">${parts.head}<div class="m-main">${main}</div>${parts.slot ? `<div class="m-slot">${parts.slot}</div>` : ''}${parts.corner ? `<div class="m-corner">${parts.corner}</div>` : ''}</div>`;
   screen.scrollTop = 0;
   requestAnimationFrame(() => { markGaps(); readout(reg, k); });
@@ -462,12 +472,13 @@ function markGaps() {
   const k = screen.getBoundingClientRect().height / screen.offsetHeight || 1;
   const main = screen.querySelector('.m-main');
   if (!main) return;
-  let prev = screen.querySelector('.m-head, .m-intro');
+  let prev = screen.querySelector('.m > .m-head, .m > .m-intro');
   gaps = [];
   [...main.children].forEach((el) => {
     if (!prev) { delete el.dataset.gap; prev = el; return; }
     const g = Math.round((el.getBoundingClientRect().top - prev.getBoundingClientRect().bottom) / k);
-    const auto = reg.fit && state.comp !== 'stack' ? g > reg.section + 1 : g > reg.section * 2 + 1;
+    const S = sec(reg, state.size === 'desktop' ? 1 : 0);
+    const auto = reg.fit && state.comp !== 'stack' ? g > S + 1 : g > S * 2 + 1;
     el.dataset.gap = auto ? `auto · ${g}` : g;
     el.style.setProperty('--gap-h', `${g}px`);
     gaps.push([el.dataset.role || 'group', g, auto]);
@@ -477,12 +488,13 @@ function markGaps() {
 const refresh = () => { markGaps(); readout(REG[state.r], state.size === 'desktop' ? 1 : 0); };
 
 function readout(reg, k) {
+  if (state.r === 1) reg = { ...reg, ...PAGE_HERO[state.hero] };
   document.getElementById('register-out').textContent = reg.name;
   document.getElementById('r-name').textContent = reg.name;
   document.getElementById('r-note').textContent = reg.note;
   const comp = reg.fit ? COMP_NOTE[state.comp] : 'Tools stack: fixed gaps, read from the top';
   const measured = gaps.filter(([r]) => r !== 'group' && r !== 'title').map(([r, g, a]) => `${r === 'hero' ? 'Above the hero' : 'Above the support'} ${a ? `${g} (room left)` : g}`).join(' · ');
-  const pairs = [['Between groups', reg.fit && state.comp !== 'stack' ? `${reg.section} at least, then the room left` : reg.section], ['Sides', reg.inset[k]], ['Top and bottom', reg.block[k]], ['Max width', state.maxw ? `${state.maxw}, centred` : 'None: the inset only'], ['On screen', reg.things], ['Hero', reg.hero], ['Composition', comp], ['Measured', measured || '—']];
+  const pairs = [['Between groups', reg.fit && state.comp !== 'stack' ? `${sec(reg, k)} at least, then the room left` : sec(reg, k)], ['Sides', reg.inset[k]], ['Top and bottom', reg.block[k]], ['Max width', state.maxw ? `${state.maxw}, centred` : 'None: the inset only'], ['On screen', reg.things], ['Hero', reg.hero], ['Composition', comp], ['Measured', measured || '—']];
   document.getElementById('r-grid').innerHTML = pairs.map(([n, v]) => `<div class="pair"><span class="t-mono">${n}</span><span class="t-body">${v}</span></div>`).join('');
   document.getElementById('r-carries').innerHTML = reg.carries.map(([n, v]) => `<li><span class="t-mono">${n}</span><span class="t-body">${v}</span></li>`).join('');
   requestAnimationFrame(() => {
@@ -503,13 +515,21 @@ const swap = () => {
 
 document.getElementById('register').addEventListener('input', (e) => {
   state.r = Number(e.target.value);
+  document.getElementById('hero-field').hidden = state.r !== 1;
   // The max width follows the register's suggestion.
-  const want = String(MAXW[state.r]);
+  const want = String(suggestMaxw());
   const opt = document.querySelector(`#maxw .segmented-option[value="${want}"]`);
-  state.maxw = MAXW[state.r];
+  state.maxw = suggestMaxw();
   if (opt && !opt.classList.contains('is-active')) document.getElementById('maxw').dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
   swap();
 });
+const syncMaxw = () => {
+  const want = suggestMaxw();
+  state.maxw = want;
+  const opt = document.querySelector(`#maxw .segmented-option[value="${want}"]`);
+  if (opt && !opt.classList.contains('is-active')) document.getElementById('maxw').dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
+};
+document.getElementById('hero').addEventListener('segmented-change', (e) => { state.hero = e.detail.value; syncMaxw(); swap(); });
 document.getElementById('comp').addEventListener('picker-change', (e) => { state.comp = e.detail.value; render(); });
 document.getElementById('maxw').addEventListener('segmented-change', (e) => { const v = Number(e.detail.value); if (v !== state.maxw) { state.maxw = v; render(); } });
 document.getElementById('content').addEventListener('segmented-change', (e) => { state.content = Number(e.detail.value); swap(); });
@@ -530,7 +550,7 @@ function summarise() {
 document.getElementById('proposals').addEventListener('segmented-change', (e) => {
   const item = e.target.closest('.proposal'); if (!item) return;
   decisions[item.dataset.id] = e.detail.value;
-  try { localStorage.setItem('register-rules', JSON.stringify(decisions)); } catch {}
+  try { localStorage.setItem('register-rules-3', JSON.stringify(decisions)); } catch {}
   item.classList.toggle('is-declined', e.detail.value === 'decline');
   summarise();
 });
