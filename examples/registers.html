@@ -298,12 +298,11 @@ const PROPOSALS = [
   ['R1', 'Name the register first', 'Five registers from Expressive to Tool: Expressive, Showcase, Page, Workspace, Tool. A brief names its register before anything is built, and the register picks the layout recipe. The components never change between registers; space, layout and how many things share the screen do.'],
   ['R2', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. At Workspace and Tool the title may carry the info button beside it, nothing more.'],
   ['R3', 'Top is the default composition', 'The title at the top, the hero right under it at the register’s section gap, the supporting content anchored to the bottom (above the bottom slot when there is one). Read from the top, the title and hero land together; the support waits at the bottom. Centre and Bottom are for a single object that should float, like a type toy.'],
-  ['R4', 'Two kinds of space: the gap and the room', 'Every distance on a screen is one of two things. The gap is fixed by the register: 96 at Expressive and Showcase, 48 at Page and Workspace, 24 at Tool between groups, 24 or 16 inside them. The room is variable: whatever height is left once everything is placed, and there is only one, below the hero. With lots of content the room is zero and the page flows at the gaps; nothing is padded to push content down.'],
+  ['R4', 'Two kinds of space: the gap and the room', 'Every distance on a screen is one of two things. The gap is fixed by the register: 80 at Expressive and Showcase (the most it ever is), 48 at Page and Workspace, 24 at Tool between groups, 24 or 16 inside them. Anything more is the room. The room is variable: whatever height is left once everything is placed, and there is only one, below the hero. With lots of content the room is zero and the page flows at the gaps; nothing is padded to push content down.'],
   ['R5', 'The hero is sized from the screen', 'The hero takes a share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a workspace’s main chart in a card about half the screen tall. It fills a phone and a desktop alike, and whatever follows it sits at the gap.'],
   ['R6', 'A reading width only where there is reading', 'A screen with paragraphs (Showcase) centres its title and content in a 720px column, a new --container-read, on a wide screen. A statement and a list (Page) run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
   ['R7', 'Tools are dense from the top', 'Workspace and Tool have no composition: fixed gaps, read from the title down, the panel docked to the corner. Tool is the tightest (24 between groups, 8 around a table row) and splits into two columns on a wide screen. Precision is its expression.'],
-  ['R8', 'A 96 step and wider sides, for the expressive end only', 'A sixth spacing step, --space-96, used only as the gap at Expressive and Showcase, set through a --space-section role the register controls. Those two and Page take 48 at the sides on a wide screen; Workspace and Tool keep 24; phones keep 24 everywhere.'],
-  ['R9', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
+  ['R8', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same at every register. Expression at the tool end comes from them and from precision; it never comes from denser motion or louder colour.'],
 ];
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem('register-rules') || '{}'); } catch {}
@@ -330,14 +329,14 @@ document.body.ontouchstart = () => {};
 
 // ---- The registers. Distances are in px; phone | desktop where they differ.
 const REG = [
-  { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
+  { name: 'Expressive', fit: true, inset: [24, 48], block: [24, 24], section: 80, inner: 24, rowPad: 16,
     note: 'One thing, front and centre. Personal software with a single job: a type toy, a mix, a card. The layout is the design.',
     things: 'A title, the hero, a caption, the nav', hero: 'A component, sized from the screen',
-    carries: [['Layout', 'The hero right under the title; the room left falls below it'], ['Space', '96 around the hero; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
-  { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 96, inner: 24, rowPad: 16,
+    carries: [['Layout', 'The hero right under the title; the room left falls below it'], ['Space', '80 under the title; the edges frame it'], ['Motion', 'The hero lifts and sways under a finger']] },
+  { name: 'Showcase', fit: true, inset: [24, 48], block: [24, 24], section: 80, inner: 24, rowPad: 16,
     note: 'One piece of work at a time, with a caption. A portfolio page, a launch, a single result.',
     things: 'A title, the work, a paragraph', hero: 'A piece of media, as wide as the column',
-    carries: [['Layout', 'Title, the work at the column’s width, then the text'], ['Space', '96 between the title, the work and the text'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
+    carries: [['Layout', 'Title, the work at the column’s width, then the text'], ['Space', '80 between the title, the work and the text'], ['Type', 'Quiet: secondary ink everywhere but the work']] },
   { name: 'Page', fit: true, inset: [24, 48], block: [48, 48], section: 48, inner: 16, rowPad: 16,
     note: 'Something to read and one thing to do. An about page, an invitation, a menu.',
     things: 'A statement and a list, one action', hero: 'The statement, in display type',
