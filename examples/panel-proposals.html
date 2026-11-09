@@ -56,16 +56,16 @@
   .pp-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24) var(--space-24); }
   .is-wide .pp-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-  /* Dividers: one between fields, 16 either side. In three columns the
+  /* Dividers: one between fields, 16 either side (or 8: --ds). In three columns the
      first row of each column has none. */
-  .pp.has-div .pp-fields { row-gap: calc(2 * var(--space-16)); }
+  .pp.has-div .pp-fields { row-gap: calc(2 * var(--ds, var(--space-16))); }
   .pp.has-div .pp-row { position: relative; }
   .pp.has-div .pp-row::before {
     content: "";
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(-1 * var(--space-16));
+    top: calc(-1 * var(--ds, var(--space-16)));
     border-top: 1px solid var(--color-divider);
   }
   .pp.has-div .pp-row:first-child::before,
@@ -83,7 +83,10 @@
     gap: var(--space-8) var(--space-16);
     min-height: var(--height-control);
   }
-  .pp-row > .t-mono { flex: none; }
+  /* Every label in a panel takes its longest label's width (measured, as
+     --lw), so when the controls have to give up some of the max width they
+     all give up the same and still start on one line. */
+  .pp-row > .pp-label { flex: none; display: flex; align-items: baseline; gap: var(--space-8); min-width: var(--lw, 0); }
   .pp-control {
     display: flex;
     align-items: center;
@@ -115,6 +118,32 @@
      end of it. */
   .pp-slider .slider { flex: 1; min-width: 0; margin-block: calc((16px - 44px) / 2); }
   .pp-slider .slider-value { flex: none; min-width: 4ch; text-align: right; }
+  /* Value beside the label: the track spans the whole max width, so its
+     ends line up with every other control's. */
+  .pp-label .slider-value { min-width: 4ch; text-align: left; } /* room for -20 or 900, so dragging never moves the track */
+  /* Value in a tooltip: a pill above the thumb while the slider is hovered,
+     focused or dragged. It grows from the thumb on the tooltip's timing. */
+  .pp-slider .slider { position: relative; }
+  .slider > .slider-value {
+    position: absolute;
+    left: calc(8px + var(--slider-pct, 0) * (100% - 16px)); /* the thumb's centre: 8px in from either end */
+    bottom: calc(50% + 8px + var(--space-8)); /* 8 above the 16px track */
+    min-width: 0;
+    padding: var(--space-4) var(--space-8);
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    pointer-events: none;
+    transform-origin: bottom center;
+    translate: -50% 0;
+    scale: 0;
+    transition: scale var(--duration-pop) var(--ease-out);
+  }
+  .slider:is(.is-active, :focus-within) > .slider-value { scale: 1; }
+  @media (hover: hover) and (pointer: fine) {
+    .slider:hover > .slider-value { scale: 1; }
+  }
   .pp .slider-field { display: flex; }
 
   /* ---- The sheet ---- */
@@ -177,7 +206,7 @@ const field = (v, [kind, label, opts, active], k) => {
   const id = `${v}-${k}`;
   if (kind === 'slider') return `
     <div class="pp-row slider-field">
-      <label class="t-mono" for="${id}">${label}</label>
+      <span class="pp-label"><label class="t-mono" for="${id}">${label}</label></span>
       <div class="pp-control pp-slider">
         <span class="slider">
           <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
@@ -188,7 +217,7 @@ const field = (v, [kind, label, opts, active], k) => {
     </div>`;
   if (kind === 'seg') return `
     <div class="pp-row">
-      <span class="t-mono" id="${id}-l">${label}</span>
+      <span class="pp-label"><span class="t-mono" id="${id}-l">${label}</span></span>
       <div class="pp-control">
         <div class="segmented" role="group" aria-labelledby="${id}-l">
           <span class="segmented-indicator" aria-hidden="true"></span>
@@ -198,7 +227,7 @@ const field = (v, [kind, label, opts, active], k) => {
     </div>`;
   return `
     <div class="pp-row">
-      <span class="t-mono" id="${id}-l">${label}</span>
+      <span class="pp-label"><span class="t-mono" id="${id}-l">${label}</span></span>
       <div class="pp-control">
         <div class="picker">
           <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="${id}-list" aria-labelledby="${id}-l ${id}-v">
@@ -224,10 +253,13 @@ document.getElementById('panels').innerHTML = VERSIONS.map(([v, name, width, div
   </section>`).join('');
 
 const PROPOSALS = [
-  ['C1', 'Inline fields with a max width', 'Every field is one row: the mono label on the left, the control on the right, and no control wider than one max width. A slider fills the max width on the label’s row, its value at the end of the track, instead of a row of its own under the label. If the label and the control can’t share the row, the control drops under the label, still at the right.'],
+  ['C1', 'Inline fields with a max width', 'Every field is one row: the mono label on the left, the control on the right, and no control wider than one max width. A slider’s track fills the max width on the label’s row, its ends on the same lines as every other control, instead of a row of its own under the label. If the label and the control can’t share the row, the control drops under the label, still at the right.'],
   ['C2', 'Every control at the max width', 'Segments share the max width equally and a select runs across it, so every control on the right starts and ends on the same lines. Versions A and B. Pick C2 or C3.'],
   ['C3', 'Controls at their natural width', 'Segments and selects hug their options, right-aligned; only a slider takes the max width. Versions C and D. Pick C2 or C3.'],
-  ['C4', 'Dividers between fields', 'A divider between fields, 16 either side, as the control panel has today (versions A and C). Declined, fields sit 24 apart with nothing between them (versions B and D).'],
+  ['C4', 'Dividers between fields', 'A divider between fields, as the control panel has today (versions A and C). Declined, fields sit 24 apart with nothing between them (versions B and D).'],
+  ['C5', '8 between a divider and the controls', 'With dividers, 8 either side of the line instead of 16: the panel tightens to a list of rows. 8 is already on the scale (it is the label-to-control distance), so no new step. Every row keeps the 36 control height, so a slider’s row is as tall as a segment’s.'],
+  ['C6', 'A slider’s value beside its label', 'The value follows the label on the left, in full ink: Weight 510. Always visible, nothing to hover. Pick C6 or C7.'],
+  ['C7', 'A slider’s value in a tooltip', 'The value rides above the thumb in a pill while the slider is hovered, focused or dragged, and is hidden otherwise. The quietest row; the value isn’t readable at a glance. Pick C6 or C7.'],
 ];
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem('panel-proposals-2') || '{}'); } catch {}
@@ -237,6 +269,8 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('width', 'Controls', [['max', 'Max width'], ['natural', 'Natural']], 'max')}
   ${seg('div', 'Dividers', [['on', 'On'], ['off', 'Off']], 'on')}
   ${seg('cw', 'Max width', [['200', '200'], ['240', '240'], ['280', '280']], '240')}
+  ${seg('ds', 'Divider space', [['16', '16'], ['8', '8']], '16')}
+  ${seg('val', 'Slider value', [['label', 'Label'], ['tip', 'Tooltip'], ['end', 'End']], 'label')}
   ${seg('pw', 'Panel', [['280', 'Dock'], ['374', 'Phone'], ['wide', 'Wide']], '374')}
   <div class="sheet-section">
     <p class="t-body sheet-note">The Type panel from the typography tool, laid out inline with a max width on every control. Dock is the 280 card in the corner, Phone the sheet on a 390 screen, Wide the panel above a tool on a desktop, three fields across.</p>
@@ -269,18 +303,35 @@ document.getElementById('sheet-body').innerHTML = `
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
 document.body.ontouchstart = () => {};
-const state = { view: 'one', width: 'max', div: 'on', cw: '240', pw: '374' };
+const state = { view: 'one', width: 'max', div: 'on', cw: '240', pw: '374', ds: '16', val: 'label' };
 const panels = document.getElementById('panels');
+function measureLabels() {
+  panels.querySelectorAll('.pp').forEach((pp) => {
+    pp.style.removeProperty('--lw');
+    const widest = Math.max(...[...pp.querySelectorAll('.pp-label')].map((l) => l.getBoundingClientRect().width));
+    if (widest > 0) pp.style.setProperty('--lw', `${Math.ceil(widest)}px`);
+  });
+}
+document.fonts?.ready.then(measureLabels);
 function apply() {
   panels.classList.toggle('is-all', state.view === 'all');
   panels.classList.toggle('is-wide', state.pw === 'wide');
   panels.style.setProperty('--cw', `${state.cw}px`);
+  panels.style.setProperty('--ds', `${state.ds}px`);
+  // The slider's value moves: beside the label, into the slider as a
+  // tooltip, or at the end of the track.
+  panels.querySelectorAll('.pp-slider').forEach((ctl) => {
+    const row = ctl.closest('.pp-row'), out = row.querySelector('.slider-value');
+    const to = { label: row.querySelector('.pp-label'), tip: ctl.querySelector('.slider'), end: ctl }[state.val];
+    if (out.parentElement !== to) to.append(out);
+  });
+  measureLabels();
   panels.style.setProperty('--pw', state.pw === 'wide' ? 'var(--container)' : `${state.pw}px`);
   const shown = VERSIONS.find(([, , w, d]) => w === state.width && d === (state.div === 'on'))[0];
   panels.querySelectorAll('.version').forEach((el) => { el.hidden = state.view === 'one' && el.dataset.version !== shown; });
   summarise();
 }
-['view', 'width', 'div', 'cw', 'pw'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
+['view', 'width', 'div', 'cw', 'pw', 'ds', 'val'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
 
 function summarise() {
   const ids = PROPOSALS.map((p) => p[0]);
