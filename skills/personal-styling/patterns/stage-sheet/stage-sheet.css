@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.4.0 */
+/* personal-styling · stage-sheet · v0.5.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -77,8 +77,16 @@
   background: var(--color-surface);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-sheet);
-  box-shadow: var(--shadow-lift);
-  transition: box-shadow var(--duration-deliberate) var(--ease-out);
+  /* CHANGED (v0.5): closed, the pill is a control in the bottom slot, so it
+     takes the rest shadow and lifts on hover, like the segmented control
+     beside it. Open on a wide screen it is the docked panel, which keeps
+     the lift (see patterns/control-panel/). */
+  box-shadow: var(--shadow-rest);
+  transition: box-shadow var(--duration-deliberate) ease;
+}
+.stage-sheet.is-open .stage-sheet-sheet { box-shadow: var(--shadow-lift); }
+@media (hover: hover) and (pointer: fine) {
+  .stage-sheet:not(.is-open) .stage-sheet-sheet:hover { box-shadow: var(--shadow-lift); }
 }
 
 /* The heading row is the control panel's: mono title, 16px, a bare 10px
