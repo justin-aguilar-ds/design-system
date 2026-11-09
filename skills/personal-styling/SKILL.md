@@ -52,7 +52,7 @@ Every page is built for a form factor: the device the person is prompting from, 
 
 ## The six rules that matter most
 
-1. **Monochrome plus one accent, spent sparingly.** Black text, 50%-black secondary text, white ground, and `#FCFF28` for *attention* — never for state. If two things on screen are accented, the rule is already broken.
+1. **Monochrome plus one accent, spent sparingly.** Black text, 50%-black secondary text, white ground, and `#FCFF28` for *attention* — never for state. If two things on screen are accented, the rule is already broken. The only other colour is polarity: green and red for values that are good or bad (see Colour).
 2. **Five spacing steps: 4, 8, 16, 24, 48, and the room.** Every gap lands on a step: `48` between groups, on every page. `4` is the inner padding of a small control only — never a gap between blocks. The one distance that isn't a step is the room: the height left over below the hero, given to the page on purpose. Any other value off the scale is a mistake, not a nuance.
 3. **Lead with the title; three type styles to a card.** The title is the first thing on the screen, with nothing small above it. A card takes a title, body copy, and one emphasis — the large number *or* the mono detail, never both.
 4. **Lists live on the page; surfaces are for content.** Dividers carry structure. A card is for an image, a chart, a demo, or a real card being shown — not for wrapping a list of rows. There is exactly **one** surface style: white fill + `#ececec` hairline, with `0 2px 14px rgba(0,0,0,.04)` added only if it lifts on hover. Buttons are the exception: every button-shaped control carries that shadow at rest — see Buttons.
@@ -61,7 +61,7 @@ Every page is built for a form factor: the device the person is prompting from, 
 
 ## Colour
 
-Effectively monochrome. The palette is a ground, a text colour, a half-strength text colour, and three near-invisible blacks.
+Effectively monochrome. The palette is a ground, a text colour, a half-strength text colour, and three near-invisible blacks — plus the accent, and polarity's green and red for good and bad values.
 
 | Role | Value | Where |
 |---|---|---|
@@ -103,6 +103,11 @@ glance.
   arrow) and tooltips (`data-tooltip-ink`). Body copy and headings stay in
   the usual inks.
 - **One signal per value.** Fill or ink, never both on the same value.
+- **Polarity is for values, not states.** A signed figure (`+0.35`, `−$1,200`)
+  or the arrow beside it takes polarity; a state (`Failed`, `Delivered`)
+  stays glyph + word in black (see State without colour). A loss in red ink
+  is still legible on its own: the sign carries the meaning, the colour
+  speeds it up.
 - The accent stays the attention colour. Polarity never replaces it, and
   the two never compete as signals on one view.
 
@@ -125,7 +130,8 @@ that isn't in play. The moment a value means something ("not allowed",
 | Unknown / not applicable | `–` | secondary text |
 
 - The glyph and the word always travel together. Never the glyph alone, and
-  never the word alone in a colour that is doing the work.
+  never the word alone in a colour that is doing the work. Polarity ink is
+  not a status colour: `✗ Failed` is never red.
 - **Problems get full ink, not less.** The instinct is to fade the negative
   state; it inverts the hierarchy — the thing you most need to see becomes
   the hardest to read.
@@ -470,7 +476,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | Grey-100/200 borders and `shadow-lg` cards | `#ececec` hairline, shadow only if it lifts |
 | Three-column feature grid with icon circles | One hero under the title, sized from the screen |
 | Emoji in headings or labels | Nothing, or uppercase mono |
-| Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black — polarity fills and ink excepted (see Colour) |
+| Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black. Polarity is never a badge either: a fill on a table cell, or ink on a signed value |
 | Centred hero: big title, subtitle, two CTAs | The title first, the hero under it, the nav in the bottom slot |
 | Glassmorphism throughout | One blurred element, at most |
 | Tailwind utility soup with arbitrary values | The tokens in `tokens.css` |

@@ -97,8 +97,8 @@ img, video, svg { display: block; max-width: 100%; }
   --color-accent-soft: rgba(252, 255, 40, 0.42);
 
   /* NEW (v0.6): POLARITY — the one colour exception: gain and loss, as
-     soft tints on a cell with full-ink values on top. Never text, never
-     decoration, never a status badge. */
+     soft tints on a cell with full-ink values on top, or (v0.20) as ink
+     on a value below. Never decoration, never a status badge. */
   --color-gain-fill: rgba(52, 168, 83, 0.14);
   --color-loss-fill: rgba(234, 67, 53, 0.12);
   /* NEW (v0.20): polarity ink — the same signal as text or an icon, for a
