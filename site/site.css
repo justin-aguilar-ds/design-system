@@ -79,14 +79,13 @@ body { min-height: 100vh; }
   display: grid;
   place-items: center;
   /* As large as a media hero, at the page's own width (so nothing jumps
-     between pages): 16:10 of the column (4:5 on a phone), up to 70% of the
-     screen; taller pieces make it taller. */
-  min-height: min(62.5cqw, 70svh);
+     between pages): 60% of the screen's height; taller pieces make it
+     taller. */
+  min-height: 60svh;
   padding: var(--space-48) var(--space-24);
   background: var(--color-stage);
   border-radius: var(--radius-card);
 }
-@media (max-width: 630px) { .hero-stage { min-height: min(125cqw, 70svh); } }
 .hero-stage > * { max-width: 100%; }
 /* A wide piece fills the stage inside its padding. */
 .hero-stage > :is(.table-wrap, .line-chart, .accordion, .sortable, .pattern-stage) { width: 100%; }

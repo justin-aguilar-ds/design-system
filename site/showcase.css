@@ -9,6 +9,8 @@
 /* The hero: the same step on a desktop and a phone, at their real sizes,
    scaled to share one height. On a phone, the phone screen alone. */
 .showcase-screens {
+  height: 60svh;                    /* the stage's height, as on every page */
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -132,7 +134,7 @@
    numbers; the hero card takes the room left, and anything more sits
    below the fold by design. */
 .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
-.m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 70cqh; padding: var(--space-24); }
+.m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 60cqh; padding: var(--space-24); }
 .m-hero-card .m-chart { align-self: end; }
 .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 

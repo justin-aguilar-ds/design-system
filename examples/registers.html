@@ -148,7 +148,7 @@
      below the fold by design. */
   .m-first { display: flex; flex-direction: column; gap: var(--m-gap-inner); }
   .m-media, .m-hero-card { box-shadow: var(--shadow-lift); }   /* a hero card is the page's object */
-  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 70cqh; padding: var(--space-24); }
+  .m-hero-card { display: grid; align-content: space-between; gap: var(--space-16); min-height: 60cqh; padding: var(--space-24); }
   .m-hero-card .m-chart { align-self: end; }
   .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
@@ -319,7 +319,7 @@ const PROPOSALS = [
   ['R3', 'Lead with the title', 'The title is the first and strongest thing on the screen, in display type. Nothing small sits above it: no name-and-About header, no Close link, no eyebrow. Navigation and the one action go in the bottom slot. A chart page or a tool may carry the info button beside its title, nothing more.'],
   ['R4', 'Top is the default composition', 'The title at the top and the hero right under it. With little content the rest is anchored to the bottom (above the bottom slot when there is one) and the room left sits between; with lots, the rest follows at the gap and the page scrolls. Centre and Bottom are for a single object that should float.'],
   ['R5', 'Two kinds of space: the gap and the room', 'Every distance is one of two things. The gap is fixed at 48 between groups, on pages and tools alike; 24 or 16 inside them. No new spacing step: the room supplies any extra air. The room is whatever height is left once everything is placed: there is one, below the hero, and with lots of content it is zero. Nothing is padded to push content down.'],
-  ['R6', 'The hero is sized from the screen', 'A share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a chart in a card about 70% of the screen tall. It fills a phone and a desktop alike.'],
+  ['R6', 'The hero is sized from the screen', 'A share of the screen, not a fixed size: a carousel card about two-thirds of the width, media at the column’s full width, a chart in a card about 60% of the screen tall. It fills a phone and a desktop alike.'],
   ['R7', 'A reading width only where there is reading', 'A page with paragraphs centres its title and content in a 720px column on a wide screen, a new --container-read. A statement and a list run the full width inside the inset, so the statement stays on one line. Tools run full width. Phones are narrower than both.'],
   ['R8', 'Tools are dense from the top', 'Tool has no composition: the gap of 48, read from the title down, the panel docked to the corner, table rows at their tightest, two columns on a wide screen. Precision is its expression.'],
   ['R9', 'Interaction is the constant', 'Hover lift, tooltips, the pop and reveal timings and the tap response are the same in both registers. Expression in a tool comes from them and from precision; it never comes from denser motion or louder colour.'],
@@ -366,7 +366,7 @@ const PAGE_HERO = {
     carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
   media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
     carries: [['Layout', 'Title, then the media with its text the gap below, as one block'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
-  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about 70% of the screen tall',
+  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about 60% of the screen tall',
     carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
 };
 const sec = (reg, k) => reg.section[k];

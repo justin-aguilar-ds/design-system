@@ -22,7 +22,7 @@ const PAGE_HERO = {
     carries: [['Layout', 'Statement at the top; the list at the bottom with little content, after the gap with lots'], ['Type', 'The statement carries the page'], ['Width', 'Full width, so the statement stays on one line']] },
   media: { things: 'A title, media, paragraphs', hero: 'Media at the column’s full width',
     carries: [['Layout', 'Title, then the media with its text the gap below, as one block'], ['Width', '720 on a wide screen: there are paragraphs to read'], ['Type', 'Secondary ink for the text, so the media leads']] },
-  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about 70% of the screen tall',
+  chart: { things: 'A title, the chart card, its numbers, then more', hero: 'The main chart in a card about 60% of the screen tall',
     carries: [['Layout', 'Title, then the chart card; numbers at the bottom or after the gap'], ['Space', 'The card takes the screen; the numbers wait below it'], ['Interaction', 'Hover and tooltips on the chart carry the feel']] },
 };
 const sec = (reg, k) => reg.section[k];
@@ -134,10 +134,9 @@ const fit = () => {
   const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
   const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
   const W = host.clientWidth - padX;
-  const slot = document.querySelector('.bottom-slot');
-  const block = slot ? 48 + 48 + 24 + 64 + 24 + 16 : 2 * 48 + 2 * 48;
-  const free = innerHeight - document.querySelector('.intro').offsetHeight - document.querySelector('.showcase-steps').offsetHeight - block - padY;
-  const H = Math.max(200, Math.min(free, 600));
+  // The stage is 60% of the screen; the screen fits inside its padding.
+  const free = host.clientHeight - padY;
+  const H = Math.max(160, free);
   screens.forEach((el) => {
     const [w, hh] = SIZES[el.dataset.size];
     const k = Math.min(H / hh, W / w);
