@@ -23,7 +23,7 @@ Requires: none
 - **Mono is the label of a figure.** The name above a value is the third place mono labels something, after the control panel title and the tooltip: uppercase, `10.5px`, secondary ink — like an axis label, it names rather than informs. The value under it is full ink. Keep the name to two or three words.
 - **A heading is usually enough.** The Section and Statement pairs are for the rare sentence the content can't say itself — a caveat, a rule. A sentence that restates what the section shows ("Cumulative P&L, day by day" under "Equity curve") goes, and the heading stands alone.
 - **Subtle to expressive is a budget, not a menu.** Most of a page is 1, 2 and 3. Use 4 to structure it, and at most one of 5, 6 or 7 on a view. Two loud pairs on one view cancel each other out.
-- **No mono above a name.** A mono kind stacked over a row's or card's name, with a description beside it, reads as an eyebrow: three styles where two do. If the kind matters, give it a column or a value at the right of the row.
+- **No mono above a name.** A mono kind stacked over a row's or card's name, with a description beside it, reads as an eyebrow: three styles where two do. No kind label beside it either: the description says what the thing is.
 - **Pairs only combine existing roles.** No new sizes, weights or tracking. If a pair you want needs a new style, the pair is wrong, not the scale.
 - **Hierarchy comes from size or ink, never weight.** The Flat pair makes the point: the same size twice, and the second line in secondary ink is enough.
 - **A pair counts toward the three-styles-per-card budget.** A card with a Figure has room for one more style.
@@ -35,6 +35,10 @@ Requires: none
 - A value that isn't a number takes `.type-pair-value` — Body at full ink.
 - The Big number pair is what a stat tile would use; there's no stat component yet.
 - Edit the spectrum here first. The table is the source the pairs follow.
+
+## Changes in v0.5.1
+
+- No kind label beside a name either: the description says what the thing is.
 
 ## Changes in v0.5.0
 

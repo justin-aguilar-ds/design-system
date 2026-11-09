@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.6.1 */
+/* personal-styling · tooltip · v0.7.0 */
 
 // Four declarative pieces:
 //   [data-tooltip="…"]         inline information — grows from the trigger on
@@ -37,6 +37,10 @@ function showTooltip(text, owner, x, top, bottom) {
   el.setAttribute('role', 'tooltip');
   const p = document.createElement('p');
   p.className = 'tooltip-text t-mono';
+  // data-tooltip-ink="gain" | "loss": the value it explains is inherently
+  // good or bad, so the text takes polarity ink.
+  const ink = owner.dataset.tooltipInk;
+  if (ink === 'gain' || ink === 'loss') p.classList.add(`ink-${ink}`);
   p.textContent = text;
   el.append(p);
   document.body.append(el);

@@ -15,6 +15,7 @@ From the source site's media carousel, where a "Learn more" pill invited a click
 - **Closing reverses only the scale.** The text stays revealed until the box has shrunk away.
 - **The cursor pill:** uppercase mono at −0.25px and full ink, over a 50% fill with a 20px backdrop blur. It's the only blurred element on a page. Its position tracks the pointer instantly; only its scale animates.
 - **Hover is an upgrade, never the only route.** Inline triggers open on focus and on tap. Dropped tooltips open from the keyboard. Escape closes either.
+- **Gain and loss can take ink.** When the value a tooltip explains is inherently good or bad, its text and any icon in it take `--color-gain-ink` or `--color-loss-ink`. The surface stays as it is: no fill.
 - One tooltip at a time.
 
 ## Use
@@ -23,7 +24,12 @@ From the source site's media carousel, where a "Learn more" pill invited a click
 - **Dropped:** `data-tooltip-drop="…"` on a `<button>` wrapping the media. A click drops the tooltip with its bottom-left corner at the pointer, and the next click anywhere closes it. From the keyboard it drops at the centre.
 - **Toggled:** `data-tooltip-toggle="<id>"` on a button, `aria-expanded` and `aria-controls` on it too, and the tooltip itself in the markup: `<div class="tooltip tooltip--anchored" id="<id>" hidden><p class="tooltip-text …">…</p></div>`. Click opens it, a second click, a click outside or Escape closes it (Escape returns focus to the button). Its container's CSS places it — `top`, `left` or `right`, and `transform-origin` on the corner nearest the button. Used by `patterns/artifact-intro/`.
 - **Cursor pill:** `data-cursor="Learn more"` on any element. Pair it with `data-tooltip-drop` for the carousel pattern: the pill invites the click, the click explains. The pill hides while that element's tooltip is open.
+- **Polarity:** add `data-tooltip-ink="gain"` or `"loss"` to an inline or dropped trigger. In an authored tooltip, put `.ink-gain` or `.ink-loss` on the text or a span in it; an icon is a 10px SVG with `.tooltip-icon`.
 - Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
+
+## Changes in v0.7.0
+
+- Polarity ink: `data-tooltip-ink` on a trigger, `.tooltip-icon` for an icon in the text.
 
 ## Changes in v0.6.0
 

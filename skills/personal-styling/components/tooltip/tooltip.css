@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.6.1 */
+/* personal-styling · tooltip · v0.7.0 */
 
 /* ---- Inline information: the value itself is the trigger. ---- */
 .tooltip-trigger {
@@ -44,6 +44,10 @@
   transition: clip-path var(--duration-reveal) var(--ease-out);
 }
 .tooltip.is-text-visible .tooltip-text { clip-path: inset(0); }
+
+/* An icon in the text: 10px, on its line, in the text's ink (a gain or
+   loss icon takes the polarity ink with its value). */
+.tooltip-icon { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }
 
 /* ---- Toggled: an authored tooltip ([data-tooltip-toggle]). It's in the
    markup, so it can hold prose and links, and it's placed by its

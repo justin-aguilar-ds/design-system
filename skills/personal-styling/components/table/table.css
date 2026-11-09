@@ -1,4 +1,4 @@
-/* personal-styling · table · v1.0.1 */
+/* personal-styling · table · v1.1.0 */
 
 /* A table is a list, so it sits on the page: no card, no outer border.
    It always fills its container, and scrolls sideways rather than
@@ -34,12 +34,11 @@
 }
 
 /* Column headers are Label: 16/19, 600, full ink. Never mono. */
-/* Cells take half the 24px column gap on each side, so a filled cell's
-   text sits 12px inside its fill instead of against its edge. The first
-   and last columns drop their outer half, so the table lines up with the
-   page. */
+/* Cells pad 16 on every side, so a filled cell's text sits 16 inside its
+   fill, the same as the row fill's bleed. The first and last columns drop
+   their outer side, so the table lines up with the page. */
 .table th {
-  padding: 0 calc(var(--space-24) / 2) var(--space-16);
+  padding: 0 var(--space-16) var(--space-16);
   text-align: left;
   vertical-align: bottom;
   font-family: var(--font-display);
@@ -54,7 +53,7 @@
 /* Every data cell is 10.5 mono, set here rather than inherited.
    Detail is secondary ink; value vs detail is ink, never size. */
 .table td {
-  padding: var(--space-16) calc(var(--space-24) / 2);
+  padding: var(--space-16);
   vertical-align: top;
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -74,8 +73,8 @@
 
 /* Polarity: gain and loss as soft tints on the cell, full-ink values on
    top — the one colour exception, for data that is inherently good or
-   bad. Interior cells already keep 12px between text and fill; a filled
-   first or last cell extends its fill 12px into the table's gutter with a
+   bad. Interior cells already keep 16px between text and fill; a filled
+   first or last cell extends its fill 16px into the table's gutter with a
    same-coloured shadow, so its text stays aligned with the page. */
 .table .table-gain,
 .table .table-loss {
@@ -84,8 +83,16 @@
 }
 .table .table-gain { --cell-fill: var(--color-gain-fill); }
 .table .table-loss { --cell-fill: var(--color-loss-fill); }
-.table td:first-child:is(.table-gain, .table-loss) { box-shadow: calc(var(--space-24) / -2) 0 0 var(--cell-fill); }
-.table td:last-child:is(.table-gain, .table-loss) { box-shadow: calc(var(--space-24) / 2) 0 0 var(--cell-fill); }
+.table td:first-child:is(.table-gain, .table-loss) { box-shadow: calc(-1 * var(--space-16)) 0 0 var(--cell-fill); }
+.table td:last-child:is(.table-gain, .table-loss) { box-shadow: var(--space-16) 0 0 var(--cell-fill); }
+
+/* Polarity ink: the same signal on a value without a fill, or on its icon.
+   It holds through the row's hover and column focus, which would otherwise
+   bring the cell up to full ink. Fill or ink on one value, never both. */
+.table :is(td, th, .is-col, tr:hover td, tr.is-indicated td).ink-gain,
+.table td .ink-gain { color: var(--color-gain-ink); }
+.table :is(td, th, .is-col, tr:hover td, tr.is-indicated td).ink-loss,
+.table td .ink-loss { color: var(--color-loss-ink); }
 
 /* One size per cell. Whatever sits inside a cell — code, a link, an
    emphasis, a span — takes the cell's type exactly, so every row keeps one
@@ -262,3 +269,6 @@
 }
 .table tbody tr.is-indicated .table-spark path { stroke: var(--color-text); }
 .table tbody tr.is-indicated .table-spark circle { opacity: 1; }
+
+/* An icon beside a value: 10px, on the text's line, in the ink around it. */
+.table-ink-icon { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }

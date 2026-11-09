@@ -93,9 +93,16 @@ glance.
 - Only when the user explicitly asks for it, or when the data itself is a
   good/bad signal (impact on a total, a gain vs a loss). Never decoration,
   never branding, never a status badge.
-- The tints are `--color-gain-fill` and `--color-loss-fill`; in a table, `.table-gain` and `.table-loss`.
-- Fills, not text. Soft tints on the cell, full-ink values on top. Never
-  coloured text on the ground.
+- **A fill, most often.** `--color-gain-fill` and `--color-loss-fill` are
+  soft tints with the value on top in full ink; in a table, `.table-gain`
+  and `.table-loss`. The common case: a table whose signed cells read as a
+  heatmap.
+- **Or ink, for a value or an icon on the ground.** `--color-gain-ink` and
+  `--color-loss-ink` set the text or the icon itself; `.ink-gain` and
+  `.ink-loss` anywhere. Mostly in tables (a change column, an up or down
+  arrow) and tooltips (`data-tooltip-ink`). Body copy and headings stay in
+  the usual inks.
+- **One signal per value.** Fill or ink, never both on the same value.
 - The accent stays the attention colour. Polarity never replaces it, and
   the two never compete as signals on one view.
 
@@ -189,7 +196,7 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **One grid: three columns, `24` apart.** On a wide screen, anything set side by side uses three equal columns with the `24` gap; on a phone, one. Content gets room to breathe at three, and every grid on a page shares the same lines.
   - **Tiles take a column each** — specimens, icons, examples, three across. Small tiles (colour swatches) split a column in two: six across. A tile is the stage at one size, its name and sentence under it. A grid whose items set their own widths is a list pretending to be a grid.
   - **Lists follow the same columns.** One column is the strong default: the name, its sentence under it, a value at the right of the name's line. Two columns are common when names are scanned down the left: the name takes the first column, a third of the width, and the description the other two. Three columns are the least common: a name, a description and a value, a third each. Because every list sits on the same three columns, the second column starts at the same place in every list on the page — never wherever a row's content happens to end.
-  - **The kind goes beside the name, never above it.** A mono label stacked over a row's name, with a description beside it, is an eyebrow by another name. If a row's kind matters (a category, a status), it takes the value at the right of the name, or the third column. Tables stay the exception: columns of values are what a table is for.
+  - **No kind label on a row.** A mono label for a row's kind (Tool, Page, Explorer), stacked over its name or set beside it, is an eyebrow by another name. Say what the thing is in its description. A row's value is a figure or a state that changes (a price, a date, a count), never a category. Tables stay the exception: columns of values are what a table is for.
 - **Three widths, and a page holds one.**
   - `--container-read` (720px), centred — a page someone reads or scans down one column: paragraphs, a list of short rows.
   - Full width inside the `24px` inset, capped at `--container` (1280px) and centred — a statement that should stay on one line, media at its size, and every tool.
@@ -463,7 +470,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | Grey-100/200 borders and `shadow-lg` cards | `#ececec` hairline, shadow only if it lifts |
 | Three-column feature grid with icon circles | One hero under the title, sized from the screen |
 | Emoji in headings or labels | Nothing, or uppercase mono |
-| Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black — polarity fills excepted (see Colour) |
+| Coloured badge pills (green/amber/red tints) | Mono uppercase text at 50% black — polarity fills and ink excepted (see Colour) |
 | Centred hero: big title, subtitle, two CTAs | The title first, the hero under it, the nav in the bottom slot |
 | Glassmorphism throughout | One blurred element, at most |
 | Tailwind utility soup with arbitrary values | The tokens in `tokens.css` |
@@ -479,7 +486,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | A list, table or feed wrapped in a card | A heading and dividers on the page |
 | A `fill-subtle` box used as a quieter card | Nothing, or a divider. One surface style only |
 | A grey box around a list, a form or a group of controls | The page. The stage features one object |
-| A mono kind stacked above a name, with a description beside it | The name and its description; the kind at the right, or in a third column |
+| A mono kind label on a row, above or beside its name | The name and its description; the description says what it is |
 | A list with a second column that starts wherever each row ends | The three-column grid: one column, or the name in the first third and the description in the other two |
 | A shadow on a card that can't be hovered | Hairline alone; shadow means it lifts |
 | A name, an About link or a Close link above the title | The title first; links in the bottom slot |
