@@ -25,6 +25,12 @@ renderToggle();
   const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
   const headings = [...document.querySelectorAll('.prose--page > h2[id]')];
   let current = null;
+  const picker = document.querySelector('.rules-picker');
+  let pickerAt = null;
+  // Choosing a section in the select jumps to it.
+  picker?.addEventListener('picker-change', (e) => {
+    document.getElementById(e.detail.value)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
   const mark = () => {
     // The last heading above the top quarter of the screen is the one being read.
     let heading = headings[0];
@@ -33,6 +39,13 @@ renderToggle();
     if (link && link !== current) {
       current = link;
       list.dispatchEvent(new CustomEvent('segmented-set', { detail: { option: link } }));
+    }
+    // The bottom slot's select (phones) shows the same section.
+    if (heading && picker && heading.id !== pickerAt) {
+      pickerAt = heading.id;
+      picker.querySelectorAll('[role="option"]').forEach((o) => o.setAttribute('aria-selected', String(o.dataset.value === heading.id)));
+      const v = picker.querySelector('.picker-value');
+      if (v) v.textContent = heading.textContent;
     }
   };
   addEventListener('scroll', mark, { passive: true });

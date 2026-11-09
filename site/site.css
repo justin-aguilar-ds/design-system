@@ -407,3 +407,21 @@ body { min-height: 100vh; }
   }
   .control-dock > .rules-contents .accordion-content { max-height: calc(100vh - 2 * var(--space-page-block) - var(--height-row)); }
 }
+
+/* Rules on a phone: the contents are the bottom slot's select, beside the
+   nav. It shows the section being read, cut short when it's long, and its
+   menu opens upward from the slot's right edge, as wide as the screen
+   allows. The docked contents panel steps aside. */
+/* The nav keeps its width; the select gives way. */
+.bottom-slot:has(> .rules-picker) > nav { flex: none; }
+.rules-picker .picker-trigger { min-width: 0; max-width: 100%; }
+.rules-picker .picker-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rules-picker .picker-menu { left: auto; right: 0; max-width: calc(100vw - 2 * var(--space-page)); transform-origin: bottom right; }
+@media (max-width: 630px) {
+  .rules-contents { display: none; }
+}
+@media (min-width: 631px) {
+  .rules-picker { display: none; }
+  /* The nav keeps its own width when the select isn't showing. */
+  .bottom-slot:has(> .rules-picker) .segmented-option { padding-inline: calc(var(--inset-slot) - var(--inset-fill)); }
+}

@@ -174,12 +174,13 @@ const INFO = '<svg class="intro-info-glyph" viewBox="0 0 16 16" aria-hidden="tru
 // The nav sits in the bottom slot: the large segmented control, three
 // two pages, nothing above any page's title (see Page composition in SKILL.md).
 const navOption = (label, href, on) => `<a class="segmented-option t-label${on ? ' is-active' : ''}" href="${href}"${on ? ' aria-current="page"' : ''}>${label}</a>`;
-const nav = (active) => `<div class="bottom-slot">
+const nav = (active, extra = '') => `<div class="bottom-slot">
   <nav class="segmented segmented--large" aria-label="Site">
     <span class="segmented-indicator" aria-hidden="true"></span>
     ${navOption('Library', 'index.html', active === 'library')}
     ${navOption('Rules', 'rules.html', active === 'rules')}
   </nav>
+  ${extra}
 </div>`;
 
 // Every page opens with the artifact intro pattern.
@@ -200,7 +201,7 @@ const accordionItem = (id, title, body, { open = false, level = 3 } = {}) => `<d
 // Every page: the title first, then the page, then a quiet footer; the
 // nav in the bottom slot. { read: true } holds the page to the reading
 // width. { head, scripts } add a page's own files.
-const page = (title, body, { active = 'library', read = false, head = '', tail = '' } = {}) => `<!doctype html>
+const page = (title, body, { active = 'library', read = false, head = '', tail = '', slot = '' } = {}) => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -220,7 +221,7 @@ ${body}
     <button class="button-text link-quiet t-control" type="button" id="theme-toggle">Dark</button>
   </footer>
 </main>
-${nav(active)}
+${nav(active, slot)}
 ${scripts}
 ${tail}
 <script src="site.js"></script>
@@ -260,6 +261,20 @@ const contents = `<nav class="segmented segmented--list" aria-label="Sections">
       <span class="segmented-indicator" aria-hidden="true"></span>
       ${toc.map((h, i) => `<a class="segmented-option t-control${i === 0 ? ' is-active' : ''}" href="#${h.id}"${i === 0 ? ' aria-current="true"' : ''}>${h.text}</a>`).join('\n      ')}
     </nav>`;
+// On a phone the contents are the bottom slot's second part: the nav docked
+// beside a large select of the sections, opening upward, showing the one
+// being read. On a wide screen they're the grid's third column instead.
+const PICKER_CHEVRON = '<svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const rulesPicker = `<div class="picker picker--large rules-picker" data-side="above">
+    <button class="picker-trigger button surface surface--rest surface--pill t-label" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="rules-sections" aria-label="Contents">
+      <span class="picker-value">${toc[0]?.text || 'Contents'}</span>${PICKER_CHEVRON}
+    </button>
+    <div class="picker-menu" hidden>
+      <ul class="picker-list" id="rules-sections" role="listbox" tabindex="-1" aria-label="Contents">
+        ${toc.map((h, i) => `<li class="picker-option t-control" role="option" aria-selected="${i === 0}" data-value="${h.id}">${h.text}</li>`).join('\n        ')}
+      </ul>
+    </div>
+  </div>`;
 writeFileSync(join(out, 'rules.html'), page('Rules — Personal styling', `
 ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes of patterns and components, motion and voice.')}
 <div class="control-dock">
@@ -270,7 +285,7 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
       <div class="accordion-panel" id="toc" role="region" aria-labelledby="toc-trigger"><div class="accordion-content"><div class="accordion-body">${contents}</div></div></div>
     </div>
   </section>
-</div>`, { active: 'rules' }));
+</div>`, { active: 'rules', slot: rulesPicker }));
 
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card
