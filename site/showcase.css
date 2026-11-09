@@ -69,7 +69,7 @@
   transition: opacity var(--duration-fast) ease;
 }
 .m.is-swapping { opacity: 0; }
-.m-main { display: flex; flex-direction: column; gap: var(--m-section); padding-block: var(--m-gap-inner); }
+.m-main { display: flex; flex-direction: column; gap: var(--m-section); }
 /* Max width: the head and main sit in a centred column; the slot keeps the screen. */
 .m-head, .m-intro, .m-main { width: 100%; max-width: var(--m-maxw, none); margin-inline: auto; }
 
@@ -139,7 +139,7 @@
 .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
 /* The bottom slot, drawn in the screen (the real one is fixed to the window). */
-.m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
+.m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; padding-top: var(--m-block); /* the page clears the slot by its block, as a real page does */ display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
 .m-slot > * { pointer-events: auto; }
 .m.is-fit .m-slot { margin-top: 0; }
 .m .segmented-option.is-indicated { opacity: 1; background: var(--color-fill-subtle); }
