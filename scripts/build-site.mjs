@@ -285,7 +285,7 @@ ${intro('Rules', 'The full skill, as an agent reads it: foundations, the indexes
       <div class="accordion-panel" id="toc" role="region" aria-labelledby="toc-trigger"><div class="accordion-content"><div class="accordion-body">${contents}</div></div></div>
     </div>
   </section>
-</div>`, { active: 'rules', slot: rulesPicker }));
+</div>`, { active: 'rules', read: true, slot: rulesPicker }));
 
 // A pattern is page-sized, so it renders on the page between dividers
 // rather than inside a demo surface — a control panel in a card in a card

@@ -12,8 +12,10 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **The persistent shadow is the exception.** The panel carries `--shadow-rest` at rest and keeps it, to put the controls on a layer above the content. It's the only surface whose shadow doesn't mean "this lifts", so it never lifts on hover.
 - **The title is mono**, and so are the field labels: inside a panel, mono is the quiet voice for names, so the controls carry the weight. Keep the title terse and singular: "Controls", "Filters".
 - **Field labels follow the label rules in SKILL.md.** Drop a label when the control names itself — chips reading Equities / Options, a period reading 1W / 1M / YTD — and keep it when the value alone is ambiguous: a number, a slider, an on/off pair. All the fields are labelled or none are; with none, put the controls in `.field-row` instead of `.control-panel-fields`, so they sit on one line. Labels that stay are mono (see above).
-- **Each field is a row: the mono label on the left, the control on the right.** A control too wide to sit beside its label drops underneath it rather than squeezing. A slider keeps its label-and-value row, with the track below. No dividers between fields.
-- **Fields flow in columns** of at least `240px`, `16px` apart, wrapping as the panel narrows.
+- **Fields are divided.** A divider between fields, `16px` either side, so a long panel reads as a list with a rhythm; the first row has none.
+- **Each field is a row by default: the mono label on the left, the control on the right.** A control too wide to sit beside its label drops underneath it rather than squeezing. A slider keeps its label-and-value row, with the track below. No dividers between fields.
+- **Fields follow the grid.** On a wide screen a panel above a tool lays its fields three across, `24px` apart, never more; on a phone and when docked, one column.
+- **Two field styles.** Inline (the default): the label left, the control right — for a narrow panel, a docked one, a sheet, a phone. `.control-panel--full`: the label above, the control the full width of its column — segments share it equally, a select runs edge to edge with its chevron at the far end — for a wide panel whose controls should line up as columns. One style per panel.
 - **Only controls go in.** A table or chart the controls change goes under or beside the panel, on the page. A contents list counts: it's a control that moves you through the page.
 
 ## Docked
@@ -35,6 +37,12 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.13.0
+
+- Dividers between fields.
+- On a wide screen, fields sit three across on the grid (they flowed in 240px columns, as many as fit).
+- `.control-panel--full`: labels above, controls the full width of their column, alongside the inline default.
 
 ## Changes in v0.12.0
 

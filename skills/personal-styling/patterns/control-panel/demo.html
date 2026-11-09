@@ -159,7 +159,76 @@
     </div>
   </div>
   <div class="pattern-demo">
-    <p class="t-caption">Docked — beside the content on wide screens; a pill bottom right on narrow ones</p>
+    <p class="t-caption">Full-width fields — .control-panel--full: labels above, each control the width of its column</p>
+    <section class="control-panel control-panel--full surface accordion" aria-label="Controls">
+      <div class="accordion-item is-open">
+        <h2 class="accordion-heading">
+          <button class="accordion-trigger" type="button" id="full-controls-trigger" aria-expanded="true" aria-controls="full-controls-body">
+            <span class="t-mono">Controls</span>
+            <svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </h2>
+        <div class="accordion-panel" id="full-controls-body" role="region" aria-labelledby="full-controls-trigger">
+          <div class="accordion-content"><div class="accordion-body">
+            <div class="control-panel-fields">
+
+              <div class="control-field">
+                <span class="t-mono" id="full-cp-view-label">View</span>
+                <div class="segmented" role="group" aria-labelledby="full-cp-view-label">
+                  <span class="segmented-indicator" aria-hidden="true"></span>
+                  <button class="segmented-option is-active t-control" type="button" aria-pressed="true">Deliveries</button>
+                  <button class="segmented-option t-control" type="button" aria-pressed="false">Endpoints</button>
+                </div>
+              </div>
+
+              <div class="picker-field">
+                <span class="t-mono" id="full-cp-range-label">Range</span>
+                <div class="picker">
+                  <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button"
+                          aria-haspopup="listbox" aria-expanded="false" aria-controls="full-cp-range-list"
+                          aria-labelledby="full-cp-range-label cp-range-value">
+                    <span class="picker-value" id="full-cp-range-value">Last 7 days</span>
+                    <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div class="picker-menu" hidden>
+                    <ul class="picker-list" id="full-cp-range-list" role="listbox" tabindex="-1" aria-labelledby="full-cp-range-label">
+                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="1d">Today</li>
+                      <li class="picker-option t-control" role="option" aria-selected="true" data-value="7d">Last 7 days</li>
+                      <li class="picker-option t-control" role="option" aria-selected="false" data-value="30d">Last 30 days</li>
+                    </ul>
+                  </div>
+                  <input type="hidden" name="range" value="7d">
+                </div>
+              </div>
+
+              <div class="control-field">
+                <span class="t-mono" id="full-cp-status-label">Status</span>
+                <div class="chip-row" role="group" aria-labelledby="full-cp-status-label">
+                  <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Delivered</button>
+                  <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Retrying</button>
+                  <button class="chip t-control" type="button" aria-pressed="true"><span class="chip-dot" aria-hidden="true"></span>Failed</button>
+                </div>
+              </div>
+
+              <div class="slider-field">
+                <div class="slider-head">
+                  <label class="t-mono" for="full-cp-latency">Slower than</label>
+                  <output class="slider-value t-mono" for="full-cp-latency">200</output>
+                </div>
+                <span class="slider">
+                  <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+                  <input class="slider-input" id="full-cp-latency" type="range" min="0" max="2000" step="50" value="200">
+                </span>
+              </div>
+
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="pattern-demo">
+    <p class="t-caption">Docked — the corner at every width: a pill when closed, a card when open</p>
     <div class="control-dock">
 <div class="table-wrap">
   <table class="table">
