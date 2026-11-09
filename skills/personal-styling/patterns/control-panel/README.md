@@ -13,9 +13,11 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **The title is mono**, and so are the field labels: inside a panel, mono is the quiet voice for names, so the controls carry the weight. Keep the title terse and singular: "Controls", "Filters".
 - **Field labels follow the label rules in SKILL.md.** Drop a label when the control names itself — chips reading Equities / Options, a period reading 1W / 1M / YTD — and keep it when the value alone is ambiguous: a number, a slider, an on/off pair. All the fields are labelled or none are; with none, put the controls in `.field-row` instead of `.control-panel-fields`, so they sit on one line. Labels that stay are mono (see above).
 - **Fields are divided.** A divider between fields, `16px` either side, so a long panel reads as a list with a rhythm; the first row has none.
-- **Each field is a row by default: the mono label on the left, the control on the right.** A control too wide to sit beside its label drops underneath it rather than squeezing. A slider keeps its label-and-value row, with the track below. No dividers between fields.
-- **Fields follow the grid.** On a wide screen a panel above a tool lays its fields three across, `24px` apart, never more; on a phone and when docked, one column.
-- **Two field styles.** Inline (the default): the label left, the control right — for a narrow panel, a docked one, a sheet, a phone. `.control-panel--full`: the label above, the control the full width of its column — segments share it equally, a select runs edge to edge with its chevron at the far end — for a wide panel whose controls should line up as columns. One style per panel.
+- **Each field is a row by default: the mono label on the left, the control on the right.** Every row shares two columns: the labels, then the controls. The control column is as wide as `--control-max` (`200px`), or what the panel can spare, and every control fills it: segments share it equally, a select runs across it with its chevron at the far end, a slider's track spans it. So every control starts and ends on the same lines, whatever its label. A long label wraps onto a second line; the control never drops under it.
+- **A control too wide for the column goes under its label.** Four or more segments, a chip row (a set of toggles reads best on one line), or any field marked `.field--wide`, span both columns, the control `8px` under its label at the panel's full width. Left in the column, one wide control would widen the column for every row. In a `280px` panel (docked, or a sheet on a wide screen) there's room for a label of about 50px beside a control of about 180px; a field with a longer label or a wider control takes `.field--wide`. Keep the words short: a panel is controls, not text.
+- **A slider's value is a tooltip.** It rides above the thumb while the slider is hovered, focused or dragged (see the slider), so the track can span the control column like everything else. A value printed beside the label or at the end of the track pushes the track out of line.
+- **Fields follow the grid.** On a wide screen a panel above a tool lays its fields three across, `24px` apart, never more, each its label beside its control; on a phone and when docked, one column.
+- **Two field styles.** Inline (the default): the label left, the control right at the max width — for a narrow panel, a docked one, a sheet, a phone, and three across on a wide screen. `.control-panel--full`: the label above, the control the full width of its column — segments share it equally, a select runs edge to edge with its chevron at the far end — for a wide panel whose controls should line up as columns. One style per panel.
 - **Only controls go in.** A table or chart the controls change goes under or beside the panel, on the page. A contents list counts: it's a control that moves you through the page.
 
 ## Docked
@@ -35,8 +37,15 @@ Requires: accordion, segmented, picker, chip, slider, button
 ## Use
 
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
-- Wrap a segmented control or chip row in `.control-field`. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`).
+- Wrap a segmented control or chip row in `.control-field`: the label first, the control second. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`). A slider is its label, then `.slider` with the `<output>` inside it, so the value is a tooltip.
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.14.0
+
+- Fields share two columns, labels and controls, and every control fills the control column up to `--control-max` (200px): one set of lines down the panel. Long labels wrap instead of pushing their control under them.
+- A slider sits beside its label, its track spanning the control column, its value in a tooltip on the thumb.
+- Four or more segments, a chip row, or `.field--wide`, go under the label across the panel.
+- Removed the stray "no dividers between fields" line, left over from v0.11; fields are divided, 16 either side.
 
 ## Changes in v0.13.0
 

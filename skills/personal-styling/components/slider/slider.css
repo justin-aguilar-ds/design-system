@@ -1,4 +1,4 @@
-/* personal-styling · slider · v0.3.1 */
+/* personal-styling · slider · v0.4.0 */
 
 .slider-field {
   display: grid;
@@ -12,6 +12,33 @@
 }
 /* A meaningful value at mono size takes full ink (see the contrast floor). */
 .slider-value { color: var(--color-text); }
+
+/* NEW (v0.4): the value as a tooltip. An <output class="slider-value"> put
+   inside .slider rides above the thumb, a pill 8 above the track, while
+   the slider is hovered, focused from the keyboard or held; otherwise it's
+   hidden. It grows from the thumb on the tooltip's timing. For a slider
+   beside its label, where a printed value would push the track out of
+   line with the controls around it. */
+.slider > .slider-value {
+  position: absolute;
+  z-index: 1;
+  left: calc(8px + var(--slider-pct, 0) * (100% - 16px)); /* the thumb's centre: 8px in from either end */
+  bottom: calc(50% + 8px + var(--space-8));                /* the 16px track's top, then 8 */
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: bottom center;
+  translate: -50% 0;
+  scale: 0;
+  transition: scale var(--duration-pop) var(--ease-out);
+}
+.slider:is(.is-active, :has(.slider-input:focus-visible)) > .slider-value { scale: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .slider:hover > .slider-value { scale: 1; }
+}
 
 /* The wrapper is the 44px touch target; the visual track inside is 16px.
    The negative margin hangs the extra 14px above and below outside the

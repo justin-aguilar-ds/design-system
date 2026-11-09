@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.13.0 */
+/* personal-styling · control-panel · v0.14.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -32,24 +32,59 @@
 }
 .control-panel .accordion-body { padding: 0 var(--space-16) var(--space-16); }
 
-/* Fields flow in columns of at least 240px — wide enough for a slider and
-   the widest picker — 16px apart both ways, wrapping as the panel narrows. */
+/* CHANGED (v0.14): fields share two columns — the labels, then the
+   controls, up to --control-max — 16 apart. Every row is a subgrid of
+   them, so every control starts and ends on the same lines whatever its
+   label. A long label wraps onto a second line rather than pushing its
+   control out of line or under it. */
 .control-panel-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(min-content, 1fr) minmax(min-content, var(--control-max));
   align-items: start;
-  gap: var(--space-16) var(--space-24);
+  gap: var(--space-16);
+}
+.control-panel-fields > * {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+  gap: var(--space-8) var(--space-16);
+  min-width: 0;
 }
 /* NEW (v0.13): a divider between fields, 16 either side, so a long panel
    reads as a list with a rhythm. The first row has none. */
 .control-panel-fields > * { padding-top: var(--space-16); border-top: 1px solid var(--color-divider); }
 .control-panel-fields > :first-child { padding-top: 0; border-top: 0; }
 /* On a wide screen the panel above a tool keeps the grid: three fields
-   across, never more. Docked, it stays one column. */
+   across, never more, each its label beside its control. Docked, it stays
+   one column. */
 @media (min-width: 631px) {
-  .control-panel:not(.control-panel--docked) .control-panel-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .control-panel:not(.control-panel--docked) .control-panel-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-24); }
+  .control-panel:not(.control-panel--docked) .control-panel-fields > * {
+    grid-column: auto;
+    grid-template-columns: minmax(min-content, 1fr) minmax(min-content, var(--control-max));
+  }
   .control-panel:not(.control-panel--docked) .control-panel-fields > :nth-child(-n + 3) { padding-top: 0; border-top: 0; }
 }
+
+/* The control fills its column: segments share it equally, a select runs
+   across it with its chevron at the far end, a slider's track spans it. */
+.control-panel-fields > * > :nth-child(2) { justify-self: stretch; min-width: 0; }
+.control-panel-fields .segmented:not(.segmented--list) { display: flex; width: 100%; }
+.control-panel-fields .segmented:not(.segmented--list) .segmented-option { flex: 1; justify-content: center; }
+.control-panel-fields .picker,
+.control-panel-fields .picker-trigger { width: 100%; }
+.control-panel-fields .picker-trigger { justify-content: space-between; }
+/* A slider's value rides above its thumb as a tooltip (see the slider);
+   an older .slider-head keeps the value beside the label instead. */
+.control-panel-fields .slider-head { justify-content: flex-start; }
+/* Anything after the control (a slider's end labels) sits under it. */
+.control-panel-fields > * > :nth-child(n + 3) { grid-column: 2; }
+/* A control too wide for the column — four or more segments, a chip row
+   (a set of toggles reads as one line), or a field marked .field--wide —
+   goes under its label, 8 below it, across both columns. Left in the
+   column it would widen it for every row. */
+.control-panel-fields > :is(.field--wide, :has(> .segmented > .segmented-option:nth-of-type(4)), :has(> .chip-row)) > * { grid-column: 1 / -1; justify-self: stretch; contain: inline-size; } /* its width never sizes the columns */
 
 /* A field is its label, 8px, then its control. The picker and slider bring
    their own field wrappers; this is the one for everything else. */
@@ -88,9 +123,10 @@
     border-radius var(--duration-entrance) var(--ease-out),
     width var(--duration-entrance) var(--ease-out);
 }
-/* One column: fields stack. */
-.control-panel--docked .control-panel-fields { grid-template-columns: minmax(0, 1fr); }
-/* A segmented list fills its field, so every option's fill is the same width. */
+/* A contents list fills the panel's width, under its label, so every
+   option's fill is the same width. */
+.control-panel-fields > .control-field:has(> .segmented--list) { grid-template-columns: minmax(0, 1fr); }
+.control-panel-fields > .control-field:has(> .segmented--list) > * { grid-column: auto; }
 .control-field:has(> .segmented--list) { justify-items: stretch; }
 /* Closed, the pill is only as wide as its label: the list inside is kept
    out of the width calculation, so the heading row alone sizes it. */
@@ -120,29 +156,10 @@
    in SKILL.md). translate, not transform, so it survives the turn. */
 .control-panel .accordion-chevron { translate: 0 -1px; }
 
-/* NEW (v0.11): each field is a row — its mono label on the left, its control
-   on the right — so a long list of fields reads as quiet names beside the
-   controls that carry the weight. A control too wide to sit beside its label
-   drops underneath it rather than squeezing; a slider keeps its
-   label-and-value row with the track below. */
-.control-panel :is(.control-field, .picker-field) {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8) var(--space-16);
-}
-/* A contents list fills its column instead (see Docked). */
-.control-panel .control-field:has(> .segmented--list) { display: grid; }
 
 /* NEW (v0.13): .control-panel--full — the label above, the control the full
-   width of its column: segments share it equally, a select runs edge to
-   edge with its chevron at the far end. For a wide panel whose controls
-   should line up as columns; inline (the default) suits a docked panel, a
-   sheet and a phone, where the panel is narrow. */
-.control-panel--full :is(.control-field, .picker-field) { display: grid; justify-items: stretch; gap: var(--space-8); }
-.control-panel--full .segmented:not(.segmented--list) { display: flex; width: 100%; }
-.control-panel--full .segmented:not(.segmented--list) .segmented-option { flex: 1; justify-content: center; }
-.control-panel--full .picker,
-.control-panel--full .picker-trigger { width: 100%; }
-.control-panel--full .picker-trigger { justify-content: space-between; }
+   width of its column. For a wide panel whose controls should line up as
+   columns; inline (the default) suits a docked panel, a sheet and a phone. */
+.control-panel--full .control-panel-fields { grid-template-columns: minmax(0, 1fr); }
+.control-panel.control-panel--full .control-panel-fields > * { grid-column: auto; grid-template-columns: minmax(0, 1fr); }
+.control-panel.control-panel--full .control-panel-fields > * > * { grid-column: auto; }

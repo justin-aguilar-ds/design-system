@@ -219,13 +219,11 @@
     </button>
     <div class="stage-sheet-body" id="sheet-body">
       <div class="slider-field">
-        <div class="slider-head">
-          <label class="t-mono" for="register">Register</label>
-          <output class="slider-value t-mono" for="register" id="register-out">Page</output>
-        </div>
+        <label class="t-mono" for="register">Register</label>
         <span class="slider">
           <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
           <input class="slider-input" id="register" type="range" min="0" max="1" step="1" value="0">
+          <output class="slider-value t-mono" for="register" id="register-out">Page</output>
         </span>
         <div class="slider-ends"><span class="t-mono">Page</span><span class="t-mono">Tool</span></div>
       </div>
@@ -239,7 +237,7 @@
           <button class="segmented-option t-control" type="button" aria-pressed="false" value="chart">Chart</button>
         </div>
       </div>
-      <div class="control-field">
+      <div class="control-field field--wide">
         <span class="t-mono" id="content-l">Content</span>
         <div class="segmented" role="group" aria-labelledby="content-l" id="content">
           <span class="segmented-indicator" aria-hidden="true"></span>
@@ -273,7 +271,7 @@
           </div>
         </div>
       </div>
-      <div class="control-field">
+      <div class="control-field field--wide">
         <span class="t-mono" id="maxw-l">Max width</span>
         <div class="segmented" role="group" aria-labelledby="maxw-l" id="maxw">
           <span class="segmented-indicator" aria-hidden="true"></span>

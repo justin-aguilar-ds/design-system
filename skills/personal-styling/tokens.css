@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.20
+   Personal styling tokens — v0.21
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -163,6 +163,11 @@ img, video, svg { display: block; max-width: 100%; }
      here rather than left to padding plus line height, so the type inside
      can't push one a pixel off the rest. */
   --height-control: 36px;
+  /* NEW (v0.21): the widest an inline control gets. In a panel or a sheet,
+     where each field is its label beside its control, every control fills
+     this width (less, if the panel can't spare it), so segments, selects
+     and slider tracks start and end on the same lines. */
+  --control-max: 200px;
 
   /* NEW (v0.6): ICONS — three sizes and one stroke. Draw each icon with a
      viewBox the same size as it renders, so a 1.5 stroke is 1.5px. */

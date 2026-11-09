@@ -176,8 +176,8 @@
 
 <script>
 // Everything is built before the component scripts set themselves up.
-const seg = (id, label, opts, active) => `
-  <div class="control-field">
+const seg = (id, label, opts, active, wide) => `
+  <div class="control-field${wide ? ' field--wide' : ''}">
     <span class="t-mono" id="${id}-l">${label}</span>
     <div class="segmented" role="group" aria-labelledby="${id}-l" id="${id}">
       <span class="segmented-indicator" aria-hidden="true"></span>
@@ -268,10 +268,10 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('view', 'Show', [['one', 'One'], ['all', 'All four']], 'one')}
   ${seg('width', 'Controls', [['max', 'Max width'], ['natural', 'Natural']], 'max')}
   ${seg('div', 'Dividers', [['on', 'On'], ['off', 'Off']], 'on')}
-  ${seg('cw', 'Max width', [['200', '200'], ['240', '240'], ['280', '280']], '240')}
+  ${seg('cw', 'Max width', [['200', '200'], ['240', '240'], ['280', '280']], '200')}
   ${seg('ds', 'Divider space', [['16', '16'], ['8', '8']], '16')}
-  ${seg('val', 'Slider value', [['label', 'Label'], ['tip', 'Tooltip'], ['end', 'End']], 'label')}
-  ${seg('pw', 'Panel', [['280', 'Dock'], ['374', 'Phone'], ['wide', 'Wide']], '374')}
+  ${seg('val', 'Slider value', [['label', 'Label'], ['tip', 'Tooltip'], ['end', 'End']], 'tip', true)}
+  ${seg('pw', 'Panel', [['280', 'Dock'], ['374', 'Phone'], ['wide', 'Wide']], '374', true)}
   <div class="sheet-section">
     <p class="t-body sheet-note">The Type panel from the typography tool, laid out inline with a max width on every control. Dock is the 280 card in the corner, Phone the sheet on a 390 screen, Wide the panel above a tool on a desktop, three fields across.</p>
   </div>
@@ -303,7 +303,7 @@ document.getElementById('sheet-body').innerHTML = `
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
 document.body.ontouchstart = () => {};
-const state = { view: 'one', width: 'max', div: 'on', cw: '240', pw: '374', ds: '16', val: 'label' };
+const state = { view: 'one', width: 'max', div: 'on', cw: '200', pw: '374', ds: '16', val: 'tip' };
 const panels = document.getElementById('panels');
 function measureLabels() {
   panels.querySelectorAll('.pp').forEach((pp) => {

@@ -1,11 +1,12 @@
-/* personal-styling · slider · v0.3.1 */
+/* personal-styling · slider · v0.4.0 */
 
 // Keys that change a range input's value. Holding one shows the progress fill.
 const SLIDER_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End']);
 
 document.querySelectorAll('.slider').forEach((slider) => {
   const input = slider.querySelector('.slider-input');
-  const output = slider.closest('.slider-field')?.querySelector('.slider-value');
+  // The value inside the slider (a tooltip) or beside its label.
+  const output = slider.querySelector('.slider-value') || slider.closest('.slider-field')?.querySelector('.slider-value');
 
   const update = () => {
     const min = Number(input.min || 0);

@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.5.0 */
+/* personal-styling · stage-sheet · v0.6.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -191,15 +191,27 @@
   .stage-sheet.is-resizing .stage-sheet-toggle { cursor: grabbing; }
 }
 
-/* NEW (v0.2): each field is a row — its mono label on the left, its control
-   on the right — so a long list of fields reads as quiet names beside the
-   controls that carry the weight. A control too wide to sit beside its label
-   drops underneath it rather than squeezing; a slider keeps its
-   label-and-value row with the track below. */
-.stage-sheet-body :is(.control-field, .picker-field) {
-  display: flex;
-  flex-wrap: wrap;
+/* CHANGED (v0.6): the fields are laid out as a control panel's (see
+   patterns/control-panel/): two columns every field shares — the mono
+   labels, then the controls, up to --control-max — so every control
+   starts and ends on the same lines. A long label wraps onto a second
+   line rather than pushing its control out of line. Anything else in the
+   body (a readout, a list of ideas) spans both columns. */
+.stage-sheet-body { grid-template-columns: minmax(min-content, 1fr) minmax(min-content, var(--control-max)); column-gap: var(--space-16); }
+.stage-sheet-body > * { grid-column: 1 / -1; min-width: 0; }
+.stage-sheet-body > :is(.control-field, .picker-field, .slider-field) {
+  display: grid;
+  grid-template-columns: subgrid;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-8) var(--space-16);
 }
+.stage-sheet-body > :is(.control-field, .picker-field, .slider-field) > :nth-child(2) { justify-self: stretch; min-width: 0; }
+.stage-sheet-body > :is(.control-field, .picker-field, .slider-field) > :nth-child(n + 3) { grid-column: 2; }
+/* A control too wide for the column, or a chip row, goes under its label (see the panel). */
+.stage-sheet-body > :is(.field--wide, :has(> .segmented > .segmented-option:nth-of-type(4)), :has(> .chip-row)) > * { grid-column: 1 / -1; justify-self: stretch; contain: inline-size; }
+.stage-sheet-body > * > .segmented:not(.segmented--list) { display: flex; width: 100%; }
+.stage-sheet-body > * > .segmented:not(.segmented--list) .segmented-option { flex: 1; justify-content: center; }
+.stage-sheet-body > * > .picker,
+.stage-sheet-body > * > .picker .picker-trigger { width: 100%; }
+.stage-sheet-body > * > .picker .picker-trigger { justify-content: space-between; }
+.stage-sheet-body .slider-head { justify-content: flex-start; }
