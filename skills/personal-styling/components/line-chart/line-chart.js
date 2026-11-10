@@ -1,9 +1,9 @@
-/* personal-styling · line-chart · v0.2.1 */
+/* personal-styling · line-chart · v0.4.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
 // Options as data attributes on the figure (defaults first):
-//   data-labels   auto | on | off     axis labels: auto shows them once the
+//   data-labels   auto | on | off | y     axis labels: auto shows them once the
 //                                     chart is wider than the 630px breakpoint
 //   data-guides   grid | base | none  dotted guides
 //   data-density  few | more          how many guides (about 4 or 8)
@@ -11,10 +11,14 @@
 //   data-legend   names | off
 //   data-rank     off | on            rank among the series, in the tooltip
 //   data-focus    a series name       the series in full ink at rest
+//   data-prefix   a unit, e.g. $      set before every value: −$12.50
 // Hover (or tap) near a line: it previews, and a tooltip grows from the
 // nearest point. Click or tap: it becomes the focus. API on the element:
-// el.lineChart.focus(name), el.lineChart.preview(name | null), and a
-// bubbling `line-chart-focus` event with detail.name.
+// el.lineChart.focus(name), el.lineChart.preview(name | null),
+// el.lineChart.update(data) to redraw from new data, and two bubbling
+// events: `line-chart-focus` with detail.name, and `line-chart-point` with
+// detail.index, detail.x, detail.name and detail.value on a click or tap
+// at a point. Values can go below zero: the guides then span both sides.
 
 const LINE_CHART_HEIGHT = 240;        // px, phones
 const LINE_CHART_HEIGHT_WIDE = 280;   // px, from 500px wide
@@ -56,10 +60,10 @@ function lineChartSpark(values, { max = Math.max(...values), width = 64, height 
 document.querySelectorAll('.line-chart').forEach((fig) => {
   const source = fig.querySelector('script[type="application/json"]');
   if (!source) return;
-  const data = JSON.parse(source.textContent);
-  const series = data.series || [];
-  const xs = data.x || [];
-  const n = xs.length;
+  let data = JSON.parse(source.textContent);
+  let series = data.series || [];
+  let xs = data.x || [];
+  let n = xs.length;
   if (!series.length || n < 2) return;
 
   const opt = (key, fallback) => fig.dataset[key] || fallback;
@@ -83,14 +87,21 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   const shown = () => preview || focus;
   let geo = null;
 
-  const niceTicks = (max, count) => {
-    const raw = (max || 1) / count;
+  // Round steps from zero, upward to the highest value and (v0.3) downward
+  // to the lowest, so zero is always a guide.
+  const niceTicks = (min, max, count) => {
+    const raw = ((max - min) || 1) / count;
     const mag = 10 ** Math.floor(Math.log10(raw));
     const step = [1, 2, 2.5, 5, 10].map((v) => v * mag).find((v) => v >= raw);
     const ticks = [];
-    for (let v = 0; ; v += step) { ticks.push(v); if (v >= max) break; }
+    for (let v = 0; ; v += step) { ticks.push(v); if (v >= max && ticks.length > 1) break; }   // a flat zero series still gets a scale
+    for (let v = -step; min < 0; v -= step) { ticks.unshift(v); if (v <= min) break; }
     return ticks;
   };
+  // A real minus sign, and the unit (data-prefix) between it and the figure.
+  // With a unit, a value that isn't whole keeps two decimals: $12.50.
+  const format = (v) => `${v < 0 ? '−' : ''}${opt('prefix', '')}${Math.abs(v).toLocaleString(undefined,
+    opt('prefix', '') && !Number.isInteger(v) ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : {})}`;
 
   function draw() {
     const W = svg.clientWidth || fig.clientWidth || 320;
@@ -98,25 +109,26 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     // Labels by width: a wide chart is read for figures, a narrow one for
     // its shape (the tooltip still gives every value). Redrawn on resize.
     const mode = opt('labels', 'auto');
-    const labels = mode === 'on' || (mode === 'auto' && W > LINE_CHART_WIDE);
+    const labels = mode === 'on' || mode === 'y' || (mode === 'auto' && W > LINE_CHART_WIDE);
+    const xLabels = labels && mode !== 'y';   // "y": the value labels alone, when the tooltip names the point
     const guides = opt('guides', 'grid');
-    const yMax = Math.max(...series.flatMap((s) => s.values));
-    const ticks = niceTicks(yMax, opt('density', 'few') === 'more' ? 8 : 4);
-    const top = ticks[ticks.length - 1];
-    const L = labels ? LINE_CHART_DIGIT * String(top).length + LINE_CHART_GAP : 4;
-    const R = 4, T = 8, B = labels ? 15 + LINE_CHART_GAP : 4;
+    const all = series.flatMap((s) => s.values);
+    const ticks = niceTicks(Math.min(0, ...all), Math.max(0, ...all), opt('density', 'few') === 'more' ? 8 : 4);
+    const top = ticks[ticks.length - 1], low = ticks[0];
+    const L = labels ? LINE_CHART_DIGIT * Math.max(...ticks.map((v) => format(v).length)) + LINE_CHART_GAP : 4;
+    const R = 4, T = 8, B = xLabels ? 15 + LINE_CHART_GAP : 4;
     const pw = W - L - R, ph = H - T - B;
     const x = (i) => L + (pw * i) / (n - 1);
-    const y = (v) => T + ph * (1 - v / top);
+    const y = (v) => T + ph * (1 - (v - low) / (top - low));
     geo = { L, pw, x, y };
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('height', H);
     svg.replaceChildren();
     ticks.forEach((v) => {
       if (guides === 'grid' || (guides === 'base' && v === 0)) el('line', { class: 'line-chart-guide', x1: L, x2: W - R, y1: y(v), y2: y(v) }, svg);
-      if (labels) el('text', { x: L - LINE_CHART_GAP, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = v;
+      if (labels) el('text', { x: L - LINE_CHART_GAP, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = format(v);
     });
-    if (labels) {
+    if (xLabels) {
       const every = Math.ceil((LINE_CHART_DIGIT * 5 + LINE_CHART_GAP) / (pw / (n - 1)));
       for (let i = 0; i < n; i += every) {
         el('text', { x: x(i), y: H - 2, 'text-anchor': i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle' }, svg).textContent = xs[i];
@@ -172,7 +184,7 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const point = svg.querySelector('.line-chart-point');
     point.setAttribute('cx', cx);
     point.setAttribute('cy', cy);
-    let text = `${near.name} · ${xs[i]} · ${near.values[i].toLocaleString()}`;
+    let text = `${near.name} · ${xs[i]} · ${format(near.values[i])}`;
     if (opt('rank', 'off') === 'on') {
       const rank = series.map((s) => s.values[i]).sort((a, b) => b - a).indexOf(near.values[i]) + 1;
       text += ` · ${rank}${['st', 'nd', 'rd'][((rank + 90) % 100 - 10) % 10 - 1] || 'th'}`;
@@ -185,7 +197,7 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const left = Math.max(0, Math.min(fig.clientWidth - w, pad + cx - w / 2));
     tip.style.translate = `${left}px ${pad + (below ? cy + 12 : cy - h - 12)}px`;
     fig.classList.add('has-tip');
-    return near;
+    return { name: near.name, index: i, value: near.values[i] };
   }
   function hideTip() {
     fig.classList.remove('has-tip');
@@ -194,7 +206,12 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
 
   svg.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') showTip(e); });
   svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTip(); });
-  svg.addEventListener('click', (e) => { const near = showTip(e); if (near) setFocus(near.name); });
+  svg.addEventListener('click', (e) => {
+    const near = showTip(e);
+    if (!near) return;
+    setFocus(near.name);
+    fig.dispatchEvent(new CustomEvent('line-chart-point', { bubbles: true, detail: { ...near, x: xs[near.index] } }));
+  });
   document.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' && !fig.contains(e.target)) hideTip(); });
   legend.addEventListener('click', (e) => { const b = e.target.closest('button[data-name]'); if (b) setFocus(b.dataset.name); });
   legend.addEventListener('pointerover', (e) => { const b = e.target.closest('button[data-name]'); if (b && e.pointerType === 'mouse') setPreview(b.dataset.name); });
@@ -203,6 +220,15 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   fig.lineChart = {
     focus: (name) => setFocus(name),
     preview: (name) => setPreview(name),
+    // NEW (v0.3): redraw from new data — a filter changed, a range moved.
+    update: (next) => {
+      if (!next?.series?.length || (next.x || []).length < 2) return;
+      data = next; series = next.series; xs = next.x; n = xs.length;
+      if (!series.some((s) => s.name === focus)) focus = series[0].name;
+      preview = null;
+      fig.classList.remove('has-tip');
+      draw();
+    },
     get focused() { return focus; },
   };
 

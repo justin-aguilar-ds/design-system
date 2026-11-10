@@ -15,6 +15,17 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 - **The legend is names, below.** In the data's order, under the chart, never beside it. Every name carries the chip's dot: a ring, filled for the focus. `data-legend="off"` when one series is all there is.
 - **Full width on a phone.** A chart sits on the page like a table, or on a surface like a card (`.line-chart--surface`).
 
+## Changes in v0.4.0
+
+- `data-labels="y"` shows the value labels and drops the ones along the bottom, for a narrow chart whose X labels would collide; the tooltip still names every point.
+
+## Changes in v0.3.0
+
+- Values can go below zero: the guides step down from zero as well as up, so a running total that dips negative stays inside the chart. A chart with no negative values draws exactly as before.
+- `data-prefix` sets a unit before every value, after a real minus sign: `−$12.50`. With a unit, a value that isn't whole keeps two decimals.
+- `el.lineChart.update(data)` redraws from new data.
+- A click or tap at a point fires `line-chart-point` with `detail.index`, `detail.x`, `detail.name` and `detail.value`, so a page can show what's behind that point.
+
 ## Changes in v0.2.1
 
 - A rule for resolution: plot the finest grain the data has, so the monotone curve reads as a line rather than angles.
@@ -25,9 +36,9 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 
 ## Use
 
-- `<figure class="line-chart" aria-label="…">` with a `<script type="application/json">` inside: `{ "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }`. Values start from zero.
-- Options as data attributes: `data-labels`, `data-guides`, `data-density`, `data-curve`, `data-legend`, `data-rank`, `data-focus`.
-- `el.lineChart.focus(name)` and `el.lineChart.preview(name | null)` drive it from outside; it fires a bubbling `line-chart-focus` event with `detail.name`.
+- `<figure class="line-chart" aria-label="…">` with a `<script type="application/json">` inside: `{ "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }`. The value axis always includes zero, and reaches below it when the data does.
+- Options as data attributes: `data-labels`, `data-guides`, `data-density`, `data-curve`, `data-legend`, `data-rank`, `data-focus`, `data-prefix`.
+- `el.lineChart.focus(name)`, `el.lineChart.preview(name | null)` and `el.lineChart.update(data)` drive it from outside; it fires bubbling `line-chart-focus` (`detail.name`) and `line-chart-point` (`detail.index`, `detail.x`, `detail.name`, `detail.value`) events.
 - Link a table to it with `data-chart="#chart-id"` on the table and `data-series` on each row (see `components/table/`).
 - `lineChartSpark(values, { max })` returns a sparkline in the same spec, for a table cell.
 - Needs `--color-series` from `tokens.css` v0.14.

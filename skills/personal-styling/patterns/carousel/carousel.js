@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.2.1 */
+/* personal-styling · carousel · v0.3.0 */
 
 // One item at a time. Moves by drag or swipe (1:1, then a snap past 40% of
 // the width or a flick), by horizontal trackpad or wheel, and by the arrow
@@ -28,7 +28,17 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
   // interpolation can never disagree with the CSS.
   const root = getComputedStyle(document.documentElement);
   const SCALE_AWAY = parseFloat(root.getPropertyValue('--scale-inactive')) || 0.8;
-  const OPACITY_AWAY = parseFloat(root.getPropertyValue('--opacity-inactive')) || 0.2;
+  // NEW (v0.3): data-edges="open" — nothing clips, so an item away from
+  // the centre is gone rather than faint (see carousel.css).
+  const OPACITY_AWAY = carousel.dataset.edges === 'open' ? 0 : parseFloat(root.getPropertyValue('--opacity-inactive')) || 0.2;
+
+  // NEW (v0.3): data-loop makes it a circle — past the last item is the
+  // first, and back from the first is the last. It needs three items or
+  // more. The track is still a row: while it rests, the item at the far
+  // end is moved round to the other side so the centred one always has a
+  // neighbour both ways, for a drag as much as for a key.
+  const order = [...items];   // the authored order: slide numbers and event indexes never change
+  const loop = carousel.hasAttribute('data-loop') && items.length > 2;
 
   let active = Math.max(0, items.findIndex((item) => item.classList.contains('is-active')));
   let locked = false;
@@ -43,7 +53,7 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
       const on = i === active;
       item.classList.toggle('is-active', on);
       item.inert = !on;
-      item.setAttribute('aria-label', `${i + 1} of ${items.length}`);
+      item.setAttribute('aria-label', `${order.indexOf(item) + 1} of ${items.length}`);
     });
     setTrack(restingOffset());
   };
@@ -53,6 +63,20 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
     render();
     void track.offsetWidth;
     track.style.transition = '';
+  };
+
+  const rebalance = () => {
+    if (!loop || locked) return;
+    if (active === items.length - 1) {
+      items.push(items.shift()); frames.push(frames.shift());
+      track.append(items[items.length - 1]);
+      active -= 1;
+    } else if (active === 0) {
+      items.unshift(items.pop()); frames.unshift(frames.pop());
+      track.prepend(items[0]);
+      active += 1;
+    } else return;
+    jump();   // the same item, centred, at its new place in the row
   };
 
   const setCaption = () => {
@@ -78,7 +102,9 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
 
   const goTo = (index) => {
     if (locked) return;
-    const next = Math.max(0, Math.min(items.length - 1, index));
+    const step = index - active;
+    rebalance();
+    const next = Math.max(0, Math.min(items.length - 1, active + step));
     if (next === active) { render(); return; } // the ends: snap back
     active = next;
     locked = true;
@@ -86,7 +112,7 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
     render();
     changeCaption();
     restartVideo();
-    carousel.dispatchEvent(new CustomEvent('carousel-change', { bubbles: true, detail: { index: active, item: items[active] } }));
+    carousel.dispatchEvent(new CustomEvent('carousel-change', { bubbles: true, detail: { index: order.indexOf(items[active]), item: items[active] } }));
     setTimeout(() => { locked = false; }, CAROUSEL_LOCK_MS);
   };
 
@@ -112,6 +138,7 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
   let drag = null;
   viewport.addEventListener('pointerdown', (event) => {
     if (locked || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    rebalance();
     drag = { id: event.pointerId, x: event.clientX, dx: 0, t: performance.now(), moving: false };
   });
   viewport.addEventListener('pointermove', (event) => {
@@ -158,6 +185,16 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
       wheel = 0;
     }
   }, { passive: false });
+
+  // ---- NEW (v0.3): from outside — a page's own previous and next
+  // controls. Dispatch `carousel-set` on the carousel with
+  // { detail: { step: 1 } } (or -1), or { detail: { index } } in the
+  // authored order. Like every other input, it waits while a slide settles.
+  carousel.addEventListener('carousel-set', (event) => {
+    const { step, index } = event.detail || {};
+    if (Number.isInteger(step)) goTo(active + step);
+    else if (Number.isInteger(index) && order[index]) goTo(items.indexOf(order[index]));
+  });
 
   // ---- Arrow keys while the carousel, or its centred item, has focus.
   carousel.addEventListener('keydown', (event) => {

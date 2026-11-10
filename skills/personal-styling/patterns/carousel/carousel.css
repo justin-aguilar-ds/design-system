@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.2.1 */
+/* personal-styling · carousel · v0.3.0 */
 
 /* One item at a time, centred, with its caption under it. Slides are the
    full width of the carousel, so moving the track by whole widths always
@@ -94,3 +94,12 @@
   translate: 0 var(--space-16);
   opacity: 0;
 }
+
+/* NEW (v0.3): data-edges="open" — no edge inside the page where an item
+   comes and goes. The viewport doesn't clip, and an item away from the
+   centre is gone rather than faint: it fades in as it arrives and out as
+   it leaves, on the carousel's own duration. Something further out has to
+   end it — the page, or a scroller with overflow-x: hidden. For items as
+   wide as the carousel, where a clip would cut a full-width edge. */
+.carousel[data-edges="open"] .carousel-viewport { overflow-x: visible; }
+.carousel[data-edges="open"] .carousel-item:not(.is-active) .carousel-frame { opacity: 0; }
