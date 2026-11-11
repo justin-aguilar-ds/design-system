@@ -53,7 +53,7 @@ Every page is built for a form factor: the device the person is prompting from, 
 ## The six rules that matter most
 
 1. **Monochrome plus one accent, spent sparingly.** Black text, 50%-black secondary text, white ground, and `#FCFF28` for *attention* — never for state. If two things on screen are accented, the rule is already broken. The only other colour is polarity: green and red for values that are good or bad (see Colour).
-2. **Five spacing steps: 4, 8, 16, 24, 48, and the room.** Every gap lands on a step: `48` between groups, on every page. `4` is the inner padding of a small control only — never a gap between blocks. The one distance that isn't a step is the room: the height left over below the hero, given to the page on purpose. Any other value off the scale is a mistake, not a nuance.
+2. **Five spacing steps: 4, 8, 16, 24, 48, and the room.** Every gap lands on a step: `48` between groups, on every page. `4` is the inner padding of a small control only — never a gap between blocks. The one distance that isn't a step is the room: the height left over below the hero, given to the page on purpose. Any other value off the scale is a mistake, not a nuance. The scale stops at the stage's edge: inside the stage, space is the stage's own (see Surfaces).
 3. **Lead with the title; three type styles to a card.** The title is the first thing on the screen, with nothing small above it. A card takes a title, body copy, and one emphasis — the large number *or* the mono detail, never both.
 4. **Lists live on the page; surfaces are for content.** Dividers carry structure. A card is for an image, a chart, a demo, or a real card being shown — not for wrapping a list of rows. There is exactly **one** surface style: white fill + `#ececec` hairline, with `0 2px 14px rgba(0,0,0,.04)` added only if it lifts on hover. Buttons are the exception: every button-shaped control carries that shadow at rest — see Buttons.
 5. **Two easing curves.** `cubic-bezier(0.23, 1, 0.32, 1)` for things entering or leaving the screen; plain `ease` for hover and colour. Never mix them up.
@@ -102,7 +102,7 @@ glance.
   `.ink-loss` anywhere. Mostly in tables (a change column, an up or down
   arrow) and tooltips (`data-tooltip-ink`). Body copy and headings stay in
   the usual inks.
-- **One signal per value.** Fill or ink, never both on the same value.
+- **One signal per value.** Fill or ink, never both on the same value. The one exception is a small tile whose whole content is the value, such as a calendar day: at that size the ink alone is too faint and the fill alone doesn't say how far, so the fill and the ink go together (see `components/calendar/`). A table cell and a large figure still take one.
 - **Polarity is for values, not states.** A signed figure (`+0.35`, `−$1,200`)
   or the arrow beside it takes polarity; a state (`Failed`, `Delivered`)
   stays glyph + word in black (see State without colour). A loss in red ink
@@ -196,6 +196,7 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
   - `16` — inside a card, between fields, a label to a compact control's edge.
   - `24` — the page's side inset, the inset of anything pinned to an edge, card to card, a label to a 64px control's edge.
   - `48` — **the gap**: between groups on every page, tools included, and the top and bottom of the page.
+- **The scale governs the page, not the inside of the stage.** A piece on the stage is placed by the stage, as a share of its size (see Surfaces). Everything outside it, and everything inside a component, lands on a step.
 - **Two kinds of space: the gap and the room.** Every distance between groups is one of two things. The gap is fixed at `48`. The room is whatever height is left once everything is placed: there is one, below the hero, and with a lot of content it is zero and the page flows at the gap. Write the room as `margin-top: auto` on what follows the hero, never as a number. **Nothing is ever padded to push content down**: a section given a min-height or a spacer to fill the screen is the mistake the room exists to avoid.
 - **The page is `48` top and bottom, `24` at the sides.** `--space-page-block` (48) opens and closes the page flow: the air above the title is a section's worth, twice the sides, which gives the opening its weight. `--space-page` (24) is the side inset and the inset of everything pinned to an edge — a docked panel, the bottom slot — on every side. Both are roles that point at existing steps; there is no sixth step.
 - **Derived values are roles, written as `calc()`.** A segment's label pads by edge − fill (`calc(var(--inset-control) - var(--inset-fill))`, 12); a position below a line of type adds its line height. Write the arithmetic, with a comment, never the resulting number. E.g. `top: calc(var(--space-page) + 35px); /* site-name line-height 19px + 16px margin */`.
@@ -211,7 +212,7 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **One breakpoint: `630px`.** Don't build a four-tier responsive system.
 - Every grid and flex item that can hold a chart, a table or a long string needs `min-width: 0`, or its content will widen the column instead of scrolling inside it.
 - A floating detail card over a canvas (a map, a diagram) is `position: absolute` within a positioned parent, `max-height: calc(100% - 48px)`, with its own `overflow-y: auto`.
-- Inside a canvas or a scrolling surface, ends are masked with a **gradient fade to the ground colour** and scrollbars are hidden (`scrollbar-width: none` + the webkit pseudo-element). The page itself keeps the browser's scrollbar.
+- Inside a canvas or a scrolling surface, ends are masked with a **gradient fade to the ground colour** and scrollbars are hidden (`scrollbar-width: none` + the webkit pseudo-element). The page itself keeps the browser's scrollbar. Use the scroll fade (`components/scroll-fade/`): it fades to whatever the content sits on, and only at an end that is cutting something.
 
 ## Page composition
 
@@ -233,10 +234,12 @@ How a screen is arranged. Decide it before any styling.
 - **Default to no surface.** The page is the ground and most things belong directly on it, separated by `1px solid var(--color-divider)`. Reach for a card only when the thing inside is *content*: an image, a chart, a live demo, or a card you are literally demonstrating.
 - **A list is never a card.** A table, a feed, a spec list, a set of rows — those get a heading and dividers on the page. Wrapping each one in a card is the fastest way to turn a calm page into a deck of floating boxes.
 - **There is exactly one surface style.** `background: #fff` + `1px solid #ececec`. No second, quieter container — a box of `--color-fill-subtle` is not a softer card, it is a *second card style*, and two is one too many.
-- **The stage: one quiet ground, for featuring.** `--color-stage` is a solid grey ground at the `20px` radius, with no hairline and no shadow; whatever sits on it keeps its own. It has two jobs:
+- **The stage: the page's hero surface, and a space of its own.** The stage is the primary surface on a page, right under the title: one quiet ground where the thing the page is about is featured. By default it is `--color-stage`, a solid grey at the `20px` radius, with no hairline and no shadow; whatever sits on it keeps its own. It has three jobs:
   - **A hero's backdrop, laid out like media.** The thing a page is about — a component, an object, a chart, a pattern — sits centred on the stage right under the title. The stage takes the page's own column — the same width as every other page, so nothing jumps between pages — `60%` of the screen's height on a phone and a desktop alike, and grows when its piece is taller. A wide piece (a table, a chart) fills it inside its padding (`48` top and bottom, `24` at the sides). What explains it follows at the gap — the proportions of a page whose hero is media, at the page's width.
+  - **A small tool of its own.** The stage can hold a view of data that works like a widget inside the page — a calendar, a chart, a set of figures, or several of them in a carousel — with its own text, values and controls. This is where a page gets its air and its expression: the page around it stays plain so the stage can be generous.
   - **A specimen's tile.** Things shown side by side as equals — surfaces, icons, sizes — each on a tile of one size in the three-column grid, so the eye gets a rhythm and every item a frame.
-  - It is a ground, not a card: it never wraps a list in the page's flow, never groups controls or a form, and holds no text but its piece.
+  - **Inside the stage, space is the stage's.** The five spacing steps govern the page. Inside the stage, how far a piece sits from the edges and how its parts are spaced belong to the stage: sized from it, as a share of its width or height, the way a hero is sized from the screen. Give it room; never carry a fixed number from one stage to the next. Nothing else is freed: colour, type roles, radius and motion are the system's inside the stage as they are outside it, and a component placed on a stage keeps its own internal spacing.
+  - It is a ground, not a card: it never wraps a list in the page's flow and never groups controls or a form.
 - **One quiet fill, for secondary controls only.** `--color-fill-quiet` is the surface of a secondary control — a secondary icon button: grey, no edge, no shadow, deepening to `--color-fill-quiet-hover` on hover. It is never a container and never state; selection keeps `--color-fill-subtle`.
 - `--color-fill-subtle` has one job: the **selected state** (a pressed segment, the current nav item, a chip that's on). It is not a background, not a well, not a panel, not a demo stage. If you are filling an area to group it, use a divider or nothing.
 - The hairline is the constant.
@@ -314,6 +317,8 @@ rules.
 | Input | a line of text has to be typed — a name, a URL, a search | `components/input/` |
 | Icon button | an action is clear from an icon alone — back, more, share, close | `components/icon-button/` |
 | Sortable list | the order of a short list is the user's to set — priorities, steps, a queue | `components/sortable/` |
+| Calendar | a value a day, on the dates it happened — which way each day went, and how far | `components/calendar/` |
+| Scroll fade | an area inside the page scrolls — its cut ends dissolve into the ground instead of meeting a line | `components/scroll-fade/` |
 
 ### Patterns
 
@@ -491,7 +496,7 @@ The point of this skill is output that doesn't read as model-generated. These ar
 | Content running the full width of a 2560px monitor | `--container` (1280px), or `--container-read` (720px) for reading, centred |
 | A list, table or feed wrapped in a card | A heading and dividers on the page |
 | A `fill-subtle` box used as a quieter card | Nothing, or a divider. One surface style only |
-| A grey box around a list, a form or a group of controls | The page. The stage features one object |
+| A grey box around a list, a form or a group of controls | The page. The stage features the page's hero |
 | A mono kind label on a row, above or beside its name | The name and its description; the description says what it is |
 | A list with a second column that starts wherever each row ends | The three-column grid: one column, or the name in the first third and the description in the other two |
 | A shadow on a card that can't be hovered | Hairline alone; shadow means it lifts |

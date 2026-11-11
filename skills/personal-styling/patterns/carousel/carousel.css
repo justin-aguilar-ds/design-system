@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.3.0 */
+/* personal-styling · carousel · v0.4.0 */
 
 /* One item at a time, centred, with its caption under it. Slides are the
    full width of the carousel, so moving the track by whole widths always
@@ -29,6 +29,13 @@
   transition: transform var(--duration-carousel) var(--ease-out);
 }
 .carousel.is-dragging .carousel-track { transition: none; }
+/* NEW (v0.4): while the carousel's own width is changing — its container
+   is resizing it — the track follows the width with no settle: the offset
+   is a product of the width, and animating toward a moving target reads
+   as a jump. The frames hold too, so the centred one can't sit a beat at
+   the away scale and spring back. Set and released by carousel.js. */
+.carousel.is-resizing .carousel-track,
+.carousel.is-resizing .carousel-frame { transition: none; }
 .carousel-item {
   flex: none;
   width: 100%;

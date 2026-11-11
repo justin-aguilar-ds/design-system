@@ -1,0 +1,98 @@
+/* personal-styling · calendar · v0.1.0 */
+
+/* A value a day, on a real calendar: seven columns, a week to a row, a
+   tile a day. The tile is the value — its fill says which way the day
+   went and its figure says how far. Drawn by calendar.js. It decides its
+   own narrow layout from its own width, like the line chart. */
+.calendar {
+  container: calendar / inline-size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-8);
+  width: 100%;                  /* it measures its own width, so it can't take its width from its content */
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+}
+.calendar-head,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.calendar-head > * { text-align: center; }
+
+/* A day: the date over the day's value, one treatment — both mono at one
+   size, told apart by ink alone. 4:3 on a wide calendar; a card's corner,
+   which on a small tile renders fully round. */
+.calendar-day {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);          /* inside a small tile, as inside a small control */
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  padding: var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  white-space: nowrap;
+  transition:
+    opacity var(--duration-base) ease,
+    box-shadow var(--duration-fast) ease,
+    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
+}
+.calendar-date { color: var(--color-text); }
+.calendar-short { display: none; }
+
+/* Polarity, at tile scale: the soft fill AND the ink, together. On a
+   tile this small the ink alone is too faint and the fill alone doesn't
+   say how far — the one place a value takes both (see Polarity in
+   SKILL.md). A day that came out even takes the quiet fill. */
+.calendar-day--gain { background: var(--color-gain-fill); }
+.calendar-day--loss { background: var(--color-loss-fill); }
+.calendar-day--flat { background: var(--color-fill-quiet); }
+/* Nothing that day, past or to come: the surface itself, held by its
+   edge, a dash where the value would be. A day still to come has no
+   dash and a quieter date. */
+.calendar-day--idle,
+.calendar-day--future {
+  background: var(--color-surface);
+  border-color: var(--color-hairline);
+}
+.calendar-day--future .calendar-date { color: var(--color-text-secondary); }
+
+/* Hover firms up the edge; the fill is the value's and stays put. */
+@media (hover: hover) and (pointer: fine) {
+  button.calendar-day:hover { box-shadow: inset 0 0 0 1px var(--color-hairline-strong); }
+}
+/* Touch: the hover response plays on press, and the tile presses in. */
+@media (hover: none) {
+  button.calendar-day:active { box-shadow: inset 0 0 0 1px var(--color-hairline-strong); scale: var(--scale-tap); transition-duration: var(--duration-instant); }
+}
+
+/* Picked: no ring. The day reads by contrast — every other day drops to
+   the inactive opacity and the picked one alone stays at full strength.
+   The days that fade carry on being legible in the list or the view the
+   pick opens; here they are out of play. */
+.calendar.has-pick .calendar-day:not([aria-pressed="true"]) { opacity: var(--opacity-inactive); }
+
+/* Narrow: squares, 4 apart, the short figure (no unit, fewer decimals)
+   so a signed value still fits a tile about 40px wide. */
+@container calendar (max-width: 630px) {
+  .calendar-head,
+  .calendar-grid { gap: var(--space-4); }
+  .calendar-day { aspect-ratio: 1; gap: 0; padding: 0; }
+  .calendar-full,
+  .calendar-month { display: none; }
+  .calendar-short { display: inline; }
+}
+
+/* Same specificity as the press, and later, so it wins. */
+@media (prefers-reduced-motion: reduce) {
+  button.calendar-day:active { scale: none; }
+}
