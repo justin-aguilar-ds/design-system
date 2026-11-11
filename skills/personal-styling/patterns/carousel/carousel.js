@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.3.0 */
+/* personal-styling · carousel · v0.4.0 */
 
 // One item at a time. Moves by drag or swipe (1:1, then a snap past 40% of
 // the width or a flick), by horizontal trackpad or wheel, and by the arrow
@@ -202,7 +202,30 @@ document.querySelectorAll('.carousel').forEach((carousel) => {
     if (event.key === 'ArrowLeft') { event.preventDefault(); goTo(active - 1); }
   });
 
-  new ResizeObserver(jump).observe(viewport);
+  // ---- NEW (v0.4): a size-driven hold. While something outside is
+  // resizing the carousel (a panel opening beside it, a screen splitting),
+  // the track's offset is a product of a width that is still moving, so
+  // nothing settles toward it: .is-resizing turns the track's and the
+  // frames' transitions off and the track follows the width frame by
+  // frame. The hold is released by the sizes themselves — two animation
+  // frames with no change — never by a timer: the tail of an ease-out
+  // moves the width by less than a pixel a frame, and a timer lets go
+  // mid-move.
+  let resizeFrame = 0;
+  let quietFrames = 0;
+  const resizeTick = () => {
+    if (++quietFrames < 2) { resizeFrame = requestAnimationFrame(resizeTick); return; }
+    resizeFrame = 0;
+    carousel.classList.remove('is-resizing');
+  };
+  let sized = false;
+  new ResizeObserver(() => {
+    if (!sized) { sized = true; return; }   // the first report is the size it already has
+    quietFrames = 0;
+    carousel.classList.add('is-resizing');
+    render();
+    if (!resizeFrame) resizeFrame = requestAnimationFrame(resizeTick);
+  }).observe(viewport, { box: 'border-box' });
   jump();
   setCaption();
 });

@@ -1,0 +1,47 @@
+/* personal-styling · scroll-fade · v0.1.0 */
+
+/* Content that runs past the edge of a scrolling area dissolves into the
+   ground instead of meeting a hard line. The fade is an overlay the height
+   of the gap (48), from the colour the content sits on to nothing. It
+   rests clear and comes in only while something is actually cut at that
+   edge (scroll-fade.js), and it never takes a press: what's under it
+   stays tappable. */
+.scroll-fade {
+  --scroll-fade-to: var(--color-bg);    /* the ground the content sits on */
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+/* On a card or a sheet, fade to the surface instead of the page. */
+.scroll-fade--surface { --scroll-fade-to: var(--color-surface); }
+/* On the stage's grey ground. */
+.scroll-fade--stage { --scroll-fade-to: var(--color-stage); }
+
+/* The area that scrolls. Scrollbars are hidden: the fade is what says
+   there is more (see "Masking content ends" in tokens.css). */
+.scroll-fade-area {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-fade-area::-webkit-scrollbar { display: none; }
+
+.scroll-fade::before,
+.scroll-fade::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: var(--space-48);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) ease;
+}
+.scroll-fade::before { top: 0; background: linear-gradient(to bottom, var(--scroll-fade-to), transparent); }
+.scroll-fade::after { bottom: 0; background: linear-gradient(to top, var(--scroll-fade-to), transparent); }
+.scroll-fade.is-cut-top::before,
+.scroll-fade.is-cut-bottom::after { opacity: 1; }

@@ -11,6 +11,7 @@ From the source site's project carousel.
 - **One item at a time, centred.** The ones beside it wait at `--scale-inactive` (0.8) and `--opacity-inactive` (0.2), out of view; only the centred item can be focused or clicked.
 - **It settles slowly.** The track and the frames glide on `--duration-carousel` (1200ms) with `--ease-out` — the main object settling, the slowest motion in the system. Input waits until it has.
 - **Drag is 1:1.** The track follows the pointer with no transition, and the centred item and its neighbours scale and fade with it. Release past 40% of the width, or with a flick, and it moves on; otherwise it springs back.
+- **Resized from outside, it follows and doesn't settle.** When a panel opens beside it or a screen splits around it, the centred item stays centred on every frame of the move: no glide toward a width that is still changing. Whatever resizes it owns the motion; the carousel only keeps up, and re-centres for good once its size has stopped changing. Sub-pixel movement at the end of an ease-out is still movement.
 - **It never takes the page's scroll.** Only horizontal trackpad and wheel movement moves it; a vertical swipe or scroll still scrolls the page. Arrow keys work while it has focus.
 - **The item always has lift.** The frame is the one surface style — `20px` radius, the hairline — with `--shadow-lift` at all times, not only on hover: it's the object you pick up and move, so it stays raised. Empty or still loading, it's the bare surface. The viewport clips sideways only, so the shadow is never cut off.
 - **The caption is one unit under the item:** a title in Label and a value — a year, a date — in mono, `8px` apart, `16px` below the frame. When the item changes it drops `16px` and fades, swaps its words while hidden, then rises back in, on `--duration-base`.
@@ -25,6 +26,10 @@ From the source site's project carousel.
 - `carousel.js` fires a bubbling `carousel-change` event with `detail.index` and `detail.item`.
 - `data-loop` makes it a circle (three items or more). `data-edges="open"` drops the clip and fades the neighbours out. Dispatch `carousel-set` with `detail.step` or `detail.index` to move it from your own controls.
 - Load `tooltip.css` and `tooltip.js` for the cursor pill and the dropped description; without them it's a plain carousel.
+
+## Changes in v0.4.0
+
+- A size-driven resize hold. While its container resizes it (a panel opening beside it, a stage and sheet splitting), the track follows the width with no settle and the frames hold their scale. The hold releases after two animation frames with no change in size, never on a timer.
 
 ## Changes in v0.3.0
 
