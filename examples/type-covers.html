@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Cover type</title>
+<script>try { const t = localStorage.getItem('ps-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="stylesheet" href="lib/tokens.css">
+<link rel="stylesheet" href="lib/components/button/button.css">
+<link rel="stylesheet" href="lib/components/segmented/segmented.css">
+<link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/picker/picker.css">
+<link rel="stylesheet" href="lib/components/input/input.css">
+<link rel="stylesheet" href="lib/components/toast/toast.css">
+<link rel="stylesheet" href="lib/patterns/stage-sheet/stage-sheet.css">
+<style>
+  /* A type explorer for repeat covers: one ground, one ink, one hero size,
+     a word repeated and wrapped. The stage is the cover (or a sheet of
+     variations); the controls are in the sheet. */
+  h2, p { margin: 0; }
+  body { background: var(--color-bg); }
+
+  /* ---- The stage: the cover at its own proportions, fitted to the room
+     the stage has. On a wide screen the open sheet takes the corner, so
+     the cover fits the room beside it. */
+  .stage-host {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--space-24);
+    transition: padding var(--duration-deliberate) var(--ease-out);
+  }
+  @container stage-sheet (min-width: 631px) {
+    .stage-host { padding: var(--space-48); }
+    .stage-sheet.is-open .stage-host { padding-right: calc(280px + 2 * var(--space-page)); }
+  }
+  /* On a phone the closed pill sits over the stage: the cover ends above it. */
+  @container stage-sheet (max-width: 630px) {
+    .stage-sheet:not(.is-open) .stage-host { padding-bottom: calc(var(--height-slot) + 2 * var(--space-page)); }
+  }
+
+  /* A cover is media: the 20px radius, the media shadow. */
+  .cover { display: block; border-radius: var(--radius-card); box-shadow: var(--shadow-media); }
+
+  /* Variations: a grid of covers, each a button that makes it current. */
+  .variations { display: grid; gap: var(--space-24); }
+  @container stage-sheet (max-width: 630px) { .variations { gap: var(--space-16); } }
+  .variation {
+    display: block;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-rest);
+    -webkit-tap-highlight-color: transparent;
+    transition: box-shadow var(--duration-fast) ease, transform var(--duration-base) var(--ease-out);
+  }
+  .variation .cover { box-shadow: none; }
+  @media (hover: hover) { .variation:hover { box-shadow: var(--shadow-lift); } }
+  @media (hover: none) { .variation:active { box-shadow: var(--shadow-lift); transform: scale(var(--scale-tap)); transition-duration: var(--duration-instant); } }
+  @media (prefers-reduced-motion: reduce) {
+    .variation, .stage-host { transition-duration: 1ms; }
+    .variation:active { transform: none; }
+  }
+
+  /* ---- The sheet. */
+  .sheet-section { display: grid; gap: var(--space-16); padding-top: var(--space-24); border-top: 1px solid var(--color-divider); }
+  .sheet-section:first-child { padding-top: 0; border-top: 0; }
+  .sheet-note { color: var(--color-text-secondary); }
+  .input-field .t-mono { color: var(--color-text-secondary); }
+  .slider-field[hidden], .control-field[hidden] { display: none; }
+
+  /* A colour well: the native colour input, drawn as a 36px swatch. */
+  .swatches { display: flex; gap: var(--space-8); }
+  .swatch {
+    position: relative;
+    width: var(--height-control);
+    height: var(--height-control);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-rest);
+    background: var(--swatch);
+    transition: box-shadow var(--duration-fast) ease;
+  }
+  @media (hover: hover) { .swatch:hover { box-shadow: var(--shadow-lift); } }
+  .swatch:focus-within { outline: 2px solid var(--color-text); outline-offset: 2px; }
+  .swatch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+</style>
+</head>
+<body ontouchstart>
+<div class="stage-sheet" data-open="true">
+  <section class="stage-sheet-stage" aria-label="Cover">
+    <div class="stage-host" id="stage"></div>
+  </section>
+
+  <section class="stage-sheet-sheet" aria-label="Controls">
+    <button class="stage-sheet-toggle" type="button" aria-expanded="false" aria-controls="sheet-body">
+      <span class="stage-sheet-title t-mono">Controls</span>
+      <svg class="stage-sheet-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="stage-sheet-body" id="sheet-body">
+
+      <div class="sheet-section">
+        <div class="control-field">
+          <span class="t-mono" id="view-l">View</span>
+          <div class="segmented" role="group" aria-labelledby="view-l" id="view">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="cover">Cover</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="variations">Variations</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="vary-l">Vary</span>
+          <div class="segmented" role="group" aria-labelledby="vary-l" id="vary">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="all">All</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="layout">Wrap</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="type">Type</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="colour">Colour</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <button class="button surface surface--rest surface--pill t-control" type="button" id="shuffle">Shuffle</button>
+          <button class="button surface surface--rest surface--pill t-control" type="button" id="download">Download PNG</button>
+          <span class="toast-anchor">
+            <button class="button surface surface--rest surface--pill t-control" type="button" id="copy-link" data-copy="" data-toast="Link copied">Copy link</button>
+            <span class="toast t-mono" role="status"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">Text</h2>
+        <div class="input-field">
+          <label class="t-mono" for="f-text">Word</label>
+          <input class="input" id="f-text" type="text" autocomplete="off" spellcheck="false" aria-describedby="f-text-help">
+          <p class="input-message t-caption" id="f-text-help">A | marks where it splits.</p>
+        </div>
+        <div class="input-field">
+          <label class="t-mono" for="f-left">Top left</label>
+          <input class="input" id="f-left" type="text" autocomplete="off">
+        </div>
+        <div class="input-field">
+          <label class="t-mono" for="f-centre">Top centre</label>
+          <input class="input" id="f-centre" type="text" autocomplete="off">
+        </div>
+        <div class="input-field">
+          <label class="t-mono" for="f-right">Top right</label>
+          <input class="input" id="f-right" type="text" autocomplete="off">
+        </div>
+        <div class="input-field">
+          <label class="t-mono" for="f-blurb">Blurb</label>
+          <input class="input" id="f-blurb" type="text" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">Layout</h2>
+        <div class="control-field">
+          <span class="t-mono" id="wrap-l">Wrap</span>
+          <div class="segmented" role="group" aria-labelledby="wrap-l" id="wrap">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="whole">Full</button>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="split">Split</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="words">Words</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="flow">Flow</button>
+          </div>
+        </div>
+        <div class="slider-field" id="brk-field">
+          <div class="slider-head">
+            <label class="t-mono" for="brk" id="brk-l">Break</label>
+            <output class="slider-value t-mono" for="brk" id="brk-out"></output>
+          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="brk" type="range" min="1" max="8" step="1" value="3">
+          </span>
+        </div>
+        <div class="slider-field">
+          <div class="slider-head">
+            <label class="t-mono" for="count">Repeat</label>
+            <output class="slider-value t-mono" for="count" id="count-out">Auto</output>
+          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="count" type="range" min="0" max="8" step="1" value="0">
+          </span>
+        </div>
+        <div class="picker-field">
+          <span class="t-mono" id="align-l">Align</span>
+          <div class="picker" id="align">
+            <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="align-list" aria-labelledby="align-l align-v">
+              <span class="picker-value" id="align-v">Left</span>
+              <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="picker-menu" hidden>
+              <ul class="picker-list" id="align-list" role="listbox" tabindex="-1" aria-labelledby="align-l">
+                <li class="picker-option t-control" role="option" aria-selected="true" data-value="left">Left</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="centre">Centre</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="right">Right</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="justify">Justify</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="alternate">Alternate</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="stairs">Stairs</li>
+                <li class="picker-option t-control" role="option" aria-selected="false" data-value="scatter">Scatter</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="vertical-l">Height</span>
+          <div class="segmented" role="group" aria-labelledby="vertical-l" id="vertical">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="fill">Fill</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="top">Top</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="centre">Centre</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="bottom">Bottom</button>
+          </div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-head">
+            <label class="t-mono" for="leading">Leading</label>
+            <output class="slider-value t-mono" for="leading" id="leading-out"></output>
+          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="leading" type="range" min="60" max="140" step="1" value="90">
+          </span>
+        </div>
+        <div class="slider-field">
+          <div class="slider-head">
+            <label class="t-mono" for="tilt">Tilt</label>
+            <output class="slider-value t-mono" for="tilt" id="tilt-out"></output>
+          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="tilt" type="range" min="0" max="15" step="1" value="0">
+          </span>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">Type</h2>
+        <div class="control-field">
+          <span class="t-mono" id="font-l">Font</span>
+          <div class="segmented" role="group" aria-labelledby="font-l" id="font">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="sans">Sans</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="mono">Mono</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="weight-l">Weight</span>
+          <div class="segmented" role="group" aria-labelledby="weight-l" id="weight">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="500">500</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="700">700</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="900">900</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="italic-l">Italic</span>
+          <div class="segmented" role="group" aria-labelledby="italic-l" id="italic">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="off">Off</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="on">On</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="case-l">Case</span>
+          <div class="segmented" role="group" aria-labelledby="case-l" id="case">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="as">Aa</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="upper">AA</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="lower">aa</button>
+          </div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-head">
+            <label class="t-mono" for="tracking">Tracking</label>
+            <output class="slider-value t-mono" for="tracking" id="tracking-out"></output>
+          </div>
+          <span class="slider">
+            <span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span>
+            <input class="slider-input" id="tracking" type="range" min="-80" max="100" step="5" value="-30">
+          </span>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">Colour</h2>
+        <div class="picker-field">
+          <span class="t-mono" id="pair-l">Pair</span>
+          <div class="picker" id="pair">
+            <button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="pair-list" aria-labelledby="pair-l pair-v">
+              <span class="picker-value" id="pair-v"></span>
+              <svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="picker-menu" hidden>
+              <ul class="picker-list" id="pair-list" role="listbox" tabindex="-1" aria-labelledby="pair-l"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="custom-l">Ground, ink</span>
+          <div class="swatches" role="group" aria-labelledby="custom-l">
+            <label class="swatch" id="ground-swatch"><input type="color" id="ground" aria-label="Ground"></label>
+            <label class="swatch" id="ink-swatch"><input type="color" id="ink" aria-label="Ink"></label>
+          </div>
+        </div>
+        <div class="field-row">
+          <button class="button surface surface--rest surface--pill t-control" type="button" id="swap">Swap</button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h2 class="t-label">Format</h2>
+        <div class="control-field">
+          <span class="t-mono" id="aspect-l">Size</span>
+          <div class="segmented" role="group" aria-labelledby="aspect-l" id="aspect">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="guide">5:7</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="poster">A4</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="square">1:1</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="story">9:16</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="details-l">Details</span>
+          <div class="segmented" role="group" aria-labelledby="details-l" id="details">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="on">On</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="off">Off</button>
+          </div>
+        </div>
+        <div class="control-field">
+          <span class="t-mono" id="grid-l">Grid</span>
+          <div class="segmented" role="group" aria-labelledby="grid-l" id="grid">
+            <span class="segmented-indicator" aria-hidden="true"></span>
+            <button class="segmented-option t-control is-active" type="button" aria-pressed="true" value="off">Off</button>
+            <button class="segmented-option t-control" type="button" aria-pressed="false" value="on">On</button>
+          </div>
+        </div>
+        <p class="t-caption sheet-note">One ground, one ink, one size for the word and one for the details. The word fits the width; Repeat on Auto fills the height with it.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="lib/components/segmented/segmented.js"></script>
+<script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/picker/picker.js"></script>
+<script src="lib/components/toast/toast.js"></script>
+<script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
+<script>
+/* ============================================================
+   THE SYSTEM. A cover is a recipe: every choice below, and nothing
+   else. The renderer turns a recipe into an SVG in cover units, so
+   the stage, the variations and the PNG are the same drawing.
+   ============================================================ */
+
+// One ground and one ink per pair. Picked by eye for contrast; the last
+// is tone on tone on purpose.
+const PAIRS = [
+  ['Pine', '#108a5f', '#111111'], ['Harbour', '#22466e', '#ffffff'], ['Sand', '#efd3a4', '#d7263d'],
+  ['Cobalt', '#1c3fd6', '#ffffff'], ['Signal', '#e5392c', '#ffffff'], ['Lagoon', '#20c2d4', '#ffffff'],
+  ['Cream', '#f1e6b8', '#121212'], ['Marigold', '#f6b92e', '#e0605e'], ['Night', '#151718', '#ece491'],
+  ['Rust', '#c75a12', '#111111'], ['Paper', '#ffffff', '#111111'], ['Saffron', '#ffc61a', '#1a1a1a'],
+  ['Raspberry', '#d8124a', '#ffffff'], ['Ochre', '#d68a12', '#ffffff'], ['Lime', '#3bb52f', '#ffffff'],
+  ['Fog', '#d9d9d6', '#e1251b'], ['Lilac', '#b99ae0', '#ffffff'], ['Claret', '#a5192c', '#ffd23f'],
+  ['Coral', '#ff5a52', '#ffffff'], ['Plum', '#9b1f7c', '#ffffff'], ['Petrol', '#0f5e6e', '#ffffff'],
+  ['Mint', '#2fb67c', '#1f8f5d'],
+];
+const ASPECTS = { guide: 0.72, poster: 1 / Math.SQRT2, square: 1, story: 9 / 16 };
+const W = 1000;   // cover units across; the height follows the aspect
+
+const DEFAULT = {
+  text: 'Marseille', left: 'No. 01', centre: 'Field Notes', right: 'First printing',
+  blurb: 'A ferry at dawn, fish soup at noon, a rooftop bar that stays open too late. Notes for getting lost on purpose.',
+  wrap: 'split', brk: null, count: 0, align: 'left', vertical: 'fill', leading: 0.9, tilt: 0,
+  font: 'sans', weight: 500, italic: false, case: 'as', tracking: -0.03,
+  ground: '#108a5f', ink: '#111111', aspect: 'guide', details: true, grid: false, seed: 1,
+};
+
+const css = getComputedStyle(document.documentElement);
+const FAMILY = {
+  sans: css.getPropertyValue('--font-display').trim(),
+  mono: css.getPropertyValue('--font-mono').trim(),
+};
+
+// ---- Measuring: a canvas at 100px stands in for the SVG's text.
+const ctx = document.createElement('canvas').getContext('2d');
+const cache = new Map();
+function measure(str, font) {
+  const key = font + '\u0000' + str;
+  if (cache.has(key)) return cache.get(key);
+  ctx.font = font;
+  const m = ctx.measureText(str);
+  const r = { l: m.actualBoundingBoxLeft, r: m.actualBoundingBoxRight, a: m.actualBoundingBoxAscent, d: m.actualBoundingBoxDescent, w: m.width };
+  cache.set(key, r);
+  return r;
+}
+const heroFont = (rc, px = 100) => `${rc.italic ? 'italic ' : ''}${rc.weight} ${px}px ${FAMILY[rc.font]}`;
+const detailFont = (px = 100) => `600 ${px}px ${FAMILY.sans}`;
+
+// ---- Words into lines.
+const applyCase = (s, c) => (c === 'upper' ? s.toLocaleUpperCase() : c === 'lower' ? s.toLocaleLowerCase() : s);
+const clean = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim();
+
+// Where a word splits on its own, as near the middle as it gets: between
+// two consonants (Mar|seille, Stock|holm), then before a consonant that
+// starts a syllable (Barce|lona); never through ch / sh / th, and never
+// leaving a half without a vowel.
+const VOWEL = /[aeiouyàáâäãåæèéêëìíîïòóôöõøùúûüý]/i;
+const DIGRAPH = /^(ch|sh|th|ph|ck|qu|gh|wh)$/i;
+function autoBreak(word) {
+  const s = clean(word);
+  if (s.includes(' ')) {   // more than one word: the space nearest the middle
+    let best = null;
+    [...s].forEach((ch, i) => { if (ch === ' ' && (best === null || Math.abs(i - s.length / 2) < Math.abs(best - s.length / 2))) best = i; });
+    return best;
+  }
+  const chars = [...s];
+  if (chars.length < 4) return Math.max(1, Math.floor(chars.length / 2));
+  let best = 1, score = Infinity;
+  const v = (c) => c !== undefined && VOWEL.test(c);
+  for (let i = 2; i <= chars.length - 2; i++) {
+    const a = chars[i - 1], b = chars[i];
+    const cc = !v(a) && !v(b);                       // VC|CV
+    const vcv = v(a) && !v(b) && v(chars[i + 1]);     // V|CV
+    const bare = !chars.slice(0, i).some(v) || !chars.slice(i).some(v);
+    const sc = Math.abs(i - chars.length / 2) + (cc ? (v(chars[i + 1]) ? -0.3 : 0) : vcv ? 0.25 : 2) + (DIGRAPH.test(a + b) ? 4 : 0) + (bare ? 5 : 0);
+    if (sc < score) { score = sc; best = i; }
+  }
+  return best;
+}
+const flowLength = (rc) => [...applyCase(clean(rc.text).replace(/ /g, ''), rc.case)].length;
+const breakRange = (rc) => (rc.wrap === 'flow'
+  ? [2, Math.max(3, flowLength(rc) * 2)]
+  : [1, Math.max(1, [...clean(rc.text)].length - 1)]);
+const breakAt = (rc) => {
+  const [lo, hi] = breakRange(rc);
+  const auto = rc.wrap === 'flow' ? Math.max(2, flowLength(rc) - 1) : autoBreak(rc.text);
+  return Math.min(hi, Math.max(lo, rc.brk ?? auto));
+};
+
+// The repeating unit: the lines one copy of the word becomes.
+function unitLines(rc) {
+  const t = rc.text;
+  if (rc.wrap === 'words') return clean(t).split(' ');
+  if (rc.wrap === 'split') {
+    if (t.includes('|')) return t.split('|').map(clean).filter(Boolean);
+    const s = clean(t), b = breakAt(rc), chars = [...s];
+    return [chars.slice(0, b).join('').trim(), chars.slice(b).join('').trim()].filter(Boolean);
+  }
+  return [clean(t)];
+}
+
+// Seeded randomness, so a recipe always draws the same cover.
+function rng(seed) {
+  let s = (seed >>> 0) || 1;
+  return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return ((s >>> 0) % 100000) / 100000; };
+}
+const hash = (str) => [...str].reduce((h, c) => (Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0), 2166136261);
+
+/* ---- Layout: a recipe in, positioned lines out (cover units). */
+function layout(rc) {
+  const H = Math.round(W / ASPECTS[rc.aspect]);
+  const m = W * 0.045;                 // the margin, all round
+  const d = W * 0.022;                 // the one detail size
+  const dl = d * 1.2;                  // its line height
+  const out = { W, H, m, d, lines: [], details: null };
+
+  let heroTop = m, heroBottom = H - m;
+  if (rc.details) {
+    const capD = measure('H', detailFont()).a / 100 * d;
+    const codeW = W * 0.2, codeH = W * 0.085, gap = m * 0.6;
+    const bx = m + codeW + gap, bw = W - m - bx;
+    // Blurb: greedy word wrap at the detail size.
+    const words = clean(rc.blurb).split(' ').filter(Boolean), blurb = [];
+    let line = '';
+    for (const w of words) {
+      const next = line ? line + ' ' + w : w;
+      if (line && measure(next, detailFont()).w / 100 * d > bw) { blurb.push(line); line = w; } else line = next;
+    }
+    if (line) blurb.push(line);
+    const fh = Math.max(codeH, blurb.length * dl);
+    out.details = { capD, codeW, codeH, bx, blurb, footTop: H - m - fh, top: m + capD };
+    heroTop = m + capD + m * 0.9;
+    heroBottom = H - m - fh - m * 0.9;
+  }
+  const x0 = m, aw = W - 2 * m, ah = heroBottom - heroTop;
+  out.hero = { x0, aw, top: heroTop, bottom: heroBottom };
+
+  const font = heroFont(rc);
+  const track = rc.tracking * 100;     // at the 100px measuring size
+  const inkOf = (str) => { const mt = measure(str, font); const n = [...str].length; return { ...mt, n, ink: mt.l + mt.r + track * Math.max(0, n - 1) }; };
+
+  // The unit, cased. Flow is one long string cut every `brk` letters.
+  let unit, period;
+  if (rc.wrap === 'flow') {
+    const chars = [...applyCase(clean(rc.text).replace(/ /g, ''), rc.case)];
+    const c = breakAt(rc), L = chars.length || 1;
+    const g = (a, b) => (b ? g(b, a % b) : a);
+    period = L / g(L, c);
+    const lineAt = (i) => Array.from({ length: c }, (_, k) => chars[(i * c + k) % L]).join('');
+    unit = { get: lineAt, n: 1, sample: Array.from({ length: period }, (_, i) => lineAt(i)) };
+  } else {
+    const lines = unitLines(rc).map((s) => applyCase(s, rc.case));
+    unit = { get: (i) => lines[i % lines.length], n: lines.length, sample: lines };
+  }
+  if (!unit.sample.length || !unit.sample[0]) return out;
+
+  const ms = unit.sample.map(inkOf);
+  const maxInk = Math.max(...ms.map((x) => x.ink), 1);
+  const asc = Math.max(...ms.map((x) => x.a)) / 100;   // ink above the baseline, per px of size
+  const lead = rc.leading;
+  // A tilted line takes more room: fit its rotated box, not its upright one.
+  const th = (rc.tilt * Math.PI) / 180, wide = maxInk / 100;
+  const pad = wide * Math.sin(th);                      // extra height, per px of size
+  const sW = aw / (wide * Math.cos(th) + asc * Math.sin(th));   // the size that fits the width
+  const fitH = (n) => ah / (asc + (n - 1) * lead + pad);        // the size that fits n lines in the height
+
+  let s, n;
+  if (!rc.count) {
+    // Auto: the number of copies that covers the hero best — the share of
+    // the width the word fills, times the share of the height the lines
+    // fill — leaning towards repetition, since repetition is the point.
+    let best = -1;
+    for (let k = 1; k <= 12; k++) {
+      const nk = k * unit.n, sk = Math.min(sW, fitH(nk));
+      const cover = (sk / sW) * Math.min(1, (sk * (asc + (nk - 1) * lead + pad)) / ah) * (k === 1 ? 0.85 : 1);
+      if (cover > best + 1e-6) { best = cover; s = sk; n = nk; }
+    }
+  } else {
+    n = rc.count * unit.n;
+    s = Math.min(sW, fitH(n));
+  }
+  out.size = s;
+
+  // Baselines.
+  const blockH = s * (asc + (n - 1) * lead + pad);
+  let step = lead * s, y0 = heroTop + (asc + pad / 2) * s;
+  if (rc.vertical === 'fill' && n > 1) step = (ah - (asc + pad) * s) / (n - 1);
+  else if (rc.vertical === 'fill' || rc.vertical === 'centre') y0 += (ah - blockH) / 2;
+  else if (rc.vertical === 'bottom') y0 += ah - blockH;
+
+  const rand = rng(rc.seed * 7919 + 1);
+  for (let i = 0; i < n; i++) {
+    const str = unit.get(i);
+    const mt = inkOf(str);
+    const k = s / 100;
+    let spacing = rc.tracking * s, ink = mt.ink * k;
+    const slack = Math.max(0, aw - ink);
+    let left;
+    switch (rc.align) {
+      case 'centre': left = x0 + slack / 2; break;
+      case 'right': left = x0 + slack; break;
+      case 'justify':
+        if (mt.n > 1) { spacing += slack / (mt.n - 1); ink = aw; left = x0; } else left = x0 + slack / 2;
+        break;
+      case 'alternate': left = x0 + (i % 2 ? slack : 0); break;
+      case 'stairs': left = x0 + slack * (n > 1 ? i / (n - 1) : 0); break;
+      case 'scatter': left = x0 + slack * rand(); break;
+      default: left = x0;
+    }
+    const y = y0 + i * step;
+    out.lines.push({
+      str, x: left + mt.l * k, y, spacing,
+      cx: left + ink / 2, cy: y - asc * s / 2,
+      rot: rc.tilt ? rc.tilt * (i % 2 ? 1 : -1) : 0,
+    });
+  }
+  return out;
+}
+
+/* ---- Drawing: the layout as an SVG string. */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const attrFont = (f) => esc(f.replace(/"/g, "'"));
+
+function drawCover(rc) {
+  const L = layout(rc);
+  const { H, m, d } = L;
+  const p = [];
+  p.push(`<rect width="${W}" height="${H}" fill="${rc.ground}"/>`);
+
+  if (rc.grid) {
+    const cell = W / 20, sw = W * 0.0012;
+    let g = '';
+    for (let x = cell; x < W; x += cell) g += `M${x.toFixed(1)} 0V${H}`;
+    for (let y = cell; y < H; y += cell) g += `M0 ${y.toFixed(1)}H${W}`;
+    p.push(`<path d="${g}" stroke="${rc.ink}" stroke-width="${sw}" opacity="0.35" fill="none"/>`);
+  }
+
+  // The hero: every line one size.
+  const hf = `font-family="${attrFont(FAMILY[rc.font])}" font-weight="${rc.weight}"${rc.italic ? ' font-style="italic"' : ''} font-size="${(L.size || 0).toFixed(2)}"`;
+  p.push(`<g fill="${rc.ink}" ${hf}>`);
+  for (const ln of L.lines) {
+    const rot = ln.rot ? ` transform="rotate(${ln.rot} ${ln.cx.toFixed(1)} ${ln.cy.toFixed(1)})"` : '';
+    p.push(`<text x="${ln.x.toFixed(2)}" y="${ln.y.toFixed(2)}" letter-spacing="${ln.spacing.toFixed(2)}" xml:space="preserve"${rot}>${esc(ln.str)}</text>`);
+  }
+  p.push('</g>');
+
+  // The details: three slots at the top, a code and a blurb at the foot.
+  if (L.details) {
+    const D = L.details;
+    const df = `font-family="${attrFont(FAMILY.sans)}" font-weight="600" font-size="${d}"`;
+    p.push(`<g fill="${rc.ink}" ${df}>`);
+    p.push(`<text x="${m}" y="${D.top}">${esc(rc.left)}</text>`);
+    p.push(`<text x="${W / 2}" y="${D.top}" text-anchor="middle">${esc(rc.centre)}</text>`);
+    p.push(`<text x="${W - m}" y="${D.top}" text-anchor="end">${esc(rc.right)}</text>`);
+    const dl = d * 1.2;
+    D.blurb.forEach((line, i) => {
+      const y = H - m - (D.blurb.length - 1 - i) * dl - d * 0.22;
+      p.push(`<text x="${D.bx.toFixed(1)}" y="${y.toFixed(1)}">${esc(line)}</text>`);
+    });
+    p.push('</g>');
+    // A code: bars from the word, the number under them in mono.
+    const r = rng(hash(rc.text + rc.left));
+    const digits = Array.from({ length: 13 }, () => Math.floor(r() * 10)).join('');
+    const barsH = D.codeH - d * 1.35, cx = m, cy = H - m - D.codeH;
+    let x = 0, bars = '';
+    const u = D.codeW / 95;
+    while (x < 95) {
+      const bw = 1 + Math.floor(r() * 3), gap = 1 + Math.floor(r() * 3);
+      if (x + bw > 95) break;
+      bars += `<rect x="${(cx + x * u).toFixed(2)}" y="${cy.toFixed(1)}" width="${(bw * u).toFixed(2)}" height="${barsH.toFixed(1)}"/>`;
+      x += bw + gap;
+    }
+    p.push(`<g fill="${rc.ink}">${bars}</g>`);
+    p.push(`<text x="${cx}" y="${(H - m - d * 0.22).toFixed(1)}" fill="${rc.ink}" font-family="${attrFont(FAMILY.mono)}" font-weight="500" font-size="${(d * 0.8).toFixed(1)}" textLength="${D.codeW.toFixed(1)}" lengthAdjust="spacing">${digits.replace(/^(\d)(\d{6})(\d{6})$/, '$1 $2 $3')}</text>`);
+  }
+  return { svg: p.join(''), W, H };
+}
+
+function coverSVG(rc, { w, h, label, standalone = false } = {}) {
+  const { svg, H } = drawCover(rc);
+  const size = standalone ? `width="${w}" height="${h}"` : `width="${w}" height="${h}" class="cover"`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" ${size} role="img" aria-label="${esc(label || clean(rc.text))}">${svg}</svg>`;
+}
+
+/* ============================================================
+   THE TOOL.
+   ============================================================ */
+let state = { ...DEFAULT };
+let view = 'cover', vary = 'all', variants = [], shuffleSeed = Date.now() % 100000;
+
+// A recipe lives in the URL, so a link redraws the same cover.
+function readHash() {
+  try {
+    const raw = decodeURIComponent(escape(atob(location.hash.slice(1))));
+    return { ...DEFAULT, ...JSON.parse(raw) };
+  } catch { return null; }
+}
+function writeHash() {
+  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  history.replaceState(null, '', '#' + enc);
+  document.getElementById('copy-link').dataset.copy = location.href;
+}
+
+// ---- Variations: keep the words, change one family of choices.
+const pick = (r, list) => list[Math.floor(r() * list.length)];
+function variant(base, seed, mode) {
+  const r = rng(seed);
+  const v = { ...base, seed: Math.floor(r() * 100000) + 1 };
+  if (mode === 'all' || mode === 'layout') {
+    const multi = clean(base.text).includes(' ');
+    v.wrap = pick(r, multi ? ['whole', 'split', 'words', 'words', 'flow'] : ['whole', 'whole', 'split', 'split', 'flow']);
+    v.brk = v.wrap === 'flow' ? Math.max(2, flowLength(v) + pick(r, [-3, -2, -1, -1, 1])) : null;
+    v.align = pick(r, ['left', 'left', 'centre', 'centre', 'right', 'justify', 'alternate', 'stairs', 'scatter']);
+    v.leading = +(0.78 + r() * 0.28).toFixed(2);
+    v.count = r() < 0.75 ? 0 : 2 + Math.floor(r() * 3);
+    // A fixed count can leave room; Fill or Centre spends it, Top leaves a hole.
+    v.vertical = pick(r, v.count ? ['fill', 'fill', 'centre'] : ['fill', 'fill', 'fill', 'top', 'centre']);
+    v.tilt = r() < 0.12 ? 4 + Math.floor(r() * 6) : 0;
+  }
+  if (mode === 'all' || mode === 'type') {
+    v.font = r() < 0.7 ? 'sans' : 'mono';
+    v.weight = pick(r, [500, 700, 700, 900]);
+    v.italic = r() < 0.25;
+    v.case = pick(r, ['as', 'as', 'upper', 'upper', 'lower']);
+    v.tracking = +(-0.07 + r() * 0.08).toFixed(2);
+  }
+  if (mode === 'all' || mode === 'colour') {
+    const [, g, i] = pick(r, PAIRS);
+    const flip = r() < 0.2;
+    v.ground = flip ? i : g; v.ink = flip ? g : i;
+  }
+  return v;
+}
+function makeVariants() {
+  variants = Array.from({ length: 6 }, (_, i) => variant(state, shuffleSeed * 31 + i * 977 + 1, vary));
+}
+
+// ---- The stage.
+const stage = document.getElementById('stage');
+function innerBox() {
+  const cs = getComputedStyle(stage);
+  return {
+    w: stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+    h: stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom),
+  };
+}
+function render() {
+  const box = innerBox();
+  if (box.w <= 0 || box.h <= 0) return;
+  if (view === 'cover') {
+    const ratio = ASPECTS[state.aspect];
+    let h = box.h, w = h * ratio;
+    if (w > box.w) { w = box.w; h = w / ratio; }
+    stage.innerHTML = coverSVG(state, { w: Math.floor(w), h: Math.floor(h) });
+    return;
+  }
+  // Six covers, in the arrangement that draws them largest.
+  const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(box.w > 600 ? '--space-24' : '--space-16'));
+  let best = null;
+  for (const cols of [1, 2, 3, 6]) {
+    const rows = Math.ceil(6 / cols);
+    const cw = (box.w - gap * (cols - 1)) / cols, ch = (box.h - gap * (rows - 1)) / rows;
+    const ratio = ASPECTS[state.aspect];
+    const w = Math.min(cw, ch * ratio);
+    if (!best || w > best.w) best = { cols, w, h: w / ratio };
+  }
+  stage.innerHTML = `<div class="variations" style="grid-template-columns: repeat(${best.cols}, auto)">${variants.map((v, i) =>
+    `<button class="variation" type="button" data-i="${i}" aria-label="Use variation ${i + 1}">${coverSVG(v, { w: Math.floor(best.w), h: Math.floor(best.h), label: `Variation ${i + 1}` })}</button>`).join('')}</div>`;
+}
+stage.addEventListener('click', (e) => {
+  const b = e.target.closest('.variation');
+  if (!b) return;
+  state = { ...variants[+b.dataset.i] };
+  setView('cover');
+  sync();
+  update();
+});
+
+/* ---- Controls: state → controls (after a variation, a link, a shuffle). */
+const $ = (id) => document.getElementById(id);
+function setSeg(id, value) {
+  const control = $(id);
+  const opt = control.querySelector(`.segmented-option[value="${value}"]`);
+  if (opt && !opt.classList.contains('is-active')) control.dispatchEvent(new CustomEvent('segmented-set', { detail: { option: opt } }));
+}
+function setPicker(id, value, text) {
+  const picker = $(id);
+  let label = text;
+  picker.querySelectorAll('[role="option"]').forEach((o) => {
+    const on = o.dataset.value === value;
+    o.setAttribute('aria-selected', String(on));
+    if (on) label = o.textContent.trim();
+  });
+  picker.querySelector('.picker-value').textContent = label ?? '';
+}
+function setSlider(id, value) {
+  const input = $(id);
+  input.value = value;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+let syncing = false;
+function sync() {
+  syncing = true;
+  $('f-text').value = state.text; $('f-left').value = state.left; $('f-centre').value = state.centre;
+  $('f-right').value = state.right; $('f-blurb').value = state.blurb;
+  setSeg('wrap', state.wrap); setSeg('vertical', state.vertical); setSeg('font', state.font);
+  setSeg('weight', String(state.weight)); setSeg('italic', state.italic ? 'on' : 'off'); setSeg('case', state.case);
+  setSeg('aspect', state.aspect); setSeg('details', state.details ? 'on' : 'off'); setSeg('grid', state.grid ? 'on' : 'off');
+  setPicker('align', state.align);
+  setSlider('count', state.count); setSlider('leading', Math.round(state.leading * 100));
+  setSlider('tilt', state.tilt); setSlider('tracking', Math.round(state.tracking * 1000));
+  syncColour();
+  syncBreak();
+  syncing = false;
+}
+function syncColour() {
+  const match = PAIRS.find(([, g, i]) => g === state.ground && i === state.ink);
+  setPicker('pair', match ? match[0] : null, match ? undefined : 'Custom');
+  $('ground').value = state.ground; $('ink').value = state.ink;
+  $('ground-swatch').style.setProperty('--swatch', state.ground);
+  $('ink-swatch').style.setProperty('--swatch', state.ink);
+}
+// The Break slider means "split here" for Split and "letters a line" for Flow.
+function syncBreak() {
+  const field = $('brk-field');
+  const typed = state.wrap === 'split' && state.text.includes('|');
+  field.hidden = !(state.wrap === 'flow' || (state.wrap === 'split' && !typed));
+  if (field.hidden) return;
+  const [lo, hi] = breakRange(state), b = breakAt(state);
+  const input = $('brk');
+  input.min = lo; input.max = hi;
+  $('brk-l').textContent = state.wrap === 'flow' ? 'Letters a line' : 'Break';
+  const was = syncing; syncing = true;
+  setSlider('brk', b);
+  syncing = was;
+}
+function readouts() {
+  const s = applyCase(clean(state.text), state.case), b = breakAt(state);
+  $('brk-out').textContent = state.wrap === 'flow' ? String(b) : `${[...s].slice(0, b).join('')}–${[...s].slice(b).join('')}`.replace(/ /g, '');
+  $('count-out').textContent = state.count ? `${state.count}×` : 'Auto';
+  $('leading-out').textContent = state.leading.toFixed(2);
+  $('tilt-out').textContent = `${state.tilt}°`;
+  $('tracking-out').textContent = `${state.tracking > 0 ? '+' : ''}${Math.round(state.tracking * 1000)}`;
+}
+
+function update({ remake = false } = {}) {
+  if (remake || view === 'variations') makeVariants();
+  readouts();
+  writeHash();
+  try { localStorage.setItem('type-covers', JSON.stringify(state)); } catch {}
+  render();
+}
+function setView(v) { view = v; setSeg('view', v); }
+
+// ---- Controls: controls → state.
+document.getElementById('pair-list').innerHTML = PAIRS.map(([name]) =>
+  `<li class="picker-option t-control" role="option" aria-selected="false" data-value="${name}">${name}</li>`).join('');
+
+const text = (id, key, after) => $(id).addEventListener('input', (e) => { state[key] = e.target.value; after?.(); update(); });
+text('f-text', 'text', () => { state.brk = null; syncBreak(); });
+text('f-left', 'left'); text('f-centre', 'centre'); text('f-right', 'right'); text('f-blurb', 'blurb');
+
+const seg = (id, fn) => $(id).addEventListener('segmented-change', (e) => { if (!syncing) { fn(e.detail.value); update(); } });
+seg('wrap', (v) => { state.wrap = v; state.brk = null; syncBreak(); });
+seg('vertical', (v) => { state.vertical = v; });
+seg('font', (v) => { state.font = v; });
+seg('weight', (v) => { state.weight = Number(v); });
+seg('italic', (v) => { state.italic = v === 'on'; });
+seg('case', (v) => { state.case = v; syncBreak(); });
+seg('aspect', (v) => { state.aspect = v; });
+seg('details', (v) => { state.details = v === 'on'; });
+seg('grid', (v) => { state.grid = v === 'on'; });
+$('view').addEventListener('segmented-change', (e) => { view = e.detail.value; update({ remake: view === 'variations' }); });
+$('vary').addEventListener('segmented-change', (e) => {
+  vary = e.detail.value;
+  if (view !== 'variations') setView('variations');
+  update({ remake: true });
+});
+
+const slide = (id, fn) => $(id).addEventListener('input', (e) => { if (!syncing) { fn(Number(e.target.value)); update(); } else readouts(); });
+slide('brk', (v) => { state.brk = v; });
+slide('count', (v) => { state.count = v; });
+slide('leading', (v) => { state.leading = v / 100; });
+slide('tilt', (v) => { state.tilt = v; });
+slide('tracking', (v) => { state.tracking = v / 1000; });
+
+$('align').addEventListener('picker-change', (e) => { state.align = e.detail.value; update(); });
+$('pair').addEventListener('picker-change', (e) => {
+  const [, g, i] = PAIRS.find(([name]) => name === e.detail.value);
+  state.ground = g; state.ink = i; syncColour(); update();
+});
+$('ground').addEventListener('input', (e) => { state.ground = e.target.value; syncColour(); update(); });
+$('ink').addEventListener('input', (e) => { state.ink = e.target.value; syncColour(); update(); });
+$('swap').addEventListener('click', () => { [state.ground, state.ink] = [state.ink, state.ground]; syncColour(); update(); });
+
+$('shuffle').addEventListener('click', () => {
+  shuffleSeed = (shuffleSeed * 48271 + 11) % 2147483647;
+  if (view === 'cover') {
+    // On the cover, a shuffle is one new variation, made current.
+    state = variant(state, shuffleSeed, vary);
+    sync();
+    update();
+  } else update({ remake: true });
+});
+
+// ---- PNG: the same SVG, drawn at 2400px across.
+$('download').addEventListener('click', () => {
+  const { H } = drawCover(state);
+  const scale = 2.4;
+  const svg = coverSVG(state, { w: W * scale, h: H * scale, standalone: true });
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = W * scale; c.height = H * scale;
+    c.getContext('2d').drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    c.toBlob((blob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${clean(state.text).toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'cover'}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }, 'image/png');
+  };
+  img.src = url;
+});
+
+// ---- Start: a link first, then the last cover, then the default.
+state = readHash() || (() => { try { return { ...DEFAULT, ...JSON.parse(localStorage.getItem('type-covers')) }; } catch { return null; } })() || { ...DEFAULT };
+sync();
+update();
+// The stage's box changes on every frame of the split: redraw once a frame.
+let raf = 0;
+new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }).observe(stage);
+</script>
+</body>
+</html>
