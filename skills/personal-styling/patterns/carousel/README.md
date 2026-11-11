@@ -23,7 +23,15 @@ From the source site's project carousel.
 - Change an item's shape with `--item-aspect-ratio` (default `4 / 5`) and `--item-width` (default `min(360px, 70%)`) on its frame.
 - Give the carousel an `aria-label`; `carousel.js` labels each slide "2 of 5" and the caption announces itself when it changes.
 - `carousel.js` fires a bubbling `carousel-change` event with `detail.index` and `detail.item`.
+- `data-loop` makes it a circle (three items or more). `data-edges="open"` drops the clip and fades the neighbours out. Dispatch `carousel-set` with `detail.step` or `detail.index` to move it from your own controls.
 - Load `tooltip.css` and `tooltip.js` for the cursor pill and the dropped description; without them it's a plain carousel.
+
+## Changes in v0.3.0
+
+- `data-loop` on the carousel makes it a circle: past the last item is the first, and back from the first is the last, by drag, wheel or arrow key. It needs three items or more. Slide numbers and `detail.index` keep the authored order.
+- The caption is optional: leave `.carousel-caption` out when the items name themselves.
+- `carousel-set`: move it from outside, for a page's own previous and next controls. Dispatch it on the carousel with `{ detail: { step: 1 } }` (or `-1`), or `{ detail: { index } }` in the authored order.
+- `data-edges="open"`: the viewport doesn't clip and an item away from the centre fades to nothing, so there is no edge inside the page where an item is cut. For items as wide as the carousel. Something further out must end it: the page, or a scroller with `overflow-x: hidden`.
 
 ## Changes in v0.2.0
 
