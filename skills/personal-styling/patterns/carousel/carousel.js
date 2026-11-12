@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.4.0 */
+/* personal-styling · carousel · v0.5.0 */
 
 // One item at a time. Moves by drag or swipe (1:1, then a snap past 40% of
 // the width or a flick), by horizontal trackpad or wheel, and by the arrow

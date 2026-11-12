@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.4.0 */
+/* personal-styling · line-chart · v0.5.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
@@ -129,10 +129,26 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
       if (labels) el('text', { x: L - LINE_CHART_GAP, y: y(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = format(v);
     });
     if (xLabels) {
-      const every = Math.ceil((LINE_CHART_DIGIT * 5 + LINE_CHART_GAP) / (pw / (n - 1)));
-      for (let i = 0; i < n; i += every) {
-        el('text', { x: x(i), y: H - 2, 'text-anchor': i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle' }, svg).textContent = xs[i];
+      // CHANGED (v0.5): labels are placed by their own widths, not an
+      // assumed five characters. The first hangs right from its point and
+      // the last hangs left, so each one's box is measured from its anchor;
+      // a label that would come within the gap of the one before is
+      // skipped, and the last always shows, taking the place of whatever
+      // it would touch. Nothing collides at the start on a narrow chart.
+      const box = (i) => {
+        const w = LINE_CHART_DIGIT * String(xs[i]).length;
+        const anchor = i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle';
+        const left = anchor === 'start' ? x(i) : anchor === 'end' ? x(i) - w : x(i) - w / 2;
+        return { i, anchor, left, right: left + w };
+      };
+      const placed = [];
+      for (let i = 0; i < n; i++) {
+        const b = box(i);
+        const last = placed[placed.length - 1];
+        if (i === n - 1) { while (placed.length && placed[placed.length - 1].right + LINE_CHART_GAP > b.left) placed.pop(); placed.push(b); }
+        else if (!last || last.right + LINE_CHART_GAP <= b.left) placed.push(b);
       }
+      placed.forEach((b) => { el('text', { x: x(b.i), y: H - 2, 'text-anchor': b.anchor }, svg).textContent = xs[b.i]; });
     }
     series.forEach((s) => {
       el('path', { class: 'line-chart-series', d: lineChartPath(s.values.map((v, i) => [x(i), y(v)]), opt('curve', 'rounded') === 'rounded'), 'data-name': s.name }, svg);

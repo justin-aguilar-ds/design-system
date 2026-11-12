@@ -19,6 +19,7 @@ Requires: none
 ## Rules
 
 - **Pairs are at their best with numbers.** A figure under its name is the clearest hierarchy two styles can make. Reach for Detail, Figure and Big number first; the text pairs are for headings and rows.
+- **Value over value, only where the place names both.** A result over its odds, a figure over its change: two values stacked with no name between them, Label over mono. Only inside something that already says what each is — the end of a list row (`components/list-row/`), a table cell. Free-standing, a figure keeps its name; a stack of bare values is a guess.
 - **A name sits above what it names.** Detail, Figure and Big number put the small label first and the value under it, the way a reader asks the question before reading the answer. A heading still sits above its sentence, and nothing small sits above a page headline — that's an eyebrow, and it's still out.
 - **Mono is the label of a figure.** The name above a value is the third place mono labels something, after the control panel title and the tooltip: uppercase, `10.5px`, secondary ink — like an axis label, it names rather than informs. The value under it is full ink. Keep the name to two or three words.
 - **A heading is usually enough.** The Section and Statement pairs are for the rare sentence the content can't say itself — a caveat, a rule. A sentence that restates what the section shows ("Cumulative P&L, day by day" under "Equity curve") goes, and the heading stands alone.
@@ -35,6 +36,10 @@ Requires: none
 - A value that isn't a number takes `.type-pair-value` — Body at full ink.
 - The Big number pair is what a stat tile would use; there's no stat component yet.
 - Edit the spectrum here first. The table is the source the pairs follow.
+
+## Changes in v0.5.2
+
+- Value over value, only where the place names both (a list row's end, a table cell).
 
 ## Changes in v0.5.1
 

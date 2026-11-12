@@ -1,0 +1,26 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Three views on a stage — follow a link, or swipe; the names drop, swap and rise</p>
+    <div style="display: grid; gap: 16px; padding: 24px; border-radius: 20px; background: var(--color-stage); overflow: hidden;">
+      <nav class="stage-nav" aria-label="Views" data-carousel="demo-views">
+        <button class="stage-nav-link stage-nav-prev t-mono" type="button">
+          <svg class="stage-nav-arrow" viewBox="0 0 10 10" aria-hidden="true"><path d="M8.5 5h-7M4.25 2.25 1.5 5l2.75 2.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="stage-nav-label swap">Figures</span>
+        </button>
+        <button class="stage-nav-link stage-nav-next t-mono" type="button">
+          <span class="stage-nav-label swap">Chart</span>
+          <svg class="stage-nav-arrow" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 5h7M5.75 2.25 8.5 5 5.75 7.75" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </nav>
+      <section class="carousel" id="demo-views" data-loop data-edges="open" data-frame="bare" aria-roledescription="carousel" aria-label="Views" tabindex="0">
+        <div class="carousel-viewport">
+          <ul class="carousel-track">
+            <li class="carousel-item is-active" aria-roledescription="slide" data-title="Calendar"><div class="carousel-frame" style="height: 160px;"><span class="t-display">+$18.87</span></div></li>
+            <li class="carousel-item" aria-roledescription="slide" data-title="Chart"><div class="carousel-frame" style="height: 160px;"><span class="t-display">54%</span></div></li>
+            <li class="carousel-item" aria-roledescription="slide" data-title="Figures"><div class="carousel-frame" style="height: 160px;"><span class="t-display">24 bets</span></div></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

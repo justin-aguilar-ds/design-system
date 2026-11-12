@@ -168,11 +168,11 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - Don't give a label tighter tracking than the body text beside it. At interface sizes the source's `-0.25px` reads cramped, and a mismatch between a title and its own paragraph is just a defect.
 - **Line-heights are px, and tight**: `16/19` (≈1.19), `14/18`, `56/64`. Not 1.5, not 1.6. Only mono uses a ratio (1.5).
 - **Flat hierarchy on purpose.** The intro paragraph and the career-timeline company names are the *same* 56px — there is no size step between them. Prefer flattening to adding a tier.
-- **Controls take the display family, never mono.** Two steps: **Label** (16/19, 600) for a primary action, **Interactive** (14/18, 600) for compact controls — segments, tabs, card actions. The one deliberate exception is a control panel: its title and its field labels use the mono label style, so they read as quiet names and the controls carry the weight.
+- **Controls take the display family, never mono.** Two steps: **Label** (16/19, 600) for a primary action, **Interactive** (14/18, 600) for compact controls — segments, tabs, card actions. Two deliberate exceptions: a control panel's title and field labels, and stage navigation's links (`components/stage-nav/`). Both use the mono label style, so they read as quiet names and what they control carries the weight.
 - **Mono is for values and identifiers, and nothing else**: a figure in a table, a tick on an axis, a timestamp, an ID, a hex code, a year range. Uppercase, `+0.3px`, secondary, 10.5px, weight 500. **Table content defaults to 10.5 mono** — tables do not inherit font sizes for mono; every data cell is 10.5 mono (see `components/table/`). Weight is always 500.
 - **Mono is always weight 500 — never bold.** Set the weight explicitly on the mono role so heading/title semantics, inherited control styles, and browser defaults can never promote it to 600 or 700. The collapsible control-panel title exception changes mono’s role, not its weight.
 - **Rule of thumb: a number is often mono, a word almost never is.** If the mono text you're about to write is a phrase, it belongs in Caption or Label.
-- **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Three exceptions, and only three: the title and field labels inside a control panel, the tooltip, and the name above a figure in a type pair (`patterns/type-pairs/`) — a figure's name is closer to an axis label than a heading. (A stage and sheet's title is mono only while it docks like a panel on a wide screen; on a phone, where it is a 64px pill in the bottom slot, it is Label like the large button.) Budget mono like the accent: if a view is speckled with small caps, cut it back.
+- **Mono is never a subtitle, a general section header, a field label, or a table column header.** Overusing it is the single easiest way to make the style look like a costume rather than a system — it turns ordinary labels into metadata and slows the whole page down to be read. Four exceptions, and only four: the title and field labels inside a control panel, the links of stage navigation (each names the view it goes to, beside a bare arrow — `components/stage-nav/`), the tooltip, and the name above a figure in a type pair (`patterns/type-pairs/`) — a figure's name is closer to an axis label than a heading. (A stage and sheet's title is mono only while it docks like a panel on a wide screen; on a phone, where it is a 64px pill in the bottom slot, it is Label like the large button.) Budget mono like the accent: if a view is speckled with small caps, cut it back.
 - The one exception the source documents is a **label under the cursor** — the hover-cursor pill is `-0.25px` and full black, because it has to read instantly at pointer speed.
 
 ## Controls: heights and insets
@@ -228,6 +228,8 @@ How a screen is arranged. Decide it before any styling.
 - **The hero is sized from the screen**, not a fixed number: a share of its width or height (a card about two-thirds of the width, media at the column's full width, a chart card about 60% of the screen tall), so it fills a phone and a desktop alike.
 - **A tool is dense from the top.** No composition and no room: the title, then everything at the gap, read from the top. Figures, charts and tables; the controls docked to the corner (`patterns/control-panel/`); two columns on a wide screen where the content allows; full width.
 - **Expression lives in the arrangement.** A page feels designed because of its space, its hero and what's left out; a tool because of its precision. Neither gets a different button, a louder colour or more motion.
+- **Inside a host's frame, the frame is the screen.** A tool often runs embedded — an artifact viewer, a side panel, an app's own chrome around it. Size from the container, not the window: container queries and `100%`, never `100vw` or `100vh`, which measure a window the tool doesn't own. Nothing fixed escapes the frame, and nothing assumes it is the full browser: the bottom slot, a docked panel and a takeover sit inside it.
+- **Fixed things at the bottom clear the safe area.** Anything pinned to the bottom edge — the bottom slot, a thumb button, a takeover's way back, a sheet's pill — adds `env(safe-area-inset-bottom)` to its inset, and the page declares `viewport-fit=cover` so the value is real. Without it a phone's home bar sits on the main action.
 
 ## Surfaces
 
@@ -277,7 +279,7 @@ The heading names the section and the content names itself. Most labels are a se
 - **Never label twice.** A control under a heading that already names it takes no label of its own. "Invite link" over a field labelled "Link" is one name said twice.
 - **A group is all labelled or all bare.** Controls side by side (a filter bar, a form row, a control panel) either all have a label above them or none do. One labelled field beside bare ones pushes its control off the shared line and the row breaks. If one control in a group needs a label, they all get one.
 - **A label is Label, `8px` above its control, in a field** — except inside a control panel (or a stage and sheet's sheet), where it is mono and sits on the left with its control on the right, every control filling one column up to `--control-max` (200px) so they all line up, and a slider's value riding on its thumb as a tooltip (see `patterns/control-panel/`). The input, picker and slider bring their own (`.input-field`, `.picker-field`, `.slider-field`); a segmented control or chip row goes in `.control-field`. All four are the same shape.
-- **Values keep their names.** A figure still takes its mono name above it (see `patterns/type-pairs/`), because a number with no name is a guess. These rules are about chrome, not data.
+- **Values keep their names.** A figure still takes its mono name above it (see `patterns/type-pairs/`), because a number with no name is a guess. These rules are about chrome, not data. One exception: a value under a value, where the place names both — a list row's result over its odds (`components/list-row/`), a table cell's figure over its change. The column or the row says what each is; a free-standing figure still takes its name.
 
 ## Components
 
@@ -319,6 +321,9 @@ rules.
 | Sortable list | the order of a short list is the user's to set — priorities, steps, a queue | `components/sortable/` |
 | Calendar | a value a day, on the dates it happened — which way each day went, and how far | `components/calendar/` |
 | Scroll fade | an area inside the page scrolls — its cut ends dissolve into the ground instead of meeting a line | `components/scroll-fade/` |
+| List row | records with one value each, read down a phone — name and sub-line left, value and sub-line right | `components/list-row/` |
+| Takeover | one thing opened over everything — a record's detail — opaque, with the way back under the thumb | `components/takeover/` |
+| Stage navigation | a stage holds several views — links that name the view each goes to | `components/stage-nav/` |
 
 ### Patterns
 
@@ -361,6 +366,9 @@ Theme by **overriding token values, never by renaming tokens**. A theme is a
 block that redefines `--color-*` on `:root[data-theme="x"]`; every component
 keeps reading the same names. If a prototype needs a different look, change
 the values and leave the vocabulary alone.
+
+- **A reversed region takes `data-theme` on its own element.** A dark panel or a black stage on a light page is `data-theme="dark"` on that element (and a light one on a dark page, `data-theme="light"`): it repaints its own ground and ink, and everything inside reads the region's tokens. Never copy the dark values onto the element by hand.
+- **A reversed region is rare.** One per screen at most, and only where it separates two things that would otherwise run together. It is not a way to add colour.
 
 ## Diagrams and SVG
 
@@ -413,6 +421,7 @@ the values and leave the vocabulary alone.
 - **Press scales down.** A handle under a finger or a held key (a slider thumb, a drag handle) scales to `--scale-press` (0.85) while held: in on `fast`, back on `base`, on `--ease-out`. It's the tactile counterpart to the tooltip's scale-in.
 - **On touch, button-shaped controls press too — just less.** A pill button, an icon button or a chip under a finger scales to `--scale-tap` (0.97) as well as playing its hover response: in at once, back on `base`, on `--ease-out`. Touch only — with a pointer, buttons lift and don't press. Large surfaces never press: the large button, rows, cards and panels keep their lift or ink change. The exception is a thing you pick up to move: a sortable item gives to `--scale-tap` under any pointer, then grows to `--scale-lift` once it's carried (see `components/sortable/`). Nothing presses under reduced motion.
 - **Blur as a crossfade bridge**: a flat opacity crossfade reads flat however you tune it. A hover reveal is `opacity 0→1` + `scale 1.015→1` + `blur(6px)→0` over `300ms` plain `ease`.
+- **Drop, swap, rise** is how words change in place — a caption, a navigation label, a list's figure after a refresh. The words drop `16` and fade on `base`, change while hidden, then rise back on the same move (`.swap` and `.is-leaving` in `tokens.css`): add `.is-leaving`, wait `--duration-base`, swap the words, force a reflow (`el.offsetWidth`), remove it. Never a crossfade of two strings over each other, never a typewriter.
 - **Clip-path reveals text**, not width: `clip-path: inset(0 100% 0 0)` → `inset(0)` wipes left-to-right and works across wrapped lines.
 - **Stagger with JS, not `transition-delay`** when it should only apply on entrance — a CSS delay applies symmetrically and makes the close sequence run backwards. ~100ms is the stagger.
 - **Animate named properties, never `all`.** Transform and opacity by default; layout properties only with a comment justifying the reflow.
@@ -457,7 +466,7 @@ These are the recognisable moves. Reach for them when the context fits; don't fo
 
 - **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Open", "Play") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
 - **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except the one moving fill: a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer.
-- **Opaque full-bleed takeover** instead of a dimmed modal. No click-outside-to-close — an explicit Close link and Escape.
+- **Opaque full-bleed takeover** instead of a dimmed modal (`components/takeover/`). No click-outside-to-close — the way back under the thumb, and Escape.
 - **Moving indicator as its own element**, absolutely positioned behind the links rather than a background on the active link, so it can glide between tabs. Hovering a sibling tab retargets it as a preview of where you'd land.
 - **Drag-first input.** Grab cursors, `touch-action: none`, pointer-tracked 1:1 with no transition mid-drag, then snap on release past a distance *or* velocity threshold.
 - Page-to-page uses native cross-document view transitions: dismiss the outgoing snapshot in 1ms, animate only the incoming one, so motion reads as arrival rather than dissolve.

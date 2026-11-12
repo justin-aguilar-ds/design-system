@@ -22,6 +22,8 @@ From building a typography tool on a phone: the docked control panel covered the
 
 - **When the second surface holds records, not controls** — a list you pick into from the stage — it is the stage and list (`patterns/stage-list/`): the page's own ground, a fixed height, and a thumb button in place of the handle.
 
+- **The ground is black by default, or the page's grey.** Black says a tool has taken the screen over, for a mode you enter: a type toy, an editor. `data-ground="page"` puts the two surfaces on the stage grey instead, for a tool that is a page's everyday screen. On the grey they separate by the grey between them and a hairline each: no shadow, never a dark scrim.
+
 ## Use
 
 - `.stage-sheet` › `.stage-sheet-stage` (the work) and `.stage-sheet-sheet` › `button.stage-sheet-toggle` (with `.stage-sheet-title` and the chevron) + `.stage-sheet-body` (the controls). It fills the screen itself (`position: fixed`), so it is the page.
@@ -36,6 +38,10 @@ From building a typography tool on a phone: the docked control panel covered the
 
 - The stage takes the page colour, so it always stands out from the ground: a white stage on black in light, a black stage on white in dark. Content that paints its own background (a poster canvas set to white, say) can match the ground in dark mode, and then the stage's edge disappears and only the sheet shows the split. Undecided: give the stage a hairline when its content matches the ground, or accept it.
 
+
+## Changes in v0.7.0
+
+- `data-ground="page"`: the light ground, the surfaces separated by the stage grey and a hairline.
 
 ## Changes in v0.6.0
 

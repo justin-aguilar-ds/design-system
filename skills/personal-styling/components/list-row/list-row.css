@@ -1,0 +1,58 @@
+/* personal-styling · list-row · v0.1.0 */
+
+/* A list of records, one value each: the name with a sub-line under it on
+   the left, the value with a sub-line under it on the right. The table's
+   little sibling — for a list read on a phone, where columns don't fit.
+   It sits on the page with dividers, like a table: no card. */
+.list-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.list-rows > li { border-top: 1px solid var(--color-divider); transition: border-top-color var(--duration-fast) ease; }
+.list-rows > li:first-child { border-top: 0; }
+
+.list-row {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-16);
+  padding-block: var(--space-16);
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+}
+/* Each side is a line of Label over a mono sub-line, 4 apart. */
+.list-row-main,
+.list-row-end { display: grid; gap: var(--space-4); min-width: 0; }
+.list-row-end { justify-items: end; text-align: right; }
+.list-row-value { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.list-row-end .list-row-sub { white-space: nowrap; }
+
+/* A row you can open is a button or a link. Its fill bleeds 16 past the
+   text either side, like a table row's, so the text stays in line with
+   the page; the dividers either side of it fade, so the fill reads as one
+   shape. Brighten, never colour. */
+:is(a, button).list-row {
+  width: calc(100% + 2 * var(--space-16));
+  margin-inline: calc(-1 * var(--space-16));
+  padding-inline: var(--space-16);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(a, button).list-row:hover { background: var(--color-fill-subtle); }
+  .list-rows > li:has(> :is(a, button).list-row:hover),
+  .list-rows > li:has(> :is(a, button).list-row:hover) + li { border-top-color: transparent; }
+}
+:is(a, button).list-row:active { background: var(--color-fill-subtle); transition-duration: var(--duration-instant); }
+/* The picked row holds the fill. */
+.list-row.is-selected,
+.list-row[aria-current="true"] { background: var(--color-fill-subtle); }
+.list-rows > li:has(> .list-row:is(.is-selected, [aria-current="true"])),
+.list-rows > li:has(> .list-row:is(.is-selected, [aria-current="true"])) + li { border-top-color: transparent; }

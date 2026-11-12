@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.21
+   Personal styling tokens — v0.22
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -246,6 +246,22 @@ body {
 .ink-gain { color: var(--color-gain-ink); }
 .ink-loss { color: var(--color-loss-ink); }
 
+/* NEW (v0.22): drop, swap, rise — the one way words change in place: a
+   caption, a navigation label, a list's figure after a refresh. The words
+   drop 16 and fade on --duration-base, change while hidden, then rise back
+   on the same move. Add .is-leaving, wait --duration-base, swap the words,
+   force a reflow, remove it (see Motion in SKILL.md). The carousel's
+   caption is the same move. */
+.swap {
+  transition:
+    translate var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+.swap.is-leaving {
+  translate: 0 var(--space-16);
+  opacity: 0;
+}
+
 @media (max-width: 630px) {
   .t-display { font-size: 32px; line-height: 1.2; }
   .t-title   { font-size: 24px; line-height: 1.2; }
@@ -396,7 +412,11 @@ body {
   }
 }
 
-:root[data-theme="dark"] {
+/* CHANGED (v0.22): data-theme works on any element, not only the root, for
+   a reversed region — a dark panel or a black stage on a light page, or a
+   light one on a dark page. The region repaints its own ground and ink. */
+:root[data-theme="dark"],
+[data-theme="dark"] {
   --color-text: #ffffff;
   --color-text-secondary: rgba(255, 255, 255, 0.5);
   --color-bg: #000000;
@@ -421,3 +441,38 @@ body {
   --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.7);
   --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.8);
 }
+/* A region's tokens that are made of other tokens resolve where they are
+   declared, so a region redeclares them to follow its own ink and ground. */
+:not(:root)[data-theme] {
+  --color-range-progress: var(--color-text);
+  --color-range-thumb: var(--color-bg);
+  --color-ground: var(--color-text);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg);
+}
+:not(:root)[data-theme="light"] {
+  --color-text: #000000;
+  --color-text-secondary: rgba(0, 0, 0, 0.5);
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-hairline: #ececec;
+  --color-hairline-strong: rgba(0, 0, 0, 0.12);
+  --color-fill-subtle: rgba(0, 0, 0, 0.04);
+  --color-divider: rgba(0, 0, 0, 0.08);
+  --color-accent-soft: rgba(252, 255, 40, 0.42);
+  --color-overlay-backdrop: rgba(255, 255, 255, 0.8);
+  --color-glass: rgba(255, 255, 255, 0.5);
+  --color-range-track: rgba(0, 0, 0, 0.12);
+  --color-gain-fill: rgba(52, 168, 83, 0.14);
+  --color-loss-fill: rgba(234, 67, 53, 0.12);
+  --color-gain-ink: #137333;
+  --color-loss-ink: #c5221f;
+  --color-fill-quiet: rgba(0, 0, 0, 0.06);
+  --color-stage: #f5f5f5;
+  --color-fill-quiet-hover: rgba(0, 0, 0, 0.1);
+  --color-series: #d2d2d2;
+  --shadow-rest: 0px 2px 14px rgba(0, 0, 0, 0.04);
+  --shadow-lift: 0px 6px 20px rgba(0, 0, 0, 0.18);
+  --shadow-media: 0px 14px 34px rgba(0, 0, 0, 0.24);
+}
+

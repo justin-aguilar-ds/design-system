@@ -1,0 +1,19 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">Contained in a frame — open it, then go back with the button or Escape</p>
+    <div style="position: relative; height: 420px; overflow: hidden; border-radius: 20px; background: var(--color-stage); display: grid; place-items: center;">
+      <button class="button surface surface--rest surface--pill t-control" type="button" data-takeover="demo-takeover">Open the bet</button>
+      <div class="takeover takeover--contained" id="demo-takeover" role="dialog" aria-modal="true" aria-labelledby="demo-takeover-title">
+        <div class="takeover-body">
+          <div style="display: grid; gap: 48px;">
+            <h2 class="t-display" id="demo-takeover-title" style="margin: 0;">+$18.87</h2>
+            <p class="t-body" style="margin: 0;">Jayson Tatum over 26.5 points, settled Nov 3. One leg, at +115, staked $16.41.</p>
+          </div>
+        </div>
+        <button class="takeover-close button surface surface--rest surface--pill" type="button" aria-label="Back">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

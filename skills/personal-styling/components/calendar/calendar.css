@@ -1,4 +1,4 @@
-/* personal-styling · calendar · v0.1.0 */
+/* personal-styling · calendar · v0.2.0 */
 
 /* A value a day, on a real calendar: seven columns, a week to a row, a
    tile a day. The tile is the value — its fill says which way the day
@@ -7,7 +7,10 @@
 .calendar {
   container: calendar / inline-size;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  /* CHANGED (v0.2): the weeks never shrink below two rows. In a parent
+     whose height comes from its content and whose items may shrink to
+     nothing (min-height: 0), a 0 floor let the grid collapse to one week. */
+  grid-template-rows: auto minmax(calc(2 * var(--height-slot) + var(--space-8)), 1fr);
   gap: var(--space-8);
   width: 100%;                  /* it measures its own width, so it can't take its width from its content */
   min-width: 0;

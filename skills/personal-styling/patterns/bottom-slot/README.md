@@ -23,6 +23,8 @@ From a portfolio whose page nav sat at the bottom, and an about page whose one a
   | anything else: filters, sort, a second action | nothing. It goes in the page or the control panel. |
 
 - **Docked: two surfaces, 8px apart.** The nav and its partner are separate controls, each with its own frame and rest shadow. With two parts, the nav's options pad `16px`, so a label sits `20px` from the frame rather than the usual `24px` (`--inset-slot`): the one exception to the inset rule, so both fit a 390px phone.
+- **A tool heavy with filters keeps them out of the slot.** Filters, sort and search are many controls changed together; the slot holds one row of one thing. They go in the control panel — or, on a phone where the filters change something you watch, the stage and sheet's pill is the slot's one thing (`patterns/stage-sheet/`). Never a filter chip row pinned to the bottom, and never a second row above the slot.
+- **The slot clears the safe area.** Its inset from the bottom edge adds `env(safe-area-inset-bottom)`, and the page sets `viewport-fit=cover`, so a phone's home bar never sits on it.
 - **Never more than two parts, never more than three pages showing.** Past three pages, two stay as segments and the rest go in the select. Check every combination at `390px`: two pages and a short action fit with room to spare; three pages and an action don't.
 - **The action stays put.** A page that has an action shows it from the moment it loads. It doesn't arrive, leave or change the nav's width as you move between pages.
 - **A select opens upward.** Give the picker `data-side="above"`; its chevron points up while closed and turns down as the menu opens.
@@ -35,6 +37,10 @@ From a portfolio whose page nav sat at the bottom, and an about page whose one a
 - Nav options are `<a>` with `.is-active` and `aria-current="page"` on the current page (see the segmented control). Type is `.t-label` throughout.
 - The large button places itself at the bottom of a phone when it's on its own. Inside the slot, the slot places it instead.
 - When the current page is in the select, set its option `aria-selected="true"` so the trigger shows its name, and leave no nav option `.is-active`.
+
+## Changes in v0.1.2
+
+- Filter-heavy tools keep their filters out of the slot; the slot clears the safe area.
 
 ## Changes in v0.1.1
 

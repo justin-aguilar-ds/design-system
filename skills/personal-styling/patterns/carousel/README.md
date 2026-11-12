@@ -27,6 +27,10 @@ From the source site's project carousel.
 - `data-loop` makes it a circle (three items or more). `data-edges="open"` drops the clip and fades the neighbours out. Dispatch `carousel-set` with `detail.step` or `detail.index` to move it from your own controls.
 - Load `tooltip.css` and `tooltip.js` for the cursor pill and the dropped description; without them it's a plain carousel.
 
+## Changes in v0.5.0
+
+- `data-frame="bare"`: no surface, hairline or shadow, for views on a stage.
+
 ## Changes in v0.4.0
 
 - A size-driven resize hold. While its container resizes it (a panel opening beside it, a stage and sheet splitting), the track follows the width with no settle and the frames hold their scale. The hold releases after two animation frames with no change in size, never on a timer.
@@ -35,6 +39,7 @@ From the source site's project carousel.
 
 - `data-loop` on the carousel makes it a circle: past the last item is the first, and back from the first is the last, by drag, wheel or arrow key. It needs three items or more. Slide numbers and `detail.index` keep the authored order.
 - The caption is optional: leave `.carousel-caption` out when the items name themselves.
+- `data-frame="bare"`: views on a stage rather than objects on a page. The frame drops its surface, hairline and shadow, and neighbours don't shrink; each view slides and fades on the stage's ground, and the stage never moves. Pair it with `data-edges="open"` and stage navigation (`components/stage-nav/`) to name the views.
 - `carousel-set`: move it from outside, for a page's own previous and next controls. Dispatch it on the carousel with `{ detail: { step: 1 } }` (or `-1`), or `{ detail: { index } }` in the authored order.
 - `data-edges="open"`: the viewport doesn't clip and an item away from the centre fades to nothing, so there is no edge inside the page where an item is cut. For items as wide as the carousel. Something further out must end it: the page, or a scroller with `overflow-x: hidden`.
 

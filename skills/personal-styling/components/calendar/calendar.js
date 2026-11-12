@@ -1,4 +1,4 @@
-/* personal-styling · calendar · v0.1.0 */
+/* personal-styling · calendar · v0.2.0 */
 
 // Draws a .calendar from the JSON inside it:
 //   { "end": "2026-11-09", "values": { "2026-10-29": 0.3, "2026-10-30": -0.28, … } }

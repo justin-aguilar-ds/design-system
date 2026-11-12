@@ -1,4 +1,4 @@
-/* personal-styling · carousel · v0.4.0 */
+/* personal-styling · carousel · v0.5.0 */
 
 /* One item at a time, centred, with its caption under it. Slides are the
    full width of the carousel, so moving the track by whole widths always
@@ -76,6 +76,22 @@
 }
 /* Mid-drag, scale and opacity are driven by the pointer (carousel.js). */
 .carousel.is-dragging .carousel-frame { transition: none; cursor: grabbing; }
+
+/* NEW (v0.5): data-frame="bare" — views on a stage, not objects on a page.
+   No surface, hairline or shadow: each view sits on the stage's ground and
+   slides and fades there, and the stage itself never moves. The frame
+   fills the item at the item's own height. */
+.carousel[data-frame="bare"] .carousel-frame {
+  width: var(--item-width, 100%);
+  aspect-ratio: var(--item-aspect-ratio, auto);
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: grab;
+}
+.carousel[data-frame="bare"] .carousel-item:not(.is-active) .carousel-frame { scale: 1; }
 
 .carousel-frame :is(img, video) {
   display: block;

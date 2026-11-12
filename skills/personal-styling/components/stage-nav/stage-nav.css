@@ -1,0 +1,37 @@
+/* personal-styling · stage-nav · v0.1.0 */
+
+/* Moving between the views of a stage: each link names the view it goes
+   to, in mono, with a bare 10px arrow pointing the way. Mono because these
+   are the stage's quiet names for its views, read the way a control
+   panel's labels are, not buttons that carry weight; the view itself is
+   what carries it. No surface, no fill: ink only. */
+.stage-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-16);
+}
+.stage-nav-link {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-mark);
+  min-height: var(--height-control);          /* a control's height, for the hit area */
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .stage-nav-link:hover { color: var(--color-text); }
+}
+.stage-nav-link:active { color: var(--color-text); transition-duration: var(--duration-instant); }
+/* Past the last view of a carousel that doesn't loop, the link holds its
+   place but isn't there. */
+.stage-nav-link[hidden] { display: inline-flex; visibility: hidden; }
+.stage-nav-arrow { flex: none; width: var(--icon-mark); height: var(--icon-mark); }
+/* Uppercase mono sits 1px high in its line, so the mark lifts to meet it
+   (see "Optical alignment" in SKILL.md). */
+.stage-nav-arrow { translate: 0 -1px; }

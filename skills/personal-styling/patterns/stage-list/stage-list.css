@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.1.0 */
+/* personal-styling · stage-list · v0.2.0 */
 
 /* A view and the records behind it: the stage shows the data, the list
    holds the things it is made of. Pick something on the stage, read it in
@@ -86,6 +86,20 @@
 .stage-list-thumb[data-mode="back"] { padding: 0; }
 .stage-list-thumb[data-mode="back"] { display: inline-flex; }
 .stage-list-thumb svg { width: var(--icon-control); height: var(--icon-control); }
+
+/* NEW (v0.2): the top row — the figure, the navigation, the controls.
+   They share the line only while they fit: a long figure keeps its size
+   and the controls wrap under it, at the right, rather than colliding
+   with it or squeezing it. */
+.stage-list-top-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-16);
+}
+.stage-list-top-in > :first-child { flex: 0 1 auto; min-width: 0; }
+.stage-list-top-in > :not(:first-child) { margin-left: auto; }
 
 /* ---- The detail: one record, opened. An opaque takeover of the whole
    pattern, not a dimmed modal: a large surface, so it scales in from

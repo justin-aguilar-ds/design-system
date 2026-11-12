@@ -1,0 +1,61 @@
+/* personal-styling · takeover · v0.1.0 */
+
+/* One thing, opened over everything: a record's detail, a full view of a
+   piece. Opaque, in the page's own ground — never a dimmed modal over a
+   page you can still half see. A large surface, so it scales in from
+   --scale-enter with opacity, on --duration-slow and --ease-out, and
+   leaves the same way. */
+.takeover {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;              /* the body scrolls; the way back stays put */
+  background: var(--color-bg);
+  opacity: 0;
+  scale: var(--scale-enter);
+  visibility: hidden;
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    scale var(--duration-slow) var(--ease-out),
+    visibility var(--duration-instant) linear var(--duration-slow);
+}
+.takeover.is-open {
+  opacity: 1;
+  scale: 1;
+  visibility: visible;
+  transition-delay: var(--duration-instant);
+}
+/* Contained: it takes over its positioned parent instead of the screen —
+   a pattern that is the page, or a framed demo. */
+.takeover--contained { position: absolute; }
+
+/* Its content is a page that scrolls inside it: the page's inset and
+   block, the reading width, ending clear of the way back at the bottom. */
+.takeover-body {
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding:
+    var(--space-page-block)
+    max(var(--space-page), env(safe-area-inset-right, 0px))
+    calc(var(--space-page-block) + var(--height-slot) + var(--space-page) + env(safe-area-inset-bottom, 0px))
+    max(var(--space-page), env(safe-area-inset-left, 0px));
+}
+.takeover-body > * { max-width: var(--container-read); margin-inline: auto; }
+
+/* The way back is one place: bottom centre, in the bottom slot's spot and
+   height, a 64px round button with a chevron. It stays where the thing
+   that opened the takeover would reach for it. */
+.takeover-close {
+  position: absolute;            /* the takeover is the screen; fixed would ride its scale */
+  left: 50%;
+  bottom: calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+  translate: -50% 0;
+  z-index: 51;
+  width: var(--height-slot);
+  min-height: var(--height-slot);
+  padding: 0;
+  justify-content: center;
+}
+.takeover-close svg { width: var(--icon-control); height: var(--icon-control); }

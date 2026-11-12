@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.6.0 */
+/* personal-styling · stage-sheet · v0.7.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -41,6 +41,12 @@
    the open is asked for (the stage still covers it), back as the close is
    asked for. Never animated, so it never passes through grey. */
 .stage-sheet.is-ground { background: var(--color-ground); }
+/* NEW (v0.7): data-ground="page" — the light ground, for a tool that is a
+   page's everyday screen rather than a mode. Split, the two surfaces sit on
+   the stage grey, and separate by the grey between them and a hairline
+   each: no shadow, nothing dark. */
+.stage-sheet[data-ground="page"].is-ground { background: var(--color-stage); }
+.stage-sheet[data-ground="page"].is-open .stage-sheet-stage { box-shadow: inset 0 0 0 1px var(--color-hairline); }
 
 /* ---- The stage: whatever is being made. Its bottom edge is one gap
    above the sheet, less whatever hasn't separated yet: merged, that is
