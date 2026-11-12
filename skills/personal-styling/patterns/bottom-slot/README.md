@@ -17,6 +17,7 @@ From a portfolio whose page nav sat at the bottom, and an about page whose one a
   | a small site, two or three pages | the page nav (`.segmented--large`) |
   | there for one action: RSVP, sign up, get in touch | the large button, full width on a phone |
   | a live canvas and its controls | the sheet's pill (`patterns/stage-sheet/`); the nav moves to the top |
+  | a view and the records behind it | the thumb button (`patterns/stage-list/`), alone and centred |
   | a site's pages, and this page has one action | the nav, docked beside the large button |
   | four or more pages | two pages docked beside a large select for the rest |
   | anything else: filters, sort, a second action | nothing. It goes in the page or the control panel. |

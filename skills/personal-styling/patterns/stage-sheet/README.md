@@ -20,6 +20,8 @@ From building a typography tool on a phone: the docked control panel covered the
 - **The heading is the handle.** Drag it to resize the split: both surfaces follow the finger 1:1. Let go and it snaps to 40%, 55% or 75% of the screen; a flick up jumps to the next height. Dragging below about a quarter of the screen, or flicking down, closes it. A tap closes it too. The sheet's contents scroll inside it.
 - **Wide screens keep the docked corner.** Above `630px` the stage keeps the whole page and the sheet opens as the docked control panel does: a `280px` card in the bottom-right corner, on the same move.
 
+- **When the second surface holds records, not controls** — a list you pick into from the stage — it is the stage and list (`patterns/stage-list/`): the page's own ground, a fixed height, and a thumb button in place of the handle.
+
 ## Use
 
 - `.stage-sheet` › `.stage-sheet-stage` (the work) and `.stage-sheet-sheet` › `button.stage-sheet-toggle` (with `.stage-sheet-title` and the chevron) + `.stage-sheet-body` (the controls). It fills the screen itself (`position: fixed`), so it is the page.

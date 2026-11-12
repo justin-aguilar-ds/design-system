@@ -1,0 +1,31 @@
+<!-- personal-styling · stage-list · v0.1.0 -->
+<!-- The whole page. The stage holds the view; the list holds the records;
+     the detail holds one record, opened. The thumb button's text is the
+     list's name. Fill the detail, then call el.stageList.detail(true). -->
+<div class="stage-list">
+  <section class="stage-list-stage" aria-label="View">
+    <header class="stage-list-top"><div class="stage-list-top-in">
+      <h1 class="t-display">+$18.87</h1>
+    </div></header>
+    <div class="stage-list-view" style="display: grid; place-items: center;">
+      <p class="t-title">The view</p>
+    </div>
+  </section>
+
+  <aside class="stage-list-list" aria-label="Bets">
+    <h2 class="t-label" style="margin: 0; padding: 16px 0;">All bets</h2>
+    <div class="scroll-fade scroll-fade--surface">
+      <div class="scroll-fade-area">
+        <p class="t-body">Nikola Jokic o9.5 ast</p>
+        <p class="t-body">Jayson Tatum o26.5 pts</p>
+        <p class="t-body">Luka Doncic o31.5 pts</p>
+      </div>
+    </div>
+  </aside>
+
+  <div class="stage-list-detail" role="dialog" aria-modal="true" aria-label="Bet" inert>
+    <div style="padding: 48px 24px;"><h2 class="t-title" style="margin: 0;">One record, opened</h2></div>
+  </div>
+
+  <button class="stage-list-thumb button surface surface--rest surface--pill t-label" type="button">Bets</button>
+</div>

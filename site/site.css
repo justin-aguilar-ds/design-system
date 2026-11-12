@@ -201,7 +201,9 @@ body { min-height: 100vh; }
    phone-sized frame. Paint containment makes the frame its screen: the
    pattern's fixed box fills the frame, not the window. */
 .pattern-stage:has(> .stage-sheet),
-.stage-sheet-frame {
+.stage-sheet-frame,
+.pattern-stage:has(> .stage-list),
+.stage-list-frame {
   position: relative;
   contain: paint;
   width: 100%;

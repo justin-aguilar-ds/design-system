@@ -1,0 +1,143 @@
+/* personal-styling · stage-list · v0.1.0 */
+
+/* A view and the records behind it: the stage shows the data, the list
+   holds the things it is made of. Pick something on the stage, read it in
+   the list, open one record in the detail. Three depths, and on a phone
+   one button under the thumb that walks them: open, close, back.
+
+   Wide, the stage and the list are two surfaces on one line. On a phone
+   the stage takes the screen; as the list comes up the stage becomes the
+   upper of two surfaces and the list rises into the room below it. One
+   animated value, --list-open (0 → 1), drives every edge, so it is one
+   move. The pattern reads its own width, not the window's, so it works as
+   the whole page and inside a framed demo alike. */
+@property --list-open { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+.stage-list {
+  --list-open: 0;
+  --list-gap: var(--space-8);           /* between the surfaces, and from every edge */
+  --list-w: 320px;                      /* wide screens: the list's column */
+  --list-h: 52cqh;                      /* phones: how much of the screen the list takes */
+  --list-top-h: 96px;                   /* the stage's top row, measured by stage-list.js */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  container: stage-list / size;
+  background: var(--color-bg);          /* the ground is the page's: nothing here is on black */
+  transition: --list-open var(--duration-deliberate) var(--ease-out);
+}
+
+/* ---- The stage: the system's grey ground. Its top row holds what frames
+   the view — a figure, navigation, controls — and the view takes the rest. */
+.stage-list-stage {
+  --radius-stage: var(--radius-card);
+  position: absolute;
+  top: var(--list-gap);
+  left: var(--list-gap);
+  right: calc(2 * var(--list-gap) + var(--list-w));
+  bottom: var(--list-gap);
+  container: stage / size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-16);
+  min-width: 0;
+  padding: var(--space-24);
+  overflow: hidden;
+  background: var(--color-stage);
+  border-radius: var(--radius-stage);
+}
+.stage-list-view { min-width: 0; min-height: 0; }
+
+/* ---- The list: the one surface style, the full height of the stage. */
+.stage-list-list {
+  position: absolute;
+  top: var(--list-gap);
+  right: var(--list-gap);
+  bottom: var(--list-gap);
+  width: var(--list-w);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  padding: 0 var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-rest);
+}
+
+/* ---- The thumb button: one place, bottom centre, for the one thing a
+   thumb does next. It is the size of everything in the bottom slot. With
+   a label it opens the list; as a mark it closes the list, or goes back
+   from the detail. Wide, the list is always open, so it only shows as the
+   way back. */
+.stage-list-thumb {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  translate: -50% 0;
+  justify-content: center;
+  min-width: var(--height-slot);
+  min-height: var(--height-slot);
+  padding: 0 var(--inset-slot);
+  display: none;
+}
+.stage-list-thumb[data-mode="close"],
+.stage-list-thumb[data-mode="back"] { padding: 0; }
+.stage-list-thumb[data-mode="back"] { display: inline-flex; }
+.stage-list-thumb svg { width: var(--icon-control); height: var(--icon-control); }
+
+/* ---- The detail: one record, opened. An opaque takeover of the whole
+   pattern, not a dimmed modal: a large surface, so it scales in from
+   --scale-enter with opacity, on --duration-slow. The thumb button stays
+   above it, in the same place, as the way back. */
+.stage-list-detail {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow-y: auto;
+  background: var(--color-bg);
+  opacity: 0;
+  scale: var(--scale-enter);
+  visibility: hidden;
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    scale var(--duration-slow) var(--ease-out),
+    visibility var(--duration-instant) linear var(--duration-slow);
+}
+.stage-list.is-detail .stage-list-detail { opacity: 1; scale: 1; visibility: visible; transition-delay: var(--duration-instant); }
+/* Its content ends clear of the thumb button. */
+.stage-list-detail > * { padding-bottom: calc(var(--space-page-block) + var(--height-slot) + var(--space-page)); }
+
+/* ================= Phones: the split ================= */
+@container stage-list (max-width: 630px) {
+  /* Closed, the stage is the screen, edge to edge. As the list comes up
+     it draws in a gap from the edges, rounds its corners and gets
+     shorter; the list rises into the room below, a gap apart. Nothing
+     sits on top of anything, so what was picked on the stage stays in
+     view. */
+  .stage-list-stage {
+    --radius-stage: calc(var(--list-open) * var(--radius-card));
+    top: calc(var(--list-open) * var(--list-gap));
+    left: calc(var(--list-open) * var(--list-gap));
+    right: calc(var(--list-open) * var(--list-gap));
+    bottom: calc(var(--list-open) * (var(--list-h) + 2 * var(--list-gap)));
+    gap: calc((1 - var(--list-open)) * var(--space-16));
+    padding: calc(var(--space-24) - var(--list-open) * var(--space-8)) var(--space-16) var(--space-16);
+  }
+  /* Split, the stage is only its view: the top row folds away above it
+     on the same move, and comes back as the list goes down. */
+  .stage-list-top {
+    height: calc((1 - var(--list-open)) * var(--list-top-h));
+    opacity: calc(1 - var(--list-open));
+    overflow: hidden;
+  }
+  .stage-list-list {
+    top: auto;
+    left: var(--list-gap);
+    width: auto;
+    height: var(--list-h);
+    translate: 0 calc((1 - var(--list-open)) * (100% + var(--list-gap)));
+  }
+  .stage-list-thumb { display: inline-flex; }
+}

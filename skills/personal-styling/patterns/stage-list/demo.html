@@ -1,0 +1,27 @@
+<div class="demo-grid">
+  <div class="demo-cell demo-cell--wide demo-cell--stretch">
+    <p class="t-caption">On a phone — tap Bets: the stage shortens, the list rises below it, and the same spot closes it. Tap a row for the detail, and the same spot goes back.</p>
+    <div class="stage-list-frame">
+      <div class="stage-list" id="demo-stage-list">
+        <section class="stage-list-stage" aria-label="View">
+          <header class="stage-list-top"><div class="stage-list-top-in"><h2 class="t-title" style="margin: 0;">+$18.87</h2></div></header>
+          <div class="stage-list-view" style="display: grid; place-items: center;"><p class="t-display" style="margin: 0;">View</p></div>
+        </section>
+        <aside class="stage-list-list" aria-label="Bets">
+          <h3 class="t-label" style="margin: 0; padding: 16px 0;">All bets</h3>
+          <div class="scroll-fade scroll-fade--surface">
+            <div class="scroll-fade-area">
+              <button class="button-text link-quiet t-control" type="button" style="padding-left: 0;" onclick="document.getElementById('demo-stage-list').stageList.detail(true)">Nikola Jokic o9.5 ast</button>
+              <button class="button-text link-quiet t-control" type="button" style="padding-left: 0;" onclick="document.getElementById('demo-stage-list').stageList.detail(true)">Jayson Tatum o26.5 pts</button>
+              <button class="button-text link-quiet t-control" type="button" style="padding-left: 0;" onclick="document.getElementById('demo-stage-list').stageList.detail(true)">Luka Doncic o31.5 pts</button>
+            </div>
+          </div>
+        </aside>
+        <div class="stage-list-detail" role="dialog" aria-modal="true" aria-label="Bet" inert>
+          <div style="padding: 48px 24px;"><h3 class="t-title" style="margin: 0;">One record, opened</h3></div>
+        </div>
+        <button class="stage-list-thumb button surface surface--rest surface--pill t-label" type="button">Bets</button>
+      </div>
+    </div>
+  </div>
+</div>
