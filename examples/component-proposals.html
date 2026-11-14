@@ -189,6 +189,10 @@
   .specimens.pol-circle .bet-loss .row-lead { background: var(--color-loss-fill); color: var(--color-loss-ink); }
   .bet-open .row-lead, .bet-open .row-value { color: var(--color-text-secondary); }
 
+  /* No dividers: space alone separates the rows. The line keeps its 1px
+     of room, clear, so the row height doesn't change with the switch. */
+  .specimens.div-none .group[data-group="rows"] .list-rows > li { border-top-color: transparent; }
+
   /* Inset dividers start at the text, so the leading marks read as one
      column and the lines belong to the words. */
   .specimens.div-inset .list-rows--lead > li { border-top: 0; }
@@ -440,6 +444,7 @@ const PROPOSALS = [
   ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. 48, like the icon’s circle; Lead size takes both to a control’s 36.'],
   ['rows', 'R11', 'Space between a name and its sub-line', 'Title gap sets the distance from a row’s name to the line under it, on every row here: 8 (the label-to-value step), 4 (what the list row uses over a mono sub-line, and the pick so far), or 0 (the two lines as one block, like the Flat pair). Leave the switch where it reads best and say so in the note.'],
   ['rows', 'R12', 'Space above and below a row', 'Row space sets the distance between a row’s content and its dividers, on every list here: 8, 16 (the list row’s today) or 24. Decided: 24. The figure after each list’s name is its row height, divider to divider, measured live. With a 36 circle and a title gap of 4, a leading row is 58, 74 or 90.'],
+  ['rows', 'R14', 'No dividers', 'Dividers set to None takes the lines out of every list here, so the space between rows does the separating. Row space still applies: at 24 there is 48 between one row’s text and the next. A row that opens still shows its fill on hover and press.'],
   ['rows', 'R10', 'Inset dividers on leading rows', 'Dividers start at the text instead of the row’s left edge, so the icons or avatars read as one column. Switch it with Dividers.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
 ];
@@ -466,7 +471,7 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('subgap', 'Title gap', [['0', '0'], ['4', '4'], ['8', '8']], 'rows')}
   ${seg('leadicon', 'Icon', [['bare', 'Bare'], ['circle', 'Circle']], 'rows')}
   ${seg('leadsize', 'Lead size', [['36', '36'], ['48', '48']], 'rows')}
-  ${seg('leaddiv', 'Dividers', [['full', 'Full'], ['inset', 'Inset']], 'rows')}
+  ${seg('leaddiv', 'Dividers', [['full', 'Full'], ['inset', 'Inset'], ['none', 'None']], 'rows')}
   ${seg('detail', 'Detail', [['right', 'Right'], ['column', 'Column']], 'rows')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
@@ -548,7 +553,7 @@ document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on',
-    'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset',
+    'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset', 'div-none': state.leaddiv === 'none',
     'pol-ink': state.pol === 'ink', 'pol-circle': state.pol === 'circle' };
   specimens.style.setProperty('--sub-gap', `${state.subgap}px`);
   specimens.style.setProperty('--row-pad', `${state.rowpad}px`);
