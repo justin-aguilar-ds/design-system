@@ -1,4 +1,4 @@
-/* personal-styling · choice · v0.1.0 */
+/* personal-styling · choice · v0.2.0 */
 
 /* A checkbox or a radio: a mark beside a line of text. Both marks are a
    16px circle — the system has no small corner, and 16 is the height of
@@ -7,8 +7,7 @@
    ring and takes a dot. State without colour. */
 .choice-group {
   display: grid;
-  justify-items: start;
-  min-width: 0;
+  min-width: 0;                 /* CHANGED (v0.2): choices fill the group, so every mark ends its row */
   margin: 0;
   padding: 0;
   border: 0;
@@ -22,9 +21,9 @@
 .choice {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   position: relative;
-  display: inline-flex;
+  display: flex;                /* a row: it fills its line, so the mark can end it */
   align-items: center;
-  gap: var(--space-16);         /* the mark to its label */
+  gap: var(--space-16);         /* the least between the label and the mark */
   min-height: var(--height-control);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -46,6 +45,8 @@
   display: grid;
   place-items: center;
   flex: none;
+  order: 1;                     /* CHANGED (v0.2): the mark ends the row, on the right; its label leads */
+  margin-left: auto;
   width: var(--icon-inline);    /* 16px: the slider's and the switch's track */
   height: var(--icon-inline);
   border: 1px solid currentColor;

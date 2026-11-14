@@ -10,7 +10,7 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 - **The number is a value someone can type:** full ink, 16px, tabular figures, three figures wide so the pill doesn't change width as it counts.
 - **A step at its limit is disabled:** 30%, nothing happens. The number never leaves `data-min` to `data-max`.
 - **Stepper or slider.** A count someone knows exactly, in a small range, moved by ones: a stepper. A continuous value found by feel: a slider (`components/slider/`). A number typed outright, such as a price or a year: an input (`components/input/`).
-- **It hugs its number.** Never stretch it across a column: in a control panel it sits at the end of its row.
+- **It hugs its number and ends its row, on the right, wherever it can.** Never stretch it across a column. In a control panel or a sheet it is on the right line of the control column; at the end of a list row it is the row's value. Under a label of its own (`.control-field`) it starts under that label.
 - **The label follows the label rules:** Label, `8px` above, in `.control-field`; mono on the left in a control panel. A stepper always needs a name, because a bare number is a guess.
 
 ## Use

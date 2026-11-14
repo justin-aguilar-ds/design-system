@@ -204,6 +204,7 @@
   .cp.control-panel .control-panel-fields > :not(:first-child) { padding-top: var(--space-16); border-top: 1px solid var(--color-divider); }
   .cp-actions > .button-row { grid-column: 1 / -1; align-items: center; }
   .cp .choice-group { gap: 0; }
+  .spec > .choice-group, .spec > .switch { max-width: 342px; }   /* a column narrow enough to read across */
   /* Guides: a 36px band through the centre of each control, and the
      control's own drawn height after its label. */
   .cp-band { position: absolute; left: 0; right: 0; height: var(--height-control); background: var(--color-accent-soft); pointer-events: none; }
@@ -363,7 +364,7 @@ const panel = `
   </section>`;
 const inputs = `
   ${spec('Control panel', 'the inputs beside the other controls', panel)}
-  ${spec('Switch', 'on, off, disabled', `<div class="state-row">${switchCtl('Off', false)}${switchCtl('On', true)}${switchCtl('Disabled', true, true)}</div>`)}
+  ${spec('Switch', 'on, off, disabled', `<div class="state-row">${switchCtl('Off', false)}${switchCtl('On', true)}${switchCtl('Disabled', true, true)}</div><label class="switch t-body"><input class="switch-input" type="checkbox" role="switch" checked><span class="switch-track"><span class="switch-thumb"></span></span>Weekly summary</label>`)}
   ${spec('Choice', 'checkbox', `<fieldset class="choice-group"><legend class="t-label">Pack</legend>${choice('checkbox', 'pack', 'Passports', true)}${choice('checkbox', 'pack', 'Chargers and an adaptor', false)}${choice('checkbox', 'pack', 'Rain jackets', false)}${choice('checkbox', 'pack', 'Travel insurance', true, true)}</fieldset>`)}
   ${spec('Choice', 'radio', `<fieldset class="choice-group"><legend class="t-label">Getting to Porto</legend>${choice('radio', 'porto', 'Train, three hours', true)}${choice('radio', 'porto', 'Hire car', false)}${choice('radio', 'porto', 'Flight', false)}${choice('radio', 'porto', 'Coach', false, true)}</fieldset>`)}
   ${spec('Input', 'text area', `<div class="form"><div class="input-field"><label class="t-label" for="trip-notes">Notes</label><textarea class="input input--area" id="trip-notes" placeholder="Anything the others should know">The Alfama flat has no lift. Pack light.</textarea></div></div>`)}
@@ -424,7 +425,7 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
   <div class="sheet-section" data-for="inputs">
-    <p class="t-body sheet-note">Adopted. The switch, the checkbox and radio (choice), the stepper and the text area are in the library now, and this view loads them from there. A track and a mark are 16, a thumb 12, a mark 16 from its label; a small control ends its row in a panel.</p>
+    <p class="t-body sheet-note">Adopted. The switch, the checkbox and radio (choice), the stepper and the text area are in the library now, and this view loads them from there. A track and a mark are 16, a thumb 12; a small control ends its row, on the right, wherever it can.</p>
   </div>
   <div class="sheet-section" data-for="figures rows menu">
     <ol class="proposals" id="proposals">${PROPOSALS.map(([group, id, title, body]) => `

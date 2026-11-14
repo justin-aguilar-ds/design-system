@@ -1,4 +1,4 @@
-/* personal-styling · switch · v0.1.0 */
+/* personal-styling · switch · v0.2.0 */
 
 /* On or off, in place. The slider's own parts: its 16px track, its 12px
    thumb and the 2px between them, and full ink for the side that's on.
@@ -8,10 +8,9 @@
 .switch {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
   position: relative;
-  display: inline-flex;
+  display: flex;                /* a row: it fills its line, so the track can end it */
   align-items: center;
-  flex: none;
-  gap: var(--space-16);         /* the track to a label beside it, as a mark to its label */
+  gap: var(--space-16);         /* the least between the label and the track */
   min-height: var(--height-control);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -31,6 +30,8 @@
 .switch-track {
   position: relative;
   flex: none;
+  order: 1;                     /* CHANGED (v0.2): the track ends the row, on the right; its label leads */
+  margin-left: auto;
   width: 28px;                  /* the thumb, its 12px of travel and the inset either side */
   height: 16px;                 /* the slider's track */
   padding: calc(var(--inset-fill) / 2);   /* 2px: the slider's inset around its thumb */
