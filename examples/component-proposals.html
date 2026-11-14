@@ -125,10 +125,50 @@
      centred on the row. */
   .list-row--setting { align-items: center; }
   .list-row--setting .list-row-main { gap: var(--space-8); }
-  /* Status: glyph + word in mono. Good and unknown are secondary;
-     a problem takes full ink. */
+  /* Status, three quieter ways. The glyph and the word are Body, not
+     mono; good and unknown are secondary, a problem takes full ink. */
   .status { white-space: nowrap; }
   .status.is-problem { color: var(--color-text); }
+  .list-row--status { align-items: center; }
+  .list-row--status .list-row-main { gap: var(--space-8); }
+  .list-row--status .row-date { color: var(--color-text-secondary); white-space: nowrap; }
+  .status-glyph { display: grid; place-items: center; width: var(--icon-control); height: var(--icon-control); }
+
+  /* ============================================================
+     PROPOSED · leading rows — an icon or an avatar at the left
+     ============================================================ */
+  /* A third slot, before the name: 16 from the text, centred on the row.
+     An icon is a bare 20px mark in full ink, or sits on a stage-grey
+     circle; an avatar is always the circle, initials in it. The circle is
+     a control's height (36), or a row's (50). */
+  .list-row--lead { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; position: relative; }
+  .list-row--lead .list-row-main { gap: var(--space-8); }
+  .row-lead {
+    --lead-w: var(--lead, var(--height-control));
+    display: grid;
+    place-items: center;
+    width: var(--lead-w);
+    height: var(--lead-w);
+    border-radius: var(--radius-pill);
+    background: var(--color-stage);
+    color: var(--color-text);
+  }
+  .row-lead svg { width: var(--icon-control); height: var(--icon-control); }
+  .specimens:not(.lead-circle) .row-lead--icon { --lead-w: var(--icon-control); background: none; }
+  .specimens.lead-50 { --lead: var(--height-row); }
+  /* Inset dividers start at the text, so the leading marks read as one
+     column and the lines belong to the words. */
+  .specimens.div-inset .list-rows--lead > li { border-top: 0; }
+  .specimens.div-inset .list-rows--lead > li + li > .list-row--lead::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: calc(var(--lead-col) + var(--space-16));
+    border-top: 1px solid var(--color-divider);
+  }
+  .list-rows--lead { --lead-col: var(--lead, var(--height-control)); }
+  .specimens:not(.lead-circle) .list-rows--icons, .list-rows--glyph { --lead-col: var(--icon-control); }
 
   .menu-readout { color: var(--color-text-secondary); }
 
@@ -187,7 +227,7 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280' }, saved.state);
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'bare', leadsize: '36', leaddiv: 'full' }, saved.state);
 ['rowh', 'swh', 'mark', 'sw', 'step', 'small', 'icons', 'sep', 'trigger'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -225,7 +265,19 @@ const stepperCtl = (label, value) => `
     <button class="stepper-step" type="button" aria-label="More"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
   </div>`;
 const setting = (name, desc, control) => `<li><div class="list-row list-row--setting"><span class="list-row-main"><span class="t-label">${name}</span><span class="t-body">${desc}</span></span>${control}</div></li>`;
-const statusRow = (name, sub, glyph, word, problem) => `<li><div class="list-row"><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="list-row-sub t-mono">${sub}</span></span><span class="status t-mono${problem ? ' is-problem' : ''}">${glyph} ${word}</span></div></li>`;
+const STATUSES = [['Flight to Lisbon', 'May 3', '✓', 'Confirmed'], ['Hotel in Alfama', 'May 3', '!', 'Awaiting payment', true], ['Train to Porto', 'May 7', '✗', 'Cancelled', true], ['Airport transfer', 'May 9', '–', 'Not booked']];
+const statusEnd = ([name, , glyph, word, problem]) => `<li><div class="list-row list-row--status"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${glyph} ${word}</span></div></li>`;
+const statusSub = ([name, date, glyph, word, problem]) => `<li><div class="list-row list-row--status"><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${glyph} ${word}</span></span><span class="row-date t-body tnum">${date}</span></div></li>`;
+const statusLead = ([name, date, glyph, word, problem]) => `<li><div class="list-row list-row--lead list-row--status"><span class="status-glyph status t-label${problem ? ' is-problem' : ''}" style="${problem ? '' : 'color: var(--color-text-secondary)'}" aria-hidden="true">${glyph}</span><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${word}</span></span><span class="row-date t-body tnum">${date}</span></div></li>`;
+const LEAD_ICONS = {
+  plane: '<path d="m3 11 14-6-5 12-2.5-5L3 11Z"/>',
+  bed: '<path d="M3 15V6M3 12h14v3M17 12v-1.5A2.5 2.5 0 0 0 14.5 8H8v4"/>',
+  train: '<rect x="5" y="3" width="10" height="11" rx="3"/><path d="M5 9h10M7.5 17l1-3M12.5 17l-1-3"/>',
+  car: '<path d="M3.5 13.5v-3l1.5-4h10l1.5 4v3M3.5 13.5h13M5.5 13.5V15M14.5 13.5V15M3.5 10.5h13"/>',
+};
+const leadRow = (lead, name, sub, value) => `<li><div class="list-row list-row--lead">${lead}<span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="t-body">${sub}</span></span><span class="t-label tnum">${value}</span></div></li>`;
+const iconLead = (k) => `<span class="row-lead row-lead--icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${LEAD_ICONS[k]}</svg></span>`;
+const avatarLead = (initials) => `<span class="row-lead row-lead--avatar t-control" aria-hidden="true">${initials}</span>`;
 const rows = `
   ${spec('R1', 'One column', `<ul class="list-rows">${PLACES.map((p) => colRow(1, p, true)).join('')}</ul>`)}
   ${spec('R2', 'Two columns', `<ul class="list-rows">${PLACES.map((p) => colRow(2, p)).join('')}</ul>`)}
@@ -236,11 +288,19 @@ const rows = `
     ${setting('Share location', 'Only while a trip is under way.', switchCtl('Share location', false))}
     ${setting('Travellers', 'Prices are worked out per person.', stepperCtl('Travellers', 2))}
   </ul>`)}
-  ${spec('R6', 'Status row', `<ul class="list-rows">
-    ${statusRow('Flight to Lisbon', 'May 3', '✓', 'Confirmed')}
-    ${statusRow('Hotel in Alfama', 'May 3', '!', 'Awaiting payment', true)}
-    ${statusRow('Train to Porto', 'May 7', '✗', 'Cancelled', true)}
-    ${statusRow('Airport transfer', 'May 9', '–', 'Not booked')}
+  ${spec('R6a', 'Status at the end', `<ul class="list-rows">${STATUSES.map(statusEnd).join('')}</ul>`)}
+  ${spec('R6b', 'Status under the name', `<ul class="list-rows">${STATUSES.map(statusSub).join('')}</ul>`)}
+  ${spec('R6c', 'Status glyph leads', `<ul class="list-rows list-rows--lead list-rows--glyph">${STATUSES.map(statusLead).join('')}</ul>`)}
+  ${spec('R8', 'Leading icon', `<ul class="list-rows list-rows--lead list-rows--icons">
+    ${leadRow(iconLead('plane'), 'Flight to Lisbon', 'TAP 1361, leaves 07:40', '$310')}
+    ${leadRow(iconLead('bed'), 'Hotel in Alfama', 'Four nights, breakfast included', '$720')}
+    ${leadRow(iconLead('train'), 'Train to Porto', 'Three hours, seats together', '$64')}
+    ${leadRow(iconLead('car'), 'Airport transfer', 'Booked through the hotel', '$45')}
+  </ul>`)}
+  ${spec('R9', 'Leading avatar', `<ul class="list-rows list-rows--lead">
+    ${leadRow(avatarLead('JA'), 'Justin Aguilar', 'Booked the flights', '$1,240')}
+    ${leadRow(avatarLead('MO'), 'Mara Okafor', 'Paying for the hotel', '$720')}
+    ${leadRow(avatarLead('TL'), 'Tomás Lima', 'Joining in Porto', '$310')}
   </ul>`)}`;
 
 // ---- Menu
@@ -324,7 +384,12 @@ const PROPOSALS = [
   ['rows', 'R3', 'Three columns', 'Name, sentence and value, a third each, the value at the right edge. View at Read.'],
   ['rows', 'R4', 'Detail row', 'A name and its value on one line: a spec list. Detail puts the value at the right edge, or on the second column so it lines up with every other list.'],
   ['rows', 'R5', 'Setting row', 'The name and its sentence on the left, one control at the end, centred on the row. The control is a switch or a stepper, from the library.'],
-  ['rows', 'R6', 'Status row', 'Glyph and word in mono at the end of the row. Good and unknown in secondary ink, a problem in full ink. Never a badge, never colour.'],
+  ['rows', 'R6a', 'Status at the end', 'One line a row: the name, then glyph and word at the end in Body, not mono. Good and unknown in secondary ink, a problem in full ink. The quietest of the three; no date. Pick one of R6a, R6b or R6c.'],
+  ['rows', 'R6b', 'Status under the name', 'The glyph and word are the row’s sub-line, in Body, and the date is the value at the end. Two type styles, no mono.'],
+  ['rows', 'R6c', 'Status glyph leads', 'The glyph takes the leading slot at the left, the word sits under the name and the date ends the row. The glyphs read down one column, so problems are found by scanning the left edge.'],
+  ['rows', 'R8', 'Leading icon', 'A 20px icon before the name, 16 from the text, centred on the row. Icon sets it bare in full ink, or on a stage-grey circle. The sub-line is Body, so the row has two styles and no mono.'],
+  ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. Lead size makes it a control’s 36 or a row’s 50; it applies to an icon’s circle too.'],
+  ['rows', 'R10', 'Inset dividers on leading rows', 'Dividers start at the text instead of the row’s left edge, so the icons or avatars read as one column. Switch it with Dividers.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
 ];
 document.getElementById('sheet-body').innerHTML = `
@@ -345,6 +410,9 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('pw', 'Column', [['phone', 'Phone'], ['read', 'Read']])}
   ${seg('change', 'Change', [['off', 'Off'], ['on', 'On']], 'figures')}
   ${seg('chevron', 'Chevron', [['off', 'Off'], ['on', 'On']], 'rows')}
+  ${seg('leadicon', 'Icon', [['bare', 'Bare'], ['circle', 'Circle']], 'rows')}
+  ${seg('leadsize', 'Lead size', [['36', '36'], ['50', '50']], 'rows')}
+  ${seg('leaddiv', 'Dividers', [['full', 'Full'], ['inset', 'Inset']], 'rows')}
   ${seg('detail', 'Detail', [['right', 'Right'], ['column', 'Column']], 'rows')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
@@ -412,7 +480,8 @@ addEventListener('resize', measure);
 document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
-  const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on' };
+  const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on',
+    'lead-circle': state.leadicon === 'circle', 'lead-50': state.leadsize === '50', 'div-inset': state.leaddiv === 'inset' };
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
