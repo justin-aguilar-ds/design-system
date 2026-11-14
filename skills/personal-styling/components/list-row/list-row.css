@@ -1,9 +1,10 @@
-/* personal-styling · list-row · v0.1.0 */
+/* personal-styling · list-row · v0.2.0 */
 
-/* A list of records, one value each: the name with a sub-line under it on
-   the left, the value with a sub-line under it on the right. The table's
-   little sibling — for a list read on a phone, where columns don't fit.
-   It sits on the page with dividers, like a table: no card. */
+/* A list of records, one value each. The name leads and the value sits on
+   the name's line; one sub-line runs under both; a circle can lead the
+   row with an icon or an avatar. The table's little sibling — for a list
+   read on a phone, where columns don't fit. It sits on the page with
+   dividers, like a table: no card. */
 .list-rows {
   margin: 0;
   padding: 0;
@@ -12,22 +13,59 @@
 .list-rows > li { border-top: 1px solid var(--color-divider); transition: border-top-color var(--duration-fast) ease; }
 .list-rows > li:first-child { border-top: 0; }
 
+/* CHANGED (v0.2): 24 above and below, so a row has the room of a card
+   beside a card; the leading circle and the text are centred on each
+   other, 16 apart. */
 .list-row {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
+  display: flex;
+  align-items: center;
   gap: var(--space-16);
-  padding-block: var(--space-16);
+  padding-block: var(--space-24);
   color: inherit;
   text-decoration: none;
   text-align: left;
 }
-/* Each side is a line of Label over a mono sub-line, 4 apart. */
+
+/* NEW (v0.2): the leading circle — an icon or an avatar. A control's
+   height (36), on the quiet fill, full ink. The fill is translucent, so
+   the circle shows on the page and on the stage alike. It is a mark, not
+   a button: no edge, no shadow, no hover of its own. */
+.list-row-lead {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--height-control);
+  height: var(--height-control);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-quiet);
+  color: var(--color-text);
+  overflow: hidden;
+}
+.list-row-lead svg { width: var(--icon-control); height: var(--icon-control); }
+.list-row-lead img { width: 100%; height: 100%; object-fit: cover; }
+
+/* NEW (v0.2): the body. The name, the value on the name's line and on
+   its baseline, and the sub-line under both, 4 below. */
+.list-row-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-4) var(--space-16);
+  flex: 1;
+  min-width: 0;
+}
+.list-row-body > .list-row-sub { grid-column: 1 / -1; }
+.list-row-value { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Two sides (v0.1): a second value under the first — a result over its
+   odds. Each side is a line of Label over a sub-line, 4 apart, and the
+   two sides line up along the top. */
+.list-row:has(> .list-row-main) { align-items: start; }
 .list-row-main,
 .list-row-end { display: grid; gap: var(--space-4); min-width: 0; }
-.list-row-end { justify-items: end; text-align: right; }
-.list-row-value { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.list-row-main { flex: 1; }
+.list-row-end { flex: none; justify-items: end; text-align: right; }
 .list-row-end .list-row-sub { white-space: nowrap; }
 
 /* A row you can open is a button or a link. Its fill bleeds 16 past the

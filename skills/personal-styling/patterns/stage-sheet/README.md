@@ -39,6 +39,10 @@ From building a typography tool on a phone: the docked control panel covered the
 - The stage takes the page colour, so it always stands out from the ground: a white stage on black in light, a black stage on white in dark. Content that paints its own background (a poster canvas set to white, say) can match the ground in dark mode, and then the stage's edge disappears and only the sheet shows the split. Undecided: give the stage a hairline when its content matches the ground, or accept it.
 
 
+## Changes in v0.8.0
+
+- A switch, a lone mark or a stepper in the sheet sits at the end of the control column, as in a control panel.
+
 ## Changes in v0.7.0
 
 - `data-ground="page"`: the light ground, the surfaces separated by the stage grey and a hairline.

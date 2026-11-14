@@ -15,6 +15,8 @@ Requires: accordion, segmented, picker, chip, slider, button
 - **Fields are divided.** A divider between fields, `16px` either side, so a long panel reads as a list with a rhythm; the first row has none.
 - **Each field is a row by default: the mono label on the left, the control on the right.** Every row shares two columns: the labels, then the controls. The control column is as wide as `--control-max` (`200px`), or what the panel can spare, and every control fills it: segments share it equally, a select runs across it with its chevron at the far end, a slider's track spans it. So every control starts and ends on the same lines, whatever its label. A long label wraps onto a second line; the control never drops under it.
 - **A control too wide for the column goes under its label.** Four or more segments, a chip row (a set of toggles reads best on one line), or any field marked `.field--wide`, span both columns, the control `8px` under its label at the panel's full width. Left in the column, one wide control would widen the column for every row. In a `280px` panel (docked, or a sheet on a wide screen) there's room for a label of about 50px beside a control of about 180px; a field with a longer label or a wider control takes `.field--wide`. Keep the words short: a panel is controls, not text.
+- **Heights can differ; the row is the constant.** A segmented control, a select, a stepper and a button are `36px`. A slider's and a switch's track and a checkbox's or radio's mark are `16px`. They don't need to match: each is centred on its label's row, and the divider rhythm does the lining up.
+- **A small control ends the row.** A switch, a lone checkbox or a stepper doesn't fill the control column; it sits at the column's end, on the right line every other control ends on. A group of choices or a text area goes under its label, across the panel.
 - **A slider's value is a tooltip.** It rides above the thumb while the slider is hovered, focused or dragged (see the slider), so the track can span the control column like everything else. A value printed beside the label or at the end of the track pushes the track out of line.
 - **Fields follow the grid.** On a wide screen a panel above a tool lays its fields three across, `24px` apart, never more, each its label beside its control; on a phone and when docked, one column.
 - **Two field styles.** Inline (the default): the label left, the control right at the max width — for a narrow panel, a docked one, a sheet, a phone, and three across on a wide screen. `.control-panel--full`: the label above, the control the full width of its column — segments share it equally, a select runs edge to edge with its chevron at the far end — for a wide panel whose controls should line up as columns. One style per panel.
@@ -39,6 +41,11 @@ Requires: accordion, segmented, picker, chip, slider, button
 - Swap the fields for the tool's own. Each needs a unique `id` and a label wired to its control (`aria-labelledby`, or `for` on a `<label>`).
 - Wrap a segmented control or chip row in `.control-field`: the label first, the control second. The picker and slider bring their own field wrappers (`.picker-field`, `.slider-field`). A slider is its label, then `.slider` with the `<output>` inside it, so the value is a tooltip.
 - Load the CSS and JS of every component inside it, plus `accordion.js`.
+
+## Changes in v0.15.0
+
+- A switch, a lone mark or a stepper sits at the end of the control column instead of stretching across it.
+- Heights can differ inside a panel: 36 for pills, 16 for a track or a mark.
 
 ## Changes in v0.14.0
 

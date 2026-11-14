@@ -1,0 +1,82 @@
+/* personal-styling · stepper · v0.1.0 */
+
+/* A small whole number, set a step at a time. One pill — the button's
+   surface (.surface .surface--rest .surface--pill) at the height of every
+   control — holding minus, the number and plus. */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: var(--height-control);
+}
+/* The steps are bare marks inside the control, not buttons inside a
+   button: no fill, no circle. Each is --inset-control from the pill's
+   edge and --gap-mark from the number, and as tall as the pill, so the
+   target is the whole end of it. */
+.stepper-step {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 var(--gap-mark) 0 var(--inset-control);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  transition: color var(--duration-fast) ease;
+}
+.stepper-step:last-child { padding: 0 var(--inset-control) 0 var(--gap-mark); }
+.stepper-step svg {
+  width: var(--icon-mark);
+  height: var(--icon-mark);
+  transition: scale var(--duration-base) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .stepper-step:hover:not(:disabled) { color: var(--color-text); }
+}
+/* Touch: the hover response plays on press (see tokens.css). */
+@media (hover: none) {
+  .stepper-step:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
+}
+/* Tactility: the mark gives while it's held. */
+.stepper-step:active:not(:disabled) svg {
+  scale: var(--scale-press);
+  transition-duration: var(--duration-fast);
+}
+/* A step at its limit: nothing will happen here. */
+.stepper-step:disabled {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}
+/* The number: a value someone can also type. 16px, as in the input —
+   below that, iOS zooms the page on focus — in tabular figures so the
+   pill doesn't twitch as it changes. Three figures wide. */
+.stepper-input {
+  width: 3ch;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: -0.1px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  text-align: center;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* The pill carries the focus outline for the field inside it; a step
+   focused from the keyboard keeps its own. */
+.stepper-input:focus-visible { outline: none; }
+.stepper:has(.stepper-input:focus-visible) { outline: 2px solid var(--color-text); outline-offset: 2px; }
+.stepper:has(.stepper-input:disabled) {
+  opacity: var(--opacity-label-inactive);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stepper-step:active:not(:disabled) svg { scale: none; }
+}
