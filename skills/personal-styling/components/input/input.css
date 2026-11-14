@@ -1,4 +1,4 @@
-/* personal-styling · input · v0.3.1 */
+/* personal-styling · input · v0.4.0 */
 
 /* A field is its label, 8px, the input, then an optional message. The
    label sits above, never inside or beside, so every input is the same
@@ -90,3 +90,16 @@
 .input-wrap--search .input { padding-left: calc(var(--inset-control) + var(--icon-inline) + var(--gap-mark)); }
 .input::-webkit-search-decoration,
 .input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+/* NEW (v0.4): the text area — the input grown past one row. More than one
+   row is a card, not a pill, with a card's 16 inside. Three lines at
+   least; it grows with what is typed (field-sizing, where the browser has
+   it) and has no resize handle. */
+.input--area {
+  display: block;
+  min-height: calc(3 * 18px + 2 * var(--space-16) + 2px);   /* three 18px lines, the padding and the border */
+  padding: var(--space-16);
+  border-radius: var(--radius-card);
+  resize: none;
+  field-sizing: content;
+}

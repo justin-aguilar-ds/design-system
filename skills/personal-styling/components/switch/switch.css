@@ -1,0 +1,92 @@
+/* personal-styling · switch · v0.1.0 */
+
+/* On or off, in place. The slider's own parts: its 16px track, its 12px
+   thumb and the 2px between them, and full ink for the side that's on.
+   State without colour. The label is the 36px hit area every control
+   shares; the track drawn inside it is the slider's size, so a switch and
+   a slider in one panel read as the same part. */
+.switch {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: var(--space-16);         /* the track to a label beside it, as a mark to its label */
+  min-height: var(--height-control);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+/* The native checkbox stays for semantics and the keyboard. It covers the
+   whole switch, invisible. */
+.switch-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.switch-track {
+  position: relative;
+  flex: none;
+  width: 28px;                  /* the thumb, its 12px of travel and the inset either side */
+  height: 16px;                 /* the slider's track */
+  padding: calc(var(--inset-fill) / 2);   /* 2px: the slider's inset around its thumb */
+  border-radius: var(--radius-pill);
+  background: var(--color-range-track);
+  overflow: hidden;
+}
+/* The ink for the on side is a layer over the grey track, like the
+   slider's progress: 0 at rest, 30% as a hover preview, full when on.
+   A colour change, so plain ease. */
+.switch-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-range-progress);
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+.switch-thumb {
+  position: relative;
+  display: block;
+  width: 12px;                  /* the slider's thumb */
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-range-thumb);
+  box-shadow: var(--shadow-range-thumb);
+  transition:
+    translate var(--duration-base) var(--ease-out),
+    scale var(--duration-base) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .switch:hover:not(:has(:disabled)) { color: var(--color-text); }
+  .switch:hover:not(:has(:disabled)) .switch-track::before {
+    opacity: var(--opacity-label-inactive);
+    transition-duration: var(--duration-fast);
+  }
+}
+/* Touch: the hover response plays on press (see tokens.css). */
+@media (hover: none) {
+  .switch:active:not(:has(:disabled)) { color: var(--color-text); transition-duration: var(--duration-instant); }
+}
+/* On: full ink, the thumb across. Three classes deep so it wins over the
+   hover preview. */
+.switch:has(.switch-input:checked) { color: var(--color-text); }
+.switch .switch-input:checked + .switch-track.switch-track::before { opacity: 1; }
+.switch-input:checked + .switch-track .switch-thumb { translate: 12px 0; }   /* the track's width less its height */
+/* Tactility: the thumb is a handle, so it presses in while held. */
+.switch-input:active:not(:disabled) + .switch-track .switch-thumb {
+  scale: var(--scale-press);
+  transition-duration: var(--duration-fast);
+}
+/* The track carries the focus outline, not the invisible input. */
+.switch-input:focus-visible { outline: none; }
+.switch-input:focus-visible + .switch-track { outline: 2px solid var(--color-text); outline-offset: 2px; }
+.switch:has(.switch-input:disabled) {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}

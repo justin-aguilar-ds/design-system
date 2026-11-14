@@ -1,0 +1,96 @@
+/* personal-styling · choice · v0.1.0 */
+
+/* A checkbox or a radio: a mark beside a line of text. Both marks are a
+   16px circle — the system has no small corner, and 16 is the height of
+   the slider's and the switch's track, so every small control is one
+   size. A checkbox fills with ink and takes a check; a radio keeps its
+   ring and takes a dot. State without colour. */
+.choice-group {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* The group's name is Label, 8 above the first choice. */
+.choice-group > legend { padding: 0 0 var(--space-8); }
+
+/* Each choice is a 36px row, so a column of them has a control's rhythm
+   and a finger has room. The label follows the chip: secondary off, full
+   ink on. */
+.choice {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-16);         /* the mark to its label */
+  min-height: var(--height-control);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+/* The native input stays for semantics and the keyboard. It covers the
+   whole choice, invisible. */
+.choice-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+/* The ring is the label's ink, like a chip's dot. */
+.choice-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--icon-inline);    /* 16px: the slider's and the switch's track */
+  height: var(--icon-inline);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  transition:
+    background-color var(--duration-fast) ease,
+    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
+}
+/* The check or the dot pops in from nothing, like a tooltip. */
+.choice-mark > * {
+  scale: 0;
+  transition: scale var(--duration-base) var(--ease-out);
+}
+.choice-check {
+  width: var(--icon-mark);
+  height: var(--icon-mark);
+  color: var(--color-bg);
+}
+.choice-dot {
+  width: 8px;                   /* the chip's dot */
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+.choice:has(.choice-input:checked) { color: var(--color-text); }
+.choice-input:checked + .choice-mark > * { scale: 1; }
+.choice-input[type="checkbox"]:checked + .choice-mark { background: var(--color-text); }
+/* The mark carries the focus outline, not the invisible input. */
+.choice-input:focus-visible { outline: none; }
+.choice-input:focus-visible + .choice-mark { outline: 2px solid var(--color-text); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .choice:hover:not(:has(:disabled)) { color: var(--color-text); }
+}
+/* Touch: the hover response plays on press, and the mark gives like a
+   handle (see tokens.css). */
+@media (hover: none) {
+  .choice:active:not(:has(:disabled)) { color: var(--color-text); transition-duration: var(--duration-instant); }
+  .choice:active:not(:has(:disabled)) .choice-mark { scale: var(--scale-press); transition-duration: var(--duration-instant); }
+}
+.choice:has(.choice-input:disabled) {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}
+/* Same specificity as the press, and later, so it wins. */
+@media (prefers-reduced-motion: reduce) {
+  .choice:active:not(:has(:disabled)) .choice-mark { scale: none; }
+}

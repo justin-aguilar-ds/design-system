@@ -1,6 +1,6 @@
 # Input
 
-A single line of text — a name, a URL, a search — in the same pill as the picker, with its label above.
+Text someone types — a name, a URL, a search, or a few lines of notes — in the same pill as the picker, with its label above.
 
 ## Rules
 
@@ -12,15 +12,21 @@ A single line of text — a name, a URL, a search — in the same pill as the pi
 - **Errors are glyph + word, at full ink.** `aria-invalid="true"` gives the field a full-ink edge, and the message under it says what to do: "✗ Enter a full URL, starting with https://". Problems get more ink, never less.
 - **Help is one line of Caption** under the field, in secondary ink. If it needs two, it belongs in a tooltip.
 - **Disabled** drops to 30% and loses its shadow.
+- **Several lines are a text area, and a card.** `.input--area` is the same field grown past one row, so it takes the card radius and a card's `16px` inside, not the pill. Three lines at least; it grows with what is typed, and there is no resize handle.
 - **It fills its field.** Width comes from the container — a control panel column, a form, a docked panel.
 
 ## Use
 
 - Each field is `.input-field` › `<label>`, `<input class="input">`, and an optional `<p class="input-message t-caption">`. Wire the label with `for`, and the message with `aria-describedby`.
 - **Search:** wrap the input in `<span class="input-wrap input-wrap--search">` with the glyph before it, and use `type="search"`.
+- **Text area:** `<textarea class="input input--area">` in the same `.input-field`. In a control panel it goes under its label, across the panel (`.field--wide`).
 - **Error:** set `aria-invalid="true"` on the input, add `.is-error` to the message, and start the message with `✗`.
 - In a control panel, put `.input-field` straight into `.control-panel-fields` beside the other fields.
 - No JavaScript.
+
+## Changes in v0.4.0
+
+- `.input--area`: a text area, as a card.
 
 ## Changes in v0.3.1
 

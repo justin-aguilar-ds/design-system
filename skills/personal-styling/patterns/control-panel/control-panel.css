@@ -1,4 +1,4 @@
-/* personal-styling · control-panel · v0.14.0 */
+/* personal-styling · control-panel · v0.15.0 */
 
 /* One accordion item in the one surface style. The persistent rest
    shadow is the deliberate exception to "a shadow means it lifts": it
@@ -75,6 +75,12 @@
 .control-panel-fields .picker,
 .control-panel-fields .picker-trigger { width: 100%; }
 .control-panel-fields .picker-trigger { justify-content: space-between; }
+/* NEW (v0.15): a small control — a switch, a lone mark, a stepper — hugs
+   its content instead of filling the column, and sits at the column's
+   end: on the right line every other control ends on. */
+.control-panel-fields > * > :is(.switch, .choice, .stepper):nth-child(2) { justify-self: end; }
+/* A text area or a group of choices fills the panel under its label. */
+.control-panel-fields .input--area { width: 100%; }
 /* A slider's value rides above its thumb as a tooltip (see the slider);
    an older .slider-head keeps the value beside the label instead. */
 .control-panel-fields .slider-head { justify-content: flex-start; }

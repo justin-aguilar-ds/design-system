@@ -1,0 +1,31 @@
+# Choice
+
+A checkbox or a radio: a small round mark beside a line of text, for a choice that needs its own sentence.
+
+| | Off | On |
+|---|---|---|
+| Checkbox | a ring | filled with ink, a check in the ground colour |
+| Radio | a ring | the ring, a solid `8px` dot |
+| Label | secondary | full ink |
+
+## Rules
+
+- **Both marks are a `16px` circle.** The system has no small corner, so there is no square checkbox. `16px` is the height of the slider's and the switch's track: every small control is one size. What tells the two apart is the fill: a checkbox fills and takes a check, a radio keeps its ring and takes a dot.
+- **The mark is `16px` from its label.** The label is Body; secondary when off, full ink when on, like a chip.
+- **Each choice is a `36px` row** (`--height-control`), stacked with nothing between, so a column of them has a control's rhythm and a finger has room. The whole row is the target.
+- **State without colour.** Ink and a glyph. Never the accent.
+- **Checkbox, chip or switch.** Short filters on one line are chips (`components/chip/`). A setting that acts at once is a switch (`components/switch/`). A checkbox is for a choice with a sentence to it, or one that waits for a button: a list to tick off, terms to accept.
+- **Radio or segmented control.** A few short options are a segmented control (`components/segmented/`). Radios are for options that each need a full line. More than five or six, a picker (`components/picker/`).
+- **A group has a name.** `fieldset.choice-group` with a `legend` in Label, `8px` above the first choice. Under a heading that already names it, drop the legend and give the fieldset an `aria-label`.
+- **In a control panel**, a lone checkbox is a bare mark at the end of its row, named by the panel's mono label; a group goes under its label, across the panel (`.field--wide`).
+- **Hover brightens** the label and its ring to full ink. On touch the mark presses to `--scale-press`.
+- **The check and the dot pop in** from `0` on `--duration-base` with `--ease-out`.
+- **Focus is on the mark:** the system's full-ink outline, `2px` off it.
+
+## Use
+
+- `<label class="choice t-body">` › `<input class="choice-input" type="checkbox">` (or `type="radio"`), then `.choice-mark` holding the check (`svg.choice-check`) or the dot (`span.choice-dot`), then the text.
+- Radios in one group share a `name`.
+- A bare mark has no text; give the input `aria-label` or `aria-labelledby`.
+- Listen for the inputs' own `change` events.
+- No JavaScript.

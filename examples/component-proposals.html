@@ -13,6 +13,9 @@
 <link rel="stylesheet" href="lib/components/input/input.css">
 <link rel="stylesheet" href="lib/components/picker/picker.css">
 <link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/switch/switch.css">
+<link rel="stylesheet" href="lib/components/choice/choice.css">
+<link rel="stylesheet" href="lib/components/stepper/stepper.css">
 <link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/components/list-row/list-row.css">
 <link rel="stylesheet" href="lib/components/toast/toast.css">
@@ -190,171 +193,8 @@
   .menu-readout { color: var(--color-text-secondary); }
 
   /* ============================================================
-     PROPOSED · switch — on or off, in place
-     ============================================================ */
-  /* The slider's own parts: its 16px track, its 12px thumb and its 2px
-     inset, and full ink for the side that's on. State without colour. */
-  .switch {
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    flex: none;
-    height: var(--height-control);
-    cursor: pointer;
-  }
-  .switch-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: inherit; }
-  .switch-track {
-    position: relative;
-    width: 28px;                  /* the thumb, its 12px of travel and the inset */
-    height: 16px;                 /* the slider's track */
-    padding: 2px;                 /* the slider's inset around its thumb */
-    border-radius: var(--radius-pill);
-    background: var(--color-range-track);
-    overflow: hidden;
-  }
-  .switch-track::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--color-range-progress);
-    opacity: 0;
-    transition: opacity var(--duration-base) ease;
-  }
-  .switch-thumb {
-    position: relative;
-    display: block;
-    width: 12px;                  /* the slider's thumb */
-    height: 12px;
-    border-radius: var(--radius-pill);
-    background: var(--color-range-thumb);
-    box-shadow: var(--shadow-range-thumb);
-    transition: translate var(--duration-base) var(--ease-out), scale var(--duration-base) var(--ease-out);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .switch:hover .switch-input:not(:disabled) + .switch-track::before { opacity: var(--opacity-label-inactive); transition-duration: var(--duration-fast); }
-  }
-  .switch .switch-input:checked + .switch-track::before { opacity: 1; }
-  .switch-input:checked + .switch-track .switch-thumb { translate: 12px 0; }   /* the track's width less its height */
-  .switch-input:active:not(:disabled) + .switch-track .switch-thumb { scale: var(--scale-press); transition-duration: var(--duration-fast); }
-  .switch-input:focus-visible + .switch-track { outline: 2px solid var(--color-text); outline-offset: 2px; }
-  .switch:has(.switch-input:disabled) { opacity: var(--opacity-label-inactive); cursor: not-allowed; }
-  .switch-alt:has(:disabled) { opacity: var(--opacity-label-inactive); box-shadow: none; pointer-events: none; }
-  .specimens.switch-segments .switch,
-  .specimens:not(.switch-segments) .switch-alt { display: none; }
-
-  /* ============================================================
-     PROPOSED · checkbox and radio — a mark beside a line of text
-     ============================================================ */
-  /* Both are a 20px circle, because the system has no small corner. A
-     checkbox fills with ink and takes a check; a radio keeps its ring
-     and takes a dot. The label follows the chip: secondary off, full on. */
-  .choice-group { display: grid; justify-items: start; min-width: 0; margin: 0; padding: 0; border: 0; }
-  .choice-group > legend { padding: 0 0 var(--space-8); }
-  .choice {
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-16);         /* the mark to its label */
-    min-height: var(--height-control);
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    transition: color var(--duration-fast) ease;
-  }
-  .choice-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: inherit; }
-  .choice-mark {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: var(--icon-control);
-    height: var(--icon-control);
-    border: 1px solid currentColor;
-    border-radius: var(--radius-pill);
-    color: inherit;
-    transition: background-color var(--duration-fast) ease, scale var(--duration-base) var(--ease-out);
-  }
-  .choice-mark > * { scale: 0; transition: scale var(--duration-base) var(--ease-out); }
-  .choice-check { width: var(--icon-mark); height: var(--icon-mark); color: var(--color-bg); }
-  .choice-dot { width: 8px; height: 8px; border-radius: var(--radius-pill); background: currentColor; }
-  .choice:has(.choice-input:checked) { color: var(--color-text); }
-  .choice-input:checked + .choice-mark > * { scale: 1; }
-  .choice-input[type="checkbox"]:checked + .choice-mark { background: var(--color-text); }
-  .choice-input:focus-visible + .choice-mark { outline: 2px solid var(--color-text); outline-offset: 2px; }
-  @media (hover: hover) and (pointer: fine) {
-    .choice:hover:not(:has(:disabled)) { color: var(--color-text); }
-  }
-  @media (hover: none) {
-    .choice:active:not(:has(:disabled)) { color: var(--color-text); transition-duration: var(--duration-instant); }
-    .choice:active:not(:has(:disabled)) .choice-mark { scale: var(--scale-press); transition-duration: var(--duration-instant); }
-  }
-  .choice:has(.choice-input:disabled) { color: var(--color-text); opacity: var(--opacity-label-inactive); cursor: not-allowed; }
-
-  /* ============================================================
-     PROPOSED · text area — several lines of text
-     ============================================================ */
-  /* The input, grown past one row: so a card, not a pill, with a card's
-     16 inside. It grows with what is typed; there is no resize handle. */
-  .input--area {
-    display: block;
-    min-height: calc(3 * 18px + 2 * var(--space-16) + 2px);   /* three lines, the padding and the border */
-    padding: var(--space-16);
-    border-radius: var(--radius-card);
-    resize: none;
-    field-sizing: content;
-  }
-
-  /* ============================================================
-     PROPOSED · stepper — a small whole number
-     ============================================================ */
-  /* One pill: minus, the number, plus. The steps are bare marks inside
-     the control, 16 from its edge and 8 from the number. */
-  .stepper { display: inline-flex; align-items: center; height: var(--height-control); }
-  .stepper-step {
-    -webkit-tap-highlight-color: transparent;
-    display: flex;
-    align-items: center;
-    align-self: stretch;
-    padding: 0 var(--gap-mark) 0 var(--inset-control);
-    border-radius: var(--radius-pill);
-    color: var(--color-text-secondary);
-    transition: color var(--duration-fast) ease;
-  }
-  .stepper-step:last-child { padding: 0 var(--inset-control) 0 var(--gap-mark); }
-  .stepper-step svg { width: var(--icon-mark); height: var(--icon-mark); transition: scale var(--duration-base) var(--ease-out); }
-  .stepper-step:active:not(:disabled) svg { scale: var(--scale-press); transition-duration: var(--duration-fast); }
-  .stepper-step:disabled { color: var(--color-text); opacity: var(--opacity-label-inactive); cursor: not-allowed; }
-  @media (hover: hover) and (pointer: fine) {
-    .stepper-step:hover:not(:disabled) { color: var(--color-text); }
-  }
-  @media (hover: none) {
-    .stepper-step:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
-  }
-  .stepper-input {
-    width: 3ch;
-    min-width: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    font: inherit;
-    font-size: 16px;   /* below 16, iOS zooms the page on focus */
-    color: var(--color-text);
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-  .stepper-input:focus-visible { outline: none; }
-  .stepper:has(.stepper-input:focus-visible) { outline: 2px solid var(--color-text); outline-offset: 2px; }
-  /* Beside: the input as it is, with two secondary icon buttons after it. */
-  .stepper-beside { display: flex; align-items: center; gap: var(--space-8); }
-  .stepper-beside .input { width: 8ch; text-align: center; font-variant-numeric: tabular-nums; }
-  .specimens.stepper-beside-on .stepper--inside,
-  .specimens:not(.stepper-beside-on) .stepper-beside { display: none; }
-
-  /* ============================================================
-     TEST · the inputs in a control panel, beside the controls that
-     exist: do they need a shared height?
+     ADOPTED · the inputs, now from the library, in a control panel
+     beside the controls that were already there.
      ============================================================ */
   .cp { position: relative; width: var(--cp-w, 280px); max-width: 100%; padding: var(--space-16); display: grid; gap: var(--space-16); }
   /* The panel is shown at the docked or sheet width at any screen size,
@@ -364,11 +204,6 @@
   .cp.control-panel .control-panel-fields > :not(:first-child) { padding-top: var(--space-16); border-top: 1px solid var(--color-divider); }
   .cp-actions > .button-row { grid-column: 1 / -1; align-items: center; }
   .cp .choice-group { gap: 0; }
-  .cp .input--area { width: 100%; }
-  /* Small controls (a switch, a lone mark) don't fill the column: they
-     start on its left line, or end on its right one. */
-  .specimens.small-end .cp .control-panel-fields > * > .cp-small { justify-self: end; }
-  .specimens:not(.small-end) .cp .control-panel-fields > * > .cp-small { justify-self: start; }
   /* Guides: a 36px band through the centre of each control, and the
      control's own drawn height after its label. */
   .cp-band { position: absolute; left: 0; right: 0; height: var(--height-control); background: var(--color-accent-soft); pointer-events: none; }
@@ -383,7 +218,7 @@
   .sheet-note { color: var(--color-text-secondary); }
   .proposals { padding: 0; list-style: none; display: grid; }
   .proposal { display: grid; gap: var(--space-16); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
-  .proposal[hidden], .control-field[hidden] { display: none; }
+  .proposal[hidden], .control-field[hidden], .sheet-section[hidden] { display: none; }
   .proposal.is-first { border-top: 0; padding-top: 0; }
   .proposal > .segmented { justify-self: start; }
   .proposal-copy { display: grid; gap: var(--space-8); }
@@ -411,8 +246,8 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', icons: 'off', sep: 'on', trigger: 'icon', sw: 'track', step: 'inside', guides: 'on', small: 'start', cpw: '280' }, saved.state);
-['rowh', 'swh', 'mark'].forEach((k) => delete state[k]);   // decided: heights can differ
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', icons: 'off', sep: 'on', trigger: 'icon', guides: 'off', cpw: '280' }, saved.state);
+['rowh', 'swh', 'mark', 'sw', 'step', 'small'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const chevronRight = '<svg class="row-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 6.5 5 3.5 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -442,23 +277,12 @@ const colRow = (cols, [name, desc, value], open) => {
     ${cols === 2 ? '' : `<span class="row-end"><span class="t-label tnum">${value}</span>${open ? chevronRight : ''}</span>`}
   </${open ? 'button' : 'div'}></li>`;
 };
-const switchCtl = (label, on, disabled) => `
-  <label class="switch"><input class="switch-input" type="checkbox" role="switch" aria-label="${label}"${on ? ' checked' : ''}${disabled ? ' disabled' : ''}><span class="switch-track"><span class="switch-thumb"></span></span></label>
-  <div class="segmented switch-alt" role="group" aria-label="${label}">
-    <span class="segmented-indicator" aria-hidden="true"></span>
-    <button class="segmented-option t-control${on ? '' : ' is-active'}" type="button" aria-pressed="${!on}"${disabled ? ' disabled' : ''}>Off</button>
-    <button class="segmented-option t-control${on ? ' is-active' : ''}" type="button" aria-pressed="${!!on}"${disabled ? ' disabled' : ''}>On</button>
-  </div>`;
+const switchCtl = (label, on, disabled) => `<label class="switch"><input class="switch-input" type="checkbox" role="switch" aria-label="${label}"${on ? ' checked' : ''}${disabled ? ' disabled' : ''}><span class="switch-track"><span class="switch-thumb"></span></span></label>`;
 const stepperCtl = (label, value) => `
-  <div class="stepper stepper--inside surface surface--rest surface--pill" data-min="0" data-max="12">
+  <div class="stepper surface surface--rest surface--pill" data-min="0" data-max="12">
     <button class="stepper-step" type="button" aria-label="Fewer"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-    <input class="stepper-input t-body" inputmode="numeric" aria-label="${label}" value="${value}">
+    <input class="stepper-input" inputmode="numeric" aria-label="${label}" value="${value}">
     <button class="stepper-step" type="button" aria-label="More"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-  </div>
-  <div class="stepper stepper-beside" data-min="0" data-max="12">
-    <input class="input stepper-input-beside" inputmode="numeric" aria-label="${label}" value="${value}">
-    <button class="icon-button icon-button--secondary stepper-step-beside" type="button" aria-label="Fewer"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-    <button class="icon-button icon-button--secondary stepper-step-beside" type="button" aria-label="More"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
   </div>`;
 const setting = (name, desc, control) => `<li><div class="list-row list-row--setting"><span class="list-row-main"><span class="t-label">${name}</span><span class="t-body">${desc}</span></span>${control}</div></li>`;
 const statusRow = (name, sub, glyph, word, problem) => `<li><div class="list-row"><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="list-row-sub t-mono">${sub}</span></span><span class="status t-mono${problem ? ' is-problem' : ''}">${glyph} ${word}</span></div></li>`;
@@ -515,7 +339,7 @@ const cpSeg = `<div class="segmented" role="group" aria-labelledby="cp-view-l"><
 const cpPick = `<div class="picker"><button class="picker-trigger button surface surface--rest surface--pill t-control" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="cp-range-list" aria-labelledby="cp-range-l cp-range-v"><span class="picker-value" id="cp-range-v">Last 7 days</span><svg class="picker-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="picker-menu" hidden><ul class="picker-list" id="cp-range-list" role="listbox" tabindex="-1" aria-labelledby="cp-range-l">${[['1d', 'Today'], ['7d', 'Last 7 days'], ['30d', 'Last 30 days']].map(([v, t]) => `<li class="picker-option t-control" role="option" aria-selected="${v === '7d'}" data-value="${v}">${t}</li>`).join('')}</ul></div></div>`;
 const cpSlider = `<span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" id="cp-smooth" type="range" min="0" max="100" value="40"><output class="slider-value t-mono" for="cp-smooth">40</output></span>`;
 const cpField = (id, label, control, measure, cls = 'control-field') => `<div class="${cls} cp-field" data-measure="${measure}"><${cls === 'slider-field' ? 'label for="cp-smooth"' : 'span'} class="t-mono" id="cp-${id}-l">${label}</${cls === 'slider-field' ? 'label' : 'span'}>${control}</div>`;
-const small = (html) => `<span class="cp-small" style="display: inline-flex; align-items: center;">${html}</span>`;
+const small = (html) => html;
 const panel = `
   <section class="cp control-panel surface" aria-label="Controls">
     <h2 class="t-mono">Controls</h2>
@@ -523,7 +347,7 @@ const panel = `
       ${cpField('view', 'View', cpSeg, '.segmented')}
       ${cpField('range', 'Range', cpPick, '.picker-trigger')}
       ${cpField('smooth', 'Smoothing', cpSlider, '.slider-track', 'slider-field')}
-      ${cpField('guests', 'Travellers', small(stepperCtl('Travellers', 2)), '.stepper:not([hidden])')}
+      ${cpField('guests', 'Travellers', small(stepperCtl('Travellers', 2)), '.stepper')}
       ${cpField('labels', 'Labels', small(switchCtl('Labels', true)), '.switch-track')}
       ${cpField('grid', 'Gridlines', small(choice('checkbox', 'cp-grid', '', true)), '.choice-mark')}
       ${cpField('scale', 'Scale', `<fieldset class="choice-group" aria-labelledby="cp-scale-l">${choice('radio', 'cp-scale', 'Linear', true)}${choice('radio', 'cp-scale', 'Logarithmic', false)}</fieldset>`, '', 'control-field field--wide')}
@@ -538,12 +362,12 @@ const panel = `
     </div>
   </section>`;
 const inputs = `
-  ${spec('I6', 'In a control panel', panel)}
-  ${spec('I1', 'Switch', `<div class="state-row">${switchCtl('Off', false)}${switchCtl('On', true)}${switchCtl('Disabled', true, true)}</div>`)}
-  ${spec('I2', 'Checkbox', `<fieldset class="choice-group"><legend class="t-label">Pack</legend>${choice('checkbox', 'pack', 'Passports', true)}${choice('checkbox', 'pack', 'Chargers and an adaptor', false)}${choice('checkbox', 'pack', 'Rain jackets', false)}${choice('checkbox', 'pack', 'Travel insurance', true, true)}</fieldset>`)}
-  ${spec('I3', 'Radio', `<fieldset class="choice-group"><legend class="t-label">Getting to Porto</legend>${choice('radio', 'porto', 'Train, three hours', true)}${choice('radio', 'porto', 'Hire car', false)}${choice('radio', 'porto', 'Flight', false)}${choice('radio', 'porto', 'Coach', false, true)}</fieldset>`)}
-  ${spec('I4', 'Text area', `<div class="form"><div class="input-field"><label class="t-label" for="trip-notes">Notes</label><textarea class="input input--area" id="trip-notes" placeholder="Anything the others should know">The Alfama flat has no lift. Pack light.</textarea></div></div>`)}
-  ${spec('I5', 'Stepper', `<div class="control-field"><span class="t-label">Travellers</span>${stepperCtl('Travellers', 2)}</div>`)}`;
+  ${spec('Control panel', 'the inputs beside the other controls', panel)}
+  ${spec('Switch', 'on, off, disabled', `<div class="state-row">${switchCtl('Off', false)}${switchCtl('On', true)}${switchCtl('Disabled', true, true)}</div>`)}
+  ${spec('Choice', 'checkbox', `<fieldset class="choice-group"><legend class="t-label">Pack</legend>${choice('checkbox', 'pack', 'Passports', true)}${choice('checkbox', 'pack', 'Chargers and an adaptor', false)}${choice('checkbox', 'pack', 'Rain jackets', false)}${choice('checkbox', 'pack', 'Travel insurance', true, true)}</fieldset>`)}
+  ${spec('Choice', 'radio', `<fieldset class="choice-group"><legend class="t-label">Getting to Porto</legend>${choice('radio', 'porto', 'Train, three hours', true)}${choice('radio', 'porto', 'Hire car', false)}${choice('radio', 'porto', 'Flight', false)}${choice('radio', 'porto', 'Coach', false, true)}</fieldset>`)}
+  ${spec('Input', 'text area', `<div class="form"><div class="input-field"><label class="t-label" for="trip-notes">Notes</label><textarea class="input input--area" id="trip-notes" placeholder="Anything the others should know">The Alfama flat has no lift. Pack light.</textarea></div></div>`)}
+  ${spec('Stepper', 'a small whole number', `<div class="control-field"><span class="t-label">Travellers</span>${stepperCtl('Travellers', 2)}</div>`)}`;
 
 document.getElementById('specimens').innerHTML = [['figures', figures], ['rows', rows], ['menu', menu], ['inputs', inputs]]
   .map(([g, html]) => `<div class="group" data-group="${g}">${html}</div>`).join('');
@@ -567,19 +391,13 @@ const PROPOSALS = [
   ['rows', 'R2', 'Two columns', 'The name in the first third, the sentence in the other two. For names scanned down the left. View at Read.'],
   ['rows', 'R3', 'Three columns', 'Name, sentence and value, a third each, the value at the right edge. View at Read.'],
   ['rows', 'R4', 'Detail row', 'A name and its value on one line: a spec list. Detail puts the value at the right edge, or on the second column so it lines up with every other list.'],
-  ['rows', 'R5', 'Setting row', 'The name and its sentence on the left, one control at the end, centred on the row. The control is a switch (I1) or a stepper (I5).'],
+  ['rows', 'R5', 'Setting row', 'The name and its sentence on the left, one control at the end, centred on the row. The control is a switch or a stepper, from the library.'],
   ['rows', 'R6', 'Status row', 'Glyph and word in mono at the end of the row. Good and unknown in secondary ink, a problem in full ink. Never a badge, never colour.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
   ['menu', 'M1', 'Menu of actions', 'The picker’s menu holding actions: the same surface, inset, 32px items and gliding fill, growing from its trigger. Nothing is selected, so nothing carries a check. Arrow keys, Home, End and Escape work.'],
   ['menu', 'M2', 'Icons in the menu', 'A 16px icon before each action, in the label’s ink. Declined, the menu is words only. Switch it with Icons.'],
   ['menu', 'M3', 'A divider before the destructive action', 'Delete sits last, under a divider, in the same ink as the rest. It is never red: red is for values. Switch it with Divider.'],
   ['menu', 'M4', 'A labelled trigger', 'A button with a chevron (Actions) instead of the More icon button, for when the menu is the main way to act. Switch it with Trigger.'],
-  ['inputs', 'I6', 'A shared height in a panel', 'The new inputs in a control panel beside a segmented control, a select, a slider and buttons. With 36 guides on, the yellow band is the 36px control height through each control’s centre, and the figure after each label is that control’s drawn height. Decided: heights can differ. The switch is the slider’s size (a 16 track, a 12 thumb), a mark is 20, and the rest are 36. Small controls sets where a switch, a mark or a stepper sits in the control column.'],
-  ['inputs', 'I1', 'Switch', 'The slider’s own parts: its 16px track and its 12px thumb, grey when off, full ink when on, the thumb pressing in under a finger. Declined, on and off stay a two-option segmented control. Switch it with Switch; it shows in R5 too.'],
-  ['inputs', 'I2', 'Checkbox', 'A 20px circle, 16 from its label, that fills with ink and takes a check. A circle, because the system has no small corner. The label is secondary when off and full ink when on, like a chip.'],
-  ['inputs', 'I3', 'Radio', 'The same circle, keeping its ring and taking a dot. For one choice from a few that need a full line each; shorter choices stay a segmented control.'],
-  ['inputs', 'I4', 'Text area', 'The input grown past one row, so it is a card with 16 inside. It grows with what is typed and has no resize handle. The notes fields below are this one.'],
-  ['inputs', 'I5', 'Stepper', 'A pill holding minus, the number and plus, the steps as bare marks. Stepper puts two icon buttons beside a plain input instead. It shows in R5 too.'],
 ];
 document.getElementById('sheet-body').innerHTML = `
   <div class="picker-field">
@@ -603,12 +421,12 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('icons', 'Icons', [['off', 'Off'], ['on', 'On']], 'menu')}
   ${seg('sep', 'Divider', [['off', 'Off'], ['on', 'On']], 'menu')}
   ${seg('trigger', 'Trigger', [['icon', 'Icon'], ['label', 'Label']], 'menu')}
-  ${seg('sw', 'Switch', [['track', 'Track'], ['segments', 'Segments']], 'inputs rows')}
-  ${seg('step', 'Stepper', [['inside', 'Inside'], ['beside', 'Beside']], 'inputs rows')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
-  ${seg('small', 'Small controls', [['start', 'Start'], ['end', 'End']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
-  <div class="sheet-section">
+  <div class="sheet-section" data-for="inputs">
+    <p class="t-body sheet-note">Adopted. The switch, the checkbox and radio (choice), the stepper and the text area are in the library now, and this view loads them from there. A track and a mark are 16, a thumb 12, a mark 16 from its label; a small control ends its row in a panel.</p>
+  </div>
+  <div class="sheet-section" data-for="figures rows menu">
     <ol class="proposals" id="proposals">${PROPOSALS.map(([group, id, title, body]) => `
       <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}" data-for="${group}">
         <div class="proposal-copy">
@@ -634,6 +452,7 @@ document.getElementById('sheet-body').innerHTML = `
 <script src="lib/components/segmented/segmented.js"></script>
 <script src="lib/components/picker/picker.js"></script>
 <script src="lib/components/slider/slider.js"></script>
+<script src="lib/components/stepper/stepper.js"></script>
 <script src="lib/components/toast/toast.js"></script>
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
@@ -665,9 +484,7 @@ document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column',
-    'has-menu-icons': state.icons === 'on', 'has-menu-sep': state.sep === 'on', 'menu-label': state.trigger === 'label',
-    'switch-segments': state.sw === 'segments', 'stepper-beside-on': state.step === 'beside',
-    'has-guides': state.guides === 'on', 'small-end': state.small === 'end' };
+    'has-menu-icons': state.icons === 'on', 'has-menu-sep': state.sep === 'on', 'menu-label': state.trigger === 'label', 'has-guides': state.guides === 'on' };
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
@@ -688,7 +505,7 @@ function summarise() {
   const ids = PROPOSALS.map((p) => p[1]);
   const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
   const a = by('approve'), d = by('decline'), p = by('pending');
-  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide, across all four components.`;
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide, across figures, rows and the menu.`;
   const noted = ids.filter((id) => (notes[id] || '').trim());
   const { group, pw, ...options } = state;
   document.getElementById('copy-decisions').dataset.copy = [
@@ -709,28 +526,6 @@ proposals.addEventListener('input', (e) => {
   const li = e.target.closest('.proposal'); if (!li) return;
   notes[li.dataset.id] = e.target.value;
   summarise(); save();
-});
-
-// ---- Proposed: stepper. Clamps to data-min / data-max; a step at its
-// limit is disabled.
-document.querySelectorAll('.stepper').forEach((stepper) => {
-  const input = stepper.querySelector('input');
-  const [down, up] = stepper.querySelectorAll('button');
-  const min = Number(stepper.dataset.min ?? -Infinity), max = Number(stepper.dataset.max ?? Infinity);
-  const set = (n) => {
-    const v = Math.min(max, Math.max(min, Number.isFinite(n) ? Math.round(n) : min));
-    input.value = v;
-    down.disabled = v <= min;
-    up.disabled = v >= max;
-  };
-  down.addEventListener('click', () => set(Number(input.value) - 1));
-  up.addEventListener('click', () => set(Number(input.value) + 1));
-  input.addEventListener('change', () => set(Number(input.value)));
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp') { e.preventDefault(); set(Number(input.value) + 1); }
-    if (e.key === 'ArrowDown') { e.preventDefault(); set(Number(input.value) - 1); }
-  });
-  set(Number(input.value));
 });
 
 // ---- Proposed: menu. A button opens a list of actions; the fill glides
