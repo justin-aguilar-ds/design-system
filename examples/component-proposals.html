@@ -178,6 +178,17 @@
   .row-lead svg { width: var(--icon-control); height: var(--icon-control); }
   .specimens:not(.lead-circle) .row-lead--icon { --lead-w: var(--icon-control); background: none; }
   .specimens.lead-36 { --lead: var(--height-control); }
+  /* Bets: polarity on a leading row, one signal per bet. Ink: the result
+     takes gain or loss ink and the circle stays grey. Circle: the circle
+     takes the soft fill with its arrow in the ink (a small tile whose
+     whole content is the value, like a calendar day) and the result
+     stays black. An open or pushed bet takes neither. */
+  .specimens.pol-ink .bet-gain .row-value { color: var(--color-gain-ink); }
+  .specimens.pol-ink .bet-loss .row-value { color: var(--color-loss-ink); }
+  .specimens.pol-circle .bet-gain .row-lead { background: var(--color-gain-fill); color: var(--color-gain-ink); }
+  .specimens.pol-circle .bet-loss .row-lead { background: var(--color-loss-fill); color: var(--color-loss-ink); }
+  .bet-open .row-lead, .bet-open .row-value { color: var(--color-text-secondary); }
+
   /* Inset dividers start at the text, so the leading marks read as one
      column and the lines belong to the words. */
   .specimens.div-inset .list-rows--lead > li { border-top: 0; }
@@ -249,7 +260,7 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'circle', leadsize: '36', leaddiv: 'full', subgap: '4', rowpad: '16' }, saved.state);
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'circle', leadsize: '36', leaddiv: 'full', subgap: '4', rowpad: '24', pol: 'ink' }, saved.state);
 if (state.leadsize === '50') state.leadsize = '48';
 ['rowh', 'swh', 'mark', 'sw', 'step', 'small', 'icons', 'sep', 'trigger'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -301,7 +312,21 @@ const LEAD_ICONS = {
 const leadRow = (lead, name, sub, value) => `<li><div class="list-row list-row--lead">${lead}<span class="row-body"><span class="list-row-name t-label">${name}</span><span class="row-value t-label tnum">${value}</span><span class="row-sub t-body">${sub}</span></span></div></li>`;
 const iconLead = (k) => `<span class="row-lead row-lead--icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${LEAD_ICONS[k]}</svg></span>`;
 const avatarLead = (initials) => `<span class="row-lead row-lead--avatar t-control" aria-hidden="true">${initials}</span>`;
+const BET_ICONS = {
+  gain: '<path d="M6 14 14 6M7.5 6H14v6.5"/>',
+  loss: '<path d="M6 6l8 8M14 7.5V14H7.5"/>',
+  open: '<path d="M5.5 10h9"/>',
+};
+const bet = (kind, name, sub, value) => `<li><button type="button" class="list-row list-row--lead bet-${kind}"><span class="row-lead row-lead--icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${BET_ICONS[kind]}</svg></span><span class="row-body"><span class="list-row-name t-label">${name}</span><span class="row-value t-label tnum">${value}</span><span class="row-sub t-body tnum">${sub}</span></span></button></li>`;
 const rows = `
+  ${spec('R13', 'Bets, with polarity', `<ul class="list-rows list-rows--lead list-rows--icons" aria-label="Bets">
+    ${bet('gain', 'Tatum o26.5 pts', 'Nov 3, at +115', '+$18.87')}
+    ${bet('loss', 'Jokic o9.5 ast', 'Nov 2, at −120', '−$10.00')}
+    ${bet('gain', 'Celtics −4.5', 'Nov 2, at −110', '+$9.09')}
+    ${bet('open', 'Knicks ML', 'Tonight, at +140', '$10.00')}
+    ${bet('loss', 'Curry o4.5 threes', 'Nov 1, at +105', '−$15.00')}
+    ${bet('open', 'Lakers +6.5', 'Oct 31, pushed', '$0.00')}
+  </ul>`)}
   ${spec('R1', 'One column', `<ul class="list-rows">${PLACES.map((p) => colRow(1, p, true)).join('')}</ul>`)}
   ${spec('R2', 'Two columns', `<ul class="list-rows">${PLACES.map((p) => colRow(2, p)).join('')}</ul>`)}
   ${spec('R3', 'Three columns', `<ul class="list-rows">${PLACES.map((p) => colRow(3, p)).join('')}</ul>`)}
@@ -402,6 +427,7 @@ const PROPOSALS = [
   ['figures', 'F2', 'Ruled figures', 'A divider above each figure. On a phone each one turns into a row, its name left and its number right, so three or more read down like a list. Pick F1 or F2 as the default.'],
   ['figures', 'F3', 'A lead figure', 'One Big number on a row of its own, the rest under it in the grid. For a view where one figure is the reason and the others qualify it.'],
   ['figures', 'F4', 'A change under the figure', 'A third line in mono: how the figure moved. The change takes polarity ink; the figure stays black, so each value carries one signal. Switch it with Change.'],
+  ['rows', 'R13', 'Bets, with polarity', 'The bet tracker’s list in the leading row: an arrow in the circle (up for a win, down for a loss, a dash for open or pushed), the result on the name’s line, the date and odds under it. Polarity puts green and red on the result as ink, or on the circle as a soft fill with its arrow; one signal per bet, never both. Open and pushed bets take no colour. Rows open, so they brighten on hover and press.'],
   ['rows', 'R1', 'One column', 'The name, its sentence under it, the value at the right of the name’s line. The default, and what every row becomes on a phone.'],
   ['rows', 'R2', 'Two columns', 'The name in the first third, the sentence in the other two. For names scanned down the left. View at Read.'],
   ['rows', 'R3', 'Three columns', 'Name, sentence and value, a third each, the value at the right edge. View at Read.'],
@@ -413,7 +439,7 @@ const PROPOSALS = [
   ['rows', 'R8', 'Leading icon', 'A 20px icon on a 48 stage-grey circle before the name, 16 from the text. The value sits on the name’s line and the Body sub-line runs under both. Icon sets it bare instead; Lead size takes the circle to 36.'],
   ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. 48, like the icon’s circle; Lead size takes both to a control’s 36.'],
   ['rows', 'R11', 'Space between a name and its sub-line', 'Title gap sets the distance from a row’s name to the line under it, on every row here: 8 (the label-to-value step), 4 (what the list row uses over a mono sub-line, and the pick so far), or 0 (the two lines as one block, like the Flat pair). Leave the switch where it reads best and say so in the note.'],
-  ['rows', 'R12', 'Space above and below a row', 'Row space sets the distance between a row’s content and its dividers, on every list here: 8, 16 (the list row’s today) or 24. The figure after each list’s name is its row height, divider to divider, measured live. With a 36 circle and a title gap of 4, a leading row is 58, 74 or 90.'],
+  ['rows', 'R12', 'Space above and below a row', 'Row space sets the distance between a row’s content and its dividers, on every list here: 8, 16 (the list row’s today) or 24. Decided: 24. The figure after each list’s name is its row height, divider to divider, measured live. With a 36 circle and a title gap of 4, a leading row is 58, 74 or 90.'],
   ['rows', 'R10', 'Inset dividers on leading rows', 'Dividers start at the text instead of the row’s left edge, so the icons or avatars read as one column. Switch it with Dividers.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
 ];
@@ -435,6 +461,7 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('pw', 'Column', [['phone', 'Phone'], ['read', 'Read']])}
   ${seg('change', 'Change', [['off', 'Off'], ['on', 'On']], 'figures')}
   ${seg('chevron', 'Chevron', [['off', 'Off'], ['on', 'On']], 'rows')}
+  ${seg('pol', 'Polarity', [['ink', 'Ink'], ['circle', 'Circle'], ['off', 'Off']], 'rows')}
   ${seg('rowpad', 'Row space', [['8', '8'], ['16', '16'], ['24', '24']], 'rows')}
   ${seg('subgap', 'Title gap', [['0', '0'], ['4', '4'], ['8', '8']], 'rows')}
   ${seg('leadicon', 'Icon', [['bare', 'Bare'], ['circle', 'Circle']], 'rows')}
@@ -521,7 +548,8 @@ document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on',
-    'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset' };
+    'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset',
+    'pol-ink': state.pol === 'ink', 'pol-circle': state.pol === 'circle' };
   specimens.style.setProperty('--sub-gap', `${state.subgap}px`);
   specimens.style.setProperty('--row-pad', `${state.rowpad}px`);
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
