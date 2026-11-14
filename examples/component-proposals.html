@@ -116,6 +116,10 @@
     .list-row--cols[data-cols="3"] { grid-template-areas: "name desc end"; }
     .list-row--cols[data-cols="3"] .row-end { justify-self: end; }
   }
+  /* Row spacing, the variant under test: the space above and below a
+     row's content, between it and the dividers. 16 is the list row's. */
+  .specimens .group[data-group="rows"] .list-row { padding-block: var(--row-pad, var(--space-16)); }
+  .spec-h { color: var(--color-text); }
   /* Detail: a name and its value on one line — a spec list. */
   .list-row--detail { align-items: baseline; }
   .list-row--detail > :last-child { text-align: right; }
@@ -245,13 +249,13 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'circle', leadsize: '48', leaddiv: 'full', subgap: '8' }, saved.state);
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'circle', leadsize: '36', leaddiv: 'full', subgap: '4', rowpad: '16' }, saved.state);
 if (state.leadsize === '50') state.leadsize = '48';
 ['rowh', 'swh', 'mark', 'sw', 'step', 'small', 'icons', 'sep', 'trigger'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const chevronRight = '<svg class="row-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 6.5 5 3.5 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const spec = (id, name, html) => `<section class="spec" data-spec="${id}" aria-label="${name}"><p class="spec-name t-caption">${id} · ${name}</p>${html}</section>`;
+const spec = (id, name, html) => `<section class="spec" data-spec="${id}" aria-label="${name}"><p class="spec-name t-caption">${id} · ${name}<span class="spec-h tnum"></span></p>${html}</section>`;
 
 // ---- Figures
 const FIGS = [['Net this month', '+$4,212', '+12.4% on October', 'ink-gain'], ['Win rate', '58%', '−3 pts', 'ink-loss'], ['Open bets', '9', '2 settle today', '']];
@@ -408,7 +412,8 @@ const PROPOSALS = [
   ['rows', 'R6c', 'Status glyph leads', 'The glyph takes the leading slot at the left, the word sits under the name and the date ends the row. The glyphs read down one column, so problems are found by scanning the left edge.'],
   ['rows', 'R8', 'Leading icon', 'A 20px icon on a 48 stage-grey circle before the name, 16 from the text. The value sits on the name’s line and the Body sub-line runs under both. Icon sets it bare instead; Lead size takes the circle to 36.'],
   ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. 48, like the icon’s circle; Lead size takes both to a control’s 36.'],
-  ['rows', 'R11', 'Space between a name and its sub-line', 'Title gap sets the distance from a row’s name to the line under it, on every row here: 8 (today, the label-to-value step), 4 (what the list row uses over a mono sub-line), or 0 (the two lines as one block, like the Flat pair). Leave the switch where it reads best and say so in the note.'],
+  ['rows', 'R11', 'Space between a name and its sub-line', 'Title gap sets the distance from a row’s name to the line under it, on every row here: 8 (the label-to-value step), 4 (what the list row uses over a mono sub-line, and the pick so far), or 0 (the two lines as one block, like the Flat pair). Leave the switch where it reads best and say so in the note.'],
+  ['rows', 'R12', 'Space above and below a row', 'Row space sets the distance between a row’s content and its dividers, on every list here: 8, 16 (the list row’s today) or 24. The figure after each list’s name is its row height, divider to divider, measured live. With a 36 circle and a title gap of 4, a leading row is 58, 74 or 90.'],
   ['rows', 'R10', 'Inset dividers on leading rows', 'Dividers start at the text instead of the row’s left edge, so the icons or avatars read as one column. Switch it with Dividers.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
 ];
@@ -430,6 +435,7 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('pw', 'Column', [['phone', 'Phone'], ['read', 'Read']])}
   ${seg('change', 'Change', [['off', 'Off'], ['on', 'On']], 'figures')}
   ${seg('chevron', 'Chevron', [['off', 'Off'], ['on', 'On']], 'rows')}
+  ${seg('rowpad', 'Row space', [['8', '8'], ['16', '16'], ['24', '24']], 'rows')}
   ${seg('subgap', 'Title gap', [['0', '0'], ['4', '4'], ['8', '8']], 'rows')}
   ${seg('leadicon', 'Icon', [['bare', 'Bare'], ['circle', 'Circle']], 'rows')}
   ${seg('leadsize', 'Lead size', [['36', '36'], ['48', '48']], 'rows')}
@@ -497,6 +503,19 @@ function measure() {
     if (label) label.dataset.h = Math.round(r.height);
   });
 }
+// Each list's name carries its row height, divider to divider: measured
+// from the tallest row, so it follows Row space, Title gap and Lead size.
+function measureRows() {
+  specimens.querySelectorAll('.group[data-group="rows"] .spec').forEach((sp) => {
+    const out = sp.querySelector('.spec-h');
+    const hs = [...sp.querySelectorAll('.list-rows > li > .list-row')].map((r) => Math.round(r.getBoundingClientRect().height)).filter(Boolean);
+    if (!out || !hs.length) return;
+    const lo = Math.min(...hs), hi = Math.max(...hs);
+    out.textContent = ` · ${lo === hi ? lo : `${lo} to ${hi}`}`;
+  });
+}
+addEventListener('resize', measureRows);
+document.fonts?.ready.then(measureRows);
 addEventListener('resize', measure);
 document.fonts?.ready.then(measure);
 function apply() {
@@ -504,6 +523,7 @@ function apply() {
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on',
     'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset' };
   specimens.style.setProperty('--sub-gap', `${state.subgap}px`);
+  specimens.style.setProperty('--row-pad', `${state.rowpad}px`);
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
@@ -513,6 +533,7 @@ function apply() {
   summarise();
   save();
   measure();
+  measureRows();
 }
 Object.keys(state).forEach((k) => document.getElementById(k)?.addEventListener(k === 'group' ? 'picker-change' : 'segmented-change', (e) => {
   state[k] = e.detail.value;
