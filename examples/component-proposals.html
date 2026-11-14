@@ -192,8 +192,8 @@
   /* ============================================================
      PROPOSED · switch — on or off, in place
      ============================================================ */
-  /* The slider's parts at a switch's size: the grey track, the white
-     thumb, and full ink for the side that's on. State without colour. */
+  /* The slider's own parts: its 16px track, its 12px thumb and its 2px
+     inset, and full ink for the side that's on. State without colour. */
   .switch {
     -webkit-tap-highlight-color: transparent;
     position: relative;
@@ -206,9 +206,9 @@
   .switch-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: inherit; }
   .switch-track {
     position: relative;
-    width: calc(var(--sw-h, 24px) * 5 / 3);   /* 40 at 24, 60 at 36 */
-    height: var(--sw-h, 24px);
-    padding: var(--inset-fill);
+    width: 28px;                  /* the thumb, its 12px of travel and the inset */
+    height: 16px;                 /* the slider's track */
+    padding: 2px;                 /* the slider's inset around its thumb */
     border-radius: var(--radius-pill);
     background: var(--color-range-track);
     overflow: hidden;
@@ -224,8 +224,8 @@
   .switch-thumb {
     position: relative;
     display: block;
-    width: calc(var(--sw-h, 24px) - 2 * var(--inset-fill));
-    height: calc(var(--sw-h, 24px) - 2 * var(--inset-fill));
+    width: 12px;                  /* the slider's thumb */
+    height: 12px;
     border-radius: var(--radius-pill);
     background: var(--color-range-thumb);
     box-shadow: var(--shadow-range-thumb);
@@ -235,7 +235,7 @@
     .switch:hover .switch-input:not(:disabled) + .switch-track::before { opacity: var(--opacity-label-inactive); transition-duration: var(--duration-fast); }
   }
   .switch .switch-input:checked + .switch-track::before { opacity: 1; }
-  .switch-input:checked + .switch-track .switch-thumb { translate: calc(var(--sw-h, 24px) * 2 / 3) 0; }   /* the track's width less its height */
+  .switch-input:checked + .switch-track .switch-thumb { translate: 12px 0; }   /* the track's width less its height */
   .switch-input:active:not(:disabled) + .switch-track .switch-thumb { scale: var(--scale-press); transition-duration: var(--duration-fast); }
   .switch-input:focus-visible + .switch-track { outline: 2px solid var(--color-text); outline-offset: 2px; }
   .switch:has(.switch-input:disabled) { opacity: var(--opacity-label-inactive); cursor: not-allowed; }
@@ -256,7 +256,7 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-mark);
+    gap: var(--space-16);         /* the mark to its label */
     min-height: var(--height-control);
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -267,8 +267,8 @@
     display: grid;
     place-items: center;
     flex: none;
-    width: var(--mark, var(--icon-control));
-    height: var(--mark, var(--icon-control));
+    width: var(--icon-control);
+    height: var(--icon-control);
     border: 1px solid currentColor;
     border-radius: var(--radius-pill);
     color: inherit;
@@ -369,14 +369,6 @@
      start on its left line, or end on its right one. */
   .specimens.small-end .cp .control-panel-fields > * > .cp-small { justify-self: end; }
   .specimens:not(.small-end) .cp .control-panel-fields > * > .cp-small { justify-self: start; }
-  /* Rows at 36: every inline row is a control's height, whatever is in it. */
-  .specimens.rows-36 .cp-field:not(.field--wide) { grid-auto-rows: minmax(var(--height-control), auto); }
-  /* Sizes under test. */
-  .specimens.switch-36 { --sw-h: var(--height-control); }
-  .specimens.mark-36 { --mark: var(--height-control); }
-  .specimens.mark-36 .choice-check { width: var(--icon-control); height: var(--icon-control); }
-  .specimens.mark-36 .choice-dot { width: 16px; height: 16px; }
-  .choice-check path { vector-effect: non-scaling-stroke; }
   /* Guides: a 36px band through the centre of each control, and the
      control's own drawn height after its label. */
   .cp-band { position: absolute; left: 0; right: 0; height: var(--height-control); background: var(--color-accent-soft); pointer-events: none; }
@@ -419,7 +411,8 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', icons: 'off', sep: 'on', trigger: 'icon', sw: 'track', step: 'inside', guides: 'on', rowh: 'natural', swh: '24', mark: '20', small: 'start', cpw: '280' }, saved.state);
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', icons: 'off', sep: 'on', trigger: 'icon', sw: 'track', step: 'inside', guides: 'on', small: 'start', cpw: '280' }, saved.state);
+['rowh', 'swh', 'mark'].forEach((k) => delete state[k]);   // decided: heights can differ
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const chevronRight = '<svg class="row-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 6.5 5 3.5 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -581,9 +574,9 @@ const PROPOSALS = [
   ['menu', 'M2', 'Icons in the menu', 'A 16px icon before each action, in the label’s ink. Declined, the menu is words only. Switch it with Icons.'],
   ['menu', 'M3', 'A divider before the destructive action', 'Delete sits last, under a divider, in the same ink as the rest. It is never red: red is for values. Switch it with Divider.'],
   ['menu', 'M4', 'A labelled trigger', 'A button with a chevron (Actions) instead of the More icon button, for when the menu is the main way to act. Switch it with Trigger.'],
-  ['inputs', 'I6', 'A shared height in a panel', 'The new inputs in a control panel beside a segmented control, a select, a slider and buttons. With 36 guides on, the yellow band is the 36px control height through each control’s centre, and the figure after each label is that control’s drawn height. Today the switch draws at 24, a mark at 20 and the slider’s track at 16, inside rows that are 36 tall except the slider’s, which is 16. Try Row height, Switch size and Mark size, and say which should share the 36.'],
-  ['inputs', 'I1', 'Switch', 'A track and thumb from the slider’s parts: grey when off, full ink when on, the thumb pressing in under a finger. Declined, on and off stay a two-option segmented control. Switch it with Switch; it shows in R5 too.'],
-  ['inputs', 'I2', 'Checkbox', 'A 20px circle that fills with ink and takes a check. A circle, because the system has no small corner. The label is secondary when off and full ink when on, like a chip.'],
+  ['inputs', 'I6', 'A shared height in a panel', 'The new inputs in a control panel beside a segmented control, a select, a slider and buttons. With 36 guides on, the yellow band is the 36px control height through each control’s centre, and the figure after each label is that control’s drawn height. Decided: heights can differ. The switch is the slider’s size (a 16 track, a 12 thumb), a mark is 20, and the rest are 36. Small controls sets where a switch, a mark or a stepper sits in the control column.'],
+  ['inputs', 'I1', 'Switch', 'The slider’s own parts: its 16px track and its 12px thumb, grey when off, full ink when on, the thumb pressing in under a finger. Declined, on and off stay a two-option segmented control. Switch it with Switch; it shows in R5 too.'],
+  ['inputs', 'I2', 'Checkbox', 'A 20px circle, 16 from its label, that fills with ink and takes a check. A circle, because the system has no small corner. The label is secondary when off and full ink when on, like a chip.'],
   ['inputs', 'I3', 'Radio', 'The same circle, keeping its ring and taking a dot. For one choice from a few that need a full line each; shorter choices stay a segmented control.'],
   ['inputs', 'I4', 'Text area', 'The input grown past one row, so it is a card with 16 inside. It grows with what is typed and has no resize handle. The notes fields below are this one.'],
   ['inputs', 'I5', 'Stepper', 'A pill holding minus, the number and plus, the steps as bare marks. Stepper puts two icon buttons beside a plain input instead. It shows in R5 too.'],
@@ -613,9 +606,6 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('sw', 'Switch', [['track', 'Track'], ['segments', 'Segments']], 'inputs rows')}
   ${seg('step', 'Stepper', [['inside', 'Inside'], ['beside', 'Beside']], 'inputs rows')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
-  ${seg('rowh', 'Row height', [['natural', 'Natural'], ['36', '36']], 'inputs')}
-  ${seg('swh', 'Switch size', [['24', '24'], ['36', '36']], 'inputs')}
-  ${seg('mark', 'Mark size', [['20', '20'], ['36', '36']], 'inputs')}
   ${seg('small', 'Small controls', [['start', 'Start'], ['end', 'End']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
   <div class="sheet-section">
@@ -677,7 +667,7 @@ function apply() {
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column',
     'has-menu-icons': state.icons === 'on', 'has-menu-sep': state.sep === 'on', 'menu-label': state.trigger === 'label',
     'switch-segments': state.sw === 'segments', 'stepper-beside-on': state.step === 'beside',
-    'has-guides': state.guides === 'on', 'rows-36': state.rowh === '36', 'switch-36': state.swh === '36', 'mark-36': state.mark === '36', 'small-end': state.small === 'end' };
+    'has-guides': state.guides === 'on', 'small-end': state.small === 'end' };
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
