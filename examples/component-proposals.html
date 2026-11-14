@@ -129,7 +129,7 @@
      mono; good and unknown are secondary, a problem takes full ink. */
   .status { white-space: nowrap; }
   .status.is-problem { color: var(--color-text); }
-  .list-row--status { align-items: center; }
+  .list-row--status { align-items: start; }   /* the date on the name's line */
   .list-row--status .list-row-main { gap: var(--space-8); }
   .list-row--status .row-date { color: var(--color-text-secondary); white-space: nowrap; }
   .status-glyph { display: grid; place-items: center; width: var(--icon-control); height: var(--icon-control); }
@@ -140,11 +140,22 @@
   /* A third slot, before the name: 16 from the text, centred on the row.
      An icon is a bare 20px mark in full ink, or sits on a stage-grey
      circle; an avatar is always the circle, initials in it. The circle is
-     a control's height (36), or a row's (50). */
-  .list-row--lead { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; position: relative; }
-  .list-row--lead .list-row-main { gap: var(--space-8); }
+     48 (the gap's step), or a control's 36. */
+  /* The value sits on the name's line, on its baseline; the sub-line runs
+     under both. The leading mark spans the two lines, centred on them. */
+  .list-row.list-row--lead {
+    position: relative;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "lead name end" "lead sub sub";
+    align-items: baseline;
+    gap: var(--space-8) var(--space-16);
+  }
+  .list-row--lead > :first-child { grid-area: lead; align-self: center; }
+  .list-row--lead > .list-row-name { grid-area: name; }
+  .list-row--lead > .row-sub { grid-area: sub; }
+  .list-row--lead > .row-value { grid-area: end; white-space: nowrap; }
   .row-lead {
-    --lead-w: var(--lead, var(--height-control));
+    --lead-w: var(--lead, var(--space-48));
     display: grid;
     place-items: center;
     width: var(--lead-w);
@@ -155,7 +166,7 @@
   }
   .row-lead svg { width: var(--icon-control); height: var(--icon-control); }
   .specimens:not(.lead-circle) .row-lead--icon { --lead-w: var(--icon-control); background: none; }
-  .specimens.lead-50 { --lead: var(--height-row); }
+  .specimens.lead-36 { --lead: var(--height-control); }
   /* Inset dividers start at the text, so the leading marks read as one
      column and the lines belong to the words. */
   .specimens.div-inset .list-rows--lead > li { border-top: 0; }
@@ -167,7 +178,7 @@
     left: calc(var(--lead-col) + var(--space-16));
     border-top: 1px solid var(--color-divider);
   }
-  .list-rows--lead { --lead-col: var(--lead, var(--height-control)); }
+  .list-rows--lead { --lead-col: var(--lead, var(--space-48)); }
   .specimens:not(.lead-circle) .list-rows--icons, .list-rows--glyph { --lead-col: var(--icon-control); }
 
   .menu-readout { color: var(--color-text-secondary); }
@@ -227,7 +238,8 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'bare', leadsize: '36', leaddiv: 'full' }, saved.state);
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280', leadicon: 'circle', leadsize: '48', leaddiv: 'full' }, saved.state);
+if (state.leadsize === '50') state.leadsize = '48';
 ['rowh', 'swh', 'mark', 'sw', 'step', 'small', 'icons', 'sep', 'trigger'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -268,14 +280,14 @@ const setting = (name, desc, control) => `<li><div class="list-row list-row--set
 const STATUSES = [['Flight to Lisbon', 'May 3', '✓', 'Confirmed'], ['Hotel in Alfama', 'May 3', '!', 'Awaiting payment', true], ['Train to Porto', 'May 7', '✗', 'Cancelled', true], ['Airport transfer', 'May 9', '–', 'Not booked']];
 const statusEnd = ([name, , glyph, word, problem]) => `<li><div class="list-row list-row--status"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${glyph} ${word}</span></div></li>`;
 const statusSub = ([name, date, glyph, word, problem]) => `<li><div class="list-row list-row--status"><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${glyph} ${word}</span></span><span class="row-date t-body tnum">${date}</span></div></li>`;
-const statusLead = ([name, date, glyph, word, problem]) => `<li><div class="list-row list-row--lead list-row--status"><span class="status-glyph status t-label${problem ? ' is-problem' : ''}" style="${problem ? '' : 'color: var(--color-text-secondary)'}" aria-hidden="true">${glyph}</span><span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="status t-body${problem ? ' is-problem' : ''}">${word}</span></span><span class="row-date t-body tnum">${date}</span></div></li>`;
+const statusLead = ([name, date, glyph, word, problem]) => `<li><div class="list-row list-row--lead list-row--status"><span class="status-glyph status t-label${problem ? ' is-problem' : ''}" style="${problem ? '' : 'color: var(--color-text-secondary)'}" aria-hidden="true">${glyph}</span><span class="list-row-name t-label">${name}</span><span class="row-date row-value t-body tnum">${date}</span><span class="row-sub status t-body${problem ? ' is-problem' : ''}">${word}</span></div></li>`;
 const LEAD_ICONS = {
   plane: '<path d="m3 11 14-6-5 12-2.5-5L3 11Z"/>',
   bed: '<path d="M3 15V6M3 12h14v3M17 12v-1.5A2.5 2.5 0 0 0 14.5 8H8v4"/>',
   train: '<rect x="5" y="3" width="10" height="11" rx="3"/><path d="M5 9h10M7.5 17l1-3M12.5 17l-1-3"/>',
   car: '<path d="M3.5 13.5v-3l1.5-4h10l1.5 4v3M3.5 13.5h13M5.5 13.5V15M14.5 13.5V15M3.5 10.5h13"/>',
 };
-const leadRow = (lead, name, sub, value) => `<li><div class="list-row list-row--lead">${lead}<span class="list-row-main"><span class="list-row-name t-label">${name}</span><span class="t-body">${sub}</span></span><span class="t-label tnum">${value}</span></div></li>`;
+const leadRow = (lead, name, sub, value) => `<li><div class="list-row list-row--lead">${lead}<span class="list-row-name t-label">${name}</span><span class="row-value t-label tnum">${value}</span><span class="row-sub t-body">${sub}</span></div></li>`;
 const iconLead = (k) => `<span class="row-lead row-lead--icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${LEAD_ICONS[k]}</svg></span>`;
 const avatarLead = (initials) => `<span class="row-lead row-lead--avatar t-control" aria-hidden="true">${initials}</span>`;
 const rows = `
@@ -387,8 +399,8 @@ const PROPOSALS = [
   ['rows', 'R6a', 'Status at the end', 'One line a row: the name, then glyph and word at the end in Body, not mono. Good and unknown in secondary ink, a problem in full ink. The quietest of the three; no date. Pick one of R6a, R6b or R6c.'],
   ['rows', 'R6b', 'Status under the name', 'The glyph and word are the row’s sub-line, in Body, and the date is the value at the end. Two type styles, no mono.'],
   ['rows', 'R6c', 'Status glyph leads', 'The glyph takes the leading slot at the left, the word sits under the name and the date ends the row. The glyphs read down one column, so problems are found by scanning the left edge.'],
-  ['rows', 'R8', 'Leading icon', 'A 20px icon before the name, 16 from the text, centred on the row. Icon sets it bare in full ink, or on a stage-grey circle. The sub-line is Body, so the row has two styles and no mono.'],
-  ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. Lead size makes it a control’s 36 or a row’s 50; it applies to an icon’s circle too.'],
+  ['rows', 'R8', 'Leading icon', 'A 20px icon on a 48 stage-grey circle before the name, 16 from the text. The value sits on the name’s line and the Body sub-line runs under both. Icon sets it bare instead; Lead size takes the circle to 36.'],
+  ['rows', 'R9', 'Leading avatar', 'A circle before the name holding a person’s initials (or their photo), in the same slot as the icon. 48, like the icon’s circle; Lead size takes both to a control’s 36.'],
   ['rows', 'R10', 'Inset dividers on leading rows', 'Dividers start at the text instead of the row’s left edge, so the icons or avatars read as one column. Switch it with Dividers.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
 ];
@@ -411,7 +423,7 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('change', 'Change', [['off', 'Off'], ['on', 'On']], 'figures')}
   ${seg('chevron', 'Chevron', [['off', 'Off'], ['on', 'On']], 'rows')}
   ${seg('leadicon', 'Icon', [['bare', 'Bare'], ['circle', 'Circle']], 'rows')}
-  ${seg('leadsize', 'Lead size', [['36', '36'], ['50', '50']], 'rows')}
+  ${seg('leadsize', 'Lead size', [['36', '36'], ['48', '48']], 'rows')}
   ${seg('leaddiv', 'Dividers', [['full', 'Full'], ['inset', 'Inset']], 'rows')}
   ${seg('detail', 'Detail', [['right', 'Right'], ['column', 'Column']], 'rows')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
@@ -481,7 +493,7 @@ document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
   const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on',
-    'lead-circle': state.leadicon === 'circle', 'lead-50': state.leadsize === '50', 'div-inset': state.leaddiv === 'inset' };
+    'lead-circle': state.leadicon === 'circle', 'lead-36': state.leadsize === '36', 'div-inset': state.leaddiv === 'inset' };
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
