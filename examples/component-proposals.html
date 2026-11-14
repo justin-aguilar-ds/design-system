@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="lib/components/input/input.css">
 <link rel="stylesheet" href="lib/components/picker/picker.css">
 <link rel="stylesheet" href="lib/components/slider/slider.css">
+<link rel="stylesheet" href="lib/components/menu/menu.css">
 <link rel="stylesheet" href="lib/components/switch/switch.css">
 <link rel="stylesheet" href="lib/components/choice/choice.css">
 <link rel="stylesheet" href="lib/components/stepper/stepper.css">
@@ -129,67 +130,6 @@
   .status { white-space: nowrap; }
   .status.is-problem { color: var(--color-text); }
 
-  /* ============================================================
-     PROPOSED · menu — actions behind one control
-     ============================================================ */
-  /* The picker's menu, holding actions instead of options: the same
-     surface, inset, option height and gliding fill. Nothing is selected,
-     so nothing carries a check. */
-  .menu { position: relative; display: inline-flex; }
-  .menu-chevron { flex: none; width: var(--icon-mark); height: var(--icon-mark); transition: transform var(--duration-base) var(--ease-out); }
-  .menu.is-open .menu-chevron { transform: rotate(180deg); }
-  .menu-surface {
-    position: absolute;
-    top: calc(100% + var(--space-8));
-    right: 0;
-    z-index: 40;
-    padding: var(--inset-fill);
-    background: var(--color-surface);
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-card);
-    transform-origin: top right;
-    transform: scale(var(--scale-enter));
-    opacity: 0;
-    transition: transform var(--duration-base) var(--ease-out), opacity var(--duration-base) var(--ease-out);
-  }
-  .menu.is-open .menu-surface { transform: scale(1); opacity: 1; }
-  .menu-list { position: relative; z-index: 1; padding: 0; list-style: none; }
-  .menu-item {
-    -webkit-tap-highlight-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: var(--gap-mark);
-    width: 100%;
-    min-height: calc(2 * (var(--radius-card) - var(--inset-fill)));   /* 32: concentric with the menu's corner */
-    padding: 0 calc(var(--inset-control) - var(--inset-fill));
-    border-radius: var(--radius-pill);
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-    text-align: left;
-    transition: color var(--duration-base) ease;
-  }
-  .menu-item.is-indicated { color: var(--color-text); }
-  .menu-item:focus-visible { outline: none; }
-  .menu-item:disabled { color: var(--color-text); opacity: var(--opacity-label-inactive); cursor: not-allowed; }
-  .menu-icon { flex: none; width: var(--icon-inline); height: var(--icon-inline); }
-  .specimens:not(.has-menu-icons) .menu-icon { display: none; }
-  /* A divider sets the destructive action apart; its ink stays the same. */
-  .menu-sep { margin: var(--inset-fill) calc(var(--inset-control) - var(--inset-fill)); border-top: 1px solid var(--color-divider); }
-  .specimens:not(.has-menu-sep) .menu-sep { display: none; }
-  .menu-fill {
-    position: absolute;
-    border-radius: var(--radius-pill);
-    background: var(--color-fill-subtle);
-    pointer-events: none;
-    opacity: 0;
-    transition:
-      left var(--duration-base) var(--ease-out), top var(--duration-base) var(--ease-out),
-      width var(--duration-base) var(--ease-out), height var(--duration-base) var(--ease-out),
-      opacity var(--duration-base) ease;
-  }
-  .menu-surface.has-fill .menu-fill { opacity: 1; }
-  .specimens.menu-label .menu-trigger--icon,
-  .specimens:not(.menu-label) .menu-trigger--label { display: none; }
   .menu-readout { color: var(--color-text-secondary); }
 
   /* ============================================================
@@ -247,12 +187,11 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
 const decisions = saved.decisions || {};
 const notes = saved.notes || {};
-const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', icons: 'off', sep: 'on', trigger: 'icon', guides: 'off', cpw: '280' }, saved.state);
-['rowh', 'swh', 'mark', 'sw', 'step', 'small'].forEach((k) => delete state[k]);   // decided, and in the library
+const state = Object.assign({ group: 'figures', pw: 'read', change: 'on', chevron: 'off', detail: 'right', guides: 'off', cpw: '280' }, saved.state);
+['rowh', 'swh', 'mark', 'sw', 'step', 'small', 'icons', 'sep', 'trigger'].forEach((k) => delete state[k]);   // decided, and in the library
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const chevronRight = '<svg class="row-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 6.5 5 3.5 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const chevronDown = '<svg class="menu-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const spec = (id, name, html) => `<section class="spec" data-spec="${id}" aria-label="${name}"><p class="spec-name t-caption">${id} · ${name}</p>${html}</section>`;
 
 // ---- Figures
@@ -305,23 +244,15 @@ const rows = `
   </ul>`)}`;
 
 // ---- Menu
-const ICONS = {
-  Rename: '<path d="m3 13 1-3.5L10.5 3 13 5.5 6.5 12 3 13Z"/>',
-  Duplicate: '<rect x="5.5" y="5.5" width="8" height="8" rx="2"/><path d="M3 10.5V4a1 1 0 0 1 1-1h6.5"/>',
-  Share: '<path d="M8 10V2.5M5 5l3-3 3 3M3 9.5v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-3"/>',
-  Archive: '<path d="M2.5 3.5h11v3h-11zM3.5 6.5v6h9v-6M6.5 9.5h3"/>',
-  Delete: '<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5"/>',
-};
-const item = (name, disabled) => `<li role="none"><button class="menu-item t-control" type="button" role="menuitem"${disabled ? ' disabled' : ''}><svg class="menu-icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>${name}</button></li>`;
+const item = (name, disabled) => `<li role="none"><button class="menu-item t-control" type="button" role="menuitem"${disabled ? ' disabled' : ''}>${name}</button></li>`;
 const menu = `
-  ${spec('M1', 'Menu of actions', `
+  ${spec('Menu', 'actions behind the More button', `
     <ul class="list-rows"><li><div class="list-row list-row--setting">
       <span class="list-row-main"><span class="list-row-name t-label">Portugal in May</span><span class="list-row-sub t-mono">3 places · 6 nights</span></span>
       <div class="menu">
-        <button class="menu-trigger menu-trigger--icon icon-button icon-button--secondary" type="button" aria-label="More" aria-haspopup="menu" aria-expanded="false">
+        <button class="menu-trigger icon-button icon-button--secondary" type="button" aria-label="More" aria-haspopup="menu" aria-expanded="false">
           <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="15.5" cy="10" r="1.5" fill="currentColor"/></svg>
         </button>
-        <button class="menu-trigger menu-trigger--label button surface surface--rest surface--pill t-control" type="button" aria-haspopup="menu" aria-expanded="false">Actions${chevronDown}</button>
         <div class="menu-surface" hidden>
           <ul class="menu-list" role="menu" aria-label="Trip actions">
             ${item('Rename')}${item('Duplicate')}${item('Share')}${item('Archive', true)}
@@ -395,10 +326,6 @@ const PROPOSALS = [
   ['rows', 'R5', 'Setting row', 'The name and its sentence on the left, one control at the end, centred on the row. The control is a switch or a stepper, from the library.'],
   ['rows', 'R6', 'Status row', 'Glyph and word in mono at the end of the row. Good and unknown in secondary ink, a problem in full ink. Never a badge, never colour.'],
   ['rows', 'R7', 'A chevron on rows that open', 'A 10px mark after the value on a row that opens something. Today a row that opens only brightens. Switch it with Chevron, on R1.'],
-  ['menu', 'M1', 'Menu of actions', 'The picker’s menu holding actions: the same surface, inset, 32px items and gliding fill, growing from its trigger. Nothing is selected, so nothing carries a check. Arrow keys, Home, End and Escape work.'],
-  ['menu', 'M2', 'Icons in the menu', 'A 16px icon before each action, in the label’s ink. Declined, the menu is words only. Switch it with Icons.'],
-  ['menu', 'M3', 'A divider before the destructive action', 'Delete sits last, under a divider, in the same ink as the rest. It is never red: red is for values. Switch it with Divider.'],
-  ['menu', 'M4', 'A labelled trigger', 'A button with a chevron (Actions) instead of the More icon button, for when the menu is the main way to act. Switch it with Trigger.'],
 ];
 document.getElementById('sheet-body').innerHTML = `
   <div class="picker-field">
@@ -419,15 +346,15 @@ document.getElementById('sheet-body').innerHTML = `
   ${seg('change', 'Change', [['off', 'Off'], ['on', 'On']], 'figures')}
   ${seg('chevron', 'Chevron', [['off', 'Off'], ['on', 'On']], 'rows')}
   ${seg('detail', 'Detail', [['right', 'Right'], ['column', 'Column']], 'rows')}
-  ${seg('icons', 'Icons', [['off', 'Off'], ['on', 'On']], 'menu')}
-  ${seg('sep', 'Divider', [['off', 'Off'], ['on', 'On']], 'menu')}
-  ${seg('trigger', 'Trigger', [['icon', 'Icon'], ['label', 'Label']], 'menu')}
   ${seg('guides', '36 guides', [['off', 'Off'], ['on', 'On']], 'inputs')}
   ${seg('cpw', 'Panel', [['280', 'Dock'], ['358', 'Sheet']], 'inputs')}
   <div class="sheet-section" data-for="inputs">
     <p class="t-body sheet-note">Adopted. The switch, the checkbox and radio (choice), the stepper and the text area are in the library now, and this view loads them from there. A track and a mark are 16, a thumb 12; a small control ends its row, on the right, wherever it can.</p>
   </div>
-  <div class="sheet-section" data-for="figures rows menu">
+  <div class="sheet-section" data-for="menu">
+    <p class="t-body sheet-note">Adopted, as the default: the More icon button opens the picker’s menu, words only, with Delete last under a divider. The labelled trigger is out; a menu never has one.</p>
+  </div>
+  <div class="sheet-section" data-for="figures rows">
     <ol class="proposals" id="proposals">${PROPOSALS.map(([group, id, title, body]) => `
       <li class="proposal${decisions[id] === 'decline' ? ' is-declined' : ''}" data-id="${id}" data-for="${group}">
         <div class="proposal-copy">
@@ -454,6 +381,7 @@ document.getElementById('sheet-body').innerHTML = `
 <script src="lib/components/picker/picker.js"></script>
 <script src="lib/components/slider/slider.js"></script>
 <script src="lib/components/stepper/stepper.js"></script>
+<script src="lib/components/menu/menu.js"></script>
 <script src="lib/components/toast/toast.js"></script>
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
@@ -484,8 +412,7 @@ addEventListener('resize', measure);
 document.fonts?.ready.then(measure);
 function apply() {
   specimens.style.setProperty('--pw', state.pw === 'phone' ? '342px' : 'var(--container-read)');
-  const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column',
-    'has-menu-icons': state.icons === 'on', 'has-menu-sep': state.sep === 'on', 'menu-label': state.trigger === 'label', 'has-guides': state.guides === 'on' };
+  const on = { 'has-change': state.change === 'on', 'has-chevron': state.chevron === 'on', 'detail-column': state.detail === 'column', 'has-guides': state.guides === 'on' };
   specimens.style.setProperty('--cp-w', `${state.cpw}px`);
   Object.entries(on).forEach(([c, v]) => specimens.classList.toggle(c, v));
   specimens.querySelectorAll('.group').forEach((g) => { g.hidden = g.dataset.group !== state.group; });
@@ -506,7 +433,7 @@ function summarise() {
   const ids = PROPOSALS.map((p) => p[1]);
   const by = (v) => ids.filter((id) => (decisions[id] || 'pending') === v);
   const a = by('approve'), d = by('decline'), p = by('pending');
-  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide, across figures, rows and the menu.`;
+  document.getElementById('decision-summary').textContent = `${a.length} approved, ${d.length} declined, ${p.length} to decide, across figures and rows.`;
   const noted = ids.filter((id) => (notes[id] || '').trim());
   const { group, pw, ...options } = state;
   document.getElementById('copy-decisions').dataset.copy = [
@@ -529,72 +456,13 @@ proposals.addEventListener('input', (e) => {
   summarise(); save();
 });
 
-// ---- Proposed: menu. A button opens a list of actions; the fill glides
-// to whatever the pointer or the arrow keys reach.
-const MENU_CLOSE_MS = 250; // mirrors --duration-base
-const SWAP_MS = 250;       // mirrors --duration-base
-document.querySelectorAll('.menu').forEach((menu) => {
-  const triggers = [...menu.querySelectorAll('.menu-trigger')];
-  const surface = menu.querySelector('.menu-surface');
-  const list = menu.querySelector('.menu-list');
-  const items = () => [...list.querySelectorAll('.menu-item:not(:disabled)')];
-  const fill = Object.assign(document.createElement('span'), { className: 'menu-fill' });
-  fill.setAttribute('aria-hidden', 'true');
-  surface.prepend(fill);
-  let active = null, closeTimer = null, opener = null;
-  const isOpen = () => menu.classList.contains('is-open');
-  const indicate = (el, instant) => {
-    active?.classList.remove('is-indicated');
-    active = el || null;
-    if (!active) { surface.classList.remove('has-fill'); return; }
-    active.classList.add('is-indicated');
-    if (instant || !surface.classList.contains('has-fill')) fill.style.transition = 'none';
-    const li = active.parentElement;
-    Object.assign(fill.style, { left: `${list.offsetLeft + li.offsetLeft}px`, top: `${list.offsetTop + li.offsetTop}px`, width: `${li.offsetWidth}px`, height: `${li.offsetHeight}px` });
-    void fill.offsetWidth;
-    fill.style.transition = '';
-    surface.classList.add('has-fill');
-  };
-  const open = (trigger, viaKeyboard) => {
-    clearTimeout(closeTimer);
-    opener = trigger;
-    surface.hidden = false;
-    triggers.forEach((t) => t.setAttribute('aria-expanded', 'true'));
-    requestAnimationFrame(() => menu.classList.add('is-open'));
-    if (viaKeyboard) { indicate(items()[0], true); items()[0]?.focus({ preventScroll: true }); }
-  };
-  const close = (refocus = true) => {
-    if (!isOpen()) return;
-    menu.classList.remove('is-open');
-    triggers.forEach((t) => t.setAttribute('aria-expanded', 'false'));
-    if (refocus) opener?.focus();
-    closeTimer = setTimeout(() => { surface.hidden = true; indicate(null); }, MENU_CLOSE_MS);
-  };
-  triggers.forEach((trigger) => {
-    trigger.addEventListener('click', (e) => { if (isOpen()) close(); else open(trigger, e.detail === 0); });
-    trigger.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); open(trigger, true); } });
-  });
-  list.addEventListener('pointermove', (e) => {
-    const el = e.target.closest('.menu-item:not(:disabled)');
-    if (e.pointerType === 'mouse' && el && el !== active) indicate(el);
-  });
-  list.addEventListener('pointerleave', () => { if (!list.contains(document.activeElement)) indicate(null); });
-  list.addEventListener('keydown', (e) => {
-    const all = items(), i = all.indexOf(document.activeElement);
-    const to = { ArrowDown: all[Math.min(i + 1, all.length - 1)], ArrowUp: all[Math.max(i - 1, 0)], Home: all[0], End: all[all.length - 1] }[e.key];
-    if (to) { e.preventDefault(); to.focus({ preventScroll: true }); indicate(to); }
-    if (e.key === 'Escape') { e.preventDefault(); close(); }
-    if (e.key === 'Tab') close(false);
-  });
-  list.addEventListener('click', (e) => {
-    const el = e.target.closest('.menu-item'); if (!el || el.disabled) return;
-    close();
-    // Drop, swap, rise: the readout changes in place.
-    const readout = document.getElementById('menu-readout');
-    readout.classList.add('is-leaving');
-    setTimeout(() => { readout.textContent = `${el.textContent.trim()} chosen.`; void readout.offsetWidth; readout.classList.remove('is-leaving'); }, SWAP_MS);
-  });
-  document.addEventListener('pointerdown', (e) => { if (!menu.contains(e.target)) close(false); });
+// The menu comes from the library; the readout under it changes in
+// place: drop, swap, rise.
+const SWAP_MS = 250; // mirrors --duration-base
+document.addEventListener('menu-select', (e) => {
+  const readout = document.getElementById('menu-readout');
+  readout.classList.add('is-leaving');
+  setTimeout(() => { readout.textContent = `${e.detail.item.textContent.trim()} chosen.`; void readout.offsetWidth; readout.classList.remove('is-leaving'); }, SWAP_MS);
 });
 
 apply();

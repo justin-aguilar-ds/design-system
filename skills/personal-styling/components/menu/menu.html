@@ -1,0 +1,17 @@
+<!-- personal-styling · menu · v0.1.0 -->
+<!-- The trigger is always the More icon button. Needs icon-button.css. -->
+<div class="menu">
+  <button class="menu-trigger icon-button icon-button--secondary" type="button" aria-label="More" aria-haspopup="menu" aria-expanded="false">
+    <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="4.5" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="15.5" cy="10" r="1.5" fill="currentColor"/></svg>
+  </button>
+  <div class="menu-surface" hidden>
+    <ul class="menu-list" role="menu" aria-label="Trip actions">
+      <li role="none"><button class="menu-item t-control" type="button" role="menuitem" data-value="rename">Rename</button></li>
+      <li role="none"><button class="menu-item t-control" type="button" role="menuitem" data-value="duplicate">Duplicate</button></li>
+      <li role="none"><button class="menu-item t-control" type="button" role="menuitem" data-value="share">Share</button></li>
+      <li role="none"><button class="menu-item t-control" type="button" role="menuitem" data-value="archive" disabled>Archive</button></li>
+      <li class="menu-sep" role="separator"></li>
+      <li role="none"><button class="menu-item t-control" type="button" role="menuitem" data-value="delete">Delete</button></li>
+    </ul>
+  </div>
+</div>

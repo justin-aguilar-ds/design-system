@@ -321,6 +321,7 @@ rules.
 | Choice | a checkbox or a radio — a choice that needs its own line of text | `components/choice/` |
 | Stepper | a small whole number, set a step at a time — guests, copies, a quantity | `components/stepper/` |
 | Icon button | an action is clear from an icon alone — back, more, share, close | `components/icon-button/` |
+| Menu | a record has three or more infrequent actions — behind the More button, never a labelled one | `components/menu/` |
 | Sortable list | the order of a short list is the user's to set — priorities, steps, a queue | `components/sortable/` |
 | Calendar | a value a day, on the dates it happened — which way each day went, and how far | `components/calendar/` |
 | Scroll fade | an area inside the page scrolls — its cut ends dissolve into the ground instead of meeting a line | `components/scroll-fade/` |

@@ -1,0 +1,102 @@
+/* personal-styling · menu · v0.1.0 */
+
+/* Actions behind one control. The trigger is the More icon button; the
+   menu is the picker's, holding actions instead of options: the same
+   surface, inset, option height and gliding fill. Nothing is selected, so
+   nothing carries a check. */
+.menu {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* The one surface style, hairline only like the picker's menu and the
+   tooltip: it can't be hovered as a whole, so no shadow. A large surface,
+   so it scales from 0.95 with opacity, and it grows from the trigger:
+   transform-origin is the corner nearest it. The trigger usually ends a
+   row, so the menu hangs from its right edge. */
+.menu-surface {
+  position: absolute;
+  top: calc(100% + var(--space-8));
+  right: 0;
+  z-index: 40;
+  padding: var(--inset-fill);   /* inset like a control: the fill is concentric with the corner */
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  transform-origin: top right;
+  transform: scale(var(--scale-enter));
+  opacity: 0;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+/* A trigger at the start of a line: the menu hangs from its left edge. */
+.menu[data-align="start"] .menu-surface { right: auto; left: 0; transform-origin: top left; }
+/* No room below: it opens upward (menu.js decides). */
+.menu.is-above .menu-surface { top: auto; bottom: calc(100% + var(--space-8)); transform-origin: bottom right; }
+.menu.is-above[data-align="start"] .menu-surface { transform-origin: bottom left; }
+.menu.is-open .menu-surface {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.menu-list {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Items: Interactive type, secondary until indicated. 32px: a pill whose
+   radius is the menu's corner less the inset. Words only — no icons. */
+.menu-item {
+  -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: calc(2 * (var(--radius-card) - var(--inset-fill)));
+  padding: 0 calc(var(--inset-control) - var(--inset-fill));
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  text-align: left;
+  transition: color var(--duration-base) ease;
+}
+.menu-item.is-indicated { color: var(--color-text); }
+/* Touch has no pointer to follow: the item under the finger brightens. */
+@media (hover: none) {
+  .menu-item:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
+}
+/* The gliding fill is the focus indicator, so an item draws no outline. */
+.menu-item:focus-visible { outline: none; }
+.menu-item:disabled {
+  color: var(--color-text);
+  opacity: var(--opacity-label-inactive);
+  cursor: not-allowed;
+}
+
+/* A divider sets the destructive action apart, last in the list. Its ink
+   stays the same as the rest: red is for values, never for an action. */
+.menu-sep {
+  margin: var(--inset-fill) calc(var(--inset-control) - var(--inset-fill));
+  border-top: 1px solid var(--color-divider);
+}
+
+/* The fill: the picker's, gliding to whatever the pointer or the arrow
+   keys reach. Items are dense, so --duration-base. */
+.menu-fill {
+  position: absolute;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-subtle);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    left var(--duration-base) var(--ease-out),
+    top var(--duration-base) var(--ease-out),
+    width var(--duration-base) var(--ease-out),
+    height var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) ease;
+}
+.menu-surface.has-fill .menu-fill { opacity: 1; }
