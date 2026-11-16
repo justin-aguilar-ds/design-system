@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.6.0 */
+/* personal-styling · line-chart · v0.7.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
@@ -12,6 +12,11 @@
 //   data-rank     off | on            rank among the series, in the tooltip
 //   data-focus    a series name       the series in full ink at rest
 //   data-prefix   a unit, e.g. $      set before every value: −$12.50
+//   data-hover    snap | track        snap: the point moves from data point
+//                                     to data point. track: it follows the
+//                                     mouse along the line and snaps to a
+//                                     data point near it, where the tooltip
+//                                     shows (v0.7)
 // Hover (or tap) near a line: it previews, and a tooltip grows from the
 // nearest point. Click or tap: it becomes the focus. API on the element:
 // el.lineChart.focus(name), el.lineChart.preview(name | null),
@@ -27,6 +32,7 @@ const LINE_CHART_WIDE = 630;          // the system's one breakpoint: wider than
 const LINE_CHART_DIGIT = 7;           // px, a mono 10.5 digit
 const LINE_CHART_NEAR = 16;           // px from a line that counts as near, mouse
 const LINE_CHART_NEAR_TOUCH = 28;     // px, finger
+const LINE_CHART_SNAP = 12;           // px either side of a data point where a tracking point snaps to it
 const LINE_CHART_NS = 'http://www.w3.org/2000/svg';
 
 // Monotone cubic (Fritsch–Carlson): smooth, and never overshoots the data,
@@ -303,9 +309,88 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     setPreview(null);
   }
 
-  svg.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') showTip(e); });
-  svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTip(); });
+  // ---- NEW (v0.7): data-hover="track". The point follows the mouse along
+  // the line, wherever it is; near a data point it snaps to it, and only
+  // there does the tooltip show. The snap reaches LINE_CHART_SNAP either
+  // side of a point, or half the gap to the next if the points are closer:
+  // with few points the point runs free between them and is pulled in as
+  // it nears one; with many, the snaps meet and it steps from point to
+  // point. It moves toward where it should be every frame, easing in on
+  // a time constant from --line-chart-glide, so a snap is a short glide
+  // rather than a jump, and changing lines settles over the same move.
+  const tracking = () => opt('hover', 'snap') === 'track';
+  let pointer = null, trackFrame = 0, trackLast = 0, trackName = null, trackIndex = -1;
+  const tipText = (s, i) => {
+    let text = `${s.name} · ${xs[i]} · ${format(s.values[i])}`;
+    if (opt('rank', 'off') === 'on') {
+      const rank = series.map((d) => d.values[i]).sort((a, b) => b - a).indexOf(s.values[i]) + 1;
+      text += ` · ${rank}${['st', 'nd', 'rd'][((rank + 90) % 100 - 10) % 10 - 1] || 'th'}`;
+    }
+    return text;
+  };
+  function trackStep(now) {
+    trackFrame = 0;
+    if (!pointer) return;
+    const { L, pw } = geo;
+    const cx = Math.max(L, Math.min(L + pw, pointer.px));
+    // The line: the nearest one at the pointer, on the curve that's drawn;
+    // away from every line, the one it is on, or the line in focus.
+    let near = null, best = LINE_CHART_NEAR;
+    series.forEach((s) => { const d = Math.abs(geo.curves[s.name](cx) - pointer.py); if (d < best) { best = d; near = s; } });
+    if (!near) near = series.find((s) => s.name === trackName) || series.find((s) => s.name === shown());
+    trackName = near.name;
+    setPreview(near.name);
+    const curve = geo.curves[near.name];
+    const gap = pw / (n - 1);
+    const i = Math.max(0, Math.min(n - 1, Math.round((cx - L) / gap)));
+    const snapped = Math.abs(cx - geo.x(i)) <= Math.min(LINE_CHART_SNAP, gap / 2);
+    const want = snapped ? geo.x(i) : cx;
+    const fresh = !at || !fig.classList.contains('has-point');
+    const ms = glideMs();
+    const dt = trackLast ? Math.max(0, now - trackLast) : 16;
+    trackLast = now;
+    const k = fresh || !ms ? 1 : 1 - Math.exp(-dt / (ms / 4));   // about settled by the glide's duration
+    const x = fresh ? want : at.x + (want - at.x) * k;
+    const off = fresh ? 0 : (at.y - curve(at.x)) * (1 - k);     // off the line it's joining, closing in
+    if (snapped) {
+      const text = tipText(near, i);
+      if (tip.textContent !== text) tip.textContent = text;
+      trackIndex = i;
+    } else trackIndex = -1;
+    place(x, curve(x) + off);
+    fig.classList.add('has-point');
+    fig.classList.toggle('has-tip', snapped);
+    if (Math.abs(want - x) > 0.1 || Math.abs(off) > 0.1) trackFrame = requestAnimationFrame(trackStep);
+    else trackLast = 0;
+  }
+  function trackMove(event) {
+    const r = svg.getBoundingClientRect();
+    pointer = { px: event.clientX - r.left, py: event.clientY - r.top };
+    if (!trackFrame) trackFrame = requestAnimationFrame(trackStep);
+  }
+  function trackLeave() {
+    pointer = null;
+    cancelAnimationFrame(trackFrame);
+    trackFrame = 0;
+    trackLast = 0;
+    trackIndex = -1;
+    fig.classList.remove('has-point');
+    hideTip();
+  }
+
+  svg.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; if (tracking()) trackMove(e); else showTip(e); });
+  svg.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse') return; if (tracking()) trackLeave(); else hideTip(); });
   svg.addEventListener('click', (e) => {
+    // A click while tracking picks the point the pointer is at; a tap (no
+    // hover to track) shows the nearest point, as the snap does.
+    if (tracking() && e.pointerType === 'mouse' && pointer) {
+      const s = series.find((d) => d.name === trackName);
+      const i = Math.max(0, Math.min(n - 1, Math.round((pointer.px - geo.L) / (geo.pw / (n - 1)))));
+      if (!s) return;
+      setFocus(s.name);
+      fig.dispatchEvent(new CustomEvent('line-chart-point', { bubbles: true, detail: { name: s.name, index: i, value: s.values[i], x: xs[i] } }));
+      return;
+    }
     const near = showTip(e);
     if (!near) return;
     setFocus(near.name);

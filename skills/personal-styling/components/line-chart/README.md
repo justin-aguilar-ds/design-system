@@ -12,9 +12,15 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 - **The values come from a tooltip at the point.** Nearing a line previews it and grows a tooltip from the nearest point, in the tooltip component's style: name, X, value (and rank, with `data-rank="on"`). A small dot in the line's own ink, ringed by the ground, marks the point. It stays as long as the pointer is over the chart: away from every line it keeps to the line it's on, or the line in focus. No crosshair, no scrub line, and the accent never marks the point.
 - **Click or tap a line, or a name, to make it the focus.** The rest stay grey.
 - **The point travels along the line.** Moving to the next data point, the dot glides there on the line itself, through the curve that's drawn rather than a straight cut, and the tooltip rides with it. Changing lines, it settles onto the new one over the same move. It appears in place the first time, then travels. Under reduced motion it steps.
+- **Or the point tracks the mouse** (`data-hover="track"`). It follows the pointer along the line wherever it is, and snaps to a data point as it comes within `12px` of one, or half the gap to the next if the points are closer. Only while it's snapped does the tooltip show. With few points it runs free between them and is pulled in near each; with many, the snaps meet and it steps from point to point. A snap is a short glide, not a jump. A tap on a phone still goes to the nearest point.
 - **The hover is timed from the duration tokens.** Lines fade on `--duration-base`, the tooltip grows on `--duration-pop`, and the point and tooltip glide on `--duration-base`, all on `--ease-out`. Override `--line-chart-fade`, `--line-chart-grow` and `--line-chart-glide` on the chart to tune it.
 - **The legend is names, below.** In the data's order, under the chart, never beside it. Every name carries the chip's dot: a ring, filled for the focus. `data-legend="off"` when one series is all there is.
 - **Full width on a phone.** A chart sits on the page like a table, or on a surface like a card (`.line-chart--surface`).
+
+## Changes in v0.7.0
+
+- `data-hover="track"`: the point follows the mouse along the line and snaps to nearby data points, where the tooltip shows.
+- The glide is back on `--duration-base`.
 
 ## Changes in v0.6.0
 
