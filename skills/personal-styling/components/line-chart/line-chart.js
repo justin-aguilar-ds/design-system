@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.7.0 */
+/* personal-styling · line-chart · v0.8.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
@@ -15,8 +15,8 @@
 //   data-hover    snap | track        snap: the point moves from data point
 //                                     to data point. track: it follows the
 //                                     mouse along the line and snaps to a
-//                                     data point near it, where the tooltip
-//                                     shows (v0.7)
+//                                     data point near it; the tooltip rides
+//                                     with it, showing the nearest point (v0.8)
 // Hover (or tap) near a line: it previews, and a tooltip grows from the
 // nearest point. Click or tap: it becomes the focus. API on the element:
 // el.lineChart.focus(name), el.lineChart.preview(name | null),
@@ -310,8 +310,8 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   }
 
   // ---- NEW (v0.7): data-hover="track". The point follows the mouse along
-  // the line, wherever it is; near a data point it snaps to it, and only
-  // there does the tooltip show. The snap reaches LINE_CHART_SNAP either
+  // the line, wherever it is; near a data point it snaps to it. The tooltip
+  // rides with it and shows the nearest data point's values (v0.8). The snap reaches LINE_CHART_SNAP either
   // side of a point, or half the gap to the next if the points are closer:
   // with few points the point runs free between them and is pulled in as
   // it nears one; with many, the snaps meet and it steps from point to
@@ -352,14 +352,14 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const k = fresh || !ms ? 1 : 1 - Math.exp(-dt / (ms / 4));   // about settled by the glide's duration
     const x = fresh ? want : at.x + (want - at.x) * k;
     const off = fresh ? 0 : (at.y - curve(at.x)) * (1 - k);     // off the line it's joining, closing in
-    if (snapped) {
-      const text = tipText(near, i);
-      if (tip.textContent !== text) tip.textContent = text;
-      trackIndex = i;
-    } else trackIndex = -1;
+    // CHANGED (v0.8): the tooltip stays up the whole time and rides with
+    // the point, on both axes; what changes is its data — the nearest data
+    // point's, switching as the pointer passes halfway between two.
+    const text = tipText(near, i);
+    if (tip.textContent !== text) tip.textContent = text;
+    trackIndex = snapped ? i : -1;
     place(x, curve(x) + off);
-    fig.classList.add('has-point');
-    fig.classList.toggle('has-tip', snapped);
+    fig.classList.add('has-point', 'has-tip');
     if (Math.abs(want - x) > 0.1 || Math.abs(off) > 0.1) trackFrame = requestAnimationFrame(trackStep);
     else trackLast = 0;
   }
