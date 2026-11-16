@@ -156,6 +156,7 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const curves = Object.fromEntries(series.map((s) => [s.name, lineChartCurve(s.values.map((v, i) => [x(i), y(v)]), rounded)]));
     geo = { L, pw, x, y, curves };
     at = null;   // the point starts afresh on the new drawing
+    target = null;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('height', H);
     svg.replaceChildren();
@@ -242,7 +243,13 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     tip.style.translate = `${left}px ${pad + (below ? cy + 12 : cy - h - 12)}px`;
     at = { x: cx, y: cy };
   };
+  let target = null;
   const travel = (name, i) => {
+    // Only a new data point starts a glide. The pointer moving within the
+    // same point leaves the one under way alone; restarting it on every
+    // move made the ease begin again each time, so the point stuttered.
+    if (target && target.name === name && target.i === i && fig.classList.contains('has-tip')) return;
+    target = { name, i };
     const curve = geo.curves[name];
     const toX = geo.x(i);
     cancelAnimationFrame(glide);
@@ -250,9 +257,13 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     if (!at || !fig.classList.contains('has-tip') || !ms) { place(toX, curve(toX)); return; }
     const fromX = at.x, off = at.y - curve(at.x);   // how far off the new line it starts
     if (Math.abs(toX - fromX) < 0.5 && Math.abs(off) < 0.5) return;
-    const start = performance.now();
+    // The clock starts on the first frame: a frame's timestamp can be
+    // earlier than the event that asked for it, and a negative start sent
+    // the point backwards before it set off.
+    let start = null;
     const step = (now) => {
-      const u = Math.min(1, (now - start) / ms), e = ease(u);
+      if (start === null) start = now;
+      const u = Math.min(1, Math.max(0, (now - start) / ms)), e = ease(u);
       const cx = fromX + (toX - fromX) * e;
       place(cx, curve(cx) + off * (1 - e));
       if (u < 1) glide = requestAnimationFrame(step);
@@ -287,6 +298,7 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   let tipName = null;
   function hideTip() {
     cancelAnimationFrame(glide);
+    target = null;
     fig.classList.remove('has-tip');
     setPreview(null);
   }
