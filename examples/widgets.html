@@ -242,19 +242,29 @@
      through the steps that are done, and the slider's 12 white thumb on
      the step that's happening now. Each step is a 36 row; the track's
      ends sit 8 past the first and last centres, as the slider's do. */
-  .steps { position: relative; padding: 0 0 0 calc(16px + var(--space-16)); list-style: none; display: grid; }
-  .steps::before,
-  .steps::after { content: ""; position: absolute; left: 0; width: 16px; top: calc(var(--height-control) / 2 - 8px); border-radius: var(--radius-pill); }
-  .steps::before { bottom: calc(var(--height-control) / 2 - 8px); background: var(--color-range-track); }
-  .steps::after { height: calc(var(--current) * var(--height-control) + 16px); background: var(--color-range-progress); }
-  .step { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-16); min-height: var(--height-control); }
-  /* Every step is the slider's 12 circle, so the track shows the same 2
-     around each one. Done: the ground colour on the ink. Now: the thumb
-     itself, with its shadow, where the ink stops. To come: the ground
-     colour, faded, on the grey. */
-  .step-dot { position: absolute; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 12px; height: 12px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-range-thumb); opacity: 0.6; }
-  .step.is-done .step-dot { opacity: 1; }
-  .step.is-current .step-dot { opacity: 1; box-shadow: var(--shadow-range-thumb); }
+  /* Each step draws its own piece of the track, so the ink always ends
+     where its step is, however tall a row grows: the grey down the whole
+     row, the ink over it. The first row starts 8 above its centre and the
+     last ends 8 below it, rounded, as the slider's track does. */
+  .steps { padding: 0 0 0 calc(16px + var(--space-16)); list-style: none; display: grid; }
+  .step { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-16); min-height: var(--height-control); }
+  .step::before,
+  .step::after { content: ""; position: absolute; left: calc(-16px - var(--space-16)); width: 16px; top: 0; bottom: 0; }
+  .step::before { background: var(--color-range-track); }
+  .step.is-done::after { background: var(--color-range-progress); }
+  .step:first-child::before,
+  .step:first-child::after { top: calc(50% - 8px); border-radius: 8px 8px 0 0; }
+  .step:last-child::before { bottom: calc(50% - 8px); border-radius: 0 0 8px 8px; }
+  /* Now: the ink stops 2 below the thumb, the same 2 the track leaves
+     either side of it (16 less 12, halved), so the thumb sits in an even
+     ring of ink. */
+  .step.is-current::after { bottom: calc(50% - 8px); border-radius: 0 0 8px 8px; background: var(--color-range-progress); }
+  .step.is-current:first-child::after { border-radius: 8px; }
+  /* Small dots for the steps done and to come; the slider's 12 thumb for
+     the one happening now. */
+  .step-dot { position: absolute; z-index: 1; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 4px; height: 4px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-text-secondary); }
+  .step.is-done .step-dot { background: var(--color-range-thumb); }
+  .step.is-current .step-dot { width: 12px; height: 12px; background: var(--color-range-thumb); }
   .step.is-done, .step.is-current { color: var(--color-text); }
   /* A filled glyph, in the same spirit: a grey shape with its edges cut in
      the ground colour, like the white thumb on the grey track. */
@@ -379,7 +389,7 @@ const GAPS = {
   spark: ['A sparkline outside a table', 'The table draws sparklines in cells; a row in a list has no cell, so this one is hand-drawn on the same spec.'],
   media: ['Playback: times and a play button', 'Elapsed and remaining under a scrubber, and a play button that turns into pause. The slider has no end labels and the icon button no toggled state.'],
   meter: ['Progress toward a goal', 'A reading, not a control: how far along. The slider’s track would invite a drag.'],
-  timeline: ['Steps over time', 'Done, now and still to come. Drawn as the slider standing up: a 16 grey track, full ink through the steps done, and every step the slider’s 12 circle with the same 2 of track around it; the current one carries the thumb’s shadow.'],
+  timeline: ['Steps over time', 'Done, now and still to come. Drawn as the slider standing up: a 16 grey track, full ink through the steps done, a small dot for each step done or to come, and the slider’s 12 thumb on the current one in an even 2 of ink.'],
   unread: ['An unread marker', 'A dot that means new. The chip’s dot means on or off, so the same mark would mean two things.'],
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
   chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
@@ -436,7 +446,7 @@ const WIDGETS = [
     <div class="figures">${pair('Distance', '5.2 km')}${pair('Active', '48 min')}${pair('Floors', '6')}</div>`],
   ['parcel', 'Parcel', 'Where an order is', ['timeline', 'icons'], `
     <div class="row"><div class="type-pair"><span class="t-label">Arriving today</span><span class="t-body">Between 2 and 4pm</span></div><span data-gap="icons"><svg class="ico-fill" viewBox="0 0 20 20" aria-hidden="true"><path class="shape" d="M10 2.2 17.3 6.1v7.8L10 17.8 2.7 13.9V6.1L10 2.2Z"/><path class="cut" d="M3.2 6.4 10 10l6.8-3.6M10 10v7.4"/></svg></span></div>
-    <ol class="steps" data-gap="timeline" style="--current: 3">${[['Ordered', 'Nov 12', 'is-done'], ['Shipped from Madrid', 'Nov 13', 'is-done'], ['In Lisbon', 'Nov 16', 'is-done'], ['Out for delivery', '08:14', 'is-current'], ['Delivered', '', '']].map(([n, d, c]) => `<li class="step ${c}"${c === 'is-current' ? ' aria-current="step"' : ''}><span class="step-dot"></span><span class="t-body">${n}</span><span class="t-mono">${d}</span></li>`).join('')}</ol>
+    <ol class="steps" data-gap="timeline">${[['Ordered', 'Nov 12', 'is-done'], ['Shipped from Madrid', 'Nov 13', 'is-done'], ['In Lisbon', 'Nov 16', 'is-done'], ['Out for delivery', '08:14', 'is-current'], ['Delivered', '', '']].map(([n, d, c]) => `<li class="step ${c}"${c === 'is-current' ? ' aria-current="step"' : ''}><span class="step-dot"></span><span class="t-body">${n}</span><span class="t-mono">${d}</span></li>`).join('')}</ol>
     <button class="button-text link-quiet t-control" type="button" style="justify-self: start; margin-left: calc(-1 * var(--inset-control))">Show on a map</button>`],
   ['portfolio', 'Portfolio', 'A balance and its line', ['chart'], `
     ${pair('Balance', '$18,640', 't-display', '<span class="t-mono ink-gain">+$412 today</span>')}
