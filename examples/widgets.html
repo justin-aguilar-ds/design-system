@@ -29,6 +29,12 @@
   body { background: var(--color-bg); }
   .tnum { font-variant-numeric: tabular-nums; }
   .quiet { color: var(--color-text-secondary); }
+  /* Proposed: a solid grey ink for marks. The secondary ink is 50% black,
+     so wherever two strokes of one icon cross they stack darker. #808080
+     is what the secondary ink looks like on white, made opaque; in dark it
+     is the same value (50% white on black). Text keeps the secondary ink;
+     icons, dots and initials in grey take this. */
+  :root { --color-ink-grey: #808080; }
   .ink { color: var(--color-text); }
 
   .stage-host {
@@ -143,8 +149,8 @@
   .widgets.avatar-series { --avatar-fill: var(--color-series); }
   /* One avatar rule: initials in mono, in the faded (secondary) ink, on
      the solid avatar grey, at any size. */
-  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); color: var(--color-text-secondary); }
-  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text-secondary); font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.3px; }
+  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); color: var(--color-ink-grey); }
+  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-ink-grey); font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.3px; }
   .stack > span + span { margin-left: calc(-1 * var(--space-8)); }
   .frame-card .stack > span { --w-ground: var(--color-surface); }
 
@@ -152,6 +158,8 @@
   .trend { padding: 0; list-style: none; display: grid; }
   .trend li { display: grid; grid-template-columns: 2ch minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-16); padding-block: var(--space-16); border-top: 1px solid var(--color-divider); }
   .trend li:first-child { border-top: 0; padding-top: 0; }
+  /* The rank is a value, so mono, on the name's line. */
+  .trend .rank, .trend li > div { align-self: baseline; }
   .trend .rank { color: var(--color-text-secondary); }
   .trend li > div { display: grid; gap: var(--space-4); min-width: 0; }
   .spark { width: 64px; height: 20px; color: var(--color-series); }
@@ -162,7 +170,7 @@
   /* The artwork is content, so it takes the one surface: white, the
      hairline, the card radius. Empty, it holds a note in the faded ink. */
   .art { display: grid; place-items: center; width: 64px; height: 64px; border-radius: var(--radius-card); background: var(--color-surface); box-shadow: inset 0 0 0 1px var(--color-hairline); }
-  .art .ico { color: var(--color-text-secondary); }
+  .art .ico { color: var(--color-ink-grey); }
   .np-times { display: flex; justify-content: space-between; margin-top: var(--space-8); }
   .np-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
   /* Proposed: the bare icon button. No fill at rest; on hover a quiet
@@ -256,14 +264,14 @@
   .step.is-current:first-child::after { border-radius: 8px; }
   /* Small dots for the steps done and to come; the slider's 12 thumb for
      the one happening now. */
-  .step-dot { position: absolute; z-index: 1; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 4px; height: 4px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-text-secondary); }
+  .step-dot { position: absolute; z-index: 1; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 4px; height: 4px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-ink-grey); }
   .step.is-done .step-dot { background: var(--color-range-thumb); }
   .step.is-current .step-dot { width: 12px; height: 12px; background: var(--color-range-thumb); }
   .step.is-done, .step.is-current { color: var(--color-text); }
   /* A filled glyph, in the same spirit: a grey shape with its edges cut in
      the ground colour, like the white thumb on the grey track. */
   .ico-fill { flex: none; width: var(--icon-control); height: var(--icon-control); }
-  .ico-fill .shape { fill: var(--color-text-secondary); }
+  .ico-fill .shape { fill: var(--color-ink-grey); }
   .ico-fill .cut { fill: none; stroke: var(--w-ground, var(--color-stage)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .frame-card .ico-fill { --w-ground: var(--color-surface); }
 
@@ -376,13 +384,14 @@ const GAPS = {
   route: ['A route between two places', 'A line with a mark on it between an origin and a destination. Dotted lines mean chart guides and dashed means provisional, so this one is a plain hairline with a plane over it.'],
   tear: ['A tear line', 'The stub of a ticket. Drawn as a dashed rule edge to edge, which borrows dashed’s meaning (provisional) for something that isn’t.'],
   code: ['A machine-readable code', 'A barcode or QR block: its size, its quiet zone, full ink, and the line under it.'],
+  ink: ['A solid grey ink for marks', 'The secondary ink is translucent, so an icon drawn in it darkens wherever its strokes cross (the note’s stem over its heads). Proposed: #808080, the secondary ink on white made opaque, for icons, dots and initials in grey. Text keeps the secondary ink.'],
   icons: ['A drawn icon set', 'The icon rules exist (three sizes, one stroke, round, current colour) but no icons do: every component draws its own marks inline. These are redrawn geometric and symmetric (circles, straight lines and 45° steps on the 20 grid) at a 2 stroke, against the rules’ 1.5.'],
   strip: ['A strip that scrolls sideways', 'Hourly tiles in one row. The carousel shows one item at a time and the scroll fade only fades top and bottom, so the side fade here is hand-made.'],
   range: ['A range on a track', 'Low to high on a shared scale: a thin track with an ink segment. The slider’s track is an input, not a reading, and is 16 tall.'],
   time: ['A time column', 'An agenda reads down its times. The list row leads with a circle, not a time, so the times sit in a column of their own.'],
   now: ['Now, in a list of times', 'Where the present falls between two events. A full-ink rule with the time, here; the accent is for attention, which this arguably is.'],
   stack: ['Overlapping avatars', 'Who is coming, as a stack of small circles, which needs a smaller size, an overlap, a ring of the ground and a solid fill. The system has no solid grey for it: the quiet fill is translucent, so overlaps show through; the stage grey (#f5f5f5) vanishes on a stage; the series grey (#d2d2d2) is solid but belongs to charts. Avatar fill compares them with a proposed solid grey, #e6e6e6 (#262626 dark): the quiet fill as it looks over the stage, made opaque.'],
-  rank: ['A rank numeral', 'A position in an ordered list, as the row’s leading mark. Here a Title figure in secondary ink.'],
+  rank: ['A rank numeral', 'A position in an ordered list, as the row’s leading mark. Here in mono, as a value, on the name’s line; the list row has no leading slot for a figure.'],
   spark: ['A sparkline outside a table', 'The table draws sparklines in cells; a row in a list has no cell, so this one is hand-drawn on the same spec.'],
   media: ['Playback: times and a play button', 'Elapsed and remaining under a scrubber, and a play button that turns into pause. The slider has no end labels and the icon button no toggled state.'],
   meter: ['Progress toward a goal', 'A reading, not a control: how far along. The slider’s track would invite a drag.'],
@@ -423,8 +432,8 @@ const WIDGETS = [
       <li class="agenda-item"><span class="t-mono ink">15:30</span><span class="t-label">Dentist</span><span></span><span class="t-body">Rua Augusta 40</span></li>
     </ul>`],
   ['trending', 'Trending', 'What people are posting about', ['rank', 'spark'], `
-    <ol class="trend">${[['Web Summit', '18.2K posts', [2, 3, 3, 5, 8, 13, 21], '+340%'], ['Porto vs Benfica', '11.9K posts', [5, 4, 6, 9, 7, 12, 15], '+120%'], ['Sintra rail', '4.1K posts', [1, 2, 2, 3, 6, 5, 9], '+88%'], ['Pastel de nata', '2.8K posts', [6, 5, 7, 6, 7, 8, 8], '+12%']].map(([n, sub, v, ch], i) => `<li><span class="rank t-title tnum"${i === 0 ? ' data-gap="rank"' : ''}>${i + 1}</span><div><span class="t-label">${n}</span><span class="t-body">${sub}</span></div><svg class="spark" viewBox="0 0 64 20" aria-hidden="true"${i === 0 ? ' data-gap="spark"' : ''}><path d="${sparkPath(v)}"/></svg><span class="t-label ink-gain tnum">${ch}</span></li>`).join('')}</ol>`],
-  ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons', 'bare'], `
+    <ol class="trend">${[['Web Summit', '18.2K posts', [2, 3, 3, 5, 8, 13, 21], '+340%'], ['Porto vs Benfica', '11.9K posts', [5, 4, 6, 9, 7, 12, 15], '+120%'], ['Sintra rail', '4.1K posts', [1, 2, 2, 3, 6, 5, 9], '+88%'], ['Pastel de nata', '2.8K posts', [6, 5, 7, 6, 7, 8, 8], '+12%']].map(([n, sub, v, ch], i) => `<li><span class="rank t-mono tnum"${i === 0 ? ' data-gap="rank"' : ''}>${i + 1}</span><div><span class="t-label">${n}</span><span class="t-body">${sub}</span></div><svg class="spark" viewBox="0 0 64 20" aria-hidden="true"${i === 0 ? ' data-gap="spark"' : ''}><path d="${sparkPath(v)}"/></svg><span class="t-label ink-gain tnum">${ch}</span></li>`).join('')}</ol>`],
+  ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons', 'bare', 'ink'], `
     <div class="np-head"><span class="art" data-gap="art" role="img" aria-label="No artwork">${ico('note')}</span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
     <div data-gap="media">
       <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" type="range" min="0" max="480" value="192" aria-label="Position"></span>
