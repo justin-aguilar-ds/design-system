@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.3.0 */
+/* personal-styling · stage-list · v0.4.0 */
 
 /* A view and the records behind it: the stage shows the data, the list
    holds the things it is made of. Pick something on the stage, read it in
@@ -114,12 +114,13 @@
   opacity: 0;
   scale: var(--scale-enter);
   visibility: hidden;
-  /* CHANGED: it scales in on the spring, its fade with it, and leaves the
-     same way: from 0.95 the dip on close stays above zero. */
+  /* CHANGED: it scales on the spring both ways (from 0.95 the dip on close
+     stays above zero), and fades quickly, on --duration-base: a fade never
+     outlasts the move it goes with. */
   transition:
-    opacity var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-base) var(--ease-out),
     scale var(--duration-spring) var(--ease-spring),
-    visibility var(--duration-instant) linear var(--duration-spring);
+    visibility var(--duration-instant) linear var(--duration-base);
 }
 .stage-list.is-detail .stage-list-detail { opacity: 1; scale: 1; visibility: visible; transition-delay: var(--duration-instant); }
 /* Its content ends clear of the thumb button. */

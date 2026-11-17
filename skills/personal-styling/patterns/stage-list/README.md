@@ -51,6 +51,10 @@ If the second surface holds both, it is a stage and list, and the controls go on
 - Tune it with `--list-w` (the wide column, `320px`), `--list-h` (the phone list's height, `52cqh`) and `--list-gap` (`8px`) on `.stage-list`.
 - The pattern sizes itself from its own width, not the window's (a container query), so it also works inside a framed demo.
 
+## Changes in v0.4.0
+
+- The detail's fade is quick, `--duration-base`; the scale keeps the spring.
+
 ## Changes in v0.3.0
 
 - The detail scales in on the spring, its fade with it.

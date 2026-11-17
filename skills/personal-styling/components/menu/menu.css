@@ -1,4 +1,4 @@
-/* personal-styling · menu · v0.3.0 */
+/* personal-styling · menu · v0.4.0 */
 
 /* Actions behind one control. The trigger is the More icon button; the
    menu is the picker's, holding actions instead of options: the same
@@ -27,13 +27,14 @@
   transform-origin: top right;
   /* CHANGED: the menu pops — it grows from 0.8 on the spring (from 0.95
      there was too little travel for a spring to show) and pops back down
-     on close, its fade running through the whole spring on --ease-in-out
-     so the pop is seen on the way out. */
+     on close. Its fade is quick, --duration-base, and never outlasts the
+     move: on close it eases in and out, so the menu is seen through the
+     dip and gone as the dip ends, not left fading after it has stopped. */
   transform: scale(0.8);
   opacity: 0;
   transition:
     transform var(--duration-spring) var(--ease-spring),
-    opacity var(--duration-spring) var(--ease-in-out);
+    opacity var(--duration-base) var(--ease-in-out);
 }
 /* A trigger at the start of a line: the menu hangs from its left edge. */
 .menu[data-align="start"] .menu-surface { right: auto; left: 0; transform-origin: top left; }
@@ -45,7 +46,7 @@
   opacity: 1;
   transition:
     transform var(--duration-spring) var(--ease-spring),
-    opacity var(--duration-spring) var(--ease-spring);   /* the fade lands with the pop */
+    opacity var(--duration-base) var(--ease-out);   /* a quick fade; the scale carries the pop */
 }
 
 .menu-list {

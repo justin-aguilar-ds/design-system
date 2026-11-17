@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.23
+   Personal styling tokens — v0.24
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -123,7 +123,7 @@ img, video, svg { display: block; max-width: 100%; }
 
   /* MOTION — two curves and a spring */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);     /* enter/exit only */
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* a fade that lasts a spring: a menu closing */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* a closing fade that holds, then goes: a menu popping shut */
   /* NEW (v0.23): THE SPRING — the system's signature. Origami's bouncy
      animation at speed 10, bounciness 10 (tension 299.6, friction 20.57):
      a pop that overshoots by about 10% and settles. Written as a linear()

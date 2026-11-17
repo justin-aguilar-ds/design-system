@@ -418,16 +418,16 @@ the values and leave the vocabulary alone.
 - `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` — a strong ease-out, for anything **entering or exiting** the screen.
 - Plain `ease` — for **hover states and colour changes**. Using the strong curve here makes hovers feel sludgy.
 - `--ease-spring` with `--duration-spring` — the system's signature. Origami's bouncy animation at speed 10, bounciness 10 (tension 299.6, friction 20.57): a pop that overshoots by about 10% and settles in 648ms. It's a `linear()` curve drawn over that duration, so the two always travel together; on another duration it is a different spring.
-- `--ease-in-out` — a fade that lasts the whole spring, so a pop can be seen on the way out (a menu closing).
+- `--ease-in-out` — a closing fade that holds, then goes, so a pop is seen on the way out (a menu closing).
 - No other curve with overshoot, and no other spring.
 
 **The spring — what it's for**
 
 - **Transforms that arrive.** Scale and rotate on the way in: a menu, a tooltip, a toast, the cursor pill, the chart's tooltip, a takeover. A mark appearing: a check and its fill, a radio's dot, a chip's dot. A chevron's turn. A fill moving to its new place: a segmented control's, a switch's thumb, a table row's, a menu option's. A press springing back.
 - **Scale is where it shows.** Things pop by scale: small things from `0`, menus from `0.8`, large surfaces from `0.95`. Fills and discs grow rather than fade in.
-- **The fade goes with it.** A pop's opacity runs on the spring too; opacity stops at 1, so it simply lands sooner.
+- **A fade never outlasts the move.** Opacity is quick: `--duration-base`, on `--ease-out` as something arrives and `--ease-in-out` as it leaves, never on the spring. The scale carries the pop; a fade that runs longer than the move leaves something that has stopped but hasn't gone.
 - **Never** for size or layout (an accordion's height, a corner's radius, a sheet's geometry), colour, text, hover or focus — those keep `--ease-out` and plain `ease`.
-- **Never for something shrinking to nothing.** A spring to `scale(0)` passes zero and flips the thing over. A tooltip, toast or pill closes on `--ease-out` at `base`: the open state declares the spring, the closed state the ease, and the destination's transition wins. A menu closes to `0.8`, so it pops on the way out too, with its fade on `--ease-in-out` over the spring so the pop is seen.
+- **Never for something shrinking to nothing.** A spring to `scale(0)` passes zero and flips the thing over. A tooltip, toast or pill closes on `--ease-out` at `base`: the open state declares the spring, the closed state the ease, and the destination's transition wins. A menu closes to `0.8`, so it pops on the way out too, its fade on `--ease-in-out` over `--duration-base` so it's seen through the dip and gone as the dip ends.
 - **Where a script waits for a transition**, it reads the element's own transition time rather than a constant, so the spring plays out (see `components/picker/`).
 
 **Patterns**

@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.8.0 */
+/* personal-styling · picker · v0.9.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -52,13 +52,14 @@
   transform-origin: top left;
   /* CHANGED: the menu pops — it grows from 0.8 on the spring (from 0.95
      there was too little travel for a spring to show) and pops back down
-     on close, its fade running through the whole spring on --ease-in-out
-     so the pop is seen on the way out. */
+     on close. Its fade is quick, --duration-base, and never outlasts the
+     move: on close it eases in and out, so the menu is seen through the
+     dip and gone as the dip ends, not left fading after it has stopped. */
   transform: scale(0.8);
   opacity: 0;
   transition:
     transform var(--duration-spring) var(--ease-spring),
-    opacity var(--duration-spring) var(--ease-in-out);
+    opacity var(--duration-base) var(--ease-in-out);
 }
 .picker.is-above .picker-menu {
   top: auto;
@@ -70,7 +71,7 @@
   opacity: 1;
   transition:
     transform var(--duration-spring) var(--ease-spring),
-    opacity var(--duration-spring) var(--ease-spring);   /* the fade lands with the pop */
+    opacity var(--duration-base) var(--ease-out);   /* a quick fade; the scale carries the pop */
 }
 
 .picker-list {

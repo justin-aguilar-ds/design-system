@@ -32,6 +32,10 @@ Actions behind the More button — rename, duplicate, share, delete — in the p
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
 
+## Changes in v0.4.0
+
+- The fade is quick, `--duration-base` (out on `--ease-in-out`), so it never outlasts the pop: the menu no longer lingers, still, while it fades.
+
 ## Changes in v0.3.0
 
 - The menu pops: it grows from 0.8 on the spring and pops back down on close, its fade on `--ease-in-out` over the spring so the pop is seen. The fill lands on its item on the spring.

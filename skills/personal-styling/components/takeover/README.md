@@ -23,6 +23,10 @@ From a bet tracker, where a bet opened from the list became the whole screen, an
 - `.takeover--contained` takes over its positioned parent instead of the screen: a pattern that is the page, or a framed demo.
 - `el.takeover.open()` and `.close()`; `.isOpen`. It fires a bubbling `takeover-toggle` event with `detail.open`, and puts `.has-takeover` on `<html>` while open.
 
+## Changes in v0.3.0
+
+- The fade is quick, `--duration-base`; the scale keeps the spring.
+
 ## Changes in v0.2.0
 
 - It scales in from 0.95 on the spring, its fade with it, and leaves the same way.

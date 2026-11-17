@@ -37,6 +37,10 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
 
+## Changes in v0.9.0
+
+- The menu's fade is quick, `--duration-base` (out on `--ease-in-out`), so it never outlasts the pop.
+
 ## Changes in v0.8.0
 
 - The menu pops: it grows from 0.8 on the spring and pops back down on close, its fade on `--ease-in-out` over the spring. The chevron turns on the spring; the fill lands on its option on it.
