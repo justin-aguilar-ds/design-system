@@ -1,4 +1,4 @@
-/* personal-styling · button · v0.7.0 */
+/* personal-styling · button · v0.8.0 */
 
 /* The pill. Fill, hairline, rest shadow and hover lift all come from
    .surface .surface--rest .surface--pill in tokens.css; this file adds
@@ -27,6 +27,37 @@
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   white-space: nowrap;
+  position: relative;
+  isolation: isolate;
+}
+/* NEW (v0.8): as its ink brightens, a quiet pill grows from the label's
+   centre behind it, the bare icon button's fill (components/icon-button/):
+   0 to full on --duration-base with the enter curve. On touch it shows
+   while pressed, a step darker; keyboard focus shows it too. */
+.button-text::before {
+  content: "";
+  position: absolute;
+  inset: -1px;                  /* over the transparent border, to the button's edge */
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-quiet);
+  scale: 0;
+  transition:
+    scale var(--duration-base) var(--ease-out),
+    background-color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .button-text:hover:not(:disabled)::before { scale: 1; }
+}
+.button-text:focus-visible::before { scale: 1; }
+.button-text:active:not(:disabled)::before {
+  scale: 1;
+  background: var(--color-fill-quiet-hover);
+  transition-duration: var(--duration-instant);
+}
+@media (prefers-reduced-motion: reduce) {
+  .button-text::before { scale: 1; opacity: 0; transition: opacity var(--duration-fast) ease; }
+  .button-text:is(:hover, :focus-visible, :active):not(:disabled)::before { opacity: 1; }
 }
 
 /* A cluster aligns on the label baseline, so a Label pill (19px line)

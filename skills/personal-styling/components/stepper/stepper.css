@@ -1,4 +1,4 @@
-/* personal-styling · stepper · v0.1.0 */
+/* personal-styling · stepper · v0.2.0 */
 
 /* A small whole number, set a step at a time. One pill — the button's
    surface (.surface .surface--rest .surface--pill) at the height of every
@@ -9,21 +9,38 @@
   flex: none;
   height: var(--height-control);
 }
-/* The steps are bare marks inside the control, not buttons inside a
-   button: no fill, no circle. Each is --inset-control from the pill's
-   edge and --gap-mark from the number, and as tall as the pill, so the
-   target is the whole end of it. */
+/* CHANGED (v0.2): each step is a square the pill's inner height (34),
+   with its mark at the centre. On hover a quiet circle grows behind the
+   mark, 4 inside the square on every side — 26 across, 4 from the pill's
+   top, bottom and end — so the space around it is even. The bare icon
+   button's fill, fitted to the pill. */
 .stepper-step {
   -webkit-tap-highlight-color: transparent;   /* the browser's tap flash; the component draws its own pressed state */
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
+  justify-content: center;
   align-self: stretch;
-  padding: 0 var(--gap-mark) 0 var(--inset-control);
+  width: calc(var(--height-control) - 2px);   /* the pill less its 1px border, top and bottom */
+  padding: 0;
   border-radius: var(--radius-pill);
   color: var(--color-text-secondary);
   transition: color var(--duration-fast) ease;
 }
-.stepper-step:last-child { padding: 0 var(--inset-control) 0 var(--gap-mark); }
+.stepper-step::before {
+  content: "";
+  position: absolute;
+  inset: var(--inset-fill);
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-quiet);
+  scale: 0;
+  transition:
+    scale var(--duration-base) var(--ease-out),
+    background-color var(--duration-fast) ease;
+}
+.stepper-step:focus-visible::before { scale: 1; }
 .stepper-step svg {
   width: var(--icon-mark);
   height: var(--icon-mark);
@@ -31,10 +48,12 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .stepper-step:hover:not(:disabled) { color: var(--color-text); }
+  .stepper-step:hover:not(:disabled)::before { scale: 1; }
 }
 /* Touch: the hover response plays on press (see tokens.css). */
 @media (hover: none) {
   .stepper-step:active:not(:disabled) { color: var(--color-text); transition-duration: var(--duration-instant); }
+  .stepper-step:active:not(:disabled)::before { scale: 1; background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
 }
 /* Tactility: the mark gives while it's held. */
 .stepper-step:active:not(:disabled) svg {
@@ -79,4 +98,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .stepper-step:active:not(:disabled) svg { scale: none; }
+  .stepper-step::before { scale: 1; opacity: 0; transition: opacity var(--duration-fast) ease; }
+  .stepper-step:is(:hover, :focus-visible, :active):not(:disabled)::before { opacity: 1; }
 }

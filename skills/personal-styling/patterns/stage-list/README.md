@@ -51,6 +51,10 @@ If the second surface holds both, it is a stage and list, and the controls go on
 - Tune it with `--list-w` (the wide column, `320px`), `--list-h` (the phone list's height, `52cqh`) and `--list-gap` (`8px`) on `.stage-list`.
 - The pattern sizes itself from its own width, not the window's (a container query), so it also works inside a framed demo.
 
+## Changes in v0.2.1
+
+- Its icons draw at the 2 stroke.
+
 ## Changes in v0.2.0
 
 - The top row wraps: controls drop under a long figure instead of colliding with it.

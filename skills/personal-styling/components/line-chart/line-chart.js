@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.5.0 */
+/* personal-styling · line-chart · v0.6.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
@@ -88,14 +88,18 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   let geo = null;
 
   // Round steps from zero, upward to the highest value and (v0.3) downward
-  // to the lowest, so zero is always a guide.
-  const niceTicks = (min, max, count) => {
+  // to the lowest, so zero is always a guide. NEW (v0.6): with
+  // data-zero="off" the steps start at the round step at or below the
+  // lowest value instead, so a value that moves a little away from zero
+  // (a balance) draws as a shape, not a flat line along the top.
+  const niceTicks = (min, max, count, fromZero = true) => {
     const raw = ((max - min) || 1) / count;
     const mag = 10 ** Math.floor(Math.log10(raw));
     const step = [1, 2, 2.5, 5, 10].map((v) => v * mag).find((v) => v >= raw);
     const ticks = [];
-    for (let v = 0; ; v += step) { ticks.push(v); if (v >= max && ticks.length > 1) break; }   // a flat zero series still gets a scale
-    for (let v = -step; min < 0; v -= step) { ticks.unshift(v); if (v <= min) break; }
+    const start = fromZero ? 0 : Math.floor(min / step) * step;
+    for (let v = start; ; v += step) { ticks.push(v); if (v >= max && ticks.length > 1) break; }   // a flat series still gets a scale
+    for (let v = start - step; fromZero && min < 0; v -= step) { ticks.unshift(v); if (v <= min) break; }
     return ticks;
   };
   // A real minus sign, and the unit (data-prefix) between it and the figure.
@@ -105,7 +109,10 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
 
   function draw() {
     const W = svg.clientWidth || fig.clientWidth || 320;
-    const H = W < 500 ? LINE_CHART_HEIGHT : LINE_CHART_HEIGHT_WIDE;
+    // NEW (v0.6): --line-chart-height on the figure sets the height, for a
+    // chart in a card or a widget; otherwise it follows the width.
+    const set = parseFloat(getComputedStyle(fig).getPropertyValue('--line-chart-height'));
+    const H = set > 0 ? set : (W < 500 ? LINE_CHART_HEIGHT : LINE_CHART_HEIGHT_WIDE);
     // Labels by width: a wide chart is read for figures, a narrow one for
     // its shape (the tooltip still gives every value). Redrawn on resize.
     const mode = opt('labels', 'auto');
@@ -113,7 +120,10 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const xLabels = labels && mode !== 'y';   // "y": the value labels alone, when the tooltip names the point
     const guides = opt('guides', 'grid');
     const all = series.flatMap((s) => s.values);
-    const ticks = niceTicks(Math.min(0, ...all), Math.max(0, ...all), opt('density', 'few') === 'more' ? 8 : 4);
+    const fromZero = opt('zero', 'on') !== 'off';
+    const ticks = fromZero
+      ? niceTicks(Math.min(0, ...all), Math.max(0, ...all), opt('density', 'few') === 'more' ? 8 : 4)
+      : niceTicks(Math.min(...all), Math.max(...all), opt('density', 'few') === 'more' ? 8 : 4, false);
     const top = ticks[ticks.length - 1], low = ticks[0];
     const L = labels ? LINE_CHART_DIGIT * Math.max(...ticks.map((v) => format(v).length)) + LINE_CHART_GAP : 4;
     const R = 4, T = 8, B = xLabels ? 15 + LINE_CHART_GAP : 4;

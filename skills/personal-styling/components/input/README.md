@@ -24,6 +24,10 @@ Text someone types — a name, a URL, a search, or a few lines of notes — in t
 - In a control panel, put `.input-field` straight into `.control-panel-fields` beside the other fields.
 - No JavaScript.
 
+## Changes in v0.4.1
+
+- The search icon draws at the 2 stroke.
+
 ## Changes in v0.4.0
 
 - `.input--area`: a text area, as a card.

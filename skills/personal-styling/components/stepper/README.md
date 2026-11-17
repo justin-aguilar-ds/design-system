@@ -5,7 +5,7 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 ## Rules
 
 - **One pill, `36px`, on the button's surface:** the hairline, the rest shadow, the hover lift. It sits in a row with any other control.
-- **The steps are bare marks.** A `10px` minus and plus (`--icon-mark`) on the pill's own surface, `16px` from its edge and `8px` from the number. No fill and no circle: a button inside a control is a control inside a control. Each mark's target is the whole end of the pill.
+- **The steps are bare marks, with a fill on hover.** A `10px` minus and plus (`--icon-mark`) at the centre of a square the pill's inner height (`34px`), which is the step's target. At rest there is no fill and no circle: a button inside a control is a control inside a control. On hover a quiet circle grows behind the mark, `4px` inside the square on every side — `26px` across, `4px` from the pill's top, bottom and end — the bare icon button's fill, fitted to the pill. On touch it shows while pressed, a step darker.
 - **Marks are secondary ink, full ink on hover**, and give to `--scale-press` while held.
 - **The number is a value someone can type:** full ink, 16px, tabular figures, three figures wide so the pill doesn't change width as it counts.
 - **A step at its limit is disabled:** 30%, nothing happens. The number never leaves `data-min` to `data-max`.
@@ -21,3 +21,7 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 - `stepper.js` fires a bubbling `stepper-change` with `detail.value`. Arrow up and down step the number while the field is focused.
 - Disable it with `disabled` on the input and both buttons.
 - Needs the surface classes from `tokens.css`.
+
+## Changes in v0.2.0
+
+- Each step is a 34px square with its mark at the centre; a quiet circle grows behind it on hover, 4px inside the pill all round. The mark used to sit 2px off where the circle would be.

@@ -1,4 +1,4 @@
-/* personal-styling · icon-button · v0.4.0 */
+/* personal-styling · icon-button · v0.5.0 */
 
 /* An icon alone as a control — back, more, share, close. A circle the
    height of every other control (--height-control, 36px), so it sits in a
@@ -57,6 +57,33 @@
 /* Three classes deep so it beats .surface--rest:hover in tokens.css. */
 .icon-button.surface--rest:disabled { box-shadow: none; }
 
+/* NEW (v0.5): bare — no circle at rest, for a row of controls beside one
+   primary (previous and next beside play). On hover a quiet circle grows
+   from the icon's centre behind it, 0 to full on --duration-base with the
+   enter curve, and shrinks away when the pointer leaves. On touch it shows
+   while the finger is down, a step darker; keyboard focus shows it too. */
+.icon-button--bare { position: relative; isolation: isolate; }
+.icon-button--bare::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-quiet);
+  scale: 0;
+  transition:
+    scale var(--duration-base) var(--ease-out),
+    background-color var(--duration-fast) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .icon-button--bare:hover:not(:disabled)::before { scale: 1; }
+}
+.icon-button--bare:focus-visible::before { scale: 1; }
+.icon-button--bare:active:not(:disabled)::before {
+  scale: 1;
+  background: var(--color-fill-quiet-hover);
+  transition-duration: var(--duration-instant);
+}
 /* A group of icon buttons: 8px apart, like a button cluster. */
 .icon-button-row {
   display: flex;
@@ -67,4 +94,7 @@
 /* Same specificity as the press, and later, so it wins. */
 @media (prefers-reduced-motion: reduce) {
   .icon-button--secondary:active:not(:disabled) { scale: none; }
+  /* The bare fill fades instead of growing. */
+  .icon-button--bare::before { scale: 1; opacity: 0; transition: opacity var(--duration-fast) ease; }
+  .icon-button--bare:is(:hover, :focus-visible, :active):not(:disabled)::before { opacity: 1; }
 }

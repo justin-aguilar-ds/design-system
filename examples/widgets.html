@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="lib/components/list-row/list-row.css">
 <link rel="stylesheet" href="lib/components/line-chart/line-chart.css">
 <link rel="stylesheet" href="lib/components/stepper/stepper.css">
+<link rel="stylesheet" href="lib/components/timeline/timeline.css">
 <link rel="stylesheet" href="lib/components/toast/toast.css">
 <link rel="stylesheet" href="lib/patterns/type-pairs/type-pairs.css">
 <link rel="stylesheet" href="lib/patterns/stage-sheet/stage-sheet.css">
@@ -29,12 +30,6 @@
   body { background: var(--color-bg); }
   .tnum { font-variant-numeric: tabular-nums; }
   .quiet { color: var(--color-text-secondary); }
-  /* Proposed: a solid grey ink for marks. The secondary ink is 50% black,
-     so wherever two strokes of one icon cross they stack darker. #808080
-     is what the secondary ink looks like on white, made opaque; in dark it
-     is the same value (50% white on black). Text keeps the secondary ink;
-     icons, dots and initials in grey take this. */
-  :root { --color-ink-grey: #808080; }
   .ink { color: var(--color-text); }
 
   .stage-host {
@@ -136,21 +131,10 @@
   .now { display: flex; align-items: center; gap: var(--space-8); color: var(--color-text); }
   .now::after { content: ""; flex: 1; border-top: 1px solid currentColor; }
   .stack { display: flex; }
-  /* Avatars, under test (Avatar fill in the sheet). The quiet fill is
-     translucent, so where circles overlap the ring and the circle under it
-     show through. Solid: #e6e6e6, which is exactly what the quiet
-     fill looks like over the stage, made opaque, so it reads on white and
-     on the stage alike. Series: the chart grey. */
-  .widgets { --avatar-fill: #e6e6e6; }
-  @media (prefers-color-scheme: dark) { .widgets { --avatar-fill: #262626; } }
-  :root[data-theme="dark"] .widgets { --avatar-fill: #262626; }
-  :root[data-theme="light"] .widgets { --avatar-fill: #e6e6e6; }
-  .widgets.avatar-quiet { --avatar-fill: var(--color-fill-quiet); }
-  .widgets.avatar-series { --avatar-fill: var(--color-series); }
   /* One avatar rule: initials in mono, in the faded (secondary) ink, on
      the solid avatar grey, at any size. */
-  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); color: var(--color-ink-grey); }
-  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-ink-grey); font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.3px; }
+  .widget .list-row-lead.is-avatar { background: var(--color-avatar); color: var(--color-text-secondary); }
+  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--color-avatar); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text-secondary); font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.3px; }
   .stack > span + span { margin-left: calc(-1 * var(--space-8)); }
   .frame-card .stack > span { --w-ground: var(--color-surface); }
 
@@ -170,108 +154,20 @@
   /* The artwork is content, so it takes the one surface: white, the
      hairline, the card radius. Empty, it holds a note in the faded ink. */
   .art { display: grid; place-items: center; width: 64px; height: 64px; border-radius: var(--radius-card); background: var(--color-surface); box-shadow: inset 0 0 0 1px var(--color-hairline); }
-  .art .ico { color: var(--color-ink-grey); }
+  .art .ico { color: var(--color-text-secondary); }
   .np-times { display: flex; justify-content: space-between; margin-top: var(--space-8); }
   .np-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
-  /* Proposed: the bare icon button. No fill at rest; on hover a quiet
-     grey circle grows from the icon's centre behind it, scale 0 to 1 on
-     --duration-base with --ease-out (it enters), and shrinks away on the
-     same. On touch the same circle plays while the finger is down. */
-  /* The stepper's steps take the bare icon button's fill, fitted inside
-     the pill. Each step is a square the pill's inner height (34) with 4
-     inside it on every side, and the circle fills that: 26 across, 4 from
-     the top, the bottom and both sides, so the gap around it is even. The
-     mark is centred in the square, which is the circle's centre. */
-  .stepper .stepper-step {
-    --step-d: calc(var(--height-control) - 2px - 2 * var(--inset-fill));   /* 26: the inner 34 less 4 each side */
-    position: relative;
-    isolation: isolate;
-    justify-content: center;
-    width: calc(var(--step-d) + 2 * var(--inset-fill));
-    padding: 0;
-  }
-  .stepper .stepper-step:last-child { padding: 0; }
-  .stepper .stepper-step::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: var(--inset-fill);
-    border-radius: var(--radius-pill);
-    background: var(--color-fill-quiet);
-    scale: 0;
-    transition: scale var(--duration-base) var(--ease-out), background-color var(--duration-fast) ease;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .stepper .stepper-step:hover:not(:disabled)::before { scale: 1; }
-  }
-  .stepper .stepper-step:active:not(:disabled)::before { scale: 1; background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
-  .stepper .stepper-step:focus-visible::before { scale: 1; }
-  .stepper .stepper-step:focus-visible { outline: none; }
-  @media (prefers-reduced-motion: reduce) {
-    .stepper .stepper-step::before { transition: opacity var(--duration-fast) ease; scale: 1; opacity: 0; }
-    .stepper .stepper-step:is(:hover, :active, :focus-visible):not(:disabled)::before { opacity: 1; }
-  }
-
-  /* The text button takes the same fill: a quiet grey pill grows from
-     its centre behind the label on hover and press. */
-  .icon-button--bare, .button-text { position: relative; isolation: isolate; }
-  :is(.icon-button--bare, .button-text)::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: var(--radius-pill);
-    background: var(--color-fill-quiet);
-    scale: 0;
-    transition: scale var(--duration-base) var(--ease-out), background-color var(--duration-fast) ease;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    :is(.icon-button--bare, .button-text):hover::before { scale: 1; }
-  }
-  :is(.icon-button--bare, .button-text):active::before { scale: 1; background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
-  :is(.icon-button--bare, .button-text):focus-visible::before { scale: 1; }
-  @media (prefers-reduced-motion: reduce) {
-    :is(.icon-button--bare, .button-text)::before { transition: opacity var(--duration-fast) ease; scale: 1; opacity: 0; }
-    :is(.icon-button--bare, .button-text):is(:hover, :active, :focus-visible)::before { opacity: 1; }
-  }
 
   /* ---- 6 Activity ---- */
   .meter { height: 16px; border-radius: var(--radius-pill); background: var(--color-range-track); overflow: hidden; }
   .meter > span { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--color-text); }
 
   /* ---- 7 Package ---- */
-  /* The slider, standing up: a 16 grey track down the left, full ink
-     through the steps that are done, and the slider's 12 white thumb on
-     the step that's happening now. Each step is a 36 row; the track's
-     ends sit 8 past the first and last centres, as the slider's do. */
-  /* Each step draws its own piece of the track, so the ink always ends
-     where its step is, however tall a row grows: the grey down the whole
-     row, the ink over it. The first row starts 8 above its centre and the
-     last ends 8 below it, rounded, as the slider's track does. */
-  .steps { padding: 0 0 0 calc(16px + var(--space-16)); list-style: none; display: grid; }
-  .step { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-16); min-height: var(--height-control); }
-  .step::before,
-  .step::after { content: ""; position: absolute; left: calc(-16px - var(--space-16)); width: 16px; top: 0; bottom: 0; }
-  .step::before { background: var(--color-range-track); }
-  .step.is-done::after { background: var(--color-range-progress); }
-  .step:first-child::before,
-  .step:first-child::after { top: calc(50% - 8px); border-radius: 8px 8px 0 0; }
-  .step:last-child::before { bottom: calc(50% - 8px); border-radius: 0 0 8px 8px; }
-  /* Now: the ink stops 2 below the thumb, the same 2 the track leaves
-     either side of it (16 less 12, halved), so the thumb sits in an even
-     ring of ink. */
-  .step.is-current::after { bottom: calc(50% - 8px); border-radius: 0 0 8px 8px; background: var(--color-range-progress); }
-  .step.is-current:first-child::after { border-radius: 8px; }
-  /* Small dots for the steps done and to come; the slider's 12 thumb for
-     the one happening now. */
-  .step-dot { position: absolute; z-index: 1; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 4px; height: 4px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-ink-grey); }
-  .step.is-done .step-dot { background: var(--color-range-thumb); }
-  .step.is-current .step-dot { width: 12px; height: 12px; background: var(--color-range-thumb); }
-  .step.is-done, .step.is-current { color: var(--color-text); }
+  /* The tracker is the library's timeline (components/timeline/). */
   /* A filled glyph, in the same spirit: a grey shape with its edges cut in
      the ground colour, like the white thumb on the grey track. */
   .ico-fill { flex: none; width: var(--icon-control); height: var(--icon-control); }
-  .ico-fill .shape { fill: var(--color-ink-grey); }
+  .ico-fill .shape { fill: var(--color-text-secondary); }
   .ico-fill .cut { fill: none; stroke: var(--w-ground, var(--color-stage)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .frame-card .ico-fill { --w-ground: var(--color-surface); }
 
@@ -350,7 +246,7 @@
 const KEY = 'widgets-1';
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
-const state = Object.assign({ frame: 'stage', gaps: 'on', avatar: 'solid' }, saved.state);
+const state = Object.assign({ frame: 'stage', gaps: 'on' }, saved.state);
 const notes = saved.notes || {};
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -379,12 +275,10 @@ const barcode = () => { let x = 0, r = ''; const w = [2, 1, 3, 1, 1, 2, 1, 3, 2,
 // The gaps: every part the library had no answer for. Numbered in the
 // order a reader meets them; data-gap on an element ties it here.
 const GAPS = {
-  frame: ['What a widget sits in', 'The system has the stage (a ground for a hero) and the card (for content). A widget is a small tool shown as an object: either fits, neither is ruled, and the two read very differently in a set. Switch Frame to compare.'],
   budget: ['Four type styles in one widget', 'The pass, the weather and the activity widget each want a Display figure, mono names, Title figures and Body. The rule is three styles to a card. Either the rule bends for a widget, or one of those goes.'],
   route: ['A route between two places', 'A line with a mark on it between an origin and a destination. Dotted lines mean chart guides and dashed means provisional, so this one is a plain hairline with a plane over it.'],
   tear: ['A tear line', 'The stub of a ticket. Drawn as a dashed rule edge to edge, which borrows dashed’s meaning (provisional) for something that isn’t.'],
   code: ['A machine-readable code', 'A barcode or QR block: its size, its quiet zone, full ink, and the line under it.'],
-  ink: ['A solid grey ink for marks', 'The secondary ink is translucent, so an icon drawn in it darkens wherever its strokes cross (the note’s stem over its heads). Proposed: #808080, the secondary ink on white made opaque, for icons, dots and initials in grey. Text keeps the secondary ink.'],
   icons: ['A drawn icon set', 'The icon rules exist (three sizes, one stroke, round, current colour) but no icons do: every component draws its own marks inline. These are redrawn geometric and symmetric (circles, straight lines and 45° steps on the 20 grid) at a 2 stroke, against the rules’ 1.5.'],
   strip: ['A strip that scrolls sideways', 'Hourly tiles in one row. The carousel shows one item at a time and the scroll fade only fades top and bottom, so the side fade here is hand-made.'],
   range: ['A range on a track', 'Low to high on a shared scale: a thin track with an ink segment. The slider’s track is an input, not a reading, and is 16 tall.'],
@@ -395,18 +289,14 @@ const GAPS = {
   spark: ['A sparkline outside a table', 'The table draws sparklines in cells; a row in a list has no cell, so this one is hand-drawn on the same spec.'],
   media: ['Playback: times and a play button', 'Elapsed and remaining under a scrubber, and a play button that turns into pause. The slider has no end labels and the icon button no toggled state.'],
   meter: ['Progress toward a goal', 'A reading, not a control: how far along. The slider’s track would invite a drag.'],
-  timeline: ['Steps over time', 'Done, now and still to come. Drawn as the slider standing up: a 16 grey track, full ink through the steps done, a small dot for each step done or to come, and the slider’s 12 thumb on the current one in an even 2 of ink.'],
   unread: ['An unread marker', 'A dot that means new. The chip’s dot means on or off, so the same mark would mean two things.'],
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
-  chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
-  bare: ['A bare icon button', 'An icon button with no circle at rest, for a row of transport controls beside one primary. The icon button has primary and secondary only, so a bare one had no hover at all. Proposed: a quiet grey circle grows behind the icon on hover and press. The text button takes the same fill as a pill (Reset, Show on a map, Comment), where today it only brightens its ink, and so do the stepper’s minus and plus, as a circle 4 inside the pill.'],
-  art: ['A media placeholder on the stage', 'An empty artwork slot in stage grey disappears on a stage-grey widget. Artwork is content, so here it takes the one surface (white, the hairline, the card radius) with a note in the faded ink while empty. The system has no rule yet for an empty media slot that isn’t the stage.'],
 };
 const GAP_IDS = Object.keys(GAPS);
 const gapNo = (id) => `G${GAP_IDS.indexOf(id) + 1}`;
 
 const WIDGETS = [
-  ['pass', 'Boarding pass', 'A flight, read at the gate', ['frame', 'budget', 'route', 'tear', 'code'], `
+  ['pass', 'Boarding pass', 'A flight, read at the gate', ['budget', 'route', 'tear', 'code'], `
     <div class="pass-route">
       <div class="type-pair"><span class="t-mono">Lisbon</span><span class="t-display">LIS</span></div>
       <div class="pass-line" data-gap="route">${ico('plane')}</div>
@@ -433,14 +323,14 @@ const WIDGETS = [
     </ul>`],
   ['trending', 'Trending', 'What people are posting about', ['rank', 'spark'], `
     <ol class="trend">${[['Web Summit', '18.2K posts', [2, 3, 3, 5, 8, 13, 21], '+340%'], ['Porto vs Benfica', '11.9K posts', [5, 4, 6, 9, 7, 12, 15], '+120%'], ['Sintra rail', '4.1K posts', [1, 2, 2, 3, 6, 5, 9], '+88%'], ['Pastel de nata', '2.8K posts', [6, 5, 7, 6, 7, 8, 8], '+12%']].map(([n, sub, v, ch], i) => `<li><span class="rank t-mono tnum"${i === 0 ? ' data-gap="rank"' : ''}>${i + 1}</span><div><span class="t-label">${n}</span><span class="t-body">${sub}</span></div><svg class="spark" viewBox="0 0 64 20" aria-hidden="true"${i === 0 ? ' data-gap="spark"' : ''}><path d="${sparkPath(v)}"/></svg><span class="t-label ink-gain tnum">${ch}</span></li>`).join('')}</ol>`],
-  ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons', 'bare', 'ink'], `
-    <div class="np-head"><span class="art" data-gap="art" role="img" aria-label="No artwork">${ico('note')}</span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
+  ['playing', 'Now playing', 'A track, its progress and the controls', ['media', 'icons'], `
+    <div class="np-head"><span class="art" role="img" aria-label="No artwork">${ico('note')}</span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
     <div data-gap="media">
       <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" type="range" min="0" max="480" value="192" aria-label="Position"></span>
       <div class="np-times"><span class="t-mono">3:12</span><span class="t-mono">−4:48</span></div>
     </div>
     <div class="np-controls">
-      <button class="icon-button icon-button--bare" type="button" aria-label="Previous" data-gap="bare">${ico('prev')}</button>
+      <button class="icon-button icon-button--bare" type="button" aria-label="Previous">${ico('prev')}</button>
       <button class="icon-button icon-button--large surface surface--rest surface--pill np-play" type="button" aria-label="Pause" aria-pressed="true">${ico('pause')}</button>
       <button class="icon-button icon-button--bare" type="button" aria-label="Next">${ico('next')}</button>
     </div>`],
@@ -448,14 +338,14 @@ const WIDGETS = [
     ${pair('Steps today', '7,412', 't-display')}
     <div class="meter" data-gap="meter" role="meter" aria-valuenow="7412" aria-valuemax="10000" aria-label="Steps toward 10,000"><span style="width: 74%"></span></div>
     <div class="figures">${pair('Goal', '10,000')}${pair('Distance', '5.2 km')}${pair('Active', '48 min')}</div>`],
-  ['parcel', 'Parcel', 'Where an order is', ['timeline', 'icons'], `
+  ['parcel', 'Parcel', 'Where an order is', ['icons'], `
     <div class="row"><div class="type-pair"><span class="t-label">Arriving today</span><span class="t-body">Between 2 and 4pm</span></div><span data-gap="icons"><svg class="ico-fill" viewBox="0 0 20 20" aria-hidden="true"><path class="shape" d="m10 2 7 4v8l-7 4-7-4V6l7-4Z"/><path class="cut" d="M3.5 6.25 10 10l6.5-3.75M10 10v7.5"/></svg></span></div>
-    <ol class="steps" data-gap="timeline">${[['Ordered', 'Nov 12', 'is-done'], ['Shipped from Madrid', 'Nov 13', 'is-done'], ['In Lisbon', 'Nov 16', 'is-done'], ['Out for delivery', '08:14', 'is-current'], ['Delivered', '', '']].map(([n, d, c]) => `<li class="step ${c}"${c === 'is-current' ? ' aria-current="step"' : ''}><span class="step-dot"></span><span class="t-body">${n}</span><span class="t-mono">${d}</span></li>`).join('')}</ol>
+    <ol class="timeline" aria-label="Delivery">${[['Ordered', 'Nov 12', 'is-done'], ['Shipped from Madrid', 'Nov 13', 'is-done'], ['In Lisbon', 'Nov 16', 'is-done'], ['Out for delivery', '08:14', 'is-current'], ['Delivered', '', '']].map(([n, d, c]) => `<li class="timeline-step ${c}"${c === 'is-current' ? ' aria-current="step"' : ''}><span class="timeline-dot" aria-hidden="true"></span><span class="t-body">${n}</span><span class="t-mono">${d}</span></li>`).join('')}</ol>
     <button class="button-text link-quiet t-control" type="button" style="justify-self: start; margin-left: calc(-1 * var(--inset-control))">Show on a map</button>`],
-  ['portfolio', 'Portfolio', 'A balance and its line', ['chart'], `
+  ['portfolio', 'Portfolio', 'A balance and its line', [], `
     ${pair('Balance', '$18,640', 't-display', '<span class="t-mono ink-gain">+$412 today</span>')}
     <div class="segmented" role="group" aria-label="Period"><span class="segmented-indicator" aria-hidden="true"></span>${['1D', '1W', '1M', '1Y'].map((p, i) => `<button class="segmented-option t-control${i === 2 ? ' is-active' : ''}" type="button" aria-pressed="${i === 2}">${p}</button>`).join('')}</div>
-    <figure class="line-chart" aria-label="Balance over a month" data-legend="off" data-guides="none" data-prefix="$" data-gap="chart"><script type="application/json">${JSON.stringify({ x: Array.from({ length: 30 }, (_, i) => `Oct ${i + 18}`), series: [{ name: 'Balance', values: [16900, 17020, 16950, 17110, 17300, 17240, 17380, 17520, 17410, 17600, 17680, 17550, 17720, 17900, 17840, 17960, 18100, 18020, 18150, 18240, 18190, 18300, 18210, 18380, 18450, 18320, 18480, 18560, 18228, 18640] }] })}<\/script></figure>`],
+    <figure class="line-chart" aria-label="Balance over a month" data-legend="off" data-guides="none" data-prefix="$" data-zero="off" style="--line-chart-height: 160px"><script type="application/json">${JSON.stringify({ x: Array.from({ length: 30 }, (_, i) => `Oct ${i + 18}`), series: [{ name: 'Balance', values: [16900, 17020, 16950, 17110, 17300, 17240, 17380, 17520, 17410, 17600, 17680, 17550, 17720, 17900, 17840, 17960, 18100, 18020, 18150, 18240, 18190, 18300, 18210, 18380, 18450, 18320, 18480, 18560, 18228, 18640] }] })}<\/script></figure>`],
   ['inbox', 'Inbox', 'The latest messages', ['unread'], `
     <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead is-avatar t-mono" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
   ['sleep', 'Sleep', 'Last night and the week', ['bars'], `
@@ -474,14 +364,13 @@ const WIDGETS = [
 
 document.getElementById('widgets').innerHTML = WIDGETS.map(([id, name, line, gaps, html]) => `
   <section class="tile" id="w-${id}" data-id="${id}" aria-label="${name}">
-    <div class="widget" data-comment-target data-gaps="${gaps.includes('frame') ? 'frame' : ''}">${html}</div>
+    <div class="widget" data-comment-target >${html}</div>
     <div class="tile-foot">
       <div class="tile-name"><h2 class="t-label">${name}</h2><p class="t-caption tile-gaps">${gaps.length ? [...gaps].sort((a, b) => GAP_IDS.indexOf(a) - GAP_IDS.indexOf(b)).map(gapNo).join(' · ') : 'No gaps — built from the library'}</p></div>
       <button class="button-text link-quiet t-control comment-btn" type="button" data-id="${id}">Comment</button>
     </div>
   </section>`).join('');
 
-const used = (gid) => WIDGETS.filter((w) => w[3].includes(gid) || (gid === 'frame')).map((w) => w[1]);
 const seg = (id, label, opts) => `
   <div class="control-field">
     <span class="t-mono" id="${id}-l">${label}</span>
@@ -493,9 +382,8 @@ const seg = (id, label, opts) => `
 document.getElementById('sheet-body').innerHTML = `
   ${seg('frame', 'Frame', [['stage', 'Stage'], ['card', 'Card']])}
   ${seg('gaps', 'Outlines', [['off', 'Off'], ['on', 'On']])}
-  ${seg('avatar', 'Avatar fill', [['quiet', 'Quiet'], ['solid', 'Solid'], ['series', 'Series']])}
   <div class="sheet-section">
-    <p class="t-body sheet-note">Twelve widgets built from the library alone. Wherever it had no answer, the part was drawn on the page and is outlined, numbered to the list below. Comment on a widget with the button under it.</p>
+    <p class="t-body sheet-note">Twelve widgets built from the library alone. Wherever it had no answer, the part was drawn on the page and is outlined, numbered to the list below. Comment on a widget with the button under it. Adopted from this round and now in the library: one solid grey ink, the avatar grey, the bare icon button and the text button’s fill, the stepper’s steps, the timeline, the line chart at widget size, media as a surface, and a widget on the stage or a card.</p>
   </div>
   <div class="sheet-section notes" id="notes" hidden>
     <h3 class="t-label" id="notes-title">Notes</h3>
@@ -511,7 +399,7 @@ document.getElementById('sheet-body').innerHTML = `
       <li class="gap-item">
         <span class="t-label">${gapNo(g)} ${GAPS[g][0]}</span>
         <p class="t-body sheet-note">${GAPS[g][1]}</p>
-        ${g === 'frame' ? '<p class="t-caption sheet-note">In every widget</p>' : `<button class="button-text link-quiet t-control show-gap" type="button" data-gap="${g}">Show in ${WIDGETS.filter((w) => w[3].includes(g)).map((w) => w[1]).join(', ')}</button>`}
+        <button class="button-text link-quiet t-control show-gap" type="button" data-gap="${g}">Show in ${WIDGETS.filter((w) => w[3].includes(g)).map((w) => w[1]).join(', ')}</button>
       </li>`).join('')}
     </ol>
   </div>`;
@@ -550,12 +438,10 @@ function apply() {
   set.classList.toggle('frame-card', state.frame === 'card');
   set.classList.toggle('frame-stage', state.frame === 'stage');
   set.classList.toggle('show-gaps', state.gaps === 'on');
-  set.classList.toggle('avatar-quiet', state.avatar === 'quiet');
-  set.classList.toggle('avatar-series', state.avatar === 'series');
   outline();
   save();
 }
-['frame', 'gaps', 'avatar'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
+['frame', 'gaps'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
 new ResizeObserver(() => requestAnimationFrame(outline)).observe(set);
 document.fonts?.ready.then(outline);
 

@@ -11,12 +11,19 @@ An icon alone as a control — back, more, share, close — in two treatments: l
 - **The quiet fill is never a container and never state.** It's the surface of a secondary control. A selected icon button takes `--color-fill-subtle`, the same as every other selection.
 - **Disabled** drops to 30% and loses its shadow.
 
+- **Bare, for a row beside one primary.** `.icon-button--bare` has no circle at rest — previous and next beside a primary play. On hover a quiet circle (`--color-fill-quiet`) grows from the icon's centre to full size behind it, on `--duration-base` with `--ease-out`, and shrinks away on the same; on touch it shows while pressed, at `--color-fill-quiet-hover`; keyboard focus shows it too. Under reduced motion it fades. A bare icon button with no hover response is a defect.
+
 ## Use
 
 - Primary: `<button class="icon-button surface surface--rest surface--pill" aria-label="…">` with an `<svg class="icon" viewBox="0 0 20 20">` inside.
 - Secondary: `<button class="icon-button icon-button--secondary" aria-label="…">`.
 - Draw icons on a viewBox the size they render (`0 0 20 20` here), `fill="none"`, `stroke="currentColor"`, `stroke-width="1.5"`, round caps and joins.
 - No JavaScript.
+
+## Changes in v0.5.0
+
+- `.icon-button--bare`: no circle at rest; a quiet circle grows behind the icon on hover, press and focus.
+- Icons draw at the 2 stroke.
 
 ## Changes in v0.4.0
 

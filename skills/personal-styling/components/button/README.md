@@ -11,6 +11,7 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 
 - **One shadow for every button-shaped control.** Anything that looks like a button carries the rest shadow (`--shadow-rest`) at rest and lifts on hover. A button-shaped control with no shadow sitting next to one with a shadow is the ambiguity this rule kills — the old no-shadow secondary pill is retired.
 - **A control cluster uses at most two treatments**: the button for actions, the quiet text treatment for the rest. Three button styles in one cluster is a defect — if three things all look like buttons, two of them take the same treatment.
+- **The text treatment fills on hover.** As its ink brightens, a quiet pill (`--color-fill-quiet`) grows from the label's centre behind it, on `--duration-base` with `--ease-out` — the bare icon button's fill. On touch it shows while pressed, a step darker; under reduced motion it fades.
 - **Infrequent actions take the text treatment.** "Show all", "Clear", "Reset", "Delete week" are text buttons. They should disappear until wanted. A rarely used action does not earn a third button style.
 - **In a button lockup, every label aligns.** Labels share one height, one vertical centring and one baseline, regardless of treatment. `.button-row` aligns on the baseline and `.button-text` takes the pill's box, so a quiet action sits on the same line as the pills beside it.
 - There is no louder button. If one action must dominate a group, it does so by position, not by a second pill style.
@@ -32,6 +33,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Always a real `<button type="button">`, or `type="submit"` in a form.
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
+
+## Changes in v0.8.0
+
+- The text button grows a quiet fill behind its label on hover, press and focus.
 
 ## Changes in v0.7.0
 

@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.2.0 */
+/* personal-styling · stage-list · v0.2.1 */
 
 // Three depths — the stage, its list, one record's detail — and one thumb
 // button that walks them: with its label it opens the list, as a cross it
@@ -13,8 +13,8 @@
 
 const STAGE_LIST_PHONE = 630;   // px wide or narrower is a phone
 const STAGE_LIST_ICONS = {
-  close: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
-  back: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  close: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  back: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
 document.querySelectorAll('.stage-list').forEach((root) => {

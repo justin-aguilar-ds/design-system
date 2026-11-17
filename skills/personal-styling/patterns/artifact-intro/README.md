@@ -14,6 +14,10 @@ Requires: tooltip, button
 - **While open, the button holds the selected fill** (`--color-fill-subtle`). That's state, so never the accent.
 - **The description is in the markup**, hidden until opened, so it's there for search and screen readers. Keep it short — mono uppercase slows reading down — one or two sentences: what the tool shows and what to do with it.
 
+## Changes in v0.4.1
+
+- The info icon draws at the 2 stroke.
+
 ## Changes in v0.4.0
 
 - The info button is 36px, the height of every other control (it was 40px).

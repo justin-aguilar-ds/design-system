@@ -1,0 +1,67 @@
+/* personal-styling · timeline · v0.1.0 */
+
+/* Steps over time — an order, a booking, a process — as the slider
+   standing up: a 16 grey track down the left, full ink through the steps
+   that are done, and the slider's 12 thumb on the step happening now.
+   Each step draws its own piece of the track, so the ink always ends at
+   its step, however tall a row grows. */
+.timeline {
+  margin: 0;
+  padding: 0 0 0 calc(16px + var(--space-16));   /* the track, then 16 to the text */
+  list-style: none;
+  display: grid;
+}
+.timeline-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-16);
+  min-height: var(--height-control);
+  color: var(--color-text-secondary);
+}
+.timeline-step.is-done,
+.timeline-step.is-current { color: var(--color-text); }
+
+/* The track: grey down every row, the ink over it. The first row starts
+   8 above its centre and the last ends 8 below it, rounded, as the
+   slider's track ends 8 past its thumb's centre. */
+.timeline-step::before,
+.timeline-step::after {
+  content: "";
+  position: absolute;
+  left: calc(-16px - var(--space-16));
+  width: 16px;
+  top: 0;
+  bottom: 0;
+}
+.timeline-step::before { background: var(--color-range-track); }
+.timeline-step.is-done::after { background: var(--color-range-progress); }
+.timeline-step:first-child::before,
+.timeline-step:first-child::after { top: calc(50% - 8px); border-radius: 999px 999px 0 0; }
+.timeline-step:last-child::before { bottom: calc(50% - 8px); border-radius: 0 0 999px 999px; }
+/* Now: the ink stops 2 below the thumb, the 2 the track leaves either
+   side of it, so the thumb sits in an even ring of ink. */
+.timeline-step.is-current::after {
+  bottom: calc(50% - 8px);
+  border-radius: 0 0 999px 999px;
+  background: var(--color-range-progress);
+}
+.timeline-step.is-current:first-child::after { border-radius: 999px; }
+
+/* The marks: a small dot for each step done (the ground on the ink) or to
+   come (the grey ink on the track); the slider's 12 thumb for now, with
+   no shadow, so the ring around it reads even. */
+.timeline-dot {
+  position: absolute;
+  z-index: 1;
+  left: calc(-16px - var(--space-16) + 8px);   /* the track's centre */
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  translate: -50% -50%;
+  border-radius: var(--radius-pill);
+  background: var(--color-text-secondary);
+}
+.timeline-step.is-done .timeline-dot { background: var(--color-range-thumb); }
+.timeline-step.is-current .timeline-dot { width: 12px; height: 12px; background: var(--color-range-thumb); }

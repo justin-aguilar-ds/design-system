@@ -12,8 +12,15 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 - **The values come from a tooltip at the point.** Nearing a line previews it and grows a tooltip from the nearest point, in the tooltip component's style: name, X, value (and rank, with `data-rank="on"`). A small dot in the line's own ink, ringed by the ground, marks the point. No crosshair, no scrub line, and the accent never marks the point.
 - **Click or tap a line, or a name, to make it the focus.** The rest stay grey.
 - **The hover is timed from the duration tokens.** Lines fade on `--duration-base`, the tooltip grows on `--duration-pop` and follows on `--duration-fast`, all on `--ease-out`. Override `--line-chart-fade`, `--line-chart-grow` and `--line-chart-follow` on the chart to tune it.
+- **Zero is on the axis, unless the shape is the point.** By default the value axis includes zero. `data-zero="off"` starts it at the round step below the lowest value instead — for a figure that never nears zero and moves a little (a balance, a weight), which would otherwise draw as a flat line along the top.
+- **Its height follows the width, or its container.** `240px` on a phone, `280px` from `500px` wide. In a card or a widget, set `--line-chart-height` on the figure.
 - **The legend is names, below.** In the data's order, under the chart, never beside it. Every name carries the chip's dot: a ring, filled for the focus. `data-legend="off"` when one series is all there is.
 - **Full width on a phone.** A chart sits on the page like a table, or on a surface like a card (`.line-chart--surface`).
+
+## Changes in v0.6.0
+
+- `data-zero="off"`: the value axis starts at the round step below the lowest value.
+- `--line-chart-height` sets the height, for a chart in a card or a widget.
 
 ## Changes in v0.5.0
 
@@ -41,7 +48,7 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 ## Use
 
 - `<figure class="line-chart" aria-label="…">` with a `<script type="application/json">` inside: `{ "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }`. The value axis always includes zero, and reaches below it when the data does.
-- Options as data attributes: `data-labels`, `data-guides`, `data-density`, `data-curve`, `data-legend`, `data-rank`, `data-focus`, `data-prefix`.
+- Options as data attributes: `data-labels`, `data-guides`, `data-density`, `data-curve`, `data-legend`, `data-rank`, `data-focus`, `data-prefix`, `data-zero`. The height: `--line-chart-height` on the figure.
 - `el.lineChart.focus(name)`, `el.lineChart.preview(name | null)` and `el.lineChart.update(data)` drive it from outside; it fires bubbling `line-chart-focus` (`detail.name`) and `line-chart-point` (`detail.index`, `detail.x`, `detail.name`, `detail.value`) events.
 - Link a table to it with `data-chart="#chart-id"` on the table and `data-series` on each row (see `components/table/`).
 - `lineChartSpark(values, { max })` returns a sparkline in the same spec, for a table cell.

@@ -1,4 +1,4 @@
-/* personal-styling · list-row · v0.2.0 */
+/* personal-styling · list-row · v0.3.0 */
 
 /* A list of records, one value each. The name leads and the value sits on
    the name's line; one sub-line runs under both; a circle can lead the
@@ -28,9 +28,10 @@
 }
 
 /* NEW (v0.2): the leading circle — an icon or an avatar. A control's
-   height (36), on the quiet fill, full ink. The fill is translucent, so
-   the circle shows on the page and on the stage alike. It is a mark, not
-   a button: no edge, no shadow, no hover of its own. */
+   height (36), full ink. CHANGED (v0.3): on the avatar grey, solid, so it
+   shows on the page and on the stage alike and an overlap never shows
+   through. It is a mark, not a button: no edge, no shadow, no hover of
+   its own. */
 .list-row-lead {
   display: grid;
   place-items: center;
@@ -38,11 +39,13 @@
   width: var(--height-control);
   height: var(--height-control);
   border-radius: var(--radius-pill);
-  background: var(--color-fill-quiet);
+  background: var(--color-avatar);
   color: var(--color-text);
   overflow: hidden;
 }
 .list-row-lead svg { width: var(--icon-control); height: var(--icon-control); }
+/* CHANGED (v0.3): initials are mono, an identifier, in the grey ink. */
+.list-row-lead.t-mono { color: var(--color-text-secondary); }
 .list-row-lead img { width: 100%; height: 100%; object-fit: cover; }
 
 /* NEW (v0.2): the body. The name, the value on the name's line and on
