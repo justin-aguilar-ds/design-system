@@ -205,7 +205,11 @@
   .widget .segmented { justify-self: start; }
 
   /* ---- 9 Inbox ---- */
-  .widget .list-rows { margin-block: calc(-1 * var(--space-24)); }
+  /* A list that fills a widget: its first and last rows' fill stops 8
+     from the widget's edge, the same 8 it stops from the sides (24 of
+     widget less the row's 16 bleed), so the fill is inset evenly all round
+     instead of meeting the edge. */
+  .widget .list-rows { margin-block: calc(-1 * (var(--space-24) - var(--space-8))); }
   .unread { display: inline-block; width: 8px; height: 8px; margin-left: var(--space-8); border-radius: var(--radius-pill); background: var(--color-text); }
   .widget .list-row-value.t-body { color: var(--color-text-secondary); font-weight: 500; }
 
