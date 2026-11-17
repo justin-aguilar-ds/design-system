@@ -130,7 +130,19 @@
   .now { display: flex; align-items: center; gap: var(--space-8); color: var(--color-text); }
   .now::after { content: ""; flex: 1; border-top: 1px solid currentColor; }
   .stack { display: flex; }
-  .stack > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-pill); background: var(--color-fill-quiet); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0; }
+  /* Avatars, under test (Avatar fill in the sheet). The quiet fill is
+     translucent, so where circles overlap the ring and the circle under it
+     show through. Solid: #e6e6e6, which is exactly what the quiet
+     fill looks like over the stage, made opaque, so it reads on white and
+     on the stage alike. Series: the chart grey. */
+  .widgets { --avatar-fill: #e6e6e6; }
+  @media (prefers-color-scheme: dark) { .widgets { --avatar-fill: #262626; } }
+  :root[data-theme="dark"] .widgets { --avatar-fill: #262626; }
+  :root[data-theme="light"] .widgets { --avatar-fill: #e6e6e6; }
+  .widgets.avatar-quiet { --avatar-fill: var(--color-fill-quiet); }
+  .widgets.avatar-series { --avatar-fill: var(--color-series); }
+  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); }
+  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0; }
   .stack > span + span { margin-left: calc(-1 * var(--space-8)); }
   .frame-card .stack > span { --w-ground: var(--color-surface); }
 
@@ -235,7 +247,7 @@
 const KEY = 'widgets-1';
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
-const state = Object.assign({ frame: 'stage', gaps: 'on' }, saved.state);
+const state = Object.assign({ frame: 'stage', gaps: 'on', avatar: 'solid' }, saved.state);
 const notes = saved.notes || {};
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -271,7 +283,7 @@ const GAPS = {
   range: ['A range on a track', 'Low to high on a shared scale: a thin track with an ink segment. The slider’s track is an input, not a reading, and is 16 tall.'],
   time: ['A time column', 'An agenda reads down its times. The list row leads with a circle, not a time, so the times sit in a column of their own.'],
   now: ['Now, in a list of times', 'Where the present falls between two events. A full-ink rule with the time, here; the accent is for attention, which this arguably is.'],
-  stack: ['Overlapping avatars', 'Who is coming, as a stack of small circles. The list row holds one avatar at 36; a stack needs a smaller size, an overlap and a ring of the ground.'],
+  stack: ['Overlapping avatars', 'Who is coming, as a stack of small circles, which needs a smaller size, an overlap, a ring of the ground and a solid fill. The system has no solid grey for it: the quiet fill is translucent, so overlaps show through; the stage grey (#f5f5f5) vanishes on a stage; the series grey (#d2d2d2) is solid but belongs to charts. Avatar fill compares them with a proposed solid grey, #e6e6e6 (#262626 dark): the quiet fill as it looks over the stage, made opaque.'],
   rank: ['A rank numeral', 'A position in an ordered list, as the row’s leading mark. Here a Title figure in secondary ink.'],
   spark: ['A sparkline outside a table', 'The table draws sparklines in cells; a row in a list has no cell, so this one is hand-drawn on the same spec.'],
   media: ['Playback: times and a play button', 'Elapsed and remaining under a scrubber, and a play button that turns into pause. The slider has no end labels and the icon button no toggled state.'],
@@ -339,14 +351,14 @@ const WIDGETS = [
     <div class="segmented" role="group" aria-label="Period"><span class="segmented-indicator" aria-hidden="true"></span>${['1D', '1W', '1M', '1Y'].map((p, i) => `<button class="segmented-option t-control${i === 2 ? ' is-active' : ''}" type="button" aria-pressed="${i === 2}">${p}</button>`).join('')}</div>
     <figure class="line-chart" aria-label="Balance over a month" data-legend="off" data-guides="none" data-prefix="$" data-gap="chart"><script type="application/json">${JSON.stringify({ x: Array.from({ length: 30 }, (_, i) => `Oct ${i + 18}`), series: [{ name: 'Balance', values: [16900, 17020, 16950, 17110, 17300, 17240, 17380, 17520, 17410, 17600, 17680, 17550, 17720, 17900, 17840, 17960, 18100, 18020, 18150, 18240, 18190, 18300, 18210, 18380, 18450, 18320, 18480, 18560, 18228, 18640] }] })}<\/script></figure>`],
   ['inbox', 'Inbox', 'The latest messages', ['unread'], `
-    <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
+    <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead is-avatar t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
   ['sleep', 'Sleep', 'Last night and the week', ['bars'], `
     ${pair('Last night', '7h 24m', 't-display', '<span class="t-body">In bed at 23:40, up at 07:10.</span>')}
     <div class="bars" data-gap="bars">${[['M', 6.5], ['T', 7.1], ['W', 5.8], ['T', 6.9], ['F', 8.2], ['S', 8.6], ['S', 7.4]].map(([d, h], i) => `<div class="bar${i === 6 ? ' is-focus' : ''}"><span style="height: ${h / 9 * 100}%" title="${h} hours"></span><span class="t-mono">${d}</span></div>`).join('')}</div>`],
   ['split', 'Split the bill', 'Who owes what — library only', [], `
     ${pair('Dinner at Taberna', '$186.40', 't-title')}
     <div class="row"><span class="t-label" id="split-l">Split between</span><div class="stepper surface surface--rest surface--pill" data-min="1" data-max="8"><button class="stepper-step" type="button" aria-label="Fewer"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button><input class="stepper-input" inputmode="numeric" aria-labelledby="split-l" value="4"><button class="stepper-step" type="button" aria-label="More"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div></div>
-    <ul class="list-rows" style="margin-block: 0">${[['JA', 'You', 'Paid the bill', '$46.60'], ['MO', 'Mara', 'Owes you', '$46.60'], ['TL', 'Tomás', 'Owes you', '$46.60']].map(([a, n, s, v]) => `<li><div class="list-row"><span class="list-row-lead t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-label tnum">${v}</span><span class="list-row-sub t-body">${s}</span></span></div></li>`).join('')}</ul>
+    <ul class="list-rows" style="margin-block: 0">${[['JA', 'You', 'Paid the bill', '$46.60'], ['MO', 'Mara', 'Owes you', '$46.60'], ['TL', 'Tomás', 'Owes you', '$46.60']].map(([a, n, s, v]) => `<li><div class="list-row"><span class="list-row-lead is-avatar t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-label tnum">${v}</span><span class="list-row-sub t-body">${s}</span></span></div></li>`).join('')}</ul>
     <button class="button button--large surface surface--rest surface--pill t-label" type="button">Request $139.80</button>`],
   ['timer', 'Focus timer', 'A countdown — library only', [], `
     <div class="segmented" role="group" aria-label="Mode" style="justify-self: center"><span class="segmented-indicator" aria-hidden="true"></span>${['Focus', 'Short break', 'Long break'].map((p, i) => `<button class="segmented-option t-control${i === 0 ? ' is-active' : ''}" type="button" aria-pressed="${i === 0}">${p}</button>`).join('')}</div>
@@ -375,6 +387,7 @@ const seg = (id, label, opts) => `
 document.getElementById('sheet-body').innerHTML = `
   ${seg('frame', 'Frame', [['stage', 'Stage'], ['card', 'Card']])}
   ${seg('gaps', 'Outlines', [['off', 'Off'], ['on', 'On']])}
+  ${seg('avatar', 'Avatar fill', [['quiet', 'Quiet'], ['solid', 'Solid'], ['series', 'Series']])}
   <div class="sheet-section">
     <p class="t-body sheet-note">Twelve widgets built from the library alone. Wherever it had no answer, the part was drawn on the page and is outlined, numbered to the list below. Comment on a widget with the button under it.</p>
   </div>
@@ -431,10 +444,12 @@ function apply() {
   set.classList.toggle('frame-card', state.frame === 'card');
   set.classList.toggle('frame-stage', state.frame === 'stage');
   set.classList.toggle('show-gaps', state.gaps === 'on');
+  set.classList.toggle('avatar-quiet', state.avatar === 'quiet');
+  set.classList.toggle('avatar-series', state.avatar === 'series');
   outline();
   save();
 }
-['frame', 'gaps'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
+['frame', 'gaps', 'avatar'].forEach((k) => document.getElementById(k).addEventListener('segmented-change', (e) => { state[k] = e.detail.value; apply(); }));
 new ResizeObserver(() => requestAnimationFrame(outline)).observe(set);
 document.fonts?.ready.then(outline);
 
