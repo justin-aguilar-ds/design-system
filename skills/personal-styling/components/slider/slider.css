@@ -1,4 +1,4 @@
-/* personal-styling · slider · v0.4.0 */
+/* personal-styling · slider · v0.5.0 */
 
 .slider-field {
   display: grid;
@@ -35,9 +35,9 @@
   scale: 0;
   transition: scale var(--duration-pop) var(--ease-out);
 }
-.slider:is(.is-active, :has(.slider-input:focus-visible)) > .slider-value { scale: 1; }
+.slider:is(.is-active, :has(.slider-input:focus-visible)) > .slider-value { scale: 1; transition: scale var(--duration-spring) var(--ease-spring); }   /* pops in on the spring, leaves on the ease */
 @media (hover: hover) and (pointer: fine) {
-  .slider:hover > .slider-value { scale: 1; }
+  .slider:hover > .slider-value { scale: 1; transition: scale var(--duration-spring) var(--ease-spring); }
 }
 
 /* The wrapper is the 44px touch target; the visual track inside is 16px.
@@ -144,7 +144,7 @@
   border-radius: var(--radius-pill);
   background: var(--color-range-thumb);
   box-shadow: var(--shadow-range-thumb);
-  transition: transform var(--duration-base) var(--ease-out);
+  transition: transform var(--duration-spring) var(--ease-spring);   /* CHANGED: the thumb springs back from a press */
 }
 .slider-input::-moz-range-track {
   height: 44px;
@@ -157,7 +157,7 @@
   border-radius: var(--radius-pill);
   background: var(--color-range-thumb);
   box-shadow: var(--shadow-range-thumb);
-  transition: transform var(--duration-base) var(--ease-out);
+  transition: transform var(--duration-spring) var(--ease-spring);   /* CHANGED: the thumb springs back from a press */
 }
 
 /* Tactility: while the slider is held — dragged, or an arrow key down —

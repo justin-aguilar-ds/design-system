@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.6.0 */
+/* personal-styling · line-chart · v0.10.0 */
 
 // Draws a .line-chart from the JSON inside it:
 //   { "x": ["Wk 1", …], "series": [{ "name": "Ana", "values": [2, 5, …] }, …] }
@@ -12,6 +12,11 @@
 //   data-rank     off | on            rank among the series, in the tooltip
 //   data-focus    a series name       the series in full ink at rest
 //   data-prefix   a unit, e.g. $      set before every value: −$12.50
+//   data-hover    snap | track        snap: the point moves from data point
+//                                     to data point. track: it follows the
+//                                     mouse along the line and snaps to a
+//                                     data point near it; the tooltip rides
+//                                     with it, showing the nearest point (v0.8)
 // Hover (or tap) near a line: it previews, and a tooltip grows from the
 // nearest point. Click or tap: it becomes the focus. API on the element:
 // el.lineChart.focus(name), el.lineChart.preview(name | null),
@@ -27,13 +32,15 @@ const LINE_CHART_WIDE = 630;          // the system's one breakpoint: wider than
 const LINE_CHART_DIGIT = 7;           // px, a mono 10.5 digit
 const LINE_CHART_NEAR = 16;           // px from a line that counts as near, mouse
 const LINE_CHART_NEAR_TOUCH = 28;     // px, finger
+const LINE_CHART_SNAP = 12;           // px either side of a data point where a tracking point snaps to it
 const LINE_CHART_NS = 'http://www.w3.org/2000/svg';
 
 // Monotone cubic (Fritsch–Carlson): smooth, and never overshoots the data,
 // so a curve never invents a peak or a dip that isn't there.
-function lineChartPath(pts, rounded = true) {
+// The rounded line's slope at each point: a monotone cubic, so the curve
+// never overshoots a value it passes through.
+function lineChartTangents(pts) {
   const n = pts.length;
-  if (!rounded || n < 3) return 'M' + pts.map((p) => p.join(',')).join('L');
   const dx = [], m = [];
   for (let i = 0; i < n - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; m[i] = (pts[i + 1][1] - pts[i][1]) / dx[i]; }
   const t = [m[0]];
@@ -41,12 +48,39 @@ function lineChartPath(pts, rounded = true) {
     t[i] = m[i - 1] * m[i] <= 0 ? 0 : 3 * (dx[i - 1] + dx[i]) / ((2 * dx[i] + dx[i - 1]) / m[i - 1] + (dx[i] + 2 * dx[i - 1]) / m[i]);
   }
   t[n - 1] = m[n - 2];
+  return { dx, t };
+}
+
+function lineChartPath(pts, rounded = true) {
+  const n = pts.length;
+  if (!rounded || n < 3) return 'M' + pts.map((p) => p.join(',')).join('L');
+  const { dx, t } = lineChartTangents(pts);
   let d = `M${pts[0][0]},${pts[0][1]}`;
   for (let i = 0; i < n - 1; i++) {
     const h = dx[i] / 3;
     d += `C${pts[i][0] + h},${pts[i][1] + t[i] * h} ${pts[i + 1][0] - h},${pts[i + 1][1] - t[i + 1] * h} ${pts[i + 1][0]},${pts[i + 1][1]}`;
   }
   return d;
+}
+
+// NEW (v0.6): the line's height at any x, on the curve that is drawn —
+// so something can travel along the line between its points. Each
+// segment's control points sit a third of the way along x, so x moves
+// evenly with the curve's parameter, and y is the segment's cubic at it.
+function lineChartCurve(pts, rounded = true) {
+  const n = pts.length;
+  const { dx, t } = n > 2 && rounded ? lineChartTangents(pts) : { dx: pts.slice(1).map((p, i) => p[0] - pts[i][0]), t: null };
+  return (x) => {
+    if (x <= pts[0][0]) return pts[0][1];
+    if (x >= pts[n - 1][0]) return pts[n - 1][1];
+    let i = 0;
+    while (i < n - 2 && x > pts[i + 1][0]) i++;
+    const u = (x - pts[i][0]) / dx[i];
+    const y0 = pts[i][1], y1 = pts[i + 1][1];
+    if (!t) return y0 + (y1 - y0) * u;
+    const h = dx[i] / 3, c0 = y0 + t[i] * h, c1 = y1 - t[i + 1] * h, v = 1 - u;
+    return v * v * v * y0 + 3 * v * v * u * c0 + 3 * v * u * u * c1 + u * u * u * y1;
+  };
 }
 
 // A sparkline in the same spec, as SVG markup — for a table cell
@@ -86,9 +120,13 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
   let preview = null;
   const shown = () => preview || focus;
   let geo = null;
+  // The point under the pointer: where it is drawn now, and the glide
+  // carrying it to the next data point (v0.6).
+  let at = null;
+  let glide = 0;
 
   // Round steps from zero, upward to the highest value and (v0.3) downward
-  // to the lowest, so zero is always a guide. NEW (v0.6): with
+  // to the lowest, so zero is always a guide. NEW (v0.10): with
   // data-zero="off" the steps start at the round step at or below the
   // lowest value instead, so a value that moves a little away from zero
   // (a balance) draws as a shape, not a flat line along the top.
@@ -109,7 +147,7 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
 
   function draw() {
     const W = svg.clientWidth || fig.clientWidth || 320;
-    // NEW (v0.6): --line-chart-height on the figure sets the height, for a
+    // NEW (v0.10): --line-chart-height on the figure sets the height, for a
     // chart in a card or a widget; otherwise it follows the width.
     const set = parseFloat(getComputedStyle(fig).getPropertyValue('--line-chart-height'));
     const H = set > 0 ? set : (W < 500 ? LINE_CHART_HEIGHT : LINE_CHART_HEIGHT_WIDE);
@@ -130,7 +168,11 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     const pw = W - L - R, ph = H - T - B;
     const x = (i) => L + (pw * i) / (n - 1);
     const y = (v) => T + ph * (1 - (v - low) / (top - low));
-    geo = { L, pw, x, y };
+    const rounded = opt('curve', 'rounded') === 'rounded';
+    const curves = Object.fromEntries(series.map((s) => [s.name, lineChartCurve(s.values.map((v, i) => [x(i), y(v)]), rounded)]));
+    geo = { L, pw, x, y, curves };
+    at = null;   // the point starts afresh on the new drawing
+    target = null;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('height', H);
     svg.replaceChildren();
@@ -197,6 +239,54 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     restyle();
   }
 
+  // NEW (v0.6): the point travels. Moving to a new data point, it glides
+  // along the line — on the curve that is drawn, not a straight cut — on
+  // --line-chart-glide with the system's ease-out, and the tooltip rides
+  // with it. Changing lines, it settles onto the new one over the same
+  // move. The first appearance is in place: it grows, then it travels.
+  const ease = (u) => 1 - (1 - u) ** 4;   // close to --ease-out, cubic-bezier(0.23, 1, 0.32, 1)
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const glideMs = () => (reduced.matches ? 0 : parseFloat(getComputedStyle(fig).getPropertyValue('--line-chart-glide')) || 0);
+  const place = (cx, cy) => {
+    const point = svg.querySelector('.line-chart-point');
+    point.setAttribute('cx', cx);
+    point.setAttribute('cy', cy);
+    const pad = parseFloat(getComputedStyle(fig).paddingLeft) || 0;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    const below = cy - h - 12 < 0;
+    tip.classList.toggle('is-below', below);
+    const left = Math.max(0, Math.min(fig.clientWidth - w, pad + cx - w / 2));
+    tip.style.translate = `${left}px ${pad + (below ? cy + 12 : cy - h - 12)}px`;
+    at = { x: cx, y: cy };
+  };
+  let target = null;
+  const travel = (name, i) => {
+    // Only a new data point starts a glide. The pointer moving within the
+    // same point leaves the one under way alone; restarting it on every
+    // move made the ease begin again each time, so the point stuttered.
+    if (target && target.name === name && target.i === i && fig.classList.contains('has-tip')) return;
+    target = { name, i };
+    const curve = geo.curves[name];
+    const toX = geo.x(i);
+    cancelAnimationFrame(glide);
+    const ms = glideMs();
+    if (!at || !fig.classList.contains('has-tip') || !ms) { place(toX, curve(toX)); return; }
+    const fromX = at.x, off = at.y - curve(at.x);   // how far off the new line it starts
+    if (Math.abs(toX - fromX) < 0.5 && Math.abs(off) < 0.5) return;
+    // The clock starts on the first frame: a frame's timestamp can be
+    // earlier than the event that asked for it, and a negative start sent
+    // the point backwards before it set off.
+    let start = null;
+    const step = (now) => {
+      if (start === null) start = now;
+      const u = Math.min(1, Math.max(0, (now - start) / ms)), e = ease(u);
+      const cx = fromX + (toX - fromX) * e;
+      place(cx, curve(cx) + off * (1 - e));
+      if (u < 1) glide = requestAnimationFrame(step);
+    };
+    glide = requestAnimationFrame(step);
+  };
+
   function showTip(event) {
     const r = svg.getBoundingClientRect();
     const px = event.clientX - r.left, py = event.clientY - r.top;
@@ -204,35 +294,113 @@ document.querySelectorAll('.line-chart').forEach((fig) => {
     let near = null;
     let best = event.pointerType === 'mouse' ? LINE_CHART_NEAR : LINE_CHART_NEAR_TOUCH;
     series.forEach((s) => { const d = Math.abs(geo.y(s.values[i]) - py); if (d < best) { best = d; near = s; } });
+    // NEW (v0.6): away from every line, the point stays on the one it is on
+    // (or the line in focus), so it is there for as long as the pointer is
+    // over the chart, and moves with it along x.
+    if (!near) near = series.find((s) => s.name === (fig.classList.contains('has-tip') && tipName)) || series.find((s) => s.name === shown());
     if (!near) { hideTip(); return null; }
+    tipName = near.name;
     setPreview(near.name);
-    const cx = geo.x(i), cy = geo.y(near.values[i]);
-    const point = svg.querySelector('.line-chart-point');
-    point.setAttribute('cx', cx);
-    point.setAttribute('cy', cy);
     let text = `${near.name} · ${xs[i]} · ${format(near.values[i])}`;
     if (opt('rank', 'off') === 'on') {
       const rank = series.map((s) => s.values[i]).sort((a, b) => b - a).indexOf(near.values[i]) + 1;
       text += ` · ${rank}${['st', 'nd', 'rd'][((rank + 90) % 100 - 10) % 10 - 1] || 'th'}`;
     }
-    tip.textContent = text;
-    const pad = parseFloat(getComputedStyle(fig).paddingLeft) || 0;
-    const w = tip.offsetWidth, h = tip.offsetHeight;
-    const below = cy - h - 12 < 0;
-    tip.classList.toggle('is-below', below);
-    const left = Math.max(0, Math.min(fig.clientWidth - w, pad + cx - w / 2));
-    tip.style.translate = `${left}px ${pad + (below ? cy + 12 : cy - h - 12)}px`;
+    if (tip.textContent !== text) tip.textContent = text;
+    travel(near.name, i);
     fig.classList.add('has-tip');
     return { name: near.name, index: i, value: near.values[i] };
   }
+  let tipName = null;
   function hideTip() {
+    cancelAnimationFrame(glide);
+    target = null;
     fig.classList.remove('has-tip');
     setPreview(null);
   }
 
-  svg.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') showTip(e); });
-  svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTip(); });
+  // ---- NEW (v0.7): data-hover="track". The point follows the mouse along
+  // the line, wherever it is; near a data point it snaps to it. The tooltip
+  // rides with it and shows the nearest data point's values (v0.8). The snap reaches LINE_CHART_SNAP either
+  // side of a point, or half the gap to the next if the points are closer:
+  // with few points the point runs free between them and is pulled in as
+  // it nears one; with many, the snaps meet and it steps from point to
+  // point. It moves toward where it should be every frame, easing in on
+  // a time constant from --line-chart-glide, so a snap is a short glide
+  // rather than a jump, and changing lines settles over the same move.
+  const tracking = () => opt('hover', 'snap') === 'track';
+  let pointer = null, trackFrame = 0, trackLast = 0, trackName = null, trackIndex = -1;
+  const tipText = (s, i) => {
+    let text = `${s.name} · ${xs[i]} · ${format(s.values[i])}`;
+    if (opt('rank', 'off') === 'on') {
+      const rank = series.map((d) => d.values[i]).sort((a, b) => b - a).indexOf(s.values[i]) + 1;
+      text += ` · ${rank}${['st', 'nd', 'rd'][((rank + 90) % 100 - 10) % 10 - 1] || 'th'}`;
+    }
+    return text;
+  };
+  function trackStep(now) {
+    trackFrame = 0;
+    if (!pointer) return;
+    const { L, pw } = geo;
+    const cx = Math.max(L, Math.min(L + pw, pointer.px));
+    // The line: the nearest one at the pointer, on the curve that's drawn;
+    // away from every line, the one it is on, or the line in focus.
+    let near = null, best = LINE_CHART_NEAR;
+    series.forEach((s) => { const d = Math.abs(geo.curves[s.name](cx) - pointer.py); if (d < best) { best = d; near = s; } });
+    if (!near) near = series.find((s) => s.name === trackName) || series.find((s) => s.name === shown());
+    trackName = near.name;
+    setPreview(near.name);
+    const curve = geo.curves[near.name];
+    const gap = pw / (n - 1);
+    const i = Math.max(0, Math.min(n - 1, Math.round((cx - L) / gap)));
+    const snapped = Math.abs(cx - geo.x(i)) <= Math.min(LINE_CHART_SNAP, gap / 2);
+    const want = snapped ? geo.x(i) : cx;
+    const fresh = !at || !fig.classList.contains('has-point');
+    const ms = glideMs();
+    const dt = trackLast ? Math.max(0, now - trackLast) : 16;
+    trackLast = now;
+    const k = fresh || !ms ? 1 : 1 - Math.exp(-dt / (ms / 4));   // about settled by the glide's duration
+    const x = fresh ? want : at.x + (want - at.x) * k;
+    const off = fresh ? 0 : (at.y - curve(at.x)) * (1 - k);     // off the line it's joining, closing in
+    // CHANGED (v0.8): the tooltip stays up the whole time and rides with
+    // the point, on both axes; what changes is its data — the nearest data
+    // point's, switching as the pointer passes halfway between two.
+    const text = tipText(near, i);
+    if (tip.textContent !== text) tip.textContent = text;
+    trackIndex = snapped ? i : -1;
+    place(x, curve(x) + off);
+    fig.classList.add('has-point', 'has-tip');
+    if (Math.abs(want - x) > 0.1 || Math.abs(off) > 0.1) trackFrame = requestAnimationFrame(trackStep);
+    else trackLast = 0;
+  }
+  function trackMove(event) {
+    const r = svg.getBoundingClientRect();
+    pointer = { px: event.clientX - r.left, py: event.clientY - r.top };
+    if (!trackFrame) trackFrame = requestAnimationFrame(trackStep);
+  }
+  function trackLeave() {
+    pointer = null;
+    cancelAnimationFrame(trackFrame);
+    trackFrame = 0;
+    trackLast = 0;
+    trackIndex = -1;
+    fig.classList.remove('has-point');
+    hideTip();
+  }
+
+  svg.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; if (tracking()) trackMove(e); else showTip(e); });
+  svg.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse') return; if (tracking()) trackLeave(); else hideTip(); });
   svg.addEventListener('click', (e) => {
+    // A click while tracking picks the point the pointer is at; a tap (no
+    // hover to track) shows the nearest point, as the snap does.
+    if (tracking() && e.pointerType === 'mouse' && pointer) {
+      const s = series.find((d) => d.name === trackName);
+      const i = Math.max(0, Math.min(n - 1, Math.round((pointer.px - geo.L) / (geo.pw / (n - 1)))));
+      if (!s) return;
+      setFocus(s.name);
+      fig.dispatchEvent(new CustomEvent('line-chart-point', { bubbles: true, detail: { name: s.name, index: i, value: s.values[i], x: xs[i] } }));
+      return;
+    }
     const near = showTip(e);
     if (!near) return;
     setFocus(near.name);

@@ -1,4 +1,4 @@
-/* personal-styling · menu · v0.1.0 */
+/* personal-styling · menu · v0.4.0 */
 
 // A button that opens a menu of actions (the "menu button" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.
@@ -10,6 +10,14 @@
 // Mirrors --duration-base in tokens.css: a closing menu is hidden once it
 // has finished scaling away.
 const MENU_CLOSE_MS = 250;
+// The longest transition on an element, delay included, in ms.
+const menuTransitionMs = (el) => {
+  const cs = getComputedStyle(el);
+  const list = (v) => v.split(',').map((t) => parseFloat(t) * (t.trim().endsWith('ms') ? 1 : 1000));
+  const d = list(cs.transitionDuration), l = list(cs.transitionDelay);
+  return Math.max(0, ...d.map((x, i) => x + (l[i % l.length] || 0)));
+};
+
 const MENU_GAP = 8; // px between trigger and menu
 
 document.querySelectorAll('.menu').forEach((menu) => {
@@ -68,10 +76,12 @@ document.querySelectorAll('.menu').forEach((menu) => {
     menu.classList.remove('is-open');
     trigger.setAttribute('aria-expanded', 'false');
     if (focusTrigger) trigger.focus();
+    // CHANGED (v0.2): hidden once its own transition has played, however
+    // long that is (today's 250ms, or a spring's settle), not a fixed time.
     closeTimer = setTimeout(() => {
       surface.hidden = true;
       indicate(null);
-    }, MENU_CLOSE_MS);
+    }, menuTransitionMs(surface) || MENU_CLOSE_MS);
   };
 
   // A click with no pointer behind it (detail 0) came from the keyboard.

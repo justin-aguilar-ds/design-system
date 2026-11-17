@@ -27,6 +27,10 @@ From the source site's media carousel, where a "Learn more" pill invited a click
 - **Polarity:** add `data-tooltip-ink="gain"` or `"loss"` to an inline or dropped trigger. In an authored tooltip, put `.ink-gain` or `.ink-loss` on the text or a span in it; an icon is a 10px SVG with `.tooltip-icon`.
 - Needs `--duration-pop`, `--duration-reveal` and `--color-glass` from `tokens.css` v0.5.
 
+## Changes in v0.8.0
+
+- The tooltip and the cursor pill pop open on the spring (`--ease-spring`), and close on the ease: a spring to scale 0 would pass zero and flip them.
+
 ## Changes in v0.7.0
 
 - Polarity ink: `data-tooltip-ink` on a trigger, `.tooltip-icon` for an icon in the text.

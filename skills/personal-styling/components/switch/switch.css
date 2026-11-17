@@ -1,4 +1,4 @@
-/* personal-styling · switch · v0.2.0 */
+/* personal-styling · switch · v0.3.0 */
 
 /* On or off, in place. The slider's own parts: its 16px track, its 12px
    thumb and the 2px between them, and full ink for the side that's on.
@@ -59,8 +59,8 @@
   background: var(--color-range-thumb);
   box-shadow: var(--shadow-range-thumb);
   transition:
-    translate var(--duration-base) var(--ease-out),
-    scale var(--duration-base) var(--ease-out);
+    translate var(--duration-spring) var(--ease-spring),   /* CHANGED: the thumb lands on the spring */
+    scale var(--duration-spring) var(--ease-spring);
 }
 @media (hover: hover) and (pointer: fine) {
   .switch:hover:not(:has(:disabled)) { color: var(--color-text); }

@@ -1,4 +1,4 @@
-/* personal-styling · menu · v0.1.0 */
+/* personal-styling · menu · v0.4.0 */
 
 /* Actions behind one control. The trigger is the More icon button; the
    menu is the picker's, holding actions instead of options: the same
@@ -25,11 +25,16 @@
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
   transform-origin: top right;
-  transform: scale(var(--scale-enter));
+  /* CHANGED: the menu pops — it grows from 0.8 on the spring (from 0.95
+     there was too little travel for a spring to show) and pops back down
+     on close. Its fade is quick, --duration-base, and never outlasts the
+     move: on close it eases in and out, so the menu is seen through the
+     dip and gone as the dip ends, not left fading after it has stopped. */
+  transform: scale(0.8);
   opacity: 0;
   transition:
-    transform var(--duration-base) var(--ease-out),
-    opacity var(--duration-base) var(--ease-out);
+    transform var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-base) var(--ease-in-out);
 }
 /* A trigger at the start of a line: the menu hangs from its left edge. */
 .menu[data-align="start"] .menu-surface { right: auto; left: 0; transform-origin: top left; }
@@ -39,6 +44,9 @@
 .menu.is-open .menu-surface {
   transform: scale(1);
   opacity: 1;
+  transition:
+    transform var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-base) var(--ease-out);   /* a quick fade; the scale carries the pop */
 }
 
 .menu-list {
@@ -85,18 +93,19 @@
 }
 
 /* The fill: the picker's, gliding to whatever the pointer or the arrow
-   keys reach. Items are dense, so --duration-base. */
+   keys reach, on the spring. */
 .menu-fill {
   position: absolute;
   border-radius: var(--radius-pill);
   background: var(--color-fill-subtle);
   pointer-events: none;
   opacity: 0;
+  /* CHANGED: the fill lands on its option on the spring. */
   transition:
-    left var(--duration-base) var(--ease-out),
-    top var(--duration-base) var(--ease-out),
-    width var(--duration-base) var(--ease-out),
-    height var(--duration-base) var(--ease-out),
+    left var(--duration-spring) var(--ease-spring),
+    top var(--duration-spring) var(--ease-spring),
+    width var(--duration-spring) var(--ease-spring),
+    height var(--duration-spring) var(--ease-spring),
     opacity var(--duration-base) ease;
 }
 .menu-surface.has-fill .menu-fill { opacity: 1; }

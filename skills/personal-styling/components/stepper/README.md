@@ -22,6 +22,11 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 - Disable it with `disabled` on the input and both buttons.
 - Needs the surface classes from `tokens.css`.
 
+## Changes in v0.3.0
+
+- A press springs back on the spring.
+
 ## Changes in v0.2.0
 
 - Each step is a 34px square with its mark at the centre; a quiet circle grows behind it on hover, 4px inside the pill all round. The mark used to sit 2px off where the circle would be.
+

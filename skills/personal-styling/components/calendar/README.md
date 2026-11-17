@@ -29,6 +29,10 @@ From a bet tracker, where the calendar was invented twice before it settled: a d
 - Give it a height from its layout to make it scroll (a grid row, or `max-height`); without one it is as tall as its weeks.
 - Load `scroll-fade.css` and `scroll-fade.js` as well, in either order.
 
+## Changes in v0.3.0
+
+- A touch press springs back on the spring.
+
 ## Changes in v0.2.0
 
 - The weeks never shrink below two rows, so the calendar can't collapse to one week inside a parent that sizes from its content.

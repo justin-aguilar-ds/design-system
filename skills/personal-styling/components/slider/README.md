@@ -30,6 +30,10 @@ A continuous value set by drag or keyboard, drawn like a compact segmented contr
 - **The value as a tooltip:** put the `<output class="slider-value t-mono">` inside `.slider`, after the input, and drop `.slider-head`. It rides above the thumb in a pill while the slider is hovered, focused from the keyboard or held. Used in a control panel and a sheet, where the slider sits beside its label.
 - `slider.js` sets `--slider-pct` and toggles `.is-active`. Load it after the markup.
 
+## Changes in v0.5.0
+
+- The thumb springs back from a press on the spring; the value's tooltip pops in on it and leaves on the ease.
+
 ## Changes in v0.4.0
 
 - The value can ride above the thumb as a tooltip: an `<output>` inside `.slider`.

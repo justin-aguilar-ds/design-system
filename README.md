@@ -20,7 +20,7 @@ scripts/
   build-site.mjs             builds the sandbox into dist/ from the skill's files
 ```
 
-The sandbox renders the same files the skill ships, so the two can't drift.
+The sandbox renders the same files the skill ships, so the two can't drift. It is the one example: published as the "Personal styling" artifact and republished with every change. Proposal and explorer pages are published as artifacts of their own and aren't kept in the repo.
 
 ## Working on the library
 

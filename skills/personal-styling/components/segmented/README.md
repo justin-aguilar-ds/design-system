@@ -22,6 +22,10 @@ From the source site's nav pill, which switched between its two top-level pages.
 - **Gliding across pages:** add `view-transition-name: segmented-indicator` to the indicator and `@view-transition { navigation: auto; }` to both pages, and the fill glides from one page's option to the next.
 - Type: `.t-control` in-page, `.t-label` in the nav.
 
+## Changes in v0.7.0
+
+- The fill lands on its choice on the spring.
+
 ## Changes in v0.6.0
 
 - A label sits as far from the frame's edge as a button's label from its own: options pad by edge − fill, `12px` at 36 (was 16) and `20px` at 64 (was 24), so a row of segments and buttons lines up inside. The fill stays `4px` in at both sizes.

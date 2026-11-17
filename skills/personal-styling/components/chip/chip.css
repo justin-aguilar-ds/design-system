@@ -1,4 +1,4 @@
-/* personal-styling · chip · v0.5.1 */
+/* personal-styling · chip · v0.6.0 */
 
 .chip-row {
   display: flex;
@@ -19,25 +19,37 @@
   transition:
     background-color var(--duration-fast) ease,
     color var(--duration-fast) ease,
-    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
+    scale var(--duration-spring) var(--ease-spring); /* the touch press springs back, on the spring */
 }
 
 /* The dot carries the state without colour: a ring when off, solid when on.
    currentColor keeps it in step with the label's ink. */
 .chip-dot {
+  position: relative;
   flex: none;
   width: 8px;
   height: 8px;
   border: 1px solid currentColor;
   border-radius: var(--radius-pill);
-  transition: background-color var(--duration-fast) ease;
 }
+/* CHANGED (v0.6): the dot's fill is a disc that grows inside its ring on
+   the spring when the chip turns on, and shrinks on the ease when it
+   turns off — not a fill that fades. */
+.chip-dot::after {
+  content: "";
+  position: absolute;
+  inset: -1px;                  /* over the ring, edge to edge */
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  scale: 0;
+  transition: scale var(--duration-base) var(--ease-out);
+}
+.chip[aria-pressed="true"] .chip-dot::after { scale: 1; transition: scale var(--duration-spring) var(--ease-spring); }
 
 .chip[aria-pressed="true"] {
   background: var(--color-fill-subtle);
   color: var(--color-text);
 }
-.chip[aria-pressed="true"] .chip-dot { background: currentColor; }
 
 @media (hover: hover) and (pointer: fine) {
   .chip:hover:not(:disabled) { color: var(--color-text); }

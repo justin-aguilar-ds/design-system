@@ -1,4 +1,4 @@
-// The System page's hero: the same mock pages as examples/expression.html,
+// The System page's hero: the same mock pages as the From Page to Tool artifact,
 // stepping from a page with an object as its hero to a tool. Needs
 // line-chart.js (for lineChartPath) and segmented.js, which every site page
 // loads first.

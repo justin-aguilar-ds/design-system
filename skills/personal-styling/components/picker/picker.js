@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.6.0 */
+/* personal-styling · picker · v0.9.0 */
 
 // A button that opens a listbox (the "select-only combobox" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.
@@ -8,6 +8,14 @@
 // Mirrors --duration-base in tokens.css: a closing menu is hidden once it
 // has finished scaling away.
 const PICKER_CLOSE_MS = 250;
+// The longest transition on an element, delay included, in ms.
+const pickerTransitionMs = (el) => {
+  const cs = getComputedStyle(el);
+  const list = (v) => v.split(',').map((t) => parseFloat(t) * (t.trim().endsWith('ms') ? 1 : 1000));
+  const d = list(cs.transitionDuration), l = list(cs.transitionDelay);
+  return Math.max(0, ...d.map((x, i) => x + (l[i % l.length] || 0)));
+};
+
 const PICKER_GAP = 8; // px between trigger and menu
 const PICKER_TYPEAHEAD_MS = 500;
 
@@ -95,10 +103,12 @@ document.querySelectorAll('.picker').forEach((picker) => {
     picker.classList.remove('is-open');
     trigger.setAttribute('aria-expanded', 'false');
     if (focusTrigger) trigger.focus();
+    // CHANGED (v0.7): hidden once its own transition has played, however
+    // long that is (today's 250ms, or a spring's settle), not a fixed time.
     closeTimer = setTimeout(() => {
       menu.hidden = true;
       setActive(null);
-    }, PICKER_CLOSE_MS);
+    }, pickerTransitionMs(menu) || PICKER_CLOSE_MS);
   };
 
   const choose = (option) => {
@@ -171,8 +181,13 @@ document.querySelectorAll('.picker').forEach((picker) => {
   document.addEventListener('pointerdown', (event) => {
     if (!picker.contains(event.target)) close({ focusTrigger: false });
   });
+  // CHANGED (v0.7): on iOS a tap lifts (pointerup), then moves focus, then
+  // clicks — so by the time the list loses focus the press is over, and
+  // closing here made the click reopen it. Wait a moment: a tap on the
+  // trigger is handled by its click first, and anything else still closes.
   list.addEventListener('focusout', (event) => {
-    if (pressedOpen === null && !picker.contains(event.relatedTarget)) close({ focusTrigger: false });
+    if (pressedOpen !== null || picker.contains(event.relatedTarget)) return;
+    setTimeout(() => { if (!picker.contains(document.activeElement)) close({ focusTrigger: false }); });
   });
 
   // A picker marked open in the markup (the sandbox's static state) shows its fill.

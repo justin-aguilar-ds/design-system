@@ -1,4 +1,4 @@
-/* personal-styling · picker · v0.6.0 */
+/* personal-styling · picker · v0.9.0 */
 
 /* A select is a button with a chevron — nothing else distinguishes it.
    The trigger is the Button component (.button .surface .surface--rest
@@ -23,12 +23,12 @@
 .picker.is-placeholder .picker-value { color: var(--color-text-secondary); }
 
 /* The chevron is the only distinguishing mark. It turns with the menu,
-   on the enter/exit curve, because it moves with something entering. */
+   on the spring, so it pops past the turn and settles (v0.8). */
 .picker-chevron {
   flex: none;
   width: var(--icon-mark);
   height: var(--icon-mark);
-  transition: transform var(--duration-base) var(--ease-out);
+  transition: transform var(--duration-spring) var(--ease-spring);
 }
 .picker.is-open .picker-chevron { transform: rotate(180deg); }
 
@@ -50,11 +50,16 @@
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-card);
   transform-origin: top left;
-  transform: scale(var(--scale-enter));
+  /* CHANGED: the menu pops — it grows from 0.8 on the spring (from 0.95
+     there was too little travel for a spring to show) and pops back down
+     on close. Its fade is quick, --duration-base, and never outlasts the
+     move: on close it eases in and out, so the menu is seen through the
+     dip and gone as the dip ends, not left fading after it has stopped. */
+  transform: scale(0.8);
   opacity: 0;
   transition:
-    transform var(--duration-base) var(--ease-out),
-    opacity var(--duration-base) var(--ease-out);
+    transform var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-base) var(--ease-in-out);
 }
 .picker.is-above .picker-menu {
   top: auto;
@@ -64,6 +69,9 @@
 .picker.is-open .picker-menu {
   transform: scale(1);
   opacity: 1;
+  transition:
+    transform var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-base) var(--ease-out);   /* a quick fade; the scale carries the pop */
 }
 
 .picker-list {
@@ -109,18 +117,19 @@
 
 /* The fill: the segmented control's indicator inside the menu. It rests
    on the selected option when the menu opens and glides to whatever the
-   pointer or arrow keys reach. Options are dense, so --duration-base. */
+   pointer or arrow keys reach, on the spring. */
 .picker-fill {
   position: absolute;
   border-radius: var(--radius-pill);
   background: var(--color-fill-subtle);
   pointer-events: none;
   opacity: 0;
+  /* CHANGED: the fill lands on its option on the spring. */
   transition:
-    left var(--duration-base) var(--ease-out),
-    top var(--duration-base) var(--ease-out),
-    width var(--duration-base) var(--ease-out),
-    height var(--duration-base) var(--ease-out),
+    left var(--duration-spring) var(--ease-spring),
+    top var(--duration-spring) var(--ease-spring),
+    width var(--duration-spring) var(--ease-spring),
+    height var(--duration-spring) var(--ease-spring),
     opacity var(--duration-base) ease;
 }
 .picker-menu.has-fill .picker-fill { opacity: 1; }

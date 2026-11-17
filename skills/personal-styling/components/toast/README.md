@@ -19,6 +19,10 @@ From the source site's copy-to-clipboard button.
 - `data-copy="…"` copies that text first: the Clipboard API, with a fallback for plain-HTTP pages. If copying fails, the toast says so instead.
 - The control is usually a Button, so load `button.css` too.
 
+## Changes in v0.4.0
+
+- The toast pops in on the spring and leaves on the ease.
+
 ## Changes in v0.2.0
 
 - Text is full ink, not secondary, per the contrast floor.

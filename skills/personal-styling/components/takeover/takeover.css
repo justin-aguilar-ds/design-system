@@ -1,10 +1,9 @@
-/* personal-styling · takeover · v0.1.1 */
+/* personal-styling · takeover · v0.4.0 */
 
 /* One thing, opened over everything: a record's detail, a full view of a
    piece. Opaque, in the page's own ground — never a dimmed modal over a
    page you can still half see. A large surface, so it scales in from
-   --scale-enter with opacity, on --duration-slow and --ease-out, and
-   leaves the same way. */
+   --scale-enter with opacity, on the spring, and leaves the same way. */
 .takeover {
   position: fixed;
   inset: 0;
@@ -14,10 +13,13 @@
   opacity: 0;
   scale: var(--scale-enter);
   visibility: hidden;
+  /* CHANGED: it scales on the spring both ways (from 0.95 the dip on close
+     stays above zero), and fades quickly, on --duration-base: a fade never
+     outlasts the move it goes with. */
   transition:
-    opacity var(--duration-slow) var(--ease-out),
-    scale var(--duration-slow) var(--ease-out),
-    visibility var(--duration-instant) linear var(--duration-slow);
+    opacity var(--duration-base) var(--ease-out),
+    scale var(--duration-spring) var(--ease-spring),
+    visibility var(--duration-instant) linear var(--duration-base);
 }
 .takeover.is-open {
   opacity: 1;

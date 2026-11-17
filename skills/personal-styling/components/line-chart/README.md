@@ -9,18 +9,37 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 - **Lines are 2.25px, the focus 3.25px.** Round caps and joins. Curves are monotone: smooth, and never overshooting the data, so a curve never invents a peak or a dip that isn't there. `data-curve="straight"` for data that changes in steps.
 - **Labels follow the width.** By default (`data-labels="auto"`) a chart wider than `630px` shows its axis labels and a narrower one doesn't: on a wide screen a chart is read for figures, on a phone for its shape, and the tooltip gives every value either way. It decides from its own width and redraws on resize. `data-labels="on"` keeps them at any width (a tool read for exact figures on a phone); `"off"` drops them (a hero read for its shape, a sparkline-like strip). Labels are mono `10.5px` in secondary ink, `16px` from the data, the X labels thinned until each has room.
 - **Guides are dotted, and few.** At most five, on round steps (`data-density="more"` for about eight), as 1.5px dots 4px apart in `--color-hairline-strong`: reference, not data. `data-guides="base"` for a baseline only, `"none"` for a bare chart. No vertical guides, no axis lines.
-- **The values come from a tooltip at the point.** Nearing a line previews it and grows a tooltip from the nearest point, in the tooltip component's style: name, X, value (and rank, with `data-rank="on"`). A small dot in the line's own ink, ringed by the ground, marks the point. No crosshair, no scrub line, and the accent never marks the point.
+- **The values come from a tooltip at the point.** Nearing a line previews it and grows a tooltip from the nearest point, in the tooltip component's style: name, X, value (and rank, with `data-rank="on"`). A small dot in the line's own ink, ringed by the ground, marks the point. It stays as long as the pointer is over the chart: away from every line it keeps to the line it's on, or the line in focus. No crosshair, no scrub line, and the accent never marks the point.
 - **Click or tap a line, or a name, to make it the focus.** The rest stay grey.
-- **The hover is timed from the duration tokens.** Lines fade on `--duration-base`, the tooltip grows on `--duration-pop` and follows on `--duration-fast`, all on `--ease-out`. Override `--line-chart-fade`, `--line-chart-grow` and `--line-chart-follow` on the chart to tune it.
+- **The point travels along the line.** Moving to the next data point, the dot glides there on the line itself, through the curve that's drawn rather than a straight cut, and the tooltip rides with it. Changing lines, it settles onto the new one over the same move. It appears in place the first time, then travels. Under reduced motion it steps.
+- **Or the point tracks the mouse** (`data-hover="track"`). It follows the pointer along the line wherever it is, and snaps to a data point as it comes within `12px` of one, or half the gap to the next if the points are closer. The tooltip stays up and rides with it, on both axes, showing the nearest data point's values: the words change as the pointer passes halfway between two points, the tooltip doesn't come and go. With few points it runs free between them and is pulled in near each; with many, the snaps meet and it steps from point to point. A snap is a short glide, not a jump. A tap on a phone still goes to the nearest point.
+- **The hover is timed from the duration tokens.** Lines fade on `--duration-base`, the tooltip grows on `--duration-pop`, and the point and tooltip glide on `--duration-base`, all on `--ease-out`. Override `--line-chart-fade`, `--line-chart-grow` and `--line-chart-glide` on the chart to tune it.
 - **Zero is on the axis, unless the shape is the point.** By default the value axis includes zero. `data-zero="off"` starts it at the round step below the lowest value instead — for a figure that never nears zero and moves a little (a balance, a weight), which would otherwise draw as a flat line along the top.
 - **Its height follows the width, or its container.** `240px` on a phone, `280px` from `500px` wide. In a card or a widget, set `--line-chart-height` on the figure.
 - **The legend is names, below.** In the data's order, under the chart, never beside it. Every name carries the chip's dot: a ring, filled for the focus. `data-legend="off"` when one series is all there is.
 - **Full width on a phone.** A chart sits on the page like a table, or on a surface like a card (`.line-chart--surface`).
 
-## Changes in v0.6.0
+## Changes in v0.10.0
 
 - `data-zero="off"`: the value axis starts at the round step below the lowest value.
 - `--line-chart-height` sets the height, for a chart in a card or a widget.
+
+## Changes in v0.9.0
+
+- The chart's tooltip pops in on the spring and shrinks away on the ease.
+
+## Changes in v0.8.0
+
+- Tracking: the tooltip stays visible and rides with the point; its values are the nearest data point's.
+
+## Changes in v0.7.0
+
+- `data-hover="track"`: the point follows the mouse along the line and snaps to nearby data points, where the tooltip shows.
+- The glide is back on `--duration-base`.
+
+## Changes in v0.6.0
+
+- The hover point glides along the line from data point to data point, following the curve, with the tooltip riding along; it stays while the pointer is over the chart. `--line-chart-glide` replaces `--line-chart-follow`.
 
 ## Changes in v0.5.0
 

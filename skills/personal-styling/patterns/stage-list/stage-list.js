@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.2.1 */
+/* personal-styling · stage-list · v0.5.0 */
 
 // Three depths — the stage, its list, one record's detail — and one thumb
 // button that walks them: with its label it opens the list, as a cross it

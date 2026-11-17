@@ -1,4 +1,4 @@
-/* personal-styling · stepper · v0.2.0 */
+/* personal-styling · stepper · v0.3.0 */
 
 // Minus and plus move the number by data-step (1 unless set), held between
 // data-min and data-max. A step at its limit is disabled. The number can

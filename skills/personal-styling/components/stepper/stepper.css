@@ -1,4 +1,4 @@
-/* personal-styling · stepper · v0.2.0 */
+/* personal-styling · stepper · v0.3.0 */
 
 /* A small whole number, set a step at a time. One pill — the button's
    surface (.surface .surface--rest .surface--pill) at the height of every
@@ -44,7 +44,7 @@
 .stepper-step svg {
   width: var(--icon-mark);
   height: var(--icon-mark);
-  transition: scale var(--duration-base) var(--ease-out);
+  transition: scale var(--duration-spring) var(--ease-spring);   /* springs back from a press */
 }
 @media (hover: hover) and (pointer: fine) {
   .stepper-step:hover:not(:disabled) { color: var(--color-text); }

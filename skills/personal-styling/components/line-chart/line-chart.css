@@ -1,4 +1,4 @@
-/* personal-styling · line-chart · v0.6.0 */
+/* personal-styling · line-chart · v0.10.0 */
 
 /* Series over time, for comparing one against the rest. The quiet series
    are a solid grey, the focus is full ink on top, and the values come
@@ -9,7 +9,7 @@
   --line-chart-weight: 2.25;                    /* the quiet series; the focus is one step heavier */
   --line-chart-fade: var(--duration-base);      /* lines brightening and dimming */
   --line-chart-grow: var(--duration-pop);       /* the tooltip and its point appearing */
-  --line-chart-follow: var(--duration-fast);    /* the tooltip moving from point to point */
+  --line-chart-glide: var(--duration-base);     /* the point and its tooltip travelling along the line, point to point (read by line-chart.js) */
   position: relative;
   min-width: 0;
   margin: 0;
@@ -74,10 +74,12 @@
   transition: opacity var(--line-chart-grow) ease;
 }
 .line-chart--surface .line-chart-point { stroke: var(--color-surface); }
-.line-chart.has-tip .line-chart-point { opacity: 1; }
+.line-chart:is(.has-tip, .has-point) .line-chart-point { opacity: 1; }
 
-/* The tooltip grows from the point, like the tooltip component, and
-   follows from point to point. One row of text: a pill. */
+/* The tooltip grows from the point, like the tooltip component, then
+   rides with it along the line: line-chart.js moves both on
+   --line-chart-glide, so only its growth is a transition here. One row of
+   text: a pill. */
 .line-chart-tip {
   position: absolute;
   top: 0;
@@ -90,11 +92,11 @@
   pointer-events: none;
   transform-origin: bottom center;
   scale: 0;
-  transition:
-    scale var(--line-chart-grow) var(--ease-out),
-    translate var(--line-chart-follow) var(--ease-out);
+  transition: scale var(--line-chart-grow) var(--ease-out);
 }
-.line-chart.has-tip .line-chart-tip { scale: 1; }
+/* CHANGED (v0.9): the tooltip pops in on the spring, and shrinks away on the
+   ease (a spring to scale 0 would flip it). */
+.line-chart.has-tip .line-chart-tip { scale: 1; transition: scale var(--duration-spring) var(--ease-spring); }
 .line-chart-tip.is-below { transform-origin: top center; }
 
 /* The legend: names in order under the chart, each a control. Every name

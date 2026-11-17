@@ -31,6 +31,10 @@ A checkbox or a radio: a small round mark beside a line of text, for a choice th
 - Listen for the inputs' own `change` events.
 - No JavaScript.
 
+## Changes in v0.3.0
+
+- A checkbox's ink is a disc that grows with its check on the spring, instead of a fill that fades; the check and a radio's dot pop in on it and leave on the ease. A touch press springs back on the spring.
+
 ## Changes in v0.2.0
 
 - A choice fills its line and the mark ends it, on the right, with the label leading.
