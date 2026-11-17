@@ -25,6 +25,7 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 ## Changes in v0.3.0
 
 - A press springs back on the spring.
+- The step's growing fill grows on the spring and shrinks on the ease.
 
 ## Changes in v0.2.0
 

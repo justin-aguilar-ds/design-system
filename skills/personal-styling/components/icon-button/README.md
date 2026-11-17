@@ -23,6 +23,7 @@ An icon alone as a control — back, more, share, close — in two treatments: l
 ## Changes in v0.6.0
 
 - A touch press springs back on the spring.
+- The bare icon button's growing fill grows on the spring and shrinks on the ease.
 
 ## Changes in v0.5.0
 

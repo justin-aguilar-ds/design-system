@@ -59,8 +59,8 @@
 
 /* NEW (v0.5): bare — no circle at rest, for a row of controls beside one
    primary (previous and next beside play). On hover a quiet circle grows
-   from the icon's centre behind it, 0 to full on --duration-base with the
-   enter curve, and shrinks away when the pointer leaves. On touch it shows
+   from the icon's centre behind it, on the spring (v0.6), and shrinks
+   away on the ease when the pointer leaves. On touch it shows
    while the finger is down, a step darker; keyboard focus shows it too. */
 .icon-button--bare { position: relative; isolation: isolate; }
 .icon-button--bare::before {
@@ -76,9 +76,15 @@
     background-color var(--duration-fast) ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .icon-button--bare:hover:not(:disabled)::before { scale: 1; }
+  .icon-button--bare:hover:not(:disabled)::before {
+    scale: 1;
+  transition: scale var(--duration-spring) var(--ease-spring), background-color var(--duration-fast) ease;   /* grows on the spring; shrinks on the ease */
+  }
 }
-.icon-button--bare:focus-visible::before { scale: 1; }
+.icon-button--bare:focus-visible::before {
+  scale: 1;
+  transition: scale var(--duration-spring) var(--ease-spring), background-color var(--duration-fast) ease;   /* grows on the spring; shrinks on the ease */
+}
 .icon-button--bare:active:not(:disabled)::before {
   scale: 1;
   background: var(--color-fill-quiet-hover);

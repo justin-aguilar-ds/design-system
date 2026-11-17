@@ -1,4 +1,4 @@
-/* personal-styling · timeline · v0.1.0 */
+/* personal-styling · timeline · v0.1.1 */
 
 /* Steps over time — an order, a booking, a process — as the slider
    standing up: a 16 grey track down the left, full ink through the steps
@@ -39,7 +39,10 @@
 .timeline-step.is-done::after { background: var(--color-range-progress); }
 .timeline-step:first-child::before,
 .timeline-step:first-child::after { top: calc(50% - 8px); border-radius: 999px 999px 0 0; }
-.timeline-step:last-child::before { bottom: calc(50% - 8px); border-radius: 0 0 999px 999px; }
+.timeline-step:last-child::before,
+.timeline-step:last-child::after { bottom: calc(50% - 8px); border-radius: 0 0 999px 999px; }   /* v0.1.1: a finished timeline's ink ends with the track, rounded, not past it */
+.timeline-step:only-child::before,
+.timeline-step:only-child.is-done::after { border-radius: 999px; }   /* one step: round at both ends */
 /* Now: the ink stops 2 below the thumb, the 2 the track leaves either
    side of it, so the thumb sits in an even ring of ink. */
 .timeline-step.is-current::after {

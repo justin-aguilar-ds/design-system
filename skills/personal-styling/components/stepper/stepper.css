@@ -40,7 +40,10 @@
     scale var(--duration-base) var(--ease-out),
     background-color var(--duration-fast) ease;
 }
-.stepper-step:focus-visible::before { scale: 1; }
+.stepper-step:focus-visible::before {
+  scale: 1;
+  transition: scale var(--duration-spring) var(--ease-spring), background-color var(--duration-fast) ease;   /* grows on the spring; shrinks on the ease */
+}
 .stepper-step svg {
   width: var(--icon-mark);
   height: var(--icon-mark);
@@ -48,7 +51,10 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .stepper-step:hover:not(:disabled) { color: var(--color-text); }
-  .stepper-step:hover:not(:disabled)::before { scale: 1; }
+  .stepper-step:hover:not(:disabled)::before {
+    scale: 1;
+  transition: scale var(--duration-spring) var(--ease-spring), background-color var(--duration-fast) ease;   /* grows on the spring; shrinks on the ease */
+  }
 }
 /* Touch: the hover response plays on press (see tokens.css). */
 @media (hover: none) {

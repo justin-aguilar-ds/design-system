@@ -17,3 +17,7 @@ Steps over time — an order, a booking, a process — drawn as the slider stand
 - `ol.timeline` (with an `aria-label`) › `li.timeline-step` › `span.timeline-dot[aria-hidden="true"]`, the name (`.t-body`) and the time (`.t-mono`).
 - Mark steps done `.is-done`, and the current one `.is-current` with `aria-current="step"`.
 - No JavaScript.
+
+## Changes in v0.1.1
+
+- When every step is done, the ink ends with the track, rounded, instead of running square past its end.

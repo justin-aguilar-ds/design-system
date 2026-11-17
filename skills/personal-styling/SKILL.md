@@ -148,6 +148,8 @@ only legal on decoration:
 | `rgba(0,0,0,0.3)` | an inactive nav label beside an active one, a disabled control | any text carrying information |
 | `#808080` at 10.5–11px | a dense table cell, an axis tick, a year range | a status, a quantity, anything acted on |
 
+The grey ink is solid, so it doesn't borrow from the ground behind it: on the stage it reads a little lighter than it did as 50% black (`3.6:1` on the light stage, `4.7:1` on the dark one, against `3.95:1` on white). Small grey text on the stage is the case to watch.
+
 If a value is meaningful and small, it takes **full ink**. If it's meaningful
 and secondary, it takes `--color-text-secondary` at 14px or larger, never at
 mono's 10.5px. When in doubt, raise the ink, not the size.
@@ -431,7 +433,7 @@ the values and leave the vocabulary alone.
 
 **The spring — what it's for**
 
-- **Transforms that arrive.** Scale and rotate on the way in: a menu, a tooltip, a toast, the cursor pill, the chart's tooltip, a takeover. A mark appearing: a check and its fill, a radio's dot, a chip's dot. A chevron's turn. A fill moving to its new place: a segmented control's, a switch's thumb, a table row's, a menu option's. A press springing back.
+- **Transforms that arrive.** Scale and rotate on the way in: a menu, a tooltip, a toast, the cursor pill, the chart's tooltip, a takeover. A mark appearing: a check and its fill, a radio's dot, a chip's dot. A chevron's turn. A fill moving to its new place: a segmented control's, a switch's thumb, a table row's, a menu option's. A growing fill behind a bare icon button, a text button or a stepper's step. A press springing back.
 - **Scale is where it shows.** Things pop by scale: small things from `0`, menus from `0.8`, large surfaces from `0.95`. Fills and discs grow rather than fade in.
 - **A fade never outlasts the move.** Opacity is quick: `--duration-base`, on `--ease-out` as something arrives and `--ease-in-out` as it leaves, never on the spring. The scale carries the pop; a fade that runs longer than the move leaves something that has stopped but hasn't gone.
 - **Never** for size or layout (an accordion's height, a corner's radius, a sheet's geometry), colour, text, hover or focus — those keep `--ease-out` and plain `ease`.
@@ -489,7 +491,7 @@ stay quiet.
 These are the recognisable moves. Reach for them when the context fits; don't force all of them in.
 
 - **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Open", "Play") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
-- **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except two fills: the one moving fill (a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer), and the growing fill, a quiet circle or pill that scales up from the centre behind a bare icon button, a text button or a stepper's step.
+- **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except two fills: the one moving fill (a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer), and the growing fill, a quiet circle or pill that scales up from the centre behind a bare icon button, a text button or a stepper's step — on the spring, shrinking away on the ease.
 - **Opaque full-bleed takeover** instead of a dimmed modal (`components/takeover/`). No click-outside-to-close — the way back under the thumb, and Escape.
 - **Moving indicator as its own element**, absolutely positioned behind the links rather than a background on the active link, so it can glide between tabs. Hovering a sibling tab retargets it as a preview of where you'd land.
 - **Drag-first input.** Grab cursors, `touch-action: none`, pointer-tracked 1:1 with no transition mid-drag, then snap on release past a distance *or* velocity threshold.

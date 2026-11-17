@@ -34,6 +34,10 @@ Two treatments for every action: the pill, and the quiet text treatment for acti
 - Disabled takes the real `disabled` attribute. It drops to 30% ink, loses its shadow and hover, and shows `cursor: not-allowed`.
 - Focus is the global `:focus-visible` outline from `tokens.css`. Don't restyle it per button.
 
+## Changes in v0.9.0
+
+- The text button's growing fill grows on the spring and shrinks on the ease.
+
 ## Changes in v0.8.0
 
 - The text button grows a quiet fill behind its label on hover, press and focus.
