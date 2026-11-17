@@ -141,8 +141,10 @@
   :root[data-theme="light"] .widgets { --avatar-fill: #e6e6e6; }
   .widgets.avatar-quiet { --avatar-fill: var(--color-fill-quiet); }
   .widgets.avatar-series { --avatar-fill: var(--color-series); }
-  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); }
-  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0; }
+  /* One avatar rule: initials in mono, in the faded (secondary) ink, on
+     the solid avatar grey, at any size. */
+  .widget .list-row-lead.is-avatar { background: var(--avatar-fill); color: var(--color-text-secondary); }
+  .stack > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--avatar-fill); box-shadow: 0 0 0 2px var(--w-ground, var(--color-stage)); color: var(--color-text-secondary); font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.3px; }
   .stack > span + span { margin-left: calc(-1 * var(--space-8)); }
   .frame-card .stack > span { --w-ground: var(--color-surface); }
 
@@ -203,9 +205,13 @@
   .steps::before { bottom: calc(var(--height-control) / 2 - 8px); background: var(--color-range-track); }
   .steps::after { height: calc(var(--current) * var(--height-control) + 16px); background: var(--color-range-progress); }
   .step { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-16); min-height: var(--height-control); }
-  .step-dot { position: absolute; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 4px; height: 4px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-text-secondary); }
-  .step.is-done .step-dot { background: var(--color-bg); }
-  .step.is-current .step-dot { width: 12px; height: 12px; background: var(--color-range-thumb); box-shadow: var(--shadow-range-thumb); }
+  /* Every step is the slider's 12 circle, so the track shows the same 2
+     around each one. Done: the ground colour on the ink. Now: the thumb
+     itself, with its shadow, where the ink stops. To come: the ground
+     colour, faded, on the grey. */
+  .step-dot { position: absolute; left: calc(-16px - var(--space-16) + 8px); top: 50%; width: 12px; height: 12px; translate: -50% -50%; border-radius: var(--radius-pill); background: var(--color-range-thumb); opacity: 0.6; }
+  .step.is-done .step-dot { opacity: 1; }
+  .step.is-current .step-dot { opacity: 1; box-shadow: var(--shadow-range-thumb); }
   .step.is-done, .step.is-current { color: var(--color-text); }
   /* A filled glyph, in the same spirit: a grey shape with its edges cut in
      the ground colour, like the white thumb on the grey track. */
@@ -330,7 +336,7 @@ const GAPS = {
   spark: ['A sparkline outside a table', 'The table draws sparklines in cells; a row in a list has no cell, so this one is hand-drawn on the same spec.'],
   media: ['Playback: times and a play button', 'Elapsed and remaining under a scrubber, and a play button that turns into pause. The slider has no end labels and the icon button no toggled state.'],
   meter: ['Progress toward a goal', 'A reading, not a control: how far along. The slider’s track would invite a drag.'],
-  timeline: ['Steps over time', 'Done, now and still to come. Drawn as the slider standing up: a 16 grey track, full ink through the steps done, the slider’s white thumb on the current one, a small dot for each step.'],
+  timeline: ['Steps over time', 'Done, now and still to come. Drawn as the slider standing up: a 16 grey track, full ink through the steps done, and every step the slider’s 12 circle with the same 2 of track around it; the current one carries the thumb’s shadow.'],
   unread: ['An unread marker', 'A dot that means new. The chip’s dot means on or off, so the same mark would mean two things.'],
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
   chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
@@ -394,14 +400,14 @@ const WIDGETS = [
     <div class="segmented" role="group" aria-label="Period"><span class="segmented-indicator" aria-hidden="true"></span>${['1D', '1W', '1M', '1Y'].map((p, i) => `<button class="segmented-option t-control${i === 2 ? ' is-active' : ''}" type="button" aria-pressed="${i === 2}">${p}</button>`).join('')}</div>
     <figure class="line-chart" aria-label="Balance over a month" data-legend="off" data-guides="none" data-prefix="$" data-gap="chart"><script type="application/json">${JSON.stringify({ x: Array.from({ length: 30 }, (_, i) => `Oct ${i + 18}`), series: [{ name: 'Balance', values: [16900, 17020, 16950, 17110, 17300, 17240, 17380, 17520, 17410, 17600, 17680, 17550, 17720, 17900, 17840, 17960, 18100, 18020, 18150, 18240, 18190, 18300, 18210, 18380, 18450, 18320, 18480, 18560, 18228, 18640] }] })}<\/script></figure>`],
   ['inbox', 'Inbox', 'The latest messages', ['unread'], `
-    <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead is-avatar t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
+    <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead is-avatar t-mono" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
   ['sleep', 'Sleep', 'Last night and the week', ['bars'], `
     ${pair('Last night', '7h 24m', 't-display', '<span class="t-body">In bed at 23:40, up at 07:10.</span>')}
     <div class="bars" data-gap="bars">${[['Mon', 6.5], ['Tue', 7.1], ['Wed', 5.8], ['Thu', 6.9], ['Fri', 8.2], ['Sat', 8.6], ['Sun', 7.4]].map(([d, h], i) => `<div class="bar${i === 6 ? ' is-focus' : ''}"><span style="height: ${h / 9 * 100}%" title="${h} hours"></span><span class="t-mono">${d}</span></div>`).join('')}</div>`],
   ['split', 'Split the bill', 'Who owes what — library only', [], `
     ${pair('Dinner at Taberna', '$186.40', 't-title')}
     <div class="row"><span class="t-label" id="split-l">Split between</span><div class="stepper surface surface--rest surface--pill" data-min="1" data-max="8"><button class="stepper-step" type="button" aria-label="Fewer"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button><input class="stepper-input" inputmode="numeric" aria-labelledby="split-l" value="4"><button class="stepper-step" type="button" aria-label="More"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div></div>
-    <ul class="list-rows" style="margin-block: 0">${[['JA', 'You', 'Paid the bill', '$46.60'], ['MO', 'Mara', 'Owes you', '$46.60'], ['TL', 'Tomás', 'Owes you', '$46.60']].map(([a, n, s, v]) => `<li><div class="list-row"><span class="list-row-lead is-avatar t-control" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-label tnum">${v}</span><span class="list-row-sub t-body">${s}</span></span></div></li>`).join('')}</ul>
+    <ul class="list-rows" style="margin-block: 0">${[['JA', 'You', 'Paid the bill', '$46.60'], ['MO', 'Mara', 'Owes you', '$46.60'], ['TL', 'Tomás', 'Owes you', '$46.60']].map(([a, n, s, v]) => `<li><div class="list-row"><span class="list-row-lead is-avatar t-mono" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-label tnum">${v}</span><span class="list-row-sub t-body">${s}</span></span></div></li>`).join('')}</ul>
     <button class="button button--large surface surface--rest surface--pill t-label" type="button">Request $139.80</button>`],
   ['timer', 'Focus timer', 'A countdown — library only', [], `
     <div class="segmented" role="group" aria-label="Mode" style="justify-self: center"><span class="segmented-indicator" aria-hidden="true"></span>${['Focus', 'Short break', 'Long break'].map((p, i) => `<button class="segmented-option t-control${i === 0 ? ' is-active' : ''}" type="button" aria-pressed="${i === 0}">${p}</button>`).join('')}</div>
