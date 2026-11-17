@@ -168,37 +168,29 @@
      --duration-base with --ease-out (it enters), and shrinks away on the
      same. On touch the same circle plays while the finger is down. */
   /* The stepper's steps take the bare icon button's fill, fitted inside
-     the pill: a circle the pill's inner height less 4 on each side, sat 4
-     from the top, the bottom and the pill's end, so the gap around it is
-     4 all round. The mark sits at the circle's centre; the number keeps
-     4 from each circle. */
+     the pill. Each step is a square the pill's inner height (34) with 4
+     inside it on every side, and the circle fills that: 26 across, 4 from
+     the top, the bottom and both sides, so the gap around it is even. The
+     mark is centred in the square, which is the circle's centre. */
   .stepper .stepper-step {
     --step-d: calc(var(--height-control) - 2px - 2 * var(--inset-fill));   /* 26: the inner 34 less 4 each side */
     position: relative;
     isolation: isolate;
     justify-content: center;
     width: calc(var(--step-d) + 2 * var(--inset-fill));
-    padding: 0 0 0 var(--inset-fill);
+    padding: 0;
   }
-  .stepper .stepper-step:last-child { padding: 0 var(--inset-fill) 0 0; }
-  .stepper .stepper-step svg { width: var(--icon-mark); }
+  .stepper .stepper-step:last-child { padding: 0; }
   .stepper .stepper-step::before {
     content: "";
     position: absolute;
     z-index: -1;
-    top: var(--inset-fill);
-    left: var(--inset-fill);
-    width: var(--step-d);
-    height: var(--step-d);
+    inset: var(--inset-fill);
     border-radius: var(--radius-pill);
     background: var(--color-fill-quiet);
     scale: 0;
     transition: scale var(--duration-base) var(--ease-out), background-color var(--duration-fast) ease;
   }
-  .stepper .stepper-step:last-child::before { left: auto; right: var(--inset-fill); }
-  .stepper .stepper-step:last-child,
-  .stepper .stepper-step:first-child { margin: 0; }
-  .stepper .stepper-input { margin-inline: var(--inset-fill); }
   @media (hover: hover) and (pointer: fine) {
     .stepper .stepper-step:hover:not(:disabled)::before { scale: 1; }
   }
