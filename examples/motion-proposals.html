@@ -19,6 +19,8 @@
 <link rel="stylesheet" href="lib/components/toast/toast.css">
 <link rel="stylesheet" href="lib/components/tooltip/tooltip.css">
 <link rel="stylesheet" href="lib/components/takeover/takeover.css">
+<link rel="stylesheet" href="lib/components/accordion/accordion.css">
+<link rel="stylesheet" href="lib/patterns/control-panel/control-panel.css">
 <link rel="stylesheet" href="lib/patterns/stage-sheet/stage-sheet.css">
 <style>
   /* An explorer as a stage and sheet: the components are the stage; the
@@ -33,7 +35,11 @@
      reads it in place of --ease-out, and its settle time in place of the
      durations it uses. Hover and colour stay on plain ease.
      ============================================================ */
-  :root { --ease-spring: cubic-bezier(0.23, 1, 0.32, 1); --duration-spring: 500ms; }
+  :root {
+    --ease-spring: cubic-bezier(0.23, 1, 0.32, 1); --duration-spring: 500ms;
+    /* Today's values, kept where the spring doesn't reach them. */
+    --today-ease: var(--ease-out); --today-base: var(--duration-base); --today-slow: var(--duration-slow); --today-entrance: var(--duration-entrance);
+  }
   html[data-spring~="pops"] :is(.tooltip, .cursor-pill, .toast, .menu, .picker),
   html[data-spring~="glides"] :is(.segmented, .switch, .choice, .chip),
   html[data-spring~="presses"] :is(.button, .icon-button, .surface--rest, .slider),
@@ -44,6 +50,32 @@
     --duration-deliberate: var(--duration-spring);
   }
   html[data-spring~="surfaces"] .takeover { --duration-slow: var(--duration-spring); --duration-entrance: var(--duration-spring); }
+
+  /* PROPOSED · opacity. With the group off, a pop's fade keeps today's
+     ease while its scale springs; on, the fade springs with it (and, at
+     opacity's ceiling of 1, its overshoot is spent holding at full). */
+  html[data-spring~="pops"]:not([data-spring~="opacity"]) :is(.menu-surface, .picker-menu) {
+    transition: transform var(--duration-spring) var(--ease-spring), opacity var(--today-base) var(--today-ease);
+  }
+  html[data-spring~="surfaces"]:not([data-spring~="opacity"]) .takeover {
+    transition: opacity var(--today-slow) var(--today-ease), scale var(--duration-spring) var(--ease-spring), visibility 0s linear var(--today-slow);
+  }
+  html[data-spring~="surfaces"]:not([data-spring~="opacity"]) .takeover.is-open { transition-delay: 0s; }
+  html[data-spring~="size"] .accordion-panel { transition: grid-template-rows var(--duration-spring) var(--ease-spring), opacity var(--today-entrance) var(--today-ease); }
+  html[data-spring~="size"][data-spring~="opacity"] .accordion-panel { transition: grid-template-rows var(--duration-spring) var(--ease-spring), opacity var(--duration-spring) var(--ease-spring); }
+
+  /* PROPOSED · size. The accordion's panel opens and closes on the spring
+     (its height overshoots, so the content under it moves past and back),
+     and the control panel's corner morphs from card to pill on it. */
+  html[data-spring~="size"] :is(.accordion, .control-panel) {
+    --ease-out: var(--ease-spring);
+    --duration-entrance: var(--duration-spring);
+    --duration-base: var(--duration-spring);
+  }
+  .tile-stage .accordion,
+  .tile-stage .control-panel { width: 100%; max-width: 320px; align-self: start; }
+  .tile-stage .control-panel .control-panel-fields { grid-template-columns: minmax(min-content, 1fr) minmax(min-content, var(--control-max)); }
+  .tile-stage .control-panel .control-panel-fields > * { grid-column: 1 / -1; grid-template-columns: subgrid; }
 
   /* PROPOSED · marks pop. The smallest things — a check and its fill, a
      radio's dot, a chip's dot, a select's chevron — scale up (or turn) on
@@ -279,6 +311,37 @@
             <div class="tile-copy"><h2 class="t-label">Takeover</h2><p class="t-body">A large surface, scaling in from 0.95.</p></div>
           </div>
 
+          <div class="tile">
+            <div class="tile-stage">
+              <div class="accordion" id="demo-accordion">
+                <div class="accordion-item">
+                  <h3 class="accordion-heading"><button class="accordion-trigger" type="button" id="acc-1-t" aria-expanded="false" aria-controls="acc-1"><span class="t-label">What counts as a push</span><svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+                  <div class="accordion-panel" id="acc-1" role="region" aria-labelledby="acc-1-t"><div class="accordion-content"><div class="accordion-body"><p class="t-body">A result exactly on the line. The stake comes back and the bet counts as neither won nor lost.</p></div></div></div>
+                </div>
+                <div class="accordion-item">
+                  <h3 class="accordion-heading"><button class="accordion-trigger" type="button" id="acc-2-t" aria-expanded="false" aria-controls="acc-2"><span class="t-label">How odds are shown</span><svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+                  <div class="accordion-panel" id="acc-2" role="region" aria-labelledby="acc-2-t"><div class="accordion-content"><div class="accordion-body"><p class="t-body">American odds: +115 wins $115 on $100; −120 risks $120 to win $100.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="tile-copy"><h2 class="t-label">Accordion</h2><p class="t-body">The panel's height opens; the chevron turns.</p></div>
+          </div>
+
+          <div class="tile">
+            <div class="tile-stage">
+              <section class="control-panel surface accordion" id="demo-panel" aria-label="Filters">
+                <div class="accordion-item is-open">
+                  <h3 class="accordion-heading"><button class="accordion-trigger" type="button" id="cp-t" aria-expanded="true" aria-controls="cp-b"><span class="t-mono">Filters</span><svg class="accordion-chevron" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+                  <div class="accordion-panel" id="cp-b" role="region" aria-labelledby="cp-t"><div class="accordion-content"><div class="accordion-body"><div class="control-panel-fields">
+                    <div class="control-field"><span class="t-mono" id="cp-kind-l">Kind</span><div class="segmented" role="group" aria-labelledby="cp-kind-l"><span class="segmented-indicator" aria-hidden="true"></span><button class="segmented-option t-control is-active" type="button" aria-pressed="true">All</button><button class="segmented-option t-control" type="button" aria-pressed="false">Props</button></div></div>
+                    <div class="control-field"><span class="t-mono" id="cp-legs-l">Legs</span><div class="segmented" role="group" aria-labelledby="cp-legs-l"><span class="segmented-indicator" aria-hidden="true"></span><button class="segmented-option t-control is-active" type="button" aria-pressed="true">One</button><button class="segmented-option t-control" type="button" aria-pressed="false">Parlay</button></div></div>
+                  </div></div></div></div>
+                </div>
+              </section>
+            </div>
+            <div class="tile-copy"><h2 class="t-label">Control panel</h2><p class="t-body">Collapsing, its corner morphs from card to pill.</p></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -323,6 +386,8 @@
           <button class="chip t-control" type="button" aria-pressed="true" value="presses"><span class="chip-dot" aria-hidden="true"></span>Presses</button>
           <button class="chip t-control" type="button" aria-pressed="true" value="marks"><span class="chip-dot" aria-hidden="true"></span>Marks</button>
           <button class="chip t-control" type="button" aria-pressed="false" value="surfaces"><span class="chip-dot" aria-hidden="true"></span>Surfaces</button>
+          <button class="chip t-control" type="button" aria-pressed="true" value="opacity"><span class="chip-dot" aria-hidden="true"></span>Opacity</button>
+          <button class="chip t-control" type="button" aria-pressed="true" value="size"><span class="chip-dot" aria-hidden="true"></span>Size</button>
         </div>
       </div>
       <div class="actions">
@@ -404,6 +469,8 @@ const PROPOSALS = [
   ['M4', 'Presses spring', 'What springs back after a press or a lift: buttons, icon buttons, the slider’s thumb.'],
   ['M5', 'Marks pop', 'The smallest things scale up on the spring, so its overshoot reads as a pop: a checkbox’s fill grows with its check instead of fading in, a radio’s dot, a chip’s dot grows inside its ring, and a select’s chevron turns with the overshoot.'],
   ['M6', 'Surfaces spring', 'Large surfaces that scale in from 0.95: the takeover, the accordion’s panel, the control panel, the sheet. Today these take 500 to 800ms; the spring settles faster, so they would too.'],
+  ['M7', 'Opacity springs with the pop', 'A pop’s fade (the menu’s, the picker’s, the takeover’s) runs on the spring with its scale, instead of today’s ease. Opacity can’t pass 1, so the overshoot is spent holding at full: the fade lands earlier and the scale carries the pop. Turn Opacity off to compare.'],
+  ['M8', 'Size springs', 'The accordion’s panel opens and closes on the spring, and the control panel’s corner morphs from card to pill on it. Today both take --duration-entrance (500ms) on the ease. Neither shows the overshoot: the panel’s height can’t pass its content’s, and a corner past fully round looks the same. The spring reads as a quicker open that lands softly. A visible bounce in the height would need the panel sized in pixels by its script.'],
 ];
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem('motion-proposals') || '{}'); } catch {}
@@ -424,11 +491,12 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
 <script src="lib/components/toast/toast.js"></script>
 <script src="lib/components/tooltip/tooltip.js"></script>
 <script src="lib/components/takeover/takeover.js"></script>
+<script src="lib/components/accordion/accordion.js"></script>
 <script src="lib/patterns/stage-sheet/stage-sheet.js"></script>
 <script>
 document.body.ontouchstart = () => {};
 const root = document.documentElement;
-const state = { mode: 'spring', speed: 10, bounce: 10, rate: 1, apply: new Set(['pops', 'glides', 'presses', 'marks']) };
+const state = { mode: 'spring', speed: 10, bounce: 10, rate: 1, apply: new Set(['pops', 'glides', 'presses', 'marks', 'opacity', 'size']) };
 let current = null;
 
 function apply() {
@@ -507,6 +575,10 @@ document.getElementById('play').addEventListener('click', async () => {
   box.click(); await wait(gap); box.click(); await wait(300);
   const chip = document.querySelectorAll('#demo-chips .chip')[1];
   chip.click(); await wait(gap); chip.click(); await wait(300);
+  const acc = document.querySelector('#acc-1-t');
+  acc.click(); await wait(gap + 300); acc.click(); await wait(gap);
+  const cp = document.querySelector('#cp-t');
+  cp.click(); await wait(gap + 300); cp.click(); await wait(gap);
   document.getElementById('demo-open').click(); await wait(gap + 600);
   document.getElementById('demo-takeover').takeover?.close(); await wait(gap);
   document.activeElement?.blur?.();
