@@ -31,3 +31,8 @@ Actions behind the More button — rename, duplicate, share, delete — in the p
 | Home, End | — | first or last action |
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
+
+## Changes in v0.2.0
+
+- The menu is hidden once its own transition has played, not after a fixed 250ms, so a longer curve (a spring) plays out on close.
+

@@ -37,6 +37,11 @@ A select menu: a button with a chevron that opens a list of options, growing fro
 | Escape | — | closes, focus back on the trigger |
 | Tab | — | closes and moves on |
 
+## Changes in v0.7.0
+
+- A tap on the open select's trigger closes it on iOS. Safari moves focus after the finger lifts, so the list's focus-out closed the menu and the click reopened it; the focus-out now waits for the click.
+- The menu is hidden once its own transition has played, not after a fixed 250ms, so a longer curve (a spring) plays out on close.
+
 ## Changes in v0.6.0
 
 - The trigger hugs its label, so the chevron is always `8px` after it. It used to keep its widest option's width, which left a gap of up to 60px after a short label.

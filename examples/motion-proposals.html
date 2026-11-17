@@ -54,7 +54,17 @@
   /* PROPOSED · opacity. With the group off, a pop's fade keeps today's
      ease while its scale springs; on, the fade springs with it (and, at
      opacity's ceiling of 1, its overshoot is spent holding at full). */
-  html[data-spring~="pops"]:not([data-spring~="opacity"]) :is(.menu-surface, .picker-menu) {
+  /* PROPOSED · menus pop open and closed, on scale. They grow from 0.8
+     rather than 0.95, so the spring has room to show. Opening, the fade is
+     quick and the scale pops; closing, the scale pops back down while the
+     fade runs through the whole spring (ease-in-out), so the pop is seen on
+     the way out, not spent under a finished fade. */
+  html[data-spring~="pops"] :is(.menu-surface, .picker-menu) {
+    transform: scale(0.8);
+    transition: transform var(--duration-spring) var(--ease-spring), opacity var(--duration-spring) var(--ease-in-out);
+  }
+  html[data-spring~="pops"] :is(.menu.is-open .menu-surface, .picker.is-open .picker-menu) {
+    transform: scale(1);
     transition: transform var(--duration-spring) var(--ease-spring), opacity var(--today-base) var(--today-ease);
   }
   html[data-spring~="surfaces"]:not([data-spring~="opacity"]) .takeover {
@@ -464,7 +474,7 @@ const today = bezier(0.23, 1, 0.32, 1);
 
 const PROPOSALS = [
   ['M1', 'A spring token from Origami’s bouncy', 'Speed 10, bounciness 10: --ease-spring, a CSS linear() curve, and --duration-spring, the time it takes to settle. A spring with a clear pop (about a 10% overshoot) that settles in about two-thirds of a second. The system’s signature: things scale up and pop into place. Hover and colour stay on plain ease.'],
-  ['M2', 'Pops spring', 'Small surfaces that scale in from where they came from: the tooltip, the toast, the menu, the picker’s menu, the cursor pill, the chart’s tooltip.'],
+  ['M2', 'Pops spring', 'Small surfaces that scale in from where they came from: the tooltip, the toast, the menu, the picker’s menu, the cursor pill, the chart’s tooltip. Menus pop open and closed on scale: they grow from 0.8 (today 0.95, too little travel to show a spring), fade in quickly, and on close fade through the whole spring so the pop shows on the way out.'],
   ['M3', 'Glides spring', 'Fills and thumbs that move to a new place: the segmented control, the switch, choice marks, chips, the picker’s option fill, table and calendar fills.'],
   ['M4', 'Presses spring', 'What springs back after a press or a lift: buttons, icon buttons, the slider’s thumb.'],
   ['M5', 'Marks pop', 'The smallest things scale up on the spring, so its overshoot reads as a pop: a checkbox’s fill grows with its check instead of fading in, a radio’s dot, a chip’s dot grows inside its ring, and a select’s chevron turns with the overshoot.'],
