@@ -45,6 +45,39 @@
   }
   html[data-spring~="surfaces"] .takeover { --duration-slow: var(--duration-spring); --duration-entrance: var(--duration-spring); }
 
+  /* PROPOSED · marks pop. The smallest things — a check and its fill, a
+     radio's dot, a chip's dot, a select's chevron — scale up (or turn) on
+     the spring, so its overshoot reads as a pop. A fill that faded in
+     becomes a disc that grows: today the checkbox's ink and the chip's dot
+     fade while only the check scales. */
+  html[data-spring~="marks"] :is(.choice, .picker-chevron) {
+    --ease-out: var(--ease-spring);
+    --duration-base: var(--duration-spring);
+  }
+  html[data-spring~="marks"] .choice-input[type="checkbox"] + .choice-mark { position: relative; background: none; }
+  html[data-spring~="marks"] .choice-input[type="checkbox"] + .choice-mark::before {
+    content: "";
+    position: absolute;
+    inset: -1px;                     /* over the ring, edge to edge */
+    border-radius: var(--radius-pill);
+    background: var(--color-text);
+    scale: 0;
+    transition: scale var(--duration-spring) var(--ease-spring);
+  }
+  html[data-spring~="marks"] .choice-input[type="checkbox"]:checked + .choice-mark::before { scale: 1; }
+  html[data-spring~="marks"] .choice-input[type="checkbox"] + .choice-mark > * { position: relative; }
+  html[data-spring~="marks"] .chip-dot { position: relative; background: none !important; }
+  html[data-spring~="marks"] .chip-dot::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    scale: 0;
+    transition: scale var(--duration-spring) var(--ease-spring);
+  }
+  html[data-spring~="marks"] .chip[aria-pressed="true"] .chip-dot::after { scale: 1; }
+
   /* ---- The stage: the components, a tile each, on the stage grey. It
      scrolls; on a wide screen the open sheet takes the corner. */
   .stage-host {
@@ -113,7 +146,7 @@
       <div class="lab">
         <div class="lab-title">
           <h1 class="t-display">A spring</h1>
-          <p class="t-body">Origami's bouncy animation at speed 10 and bounciness 5, on the library's own components. Use them, or play them all from the sheet, and switch between today's ease and the spring.</p>
+          <p class="t-body">Origami's bouncy animation at speed 10 and bounciness 10, on the library's own components. Use them, or play them all from the sheet, and switch between today's ease and the spring.</p>
         </div>
         <div class="tiles" id="tiles">
 
@@ -271,7 +304,7 @@
       </div>
       <div class="slider-field">
         <label class="t-mono" for="bounce">Bounciness</label>
-        <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" id="bounce" type="range" min="0" max="20" step="1" value="5"><output class="slider-value t-mono" for="bounce">5</output></span>
+        <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" id="bounce" type="range" min="0" max="20" step="1" value="10"><output class="slider-value t-mono" for="bounce">10</output></span>
       </div>
       <div class="control-field">
         <span class="t-mono" id="slow-l">Slow</span>
@@ -288,6 +321,7 @@
           <button class="chip t-control" type="button" aria-pressed="true" value="pops"><span class="chip-dot" aria-hidden="true"></span>Pops</button>
           <button class="chip t-control" type="button" aria-pressed="true" value="glides"><span class="chip-dot" aria-hidden="true"></span>Glides</button>
           <button class="chip t-control" type="button" aria-pressed="true" value="presses"><span class="chip-dot" aria-hidden="true"></span>Presses</button>
+          <button class="chip t-control" type="button" aria-pressed="true" value="marks"><span class="chip-dot" aria-hidden="true"></span>Marks</button>
           <button class="chip t-control" type="button" aria-pressed="false" value="surfaces"><span class="chip-dot" aria-hidden="true"></span>Surfaces</button>
         </div>
       </div>
@@ -364,11 +398,12 @@ function bezier(p1x, p1y, p2x, p2y) {
 const today = bezier(0.23, 1, 0.32, 1);
 
 const PROPOSALS = [
-  ['M1', 'A spring token from Origami’s bouncy', 'Speed 10, bounciness 5: --ease-spring, a CSS linear() curve, and --duration-spring, the time it takes to settle. A crisp spring with a small overshoot (about 2%), settled in about half a second. Hover and colour stay on plain ease; nothing gets a bounce it can be read as wobbling.'],
+  ['M1', 'A spring token from Origami’s bouncy', 'Speed 10, bounciness 10: --ease-spring, a CSS linear() curve, and --duration-spring, the time it takes to settle. A spring with a clear pop (about a 10% overshoot) that settles in about two-thirds of a second. The system’s signature: things scale up and pop into place. Hover and colour stay on plain ease.'],
   ['M2', 'Pops spring', 'Small surfaces that scale in from where they came from: the tooltip, the toast, the menu, the picker’s menu, the cursor pill, the chart’s tooltip.'],
   ['M3', 'Glides spring', 'Fills and thumbs that move to a new place: the segmented control, the switch, choice marks, chips, the picker’s option fill, table and calendar fills.'],
   ['M4', 'Presses spring', 'What springs back after a press or a lift: buttons, icon buttons, the slider’s thumb.'],
-  ['M5', 'Surfaces spring', 'Large surfaces that scale in from 0.95: the takeover, the accordion’s panel, the control panel, the sheet. Today these take 500 to 800ms; the spring settles faster, so they would too.'],
+  ['M5', 'Marks pop', 'The smallest things scale up on the spring, so its overshoot reads as a pop: a checkbox’s fill grows with its check instead of fading in, a radio’s dot, a chip’s dot grows inside its ring, and a select’s chevron turns with the overshoot.'],
+  ['M6', 'Surfaces spring', 'Large surfaces that scale in from 0.95: the takeover, the accordion’s panel, the control panel, the sheet. Today these take 500 to 800ms; the spring settles faster, so they would too.'],
 ];
 let decisions = {};
 try { decisions = JSON.parse(localStorage.getItem('motion-proposals') || '{}'); } catch {}
@@ -393,7 +428,7 @@ document.getElementById('proposals').innerHTML = PROPOSALS.map(([id, title, body
 <script>
 document.body.ontouchstart = () => {};
 const root = document.documentElement;
-const state = { mode: 'spring', speed: 10, bounce: 5, rate: 1, apply: new Set(['pops', 'glides', 'presses']) };
+const state = { mode: 'spring', speed: 10, bounce: 10, rate: 1, apply: new Set(['pops', 'glides', 'presses', 'marks']) };
 let current = null;
 
 function apply() {
