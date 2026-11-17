@@ -411,11 +411,10 @@ const WIDGETS = [
       <div class="type-pair"><span class="t-mono">Lisbon</span><span class="t-display tnum">21°</span></div>
       <span data-gap="icons">${ico('sun')}</span>
     </div>
-    <p class="t-body">Sunny, a breeze from the west. Rain from Thursday.</p>
     <div class="wx-hours" data-gap="strip">${[['Now', 'sun', 21], ['14', 'sun', 22], ['15', 'part', 22], ['16', 'part', 21], ['17', 'cloud', 19], ['18', 'cloud', 18], ['19', 'rain', 16], ['20', 'rain', 15]].map(([h, k, t]) => `<div class="wx-hour"><span class="t-mono">${h}</span>${ico(k)}<span class="t-body ink tnum">${t}°</span></div>`).join('')}</div>
     <ul class="wx-days">${[['Wed', 'sun', 14, 22], ['Thu', 'rain', 13, 17], ['Fri', 'rain', 12, 16], ['Sat', 'part', 13, 19], ['Sun', 'sun', 15, 23]].map(([d, k, lo, hi], i) => `<li class="wx-day"><span class="t-label">${d}</span>${ico(k)}<span class="t-body tnum">${lo}°</span><span class="range"${i === 0 ? ' data-gap="range"' : ''}><span style="left: ${(lo - 10) / 15 * 100}%; right: ${(25 - hi) / 15 * 100}%"></span></span><span class="t-body ink tnum">${hi}°</span></li>`).join('')}</ul>`],
   ['today', 'Today', 'A day’s calendar at a glance', ['time', 'now', 'stack'], `
-    <div class="type-pair type-pair--loose"><h3 class="t-title">Tuesday 17</h3><p class="t-body">Four events. Free after four.</p></div>
+    <h3 class="t-title">Tuesday 17</h3>
     <ul class="agenda">
       <li class="agenda-item is-past"><span class="t-mono">09:30</span><span class="t-label">Stand-up</span><span></span><span class="t-body">Video call</span></li>
       <li data-gap="now"><span class="now t-mono">11:42</span></li>
@@ -439,8 +438,7 @@ const WIDGETS = [
   ['activity', 'Activity', 'Today against a goal', ['budget', 'meter'], `
     ${pair('Steps today', '7,412', 't-display')}
     <div class="meter" data-gap="meter" role="meter" aria-valuenow="7412" aria-valuemax="10000" aria-label="Steps toward 10,000"><span style="width: 74%"></span></div>
-    <p class="t-body">Of 10,000. 2,588 to go, about 25 minutes’ walk.</p>
-    <div class="figures">${pair('Distance', '5.2 km')}${pair('Active', '48 min')}${pair('Floors', '6')}</div>`],
+    <div class="figures">${pair('Goal', '10,000')}${pair('Distance', '5.2 km')}${pair('Active', '48 min')}</div>`],
   ['parcel', 'Parcel', 'Where an order is', ['timeline', 'icons'], `
     <div class="row"><div class="type-pair"><span class="t-label">Arriving today</span><span class="t-body">Between 2 and 4pm</span></div><span data-gap="icons"><svg class="ico-fill" viewBox="0 0 20 20" aria-hidden="true"><path class="shape" d="m10 2 7 4v8l-7 4-7-4V6l7-4Z"/><path class="cut" d="M3.5 6.25 10 10l6.5-3.75M10 10v7.5"/></svg></span></div>
     <ol class="steps" data-gap="timeline">${[['Ordered', 'Nov 12', 'is-done'], ['Shipped from Madrid', 'Nov 13', 'is-done'], ['In Lisbon', 'Nov 16', 'is-done'], ['Out for delivery', '08:14', 'is-current'], ['Delivered', '', '']].map(([n, d, c]) => `<li class="step ${c}"${c === 'is-current' ? ' aria-current="step"' : ''}><span class="step-dot"></span><span class="t-body">${n}</span><span class="t-mono">${d}</span></li>`).join('')}</ol>
@@ -452,7 +450,7 @@ const WIDGETS = [
   ['inbox', 'Inbox', 'The latest messages', ['unread'], `
     <ul class="list-rows">${[['MO', 'Mara Okafor', 'The flat has no lift, pack light.', '09:41', true], ['TL', 'Tomás Lima', 'Train tickets are booked.', '08:12', true], ['JA', 'Justin Aguilar', 'Sent the itinerary.', 'Mon', false]].map(([a, n, s, t, u], i) => `<li><button type="button" class="list-row"><span class="list-row-lead is-avatar t-mono" aria-hidden="true">${a}</span><span class="list-row-body"><span class="list-row-name t-label">${n}</span><span class="list-row-value t-body tnum">${t}${u ? `<span class="unread"${i === 0 ? ' data-gap="unread"' : ''} aria-label="Unread"></span>` : ''}</span><span class="list-row-sub t-body">${s}</span></span></button></li>`).join('')}</ul>`],
   ['sleep', 'Sleep', 'Last night and the week', ['bars'], `
-    ${pair('Last night', '7h 24m', 't-display', '<span class="t-body">In bed at 23:40, up at 07:10.</span>')}
+    ${pair('Last night', '7h 24m', 't-display')}
     <div class="bars" data-gap="bars">${[['Mon', 6.5], ['Tue', 7.1], ['Wed', 5.8], ['Thu', 6.9], ['Fri', 8.2], ['Sat', 8.6], ['Sun', 7.4]].map(([d, h], i) => `<div class="bar${i === 6 ? ' is-focus' : ''}"><span style="height: ${h / 9 * 100}%" title="${h} hours"></span><span class="t-mono">${d}</span></div>`).join('')}</div>`],
   ['split', 'Split the bill', 'Who owes what — library only', [], `
     ${pair('Dinner at Taberna', '$186.40', 't-title')}
