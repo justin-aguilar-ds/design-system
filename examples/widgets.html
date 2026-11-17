@@ -167,6 +167,49 @@
      grey circle grows from the icon's centre behind it, scale 0 to 1 on
      --duration-base with --ease-out (it enters), and shrinks away on the
      same. On touch the same circle plays while the finger is down. */
+  /* The stepper's steps take the bare icon button's fill, fitted inside
+     the pill: a circle the pill's inner height less 4 on each side, sat 4
+     from the top, the bottom and the pill's end, so the gap around it is
+     4 all round. The mark sits at the circle's centre; the number keeps
+     4 from each circle. */
+  .stepper .stepper-step {
+    --step-d: calc(var(--height-control) - 2px - 2 * var(--inset-fill));   /* 26: the inner 34 less 4 each side */
+    position: relative;
+    isolation: isolate;
+    justify-content: center;
+    width: calc(var(--step-d) + 2 * var(--inset-fill));
+    padding: 0 0 0 var(--inset-fill);
+  }
+  .stepper .stepper-step:last-child { padding: 0 var(--inset-fill) 0 0; }
+  .stepper .stepper-step svg { width: var(--icon-mark); }
+  .stepper .stepper-step::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: var(--inset-fill);
+    left: var(--inset-fill);
+    width: var(--step-d);
+    height: var(--step-d);
+    border-radius: var(--radius-pill);
+    background: var(--color-fill-quiet);
+    scale: 0;
+    transition: scale var(--duration-base) var(--ease-out), background-color var(--duration-fast) ease;
+  }
+  .stepper .stepper-step:last-child::before { left: auto; right: var(--inset-fill); }
+  .stepper .stepper-step:last-child,
+  .stepper .stepper-step:first-child { margin: 0; }
+  .stepper .stepper-input { margin-inline: var(--inset-fill); }
+  @media (hover: hover) and (pointer: fine) {
+    .stepper .stepper-step:hover:not(:disabled)::before { scale: 1; }
+  }
+  .stepper .stepper-step:active:not(:disabled)::before { scale: 1; background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
+  .stepper .stepper-step:focus-visible::before { scale: 1; }
+  .stepper .stepper-step:focus-visible { outline: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .stepper .stepper-step::before { transition: opacity var(--duration-fast) ease; scale: 1; opacity: 0; }
+    .stepper .stepper-step:is(:hover, :active, :focus-visible):not(:disabled)::before { opacity: 1; }
+  }
+
   /* The text button takes the same fill: a quiet grey pill grows from
      its centre behind the label on hover and press. */
   .icon-button--bare, .button-text { position: relative; isolation: isolate; }
@@ -340,7 +383,7 @@ const GAPS = {
   unread: ['An unread marker', 'A dot that means new. The chip’s dot means on or off, so the same mark would mean two things.'],
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
   chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
-  bare: ['A bare icon button', 'An icon button with no circle at rest, for a row of transport controls beside one primary. The icon button has primary and secondary only, so a bare one had no hover at all. Proposed: a quiet grey circle grows behind the icon on hover and press. The text button takes the same fill as a pill (Reset, Show on a map, Comment), where today it only brightens its ink.'],
+  bare: ['A bare icon button', 'An icon button with no circle at rest, for a row of transport controls beside one primary. The icon button has primary and secondary only, so a bare one had no hover at all. Proposed: a quiet grey circle grows behind the icon on hover and press. The text button takes the same fill as a pill (Reset, Show on a map, Comment), where today it only brightens its ink, and so do the stepper’s minus and plus, as a circle 4 inside the pill.'],
   art: ['A media placeholder on the stage', 'An empty artwork slot is stage grey, so on a stage-grey widget it disappears.'],
 };
 const GAP_IDS = Object.keys(GAPS);
