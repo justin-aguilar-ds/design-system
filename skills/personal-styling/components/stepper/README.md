@@ -21,3 +21,8 @@ A small whole number set a step at a time — guests, copies, a quantity — as 
 - `stepper.js` fires a bubbling `stepper-change` with `detail.value`. Arrow up and down step the number while the field is focused.
 - Disable it with `disabled` on the input and both buttons.
 - Needs the surface classes from `tokens.css`.
+
+## Changes in v0.2.0
+
+- A press springs back on the spring.
+

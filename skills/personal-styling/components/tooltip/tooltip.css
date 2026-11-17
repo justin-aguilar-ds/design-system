@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.7.0 */
+/* personal-styling · tooltip · v0.8.0 */
 
 /* ---- Inline information: the value itself is the trigger. ---- */
 .tooltip-trigger {
@@ -34,7 +34,10 @@
 .tooltip.is-below { transform-origin: top left; }
 /* One row of text: a pill, like the cursor pill (tooltip.js measures). */
 .tooltip.is-pill { border-radius: var(--radius-pill); }
-.tooltip.is-visible { transform: scale(1); }
+/* CHANGED (v0.8): it pops open on the spring and closes on the ease —
+   the destination's transition wins. A spring to scale(0) would pass zero
+   and flip the box. */
+.tooltip.is-visible { transform: scale(1); transition: transform var(--duration-spring) var(--ease-spring); }
 
 /* Text starts clipped and wipes left to right once the box has scaled in.
    clip-path, not width, so it survives wrapped lines. */
@@ -93,7 +96,7 @@
   transform: translate(-50%, -50%) scale(0);
   transition: transform var(--duration-base) var(--ease-out);
 }
-.cursor-pill.is-visible .cursor-pill-inner { transform: translate(-50%, -50%) scale(1); }
+.cursor-pill.is-visible .cursor-pill-inner { transform: translate(-50%, -50%) scale(1); transition: transform var(--duration-spring) var(--ease-spring); }
 
 @media (hover: hover) and (pointer: fine) {
   [data-cursor] { cursor: none; }

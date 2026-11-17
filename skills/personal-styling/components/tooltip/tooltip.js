@@ -1,4 +1,4 @@
-/* personal-styling · tooltip · v0.7.0 */
+/* personal-styling · tooltip · v0.8.0 */
 
 // Four declarative pieces:
 //   [data-tooltip="…"]         inline information — grows from the trigger on
@@ -10,8 +10,10 @@
 //   [data-cursor="…"]          a pill replaces the cursor over the element
 // One tooltip is open at a time.
 
-// Mirrors --duration-pop in tokens.css: the text starts its wipe as the box
-// finishes scaling, and a closing box is removed once it has shrunk away.
+// Mirrors --duration-pop in tokens.css: a closing box shrinks on that
+// duration and is removed once it has. The box opens on the spring, which
+// reaches full size about a quarter of the way through its 648ms; at this
+// point it is settling, so the text starts its wipe here too.
 const TOOLTIP_POP_MS = 350;
 const TOOLTIP_GAP = 8; // px between a trigger and its tooltip
 

@@ -28,6 +28,10 @@ On or off, in place — a setting that takes effect the moment it's flipped — 
 - Listen for the input's own `change` event; read `checked`.
 - No JavaScript.
 
+## Changes in v0.3.0
+
+- The thumb lands on the spring, and springs back from a press.
+
 ## Changes in v0.2.0
 
 - The switch fills its line and the track ends it, on the right, with the label leading.

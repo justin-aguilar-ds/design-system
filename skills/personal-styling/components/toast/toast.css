@@ -1,4 +1,4 @@
-/* personal-styling · toast · v0.3.0 */
+/* personal-styling · toast · v0.4.0 */
 
 /* The toast belongs to the control it confirms, so it lives inside an
    anchor with that control and grows from it. */
@@ -25,4 +25,6 @@
   transform: translateX(-50%) scale(0);
   transition: transform var(--duration-base) var(--ease-out);
 }
-.toast.is-visible { transform: translateX(-50%) scale(1); }
+/* CHANGED (v0.4): it pops in on the spring and leaves on the ease (a spring
+   to scale(0) would pass zero and flip it). */
+.toast.is-visible { transform: translateX(-50%) scale(1); transition: transform var(--duration-spring) var(--ease-spring); }

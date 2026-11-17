@@ -18,6 +18,10 @@ An icon alone as a control — back, more, share, close — in two treatments: l
 - Draw icons on a viewBox the size they render (`0 0 20 20` here), `fill="none"`, `stroke="currentColor"`, `stroke-width="1.5"`, round caps and joins.
 - No JavaScript.
 
+## Changes in v0.5.0
+
+- A touch press springs back on the spring.
+
 ## Changes in v0.4.0
 
 - 36px (`--height-control`), not 40px, to match every other control.

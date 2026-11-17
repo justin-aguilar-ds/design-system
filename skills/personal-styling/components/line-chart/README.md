@@ -17,6 +17,10 @@ Series over time, for seeing one against the rest: a quiet bundle of grey lines,
 - **The legend is names, below.** In the data's order, under the chart, never beside it. Every name carries the chip's dot: a ring, filled for the focus. `data-legend="off"` when one series is all there is.
 - **Full width on a phone.** A chart sits on the page like a table, or on a surface like a card (`.line-chart--surface`).
 
+## Changes in v0.9.0
+
+- The chart's tooltip pops in on the spring and shrinks away on the ease.
+
 ## Changes in v0.8.0
 
 - Tracking: the tooltip stays visible and rides with the point; its values are the nearest data point's.

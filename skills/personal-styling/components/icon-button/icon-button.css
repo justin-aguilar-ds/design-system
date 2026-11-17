@@ -1,4 +1,4 @@
-/* personal-styling · icon-button · v0.4.0 */
+/* personal-styling · icon-button · v0.5.0 */
 
 /* An icon alone as a control — back, more, share, close. A circle the
    height of every other control (--height-control, 36px), so it sits in a
@@ -38,7 +38,7 @@
   background: var(--color-fill-quiet);
   transition:
     background-color var(--duration-fast) ease,
-    scale var(--duration-base) var(--ease-out); /* the touch press springs back */
+    scale var(--duration-spring) var(--ease-spring); /* the touch press springs back, on the spring */
 }
 @media (hover: hover) and (pointer: fine) {
   .icon-button--secondary:hover { background: var(--color-fill-quiet-hover); }

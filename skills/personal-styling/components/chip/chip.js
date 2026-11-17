@@ -1,4 +1,4 @@
-/* personal-styling · chip · v0.5.1 */
+/* personal-styling · chip · v0.6.0 */
 
 // Each chip owns its own on/off. Delegated, so chips added later work too.
 // Disabled buttons never fire click, so there's no check for them here.

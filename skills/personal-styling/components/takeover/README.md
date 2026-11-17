@@ -22,3 +22,8 @@ From a bet tracker, where a bet opened from the list became the whole screen, an
 - Put the content in `.takeover-body` and the way back in `button.takeover-close` with the button's pill classes and a chevron (`aria-label="Back"`).
 - `.takeover--contained` takes over its positioned parent instead of the screen: a pattern that is the page, or a framed demo.
 - `el.takeover.open()` and `.close()`; `.isOpen`. It fires a bubbling `takeover-toggle` event with `detail.open`, and puts `.has-takeover` on `<html>` while open.
+
+## Changes in v0.2.0
+
+- It scales in from 0.95 on the spring, its fade with it, and leaves the same way.
+

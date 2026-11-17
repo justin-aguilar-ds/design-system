@@ -64,3 +64,8 @@ Rows of records for tools: full width of its container, sitting on the page with
 - v0.5.0: the fill is placed from layout offsets, so it lines up inside a scaled or zoomed container.
 - v0.3.0: the fill moves on `--duration-base`, not `--duration-deliberate` — rows are dense. A selected row no longer shows a square background behind the rounded fill.
 - Right-aligned figures (`.table-num`), row links and the column gap are new decisions.
+
+## Changes in v1.2.0
+
+- The row fill lands on its row on the spring; the sort arrow turns on it.
+

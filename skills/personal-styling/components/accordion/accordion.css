@@ -1,4 +1,4 @@
-/* personal-styling · accordion · v0.5.1 */
+/* personal-styling · accordion · v0.6.0 */
 
 /* A set of sections is a list, so it sits on the page with dividers.
    Wrap it in a surface only when it is the control panel (see
@@ -28,7 +28,7 @@
   width: var(--icon-mark);
   height: var(--icon-mark);
   color: var(--color-text-secondary);
-  transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
+  transition: transform var(--duration-spring) var(--ease-spring), color var(--duration-fast) ease;   /* CHANGED: the chevron turns on the spring */
 }
 .accordion-item.is-open .accordion-chevron { transform: rotate(180deg); }
 

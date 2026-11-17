@@ -1,4 +1,4 @@
-/* personal-styling · menu · v0.2.0 */
+/* personal-styling · menu · v0.3.0 */
 
 // A button that opens a menu of actions (the "menu button" pattern).
 // Mouse: click to open, hover to move the fill, click to choose.

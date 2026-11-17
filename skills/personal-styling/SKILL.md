@@ -56,7 +56,7 @@ Every page is built for a form factor: the device the person is prompting from, 
 2. **Five spacing steps: 4, 8, 16, 24, 48, and the room.** Every gap lands on a step: `48` between groups, on every page. `4` is the inner padding of a small control only — never a gap between blocks. The one distance that isn't a step is the room: the height left over below the hero, given to the page on purpose. Any other value off the scale is a mistake, not a nuance. The scale stops at the stage's edge: inside the stage, space is the stage's own (see Surfaces).
 3. **Lead with the title; three type styles to a card.** The title is the first thing on the screen, with nothing small above it. A card takes a title, body copy, and one emphasis — the large number *or* the mono detail, never both.
 4. **Lists live on the page; surfaces are for content.** Dividers carry structure. A card is for an image, a chart, a demo, or a real card being shown — not for wrapping a list of rows. There is exactly **one** surface style: white fill + `#ececec` hairline, with `0 2px 14px rgba(0,0,0,.04)` added only if it lifts on hover. Buttons are the exception: every button-shaped control carries that shadow at rest — see Buttons.
-5. **Two easing curves.** `cubic-bezier(0.23, 1, 0.32, 1)` for things entering or leaving the screen; plain `ease` for hover and colour. Never mix them up.
+5. **The spring is the signature; two curves do the rest.** Things that arrive pop into place on the spring (`--ease-spring` over `--duration-spring`): a menu, a tooltip, a check, a chevron's turn, a fill landing on its choice, a press springing back. `cubic-bezier(0.23, 1, 0.32, 1)` for the rest of what enters or leaves; plain `ease` for hover and colour. Never mix them up.
 6. **Slower than feels right.** Overlays take 800ms. Nav takes 450ms. Default AI output lands at 200–300ms for everything; that's the single biggest tell.
 
 ## Colour
@@ -409,6 +409,7 @@ the values and leave the vocabulary alone.
 | entrance | `500ms` | a container appearing |
 | slow | `800ms` | full-surface takeovers, cross-page transitions |
 | carousel | `1200ms` | the main draggable object settling (`--duration-carousel`, `patterns/carousel/`) |
+| spring | `648ms` | the spring's settle (`--duration-spring`) — only ever with `--ease-spring` |
 
 **Duration follows density, not component.** The same motion runs at different speeds depending on how often the pointer crosses its targets. A fill gliding between two or three large options — the page nav, a segmented control — takes `deliberate`: it moves rarely, and the pause reads as care. The same fill gliding between dense, repeated targets — table rows, list items — steps down to `base`, because at 450ms it trails a pointer sweeping down a column. Step down one token; never invent a value in between.
 
@@ -416,14 +417,25 @@ the values and leave the vocabulary alone.
 
 - `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` — a strong ease-out, for anything **entering or exiting** the screen.
 - Plain `ease` — for **hover states and colour changes**. Using the strong curve here makes hovers feel sludgy.
-- A matching `--ease-in-out` exists and is unused. There is no bounce, no spring, no `cubic-bezier` with overshoot anywhere.
+- `--ease-spring` with `--duration-spring` — the system's signature. Origami's bouncy animation at speed 10, bounciness 10 (tension 299.6, friction 20.57): a pop that overshoots by about 10% and settles in 648ms. It's a `linear()` curve drawn over that duration, so the two always travel together; on another duration it is a different spring.
+- `--ease-in-out` — a fade that lasts the whole spring, so a pop can be seen on the way out (a menu closing).
+- No other curve with overshoot, and no other spring.
+
+**The spring — what it's for**
+
+- **Transforms that arrive.** Scale and rotate on the way in: a menu, a tooltip, a toast, the cursor pill, the chart's tooltip, a takeover. A mark appearing: a check and its fill, a radio's dot, a chip's dot. A chevron's turn. A fill moving to its new place: a segmented control's, a switch's thumb, a table row's, a menu option's. A press springing back.
+- **Scale is where it shows.** Things pop by scale: small things from `0`, menus from `0.8`, large surfaces from `0.95`. Fills and discs grow rather than fade in.
+- **The fade goes with it.** A pop's opacity runs on the spring too; opacity stops at 1, so it simply lands sooner.
+- **Never** for size or layout (an accordion's height, a corner's radius, a sheet's geometry), colour, text, hover or focus — those keep `--ease-out` and plain `ease`.
+- **Never for something shrinking to nothing.** A spring to `scale(0)` passes zero and flips the thing over. A tooltip, toast or pill closes on `--ease-out` at `base`: the open state declares the spring, the closed state the ease, and the destination's transition wins. A menu closes to `0.8`, so it pops on the way out too, with its fade on `--ease-in-out` over the spring so the pop is seen.
+- **Where a script waits for a transition**, it reads the element's own transition time rather than a constant, so the spring plays out (see `components/picker/`).
 
 **Patterns**
 
-- **Scale-in from `0`** for small things that pop (pills, tooltips, toasts) with a chosen `transform-origin` — a tooltip grows from the corner you clicked, a toast from the button it confirms.
-- **Scale-in from `0.95`** for large surfaces, paired with opacity.
-- **Press scales down.** A handle under a finger or a held key (a slider thumb, a drag handle) scales to `--scale-press` (0.85) while held: in on `fast`, back on `base`, on `--ease-out`. It's the tactile counterpart to the tooltip's scale-in.
-- **On touch, button-shaped controls press too — just less.** A pill button, an icon button or a chip under a finger scales to `--scale-tap` (0.97) as well as playing its hover response: in at once, back on `base`, on `--ease-out`. Touch only — with a pointer, buttons lift and don't press. Large surfaces never press: the large button, rows, cards and panels keep their lift or ink change. The exception is a thing you pick up to move: a sortable item gives to `--scale-tap` under any pointer, then grows to `--scale-lift` once it's carried (see `components/sortable/`). Nothing presses under reduced motion.
+- **Scale-in from `0`** for small things that pop (pills, tooltips, toasts) with a chosen `transform-origin` — a tooltip grows from the corner you clicked, a toast from the button it confirms. On the spring.
+- **Scale-in from `0.8`** for menus, from the trigger's corner; **from `0.95`** for large surfaces, paired with opacity. On the spring.
+- **Press scales down.** A handle under a finger or a held key (a slider thumb, a drag handle) scales to `--scale-press` (0.85) while held: in on `fast`, back on the spring. It's the tactile counterpart to the tooltip's scale-in.
+- **On touch, button-shaped controls press too — just less.** A pill button, an icon button or a chip under a finger scales to `--scale-tap` (0.97) as well as playing its hover response: in at once, back on the spring. Touch only — with a pointer, buttons lift and don't press. Large surfaces never press: the large button, rows, cards and panels keep their lift or ink change. The exception is a thing you pick up to move: a sortable item gives to `--scale-tap` under any pointer, then grows to `--scale-lift` once it's carried (see `components/sortable/`). Nothing presses under reduced motion.
 - **Blur as a crossfade bridge**: a flat opacity crossfade reads flat however you tune it. A hover reveal is `opacity 0→1` + `scale 1.015→1` + `blur(6px)→0` over `300ms` plain `ease`.
 - **Drop, swap, rise** is how words change in place — a caption, a navigation label, a list's figure after a refresh. The words drop `16` and fade on `base`, change while hidden, then rise back on the same move (`.swap` and `.is-leaving` in `tokens.css`): add `.is-leaving`, wait `--duration-base`, swap the words, force a reflow (`el.offsetWidth`), remove it. Never a crossfade of two strings over each other, never a typewriter.
 - **Clip-path reveals text**, not width: `clip-path: inset(0 100% 0 0)` → `inset(0)` wipes left-to-right and works across wrapped lines.

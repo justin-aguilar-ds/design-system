@@ -1,4 +1,4 @@
-/* personal-styling · stage-sheet · v0.8.0 */
+/* personal-styling · stage-sheet · v0.9.0 */
 
 /* A live canvas and the controls that change it. On a phone, opening the
    controls splits the screen into two surfaces on the ground: the stage
@@ -123,7 +123,7 @@
   color: var(--color-text-secondary);
   translate: 0 -1px;
   transform: rotate(180deg);
-  transition: transform var(--duration-base) var(--ease-out), color var(--duration-fast) ease;
+  transition: transform var(--duration-spring) var(--ease-spring), color var(--duration-fast) ease;   /* CHANGED: the chevron turns on the spring */
 }
 .stage-sheet.is-open .stage-sheet-chevron { transform: none; }
 @media (hover: hover) and (pointer: fine) {
