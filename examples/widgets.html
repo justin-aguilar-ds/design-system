@@ -159,8 +159,10 @@
 
   /* ---- 5 Now playing ---- */
   .np-head { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-16); }
-  .art { width: 64px; height: 64px; border-radius: var(--radius-card); background: var(--color-stage); }
-  .frame-stage .art { background: var(--color-stage); }
+  /* The artwork is content, so it takes the one surface: white, the
+     hairline, the card radius. Empty, it holds a note in the faded ink. */
+  .art { display: grid; place-items: center; width: 64px; height: 64px; border-radius: var(--radius-card); background: var(--color-surface); box-shadow: inset 0 0 0 1px var(--color-hairline); }
+  .art .ico { color: var(--color-text-secondary); }
   .np-times { display: flex; justify-content: space-between; margin-top: var(--space-8); }
   .np-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
   /* Proposed: the bare icon button. No fill at rest; on hover a quiet
@@ -356,6 +358,7 @@ const P = {
   rain: '<path d="M6 12.5h8a3 3 0 0 0 0-6h-.35a4 4 0 0 0-7.3 0H6a3 3 0 0 0 0 6Z"/><path d="M6.5 15.5v2M10 15.5v2M13.5 15.5v2"/>',
   prev: '<path d="M15 5 7 10l8 5V5ZM5 5v10"/>',
   next: '<path d="m5 5 8 5-8 5V5ZM15 5v10"/>',
+  note: '<circle cx="5.5" cy="15" r="2"/><circle cx="14.5" cy="13" r="2"/><path d="M7.5 15V5l9-2v10"/>',
   play: '<path d="M6.5 4.5v11l9-5.5-9-5.5Z"/>',
   pause: '<path d="M7 5v10M13 5v10"/>',
   box: '<path d="m10 2.5 6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5L10 2.5Z"/><path d="M3.5 6.25 10 10l6.5-3.75M10 10v7.5"/>',
@@ -388,7 +391,7 @@ const GAPS = {
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
   chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
   bare: ['A bare icon button', 'An icon button with no circle at rest, for a row of transport controls beside one primary. The icon button has primary and secondary only, so a bare one had no hover at all. Proposed: a quiet grey circle grows behind the icon on hover and press. The text button takes the same fill as a pill (Reset, Show on a map, Comment), where today it only brightens its ink, and so do the stepper’s minus and plus, as a circle 4 inside the pill.'],
-  art: ['A media placeholder on the stage', 'An empty artwork slot is stage grey, so on a stage-grey widget it disappears.'],
+  art: ['A media placeholder on the stage', 'An empty artwork slot in stage grey disappears on a stage-grey widget. Artwork is content, so here it takes the one surface (white, the hairline, the card radius) with a note in the faded ink while empty. The system has no rule yet for an empty media slot that isn’t the stage.'],
 };
 const GAP_IDS = Object.keys(GAPS);
 const gapNo = (id) => `G${GAP_IDS.indexOf(id) + 1}`;
@@ -423,7 +426,7 @@ const WIDGETS = [
   ['trending', 'Trending', 'What people are posting about', ['rank', 'spark'], `
     <ol class="trend">${[['Web Summit', '18.2K posts', [2, 3, 3, 5, 8, 13, 21], '+340%'], ['Porto vs Benfica', '11.9K posts', [5, 4, 6, 9, 7, 12, 15], '+120%'], ['Sintra rail', '4.1K posts', [1, 2, 2, 3, 6, 5, 9], '+88%'], ['Pastel de nata', '2.8K posts', [6, 5, 7, 6, 7, 8, 8], '+12%']].map(([n, sub, v, ch], i) => `<li><span class="rank t-title tnum"${i === 0 ? ' data-gap="rank"' : ''}>${i + 1}</span><div><span class="t-label">${n}</span><span class="t-body">${sub}</span></div><svg class="spark" viewBox="0 0 64 20" aria-hidden="true"${i === 0 ? ' data-gap="spark"' : ''}><path d="${sparkPath(v)}"/></svg><span class="t-label ink-gain tnum">${ch}</span></li>`).join('')}</ol>`],
   ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons', 'bare'], `
-    <div class="np-head"><span class="art" data-gap="art"></span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
+    <div class="np-head"><span class="art" data-gap="art" role="img" aria-label="No artwork">${ico('note')}</span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
     <div data-gap="media">
       <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" type="range" min="0" max="480" value="192" aria-label="Position"></span>
       <div class="np-times"><span class="t-mono">3:12</span><span class="t-mono">−4:48</span></div>
