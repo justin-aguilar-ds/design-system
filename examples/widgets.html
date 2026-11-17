@@ -161,6 +161,30 @@
   .frame-stage .art { background: var(--color-stage); }
   .np-times { display: flex; justify-content: space-between; margin-top: var(--space-8); }
   .np-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+  /* Proposed: the bare icon button. No fill at rest; on hover a quiet
+     grey circle grows from the icon's centre behind it, scale 0 to 1 on
+     --duration-base with --ease-out (it enters), and shrinks away on the
+     same. On touch the same circle plays while the finger is down. */
+  .icon-button--bare { position: relative; isolation: isolate; }
+  .icon-button--bare::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--radius-pill);
+    background: var(--color-fill-quiet);
+    scale: 0;
+    transition: scale var(--duration-base) var(--ease-out), background-color var(--duration-fast) ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .icon-button--bare:hover::before { scale: 1; }
+  }
+  .icon-button--bare:active::before { scale: 1; background: var(--color-fill-quiet-hover); transition-duration: var(--duration-instant); }
+  .icon-button--bare:focus-visible::before { scale: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .icon-button--bare::before { transition: opacity var(--duration-fast) ease; scale: 1; opacity: 0; }
+    .icon-button--bare:is(:hover, :active, :focus-visible)::before { opacity: 1; }
+  }
 
   /* ---- 6 Activity ---- */
   .meter { height: 16px; border-radius: var(--radius-pill); background: var(--color-range-track); overflow: hidden; }
@@ -292,6 +316,7 @@ const GAPS = {
   unread: ['An unread marker', 'A dot that means new. The chip’s dot means on or off, so the same mark would mean two things.'],
   bars: ['A bar chart', 'Values by day or by category. The line chart is the only chart.'],
   chart: ['A chart at widget size', 'The line chart is 240 tall on a phone, set in its script, and its value axis always starts at zero. A balance that moves 10% in a month draws as a flat line across the top of a tall, empty box.'],
+  bare: ['A bare icon button', 'An icon button with no circle at rest, for a row of transport controls beside one primary. The icon button has primary and secondary only, so a bare one had no hover at all. Proposed: a quiet grey circle grows behind the icon on hover and press.'],
   art: ['A media placeholder on the stage', 'An empty artwork slot is stage grey, so on a stage-grey widget it disappears.'],
 };
 const GAP_IDS = Object.keys(GAPS);
@@ -326,16 +351,16 @@ const WIDGETS = [
     </ul>`],
   ['trending', 'Trending', 'What people are posting about', ['rank', 'spark'], `
     <ol class="trend">${[['Web Summit', '18.2K posts', [2, 3, 3, 5, 8, 13, 21], '+340%'], ['Porto vs Benfica', '11.9K posts', [5, 4, 6, 9, 7, 12, 15], '+120%'], ['Sintra rail', '4.1K posts', [1, 2, 2, 3, 6, 5, 9], '+88%'], ['Pastel de nata', '2.8K posts', [6, 5, 7, 6, 7, 8, 8], '+12%']].map(([n, sub, v, ch], i) => `<li><span class="rank t-title tnum"${i === 0 ? ' data-gap="rank"' : ''}>${i + 1}</span><div><span class="t-label">${n}</span><span class="t-body">${sub}</span></div><svg class="spark" viewBox="0 0 64 20" aria-hidden="true"${i === 0 ? ' data-gap="spark"' : ''}><path d="${sparkPath(v)}"/></svg><span class="t-label ink-gain tnum">${ch}</span></li>`).join('')}</ol>`],
-  ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons'], `
+  ['playing', 'Now playing', 'A track, its progress and the controls', ['art', 'media', 'icons', 'bare'], `
     <div class="np-head"><span class="art" data-gap="art"></span><div class="type-pair"><span class="t-label">Weightless</span><span class="t-body">Marconi Union</span></div></div>
     <div data-gap="media">
       <span class="slider"><span class="slider-track" aria-hidden="true"><span class="slider-progress"></span></span><input class="slider-input" type="range" min="0" max="480" value="192" aria-label="Position"></span>
       <div class="np-times"><span class="t-mono">3:12</span><span class="t-mono">−4:48</span></div>
     </div>
     <div class="np-controls">
-      <button class="icon-button" type="button" aria-label="Previous">${ico('prev')}</button>
+      <button class="icon-button icon-button--bare" type="button" aria-label="Previous" data-gap="bare">${ico('prev')}</button>
       <button class="icon-button icon-button--large surface surface--rest surface--pill np-play" type="button" aria-label="Pause" aria-pressed="true">${ico('pause')}</button>
-      <button class="icon-button" type="button" aria-label="Next">${ico('next')}</button>
+      <button class="icon-button icon-button--bare" type="button" aria-label="Next">${ico('next')}</button>
     </div>`],
   ['activity', 'Activity', 'Today against a goal', ['budget', 'meter'], `
     ${pair('Steps today', '7,412', 't-display')}
