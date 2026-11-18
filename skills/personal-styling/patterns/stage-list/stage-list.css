@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.5.0 */
+/* personal-styling · stage-list · v0.6.0 */
 
 /* A view and the records behind it: the stage shows the data, the list
    holds the things it is made of. Pick something on the stage, read it in
@@ -126,18 +126,27 @@
 /* Its content ends clear of the thumb button. */
 .stage-list-detail > * { padding-bottom: calc(var(--space-page-block) + var(--height-slot) + var(--space-page)); }
 
+/* NEW (v0.6): on a phone the ground is the stage's grey, so the stage and
+   what surrounds the inset list are one colour. stage-list.js sets
+   .is-phone, since a container query can't style the container itself. */
+.stage-list.is-phone { background: var(--color-stage); }
+
 /* ================= Phones: the split ================= */
 @container stage-list (max-width: 630px) {
-  /* Closed, the stage is the screen, edge to edge. As the list comes up
-     it draws in a gap from the edges, rounds its corners and gets
-     shorter; the list rises into the room below, a gap apart. Nothing
-     sits on top of anything, so what was picked on the stage stays in
-     view. */
+  /* CHANGED (v0.6): the stage is the screen, edge to edge, open or
+     closed: it never draws in from the sides or rounds its corners, so
+     nothing reads as the page scaling down and no other ground shows
+     around it. Its width never changes. As the list comes up only its
+     bottom rises, and its content moves up with the top row folding away;
+     the list rises into the room below, inset a gap from the edges, on the
+     stage's own grey, so stage and ground are one colour and nothing
+     appears around either. Nothing sits on top of anything, so what was
+     picked on the stage stays in view. */
   .stage-list-stage {
-    --radius-stage: calc(var(--list-open) * var(--radius-card));
-    top: calc(var(--list-open) * var(--list-gap));
-    left: calc(var(--list-open) * var(--list-gap));
-    right: calc(var(--list-open) * var(--list-gap));
+    --radius-stage: 0px;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: calc(var(--list-open) * (var(--list-h) + 2 * var(--list-gap)));
     gap: calc((1 - var(--list-open)) * var(--space-16));
     padding: calc(var(--space-24) - var(--list-open) * var(--space-8)) var(--space-16) var(--space-16);

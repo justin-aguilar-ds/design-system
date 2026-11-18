@@ -14,7 +14,7 @@ Both split a phone screen into two surfaces. They answer different questions.
 |---|---|---|
 | The second surface holds | controls that change the stage | records the stage is made of |
 | You go | sheet → stage: adjust, and watch | stage → list: pick, and read |
-| The ground between them | black: a tool taking the screen over | the page: two cards on it |
+| The ground between them | black: a tool taking the screen over | the stage's grey: the list inset on it, the stage edge to edge |
 | Opened by | the sheet's own pill, which is also its handle | the thumb button, which is also the way back |
 | Its height | yours: drag to resize | fixed, so the same spot always closes it |
 | On a wide screen | a docked card in the corner | a column beside the stage, always open |
@@ -26,8 +26,8 @@ If the second surface holds both, it is a stage and list, and the controls go on
 - **Three depths, and no more.** The stage, the list, and one record's detail. The thumb button walks them one at a time; nothing opens a fourth.
 - **Two surfaces on one line.** On a wide screen the stage is the system's grey ground and the list is the one surface style, side by side, the same top and the same bottom, `8px` apart and `8px` from every edge. The list is always open.
 - **On a phone, the stage is the screen.** Closed, it runs edge to edge with no corner and no gap: the list isn't there until it's asked for.
-- **Opening splits; nothing covers.** As the list comes up the stage draws in `8px` from the edges, rounds its corners and gets shorter, and the list rises into the room below it, `8px` apart. Whatever was picked on the stage is still in view above the list that explains it. A panel laid over the stage is the mistake this pattern exists to avoid.
-- **The ground is the page.** White in light, black in dark, like everything around it. This is a tool's everyday screen, not a mode, so nothing goes dark to make room.
+- **Opening moves the stage up; nothing covers.** As the list comes up the stage stays edge to edge and square, the full width of the screen: only its bottom rises, and its content moves up as the top row folds away. It never draws in from the sides or rounds its corners, which reads as the page scaling down. The list rises into the room below it, inset `8px` from the edges. Whatever was picked on the stage is still in view above the list that explains it. A panel laid over the stage is the mistake this pattern exists to avoid.
+- **On a phone, the ground is the stage's grey.** Around the inset list, and between it and the stage, the ground is `--color-stage`, so the stage and what surrounds the list are one colour: no edge appears, nothing changes colour as the list comes up. Wide, the two surfaces sit on the page. This is a tool's everyday screen, not a mode, so nothing goes dark to make room.
 - **One move.** Every edge of both surfaces comes from one value on one duration (`--duration-deliberate`) and one curve (`--ease-out`). Closing is the same move backwards.
 - **Split, the stage is only its view.** The stage's top row — the figure, the navigation, the controls — folds away above the view on the same move and returns as the list goes down. The view re-fits the height it has; it is never cropped by the list.
 - **Keep what was picked in view.** A view that scrolls inside the shorter stage brings the picked thing back into view through the whole move, not after it.
@@ -50,6 +50,10 @@ If the second surface holds both, it is a stage and list, and the controls go on
 - It fires bubbling `stage-list-toggle` and `stage-list-detail` events, each with `detail.open`. Clear the stage's pick on `stage-list-toggle` when `open` is false.
 - Tune it with `--list-w` (the wide column, `320px`), `--list-h` (the phone list's height, `52cqh`) and `--list-gap` (`8px`) on `.stage-list`.
 - The pattern sizes itself from its own width, not the window's (a container query), so it also works inside a framed demo.
+
+## Changes in v0.6.0
+
+- On a phone the stage stays edge to edge and square as the list opens: only its bottom rises and its content moves up. The list is inset on the stage's grey, so no other ground appears and nothing reads as the page scaling down.
 
 ## Changes in v0.5.0
 

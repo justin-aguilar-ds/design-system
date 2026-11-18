@@ -1,4 +1,4 @@
-/* personal-styling · stage-list · v0.5.0 */
+/* personal-styling · stage-list · v0.6.0 */
 
 // Three depths — the stage, its list, one record's detail — and one thumb
 // button that walks them: with its label it opens the list, as a cross it
@@ -37,6 +37,9 @@ document.querySelectorAll('.stage-list').forEach((root) => {
     thumb.innerHTML = mode === 'open' ? label : STAGE_LIST_ICONS[mode];
     thumb.setAttribute('aria-label', { open: `Open ${label.toLowerCase()}`, close: `Close ${label.toLowerCase()}`, back: 'Back' }[mode]);
     root.classList.toggle('is-open', open);
+    // NEW (v0.6): a phone's ground is the stage's grey (stage-list.css). A
+    // container query can't style the container itself, so the script says.
+    root.classList.toggle('is-phone', phone());
     root.classList.toggle('is-detail', inDetail);
     root.style.setProperty('--list-open', open ? 1 : 0);
     // On a phone a closed list is off the screen; wide, it is always there.
