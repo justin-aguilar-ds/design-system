@@ -336,7 +336,7 @@ rules.
 | Calendar | a value a day, on the dates it happened — which way each day went, and how far | `components/calendar/` |
 | Scroll fade | an area inside the page scrolls — its cut ends dissolve into the ground instead of meeting a line | `components/scroll-fade/` |
 | List row | records with one value each, read down a phone — the name with its value on one line, a sub-line under both, an icon or an avatar leading | `components/list-row/` |
-| Takeover | one thing opened over everything — a record's detail — opaque, with the way back under the thumb | `components/takeover/` |
+| Takeover | one thing opened over everything — a record's detail — opaque, the way back under the thumb on a phone and an X top right on a wide screen | `components/takeover/` |
 | Stage navigation | a stage holds several views — links that name the view each goes to | `components/stage-nav/` |
 
 ### Patterns
@@ -492,7 +492,7 @@ These are the recognisable moves. Reach for them when the context fits; don't fo
 
 - **Custom cursor pill.** `cursor: none` on the target, a small uppercase-mono pill ("Learn more", "Open", "Play") follows the pointer and scales in. Position tracks instantly; only the scale transitions.
 - **Hover means lift or brighten.** Shadow deepens, or secondary text goes to full black. Never a background or colour change — except two fills: the one moving fill (a segmented control's indicator, or a table's row fill, gliding to the thing under the pointer), and the growing fill, a quiet circle or pill that scales up from the centre behind a bare icon button, a text button or a stepper's step — on the spring, shrinking away on the ease.
-- **Opaque full-bleed takeover** instead of a dimmed modal (`components/takeover/`). No click-outside-to-close — the way back under the thumb, and Escape.
+- **Opaque full-bleed takeover** instead of a dimmed modal (`components/takeover/`). No click-outside-to-close — the way back (under the thumb on a phone, an X in the top-right corner on a wide screen), and Escape.
 - **Moving indicator as its own element**, absolutely positioned behind the links rather than a background on the active link, so it can glide between tabs. Hovering a sibling tab retargets it as a preview of where you'd land.
 - **Drag-first input.** Grab cursors, `touch-action: none`, pointer-tracked 1:1 with no transition mid-drag, then snap on release past a distance *or* velocity threshold.
 - Page-to-page uses native cross-document view transitions: dismiss the outgoing snapshot in 1ms, animate only the incoming one, so motion reads as arrival rather than dissolve.

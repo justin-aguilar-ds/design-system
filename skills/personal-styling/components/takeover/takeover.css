@@ -1,4 +1,4 @@
-/* personal-styling · takeover · v0.4.0 */
+/* personal-styling · takeover · v0.5.0 */
 
 /* One thing, opened over everything: a record's detail, a full view of a
    piece. Opaque, in the page's own ground — never a dimmed modal over a
@@ -30,6 +30,9 @@
 /* Contained: it takes over its positioned parent instead of the screen —
    a pattern that is the page, or a framed demo. */
 .takeover--contained { position: absolute; }
+/* NEW (v0.5): it measures its own width, so the way back follows the
+   takeover's size, not the window's — the same when contained. */
+.takeover { container: takeover / inline-size; }
 
 /* Its content is a page that scrolls inside it: the page's inset and
    block, the reading width, ending clear of the way back at the bottom. */
@@ -61,3 +64,29 @@
   justify-content: center;
 }
 .takeover-close svg { width: var(--icon-control); height: var(--icon-control); }
+/* The button holds both marks: the chevron for a phone, the X for a wide
+   screen. Each shows at its width. */
+.takeover-close-x { display: none; }
+
+/* NEW (v0.5): on a wide screen the way back is an X in the top-right
+   corner, the page inset from the top and the right, at an icon button's
+   size (--height-control). There is no thumb to keep it near, and a
+   wide page's close belongs where the eye ends the title's line. The
+   body no longer leaves room at its foot. */
+@container takeover (min-width: 631px) {
+  .takeover-close {
+    left: auto;
+    right: max(var(--space-page), env(safe-area-inset-right, 0px));
+    top: max(var(--space-page), env(safe-area-inset-top, 0px));
+    bottom: auto;
+    translate: none;
+    width: var(--height-control);
+    min-height: var(--height-control);
+    height: var(--height-control);
+  }
+  .takeover-close-back { display: none; }
+  .takeover-close-x { display: block; }
+  .takeover-body {
+    padding-bottom: var(--space-page-block);
+  }
+}

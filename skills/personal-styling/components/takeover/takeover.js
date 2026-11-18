@@ -1,4 +1,4 @@
-/* personal-styling · takeover · v0.4.0 */
+/* personal-styling · takeover · v0.5.0 */
 
 // One thing, opened over everything. A button with data-takeover="<id>"
 // opens the takeover with that id; its .takeover-close, or Escape, closes
