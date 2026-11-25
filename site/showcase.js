@@ -93,9 +93,9 @@ const spark = (seed) => {
 PAGE_RENDER.object = (c) => {
   const picks = [[2, 'Ben Okafor', 'Forward'], [3, 'Chloe Park', 'Centre'], [4, 'Dev Shah', 'Guard'], [5, 'Eli Moreau', 'Guard'], [6, 'Fay Lin', 'Forward']];
   const shown = c === 0 ? picks.slice(2, 3) : picks;
-  // The pick in focus is an expressive hero: the player, large, on bloom.
+  // The pick in focus is an expressive hero: the player, large, on a painted ground chosen at random.
   const card = ([n, name, pos]) => n === 4
-    ? `<div class="m-card is-expressive"><div class="expressive-hero" data-style="stack" data-ground="bloom" data-text="${name}|Pick ${n}|${pos}" aria-hidden="true"></div></div>`
+    ? `<div class="m-card is-expressive"><div class="expressive-hero" data-style="stack" data-text="${name}|Pick ${n}|${pos}" aria-hidden="true"></div></div>`
     : `<div class="m-card is-side"><span class="t-mono">Round 1 · ${pos}</span><div class="m-stack" style="gap: var(--space-8)"><span class="t-display">${n}</span><span class="t-label" style="color: inherit">${name}</span>${spark(n)}</div></div>`;
   return { head: '',
     title: `<h4 class="t-display">Draft night</h4>`,
@@ -106,8 +106,8 @@ PAGE_RENDER.object = (c) => {
 PAGE_RENDER.statement = (c) => {
   const rows = [['2025 champion', 'Chloe Park'], ['2024 champion', 'Dev Shah'], ['2023 champion', 'Chloe Park'], ['2022 champion', 'Ana Ruiz'], ['2021 champion', 'Gus Romero'], ['2020 champion', 'Ben Okafor'], ['2019 champion', 'Hana Ito'], ['2018 champion', 'Fay Lin']].slice(0, [2, 4, 8][c]);
   return { head: '',
-    // The statement on an expressive hero as its ground: the league's own figures, sunk behind it.
-    title: `<header class="expressive-hero expressive-hero--page m-ground" data-style="rise" data-ground="wash" data-text="2014|12 friends|12 seasons"><h4 class="expressive-hero-title t-display">Twelve friends, one league, since 2014.</h4></header>`,
+    // The statement on an expressive hero as its ground (wash or bloom, at random): the league’s own figures, sunk behind it.
+    title: `<header class="expressive-hero expressive-hero--page m-ground" data-style="rise" data-text="2014|12 friends|12 seasons"><h4 class="expressive-hero-title t-display">Twelve friends, one league, since 2014.</h4></header>`,
     support: `<div class="m-list">${rows.map(([y, n]) => `<div class="m-row"><span class="t-mono">${y}</span><span class="t-title">${n}</span></div>`).join('')}</div>`,
     slot: `<button class="button surface surface--rest surface--pill t-label m-big" type="button">Copy invite link</button>`,
   };
@@ -117,7 +117,7 @@ PAGE_RENDER.media = (c) => {
   const Q = ['Blocks and steals now count double, and turnovers cost a point. Big men get a little more valuable; careless guards a little less.', 'Three-pointers made stay at one point, but a made three no longer also counts as a field goal. Shooters lose a point a game on average.', 'The changes were voted in at the end of last season, nine to three. They apply from the draft on.'];
   return { head: '',
     title: `<h4 class="t-display">The 2026 season preview</h4>`,
-    hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media is-expressive"><div class="expressive-hero" data-style="cross" data-ground="bloom" data-palette="Meadow" data-text="2026 season|12 teams|13 rounds|Sunday 8 pm" aria-hidden="true"></div></div><div class="m-prose">${P.slice(0, [1, 2, 3][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
+    hero: `<div class="m-stack" style="gap: var(--m-section)"><div class="m-media is-expressive"><div class="expressive-hero" data-style="cross" data-text="2026 season|12 teams|13 rounds|Sunday 8 pm" aria-hidden="true"></div></div><div class="m-prose">${P.slice(0, [1, 2, 3][c]).map((t) => `<p class="t-body">${t}</p>`).join('')}</div></div>`,
     support: c ? `<div class="m-prose"><h5 class="t-label">Scoring changes</h5>${Q.slice(0, c === 2 ? 3 : 1).map((t) => `<p class="t-body">${t}</p>`).join('')}</div>` : '',
     slot: '' };
 };

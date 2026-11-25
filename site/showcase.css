@@ -138,15 +138,19 @@
 .m-hero-card .m-chart { align-self: end; }
 .is-desktop .m-split.is-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 
-/* The bottom slot, drawn in the screen (the real one is fixed to the window). */
-.m-slot { position: sticky; bottom: var(--m-inset-b); margin-top: auto; padding-top: var(--m-block); /* the page clears the slot by its block, as a real page does */ display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
+/* The bottom slot, drawn in the screen (the real one is fixed to the window).
+   Placed on the screen's bottom edge, not sticky: the screen is scaled with
+   a transform, and iOS Safari measures sticky against the scaled height,
+   which pinned the slot halfway up. The page keeps the slot's room free, its
+   block above it, as a real page does. */
+.m:has(> .m-slot) { padding-bottom: calc(var(--m-block) + var(--height-slot) + var(--m-inset-b)); }
+.m-slot { position: absolute; left: var(--m-inset); right: var(--m-inset); bottom: var(--m-inset-b); display: flex; justify-content: center; gap: var(--space-8); pointer-events: none; }
 .m-slot > * { pointer-events: auto; }
-.m.is-fit .m-slot { margin-top: 0; }
 .m .segmented-option.is-indicated { opacity: 1; background: var(--color-fill-subtle); }
 .m-big { min-height: var(--height-slot); padding: 0 var(--inset-slot); justify-content: center; }
 .is-phone .m-slot .m-big:only-child { flex: 1; }
 .m-pill { display: inline-flex; align-items: center; gap: var(--gap-mark); min-height: var(--height-row); padding: 0 var(--inset-control); border-radius: var(--radius-row); }
-.m-corner { position: sticky; bottom: var(--space-page); margin-top: auto; display: flex; justify-content: flex-end; }
+.m-corner { position: absolute; right: var(--m-inset); bottom: var(--space-page); display: flex; justify-content: flex-end; }
 
 
 /* ---- Showcase overrides. */

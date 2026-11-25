@@ -1,4 +1,4 @@
-/* personal-styling · expressive-hero · v0.5.1 */
+/* personal-styling · expressive-hero · v0.6.0 */
 
 // Draws a page's title, or a title and its values, as large type in slow
 // repeated motion on the hero grey. Every item, the title and each value,
@@ -17,11 +17,13 @@
 //                stack is always tiered
 //   data-values  sans (default) | mono — the values' face; the title is sans
 //   data-ratio   0.25–0.55, the values' size against the title's (0.4)
-//   data-ground  grey (default) | wash | bloom — the flat hero grey, or a
-//                painted field: the hero's two colours (wash), or many
-//                colours (bloom), blurred and drifting under the type
-//   data-palette bloom's palette: Garden (default) | Meadow | Dusk | Harvest | Sea pinks
-//   data-form    bloom's marks: heads (default) | dabs
+//   data-ground  wash | bloom | grey — a painted field in the hero's two
+//                colours (wash), or of many colours (bloom), blurred and
+//                drifting under the type; or the flat hero grey. Left out,
+//                one of wash and bloom is chosen at random. There is no
+//                default: where one look must be fixed, set wash.
+//   data-palette bloom's palette: Garden | Meadow | Dusk | Harvest | Sea pinks (random if left out)
+//   data-form    bloom's marks: heads | dabs (random if left out)
 //   data-ink     bloom's type: white (default) | hero — the hero's ink, if light
 //   data-tempo   1 by default; leave it there
 // Changing any of these redraws the hero. el.expressiveHero.redraw() does
@@ -266,7 +268,11 @@
       node.querySelector(':scope > svg')?.remove();
       if (!W || !H) return;
       const d = node.dataset;
-      const ground = GROUNDS.includes(d.ground) ? d.ground : 'grey';
+      // No ground asked for: one is chosen at random, wash or bloom (and for
+      // bloom a palette and marks), once per hero, kept through its redraws.
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      if (!hero.chance) hero.chance = { ground: pick(['wash', 'bloom']), palette: pick(Object.keys(PALETTES)), form: pick(FORMS) };
+      const ground = GROUNDS.includes(d.ground) ? d.ground : hero.chance.ground;
       const style = STYLES.includes(d.style) ? d.style : 'stack';
       const parts = (d.text ?? '').split('|').map((s) => s.trim()).filter(Boolean);
       if (!parts.length) parts.push(' ');
@@ -296,9 +302,9 @@
         const pairInk = ground === 'bloom' && d.ink === 'hero' && lum(ink) >= 0.45;
         node.style.color = ground === 'bloom' && !pairInk ? white : '';
         const typeHex = toHex(getComputedStyle(node).color);
-        const pal = ground === 'wash' ? washPalette(g, ink) : PALETTES[d.palette] || PALETTES.Garden;
+        const pal = ground === 'wash' ? washPalette(g, ink) : PALETTES[d.palette] || PALETTES[hero.chance.palette];
         const seed = parseInt(d.seed, 10) || hashText((d.text || '') + ground + (d.palette || ''));
-        paintGround(canvas, W, H, Math.min(2, devicePixelRatio || 1), pal, FORMS.includes(d.form) ? d.form : 'heads', seed, typeHex);
+        paintGround(canvas, W, H, Math.min(2, devicePixelRatio || 1), pal, FORMS.includes(d.form) ? d.form : hero.chance.form, seed, typeHex);
         // The more painterly the ground, the more it is blurred: bloom's many
         // colours furthest, so no mark reads as a flower or a petal; the
         // wash's two colours less. Both scale with the stage.

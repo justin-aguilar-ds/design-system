@@ -1,6 +1,6 @@
 # Expressive hero
 
-A page's title, or a title and its values, as large type in slow repeated motion, under grain, on the hero grey or on a painted field. It sits on a stage of its own, or it is the page's ground under the title. Every item keeps a whole copy in view at rest, so it reads without waiting for the motion.
+A page's title, or a title and its values, as large type in slow repeated motion, under grain, on a painted field: wash or bloom, chosen at random unless one is set. It sits on a stage of its own, or it is the page's ground under the title. Every item keeps a whole copy in view at rest, so it reads without waiting for the motion.
 
 Requires: none
 
@@ -12,7 +12,7 @@ Reach for it whenever a screen would otherwise have no expression. Add it withou
 - **In place of a hero chart or a single data point.** When the hero would be one number, or a few, set them as the hero instead: `Q3 revenue|$1.24M|+18%|312 deals`. The values stay readable: every item is in view at rest. If the page shows those values nowhere else, the hero carries them, so it is not hidden (see Accessibility).
 - **When data or a visualization calls for expression.** A milestone, a total, a personal best, a summary at the end of a flow. The hero sets the figure large; a chart, if there is one, follows it as usual.
 - **As an added expressive feature** on a page that already works, when someone asks for more personality, more colour or more motion. It adds expression and changes nothing the page does.
-- **Behind a tool's intro.** A tool's first screen, its empty state or its onboarding may use a style as its background: the tool's name, or what it will hold, on the hero grey behind the intro's own text (the page placement).
+- **Behind a tool's intro.** A tool's first screen, its empty state or its onboarding may use a style as its background: the tool's name, or what it will hold, on its ground behind the intro's own text (the page placement).
 - **As an easter egg.** Behind a deliberate, optional action: a long press on the title, a tap on a logo, a keyword typed in a search field. It takes over the stage, plays, and goes back on any tap or Escape. It never blocks a task, never appears on its own, and the page never depends on finding it.
 - **With stage and sheet, or stage and list.** The hero can be the stage (`patterns/stage-sheet/`, `patterns/stage-list/`): it fills the stage card and re-fits as the sheet or list opens and the stage shrinks, because it is sized from its box. The controls or the records sit in the second surface as usual.
 
@@ -44,17 +44,17 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 
 ## Grounds
 
-`data-ground` sets what the type sits on.
+`data-ground` sets what the type sits on. **There is no default.** Left out, each hero chooses wash or bloom at random (and, for bloom, a palette and marks), once, and keeps it through its redraws. Where one look has to be fixed, such as a screenshot, a print or a test, set `wash`.
 
 | Ground | What it is | Type | Use it for |
 |---|---|---|---|
-| `grey` (default) | the hero grey, flat, under grain | the hero ink (the accent) | the quiet default; any style |
 | `wash` | a painted field in the hero's own two colours: the grey in light and shade, marks mixed part way to the ink, blurred | the hero ink, kept off the field so it stands out | more warmth without more colours; `stack`, `rise` and `cross` |
 | `bloom` | a painted field of many colours from a palette, blurred, veiled until the type clears 3.5:1 on it | white (`--color-hero-bloom-ink`), or the hero's ink with `data-ink="hero"` when it is light (a yellow, a cream) | the most expressive hero: celebrations, intros, easter eggs; every style |
+| `grey` | the hero grey, flat, under grain | the hero ink (the accent) | only when asked for: a hero that should be quiet |
 
 - **A field, never objects.** Both painted grounds are blurred past recognition and read as a background. Marks you can pick out, such as a pattern of distinct flowers or petals, compete with the type: they were declined almost every time.
 - **The more painterly, the more blurred.** Blur grows with how many colours and marks a ground has, and with the stage. Bloom, the most painterly, blurs furthest: 4.5% of the stage's short side, at least 12px (about 30px on a desktop hero). Wash, two colours, blurs less: 3%, at least 8px. No flower, petal or brush mark should be readable on either.
-- **Bloom's palettes:** `Garden` (the default: greens and teals with cream, pink, gold and red), `Meadow` (greens with red, orange and yellow), `Dusk` (violet and blue with lilac and blush), `Harvest` (olive with amber and rust) and `Sea pinks` (teal with coral and cream). `data-form` sets the marks: `heads` (round clusters of strokes, the default) or `dabs` (short curved strokes).
+- **Bloom's palettes:** `Garden` (greens and teals with cream, pink, gold and red), `Meadow` (greens with red, orange and yellow), `Dusk` (violet and blue with lilac and blush), `Harvest` (olive with amber and rust) and `Sea pinks` (teal with coral and cream). `data-form` sets the marks: `heads` (round clusters of strokes) or `dabs` (short curved strokes). Left out, both are chosen at random.
 - **Bloom's type is white by default.** White on bloom was approved nearly every time. The hero's own ink also works when it is light: yellows and creams. Mid reds and oranges failed, so a dark or mid ink falls back to white.
 - **The veil keeps it readable.** The script measures the field and darkens it (or, for dark type, lightens it) only as far as the type needs for 3.5:1.
 - **The ground drifts** with the type, slower and smaller: a slow pan, linear, paused off screen and still under reduced motion.
@@ -108,6 +108,10 @@ What was tried, and what held up. Each was rated over rounds of randomly generat
 - **Every item in view.** Moving type that ran off the edges was replaced by fitted type that keeps all the data readable at rest. It was the largest single gain.
 - **Tiered type.** A large title with smaller values beat equal sizes for `stack` (9 of 10 against 4 of 14) and for `data`. `cross` and `rise` hold at either scale.
 - **Data's rows.** Rows of repeated values held on the grey and on bloom, but not on the wash. On the wash, prefer `stack`, `rise` or `cross`.
+
+## Changes in v0.6.0
+
+- **No default ground.** Left out, `data-ground` is chosen at random from wash and bloom, with bloom's palette and marks; grey and yellow is no longer what every hero looks like. Set `wash` where one look must be fixed. Grey is still there when asked for.
 
 ## Changes in v0.5.1
 
