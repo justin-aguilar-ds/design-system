@@ -27,6 +27,10 @@ From the source site's project carousel.
 - `data-loop` makes it a circle (three items or more). `data-edges="open"` drops the clip and fades the neighbours out. Dispatch `carousel-set` with `detail.step` or `detail.index` to move it from your own controls.
 - Load `tooltip.css` and `tooltip.js` for the cursor pill and the dropped description; without them it's a plain carousel.
 
+## Changes in v0.5.1
+
+- The examples show an expressive hero in each frame (`patterns/expressive-hero/`, `.expressive-hero--fill`): the item's name and figures, on a ground chosen at random.
+
 ## Changes in v0.5.0
 
 - `data-frame="bare"`: no surface, hairline or shadow, for views on a stage.

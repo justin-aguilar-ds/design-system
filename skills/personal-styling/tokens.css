@@ -1,5 +1,5 @@
 /* ============================================================
-   Personal styling tokens — v0.25
+   Personal styling tokens — v0.28
    Extracted from a personal portfolio site, then deliberately tightened.
    Drop this block in verbatim, then build with the tokens.
    Divergences from the source are marked CHANGED / NEW.
@@ -124,6 +124,19 @@ img, video, svg { display: block; max-width: 100%; }
      circle. The quiet fill over the stage, made opaque, so it reads on the
      page and on the stage, and overlapping circles never show through. */
   --color-avatar: #e6e6e6;
+  /* NEW (v0.26): the expressive hero's two colours (patterns/expressive-hero/).
+     A grey ground under grain, and the accent as its ink: the one place the
+     accent is a text colour, and only on this grey. The same in light and
+     dark. A page may change the pair; it is never more than two.
+     CHANGED (v0.27): a mid grey, the system's own grey ink (was #3a3a3a,
+     too dark for the grain to show). The accent clears 3:1 on it, enough
+     for type this large and no smaller. */
+  --color-hero: #808080;
+  --color-hero-ink: var(--color-accent);
+  /* NEW (v0.28): the type on the expressive hero's bloom ground, a field
+     of many colours. White, the same in light and dark: the ground is
+     veiled until white clears 3.5:1 on it. */
+  --color-hero-bloom-ink: #ffffff;
 
   /* TYPE — two families */
   --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -152,6 +165,10 @@ img, video, svg { display: block; max-width: 100%; }
   --duration-slow: 800ms;       /* full-surface takeovers */
   --duration-carousel: 1200ms;  /* NEW (v0.9): the main object settling — listed in the rules, missing until now */
   --duration-instant: 0ms;      /* NEW (v0.7): a press — the response lands with the finger */
+  /* NEW (v0.26): drift — one loop of an expressive hero's motion: a row
+     crossing the stage once. Linear, because it neither arrives nor leaves;
+     slow, because it is decoration. Read by expressive-hero.js. */
+  --duration-drift: 40000ms;
   /* NEW (v0.5): the tooltip's two beats, from the source site. */
   --duration-pop: 350ms;        /* a small surface scaling in from its origin */
   --duration-reveal: 550ms;     /* clip-path text wipe, after the pop */

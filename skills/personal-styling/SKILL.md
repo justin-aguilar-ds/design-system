@@ -78,6 +78,7 @@ Effectively monochrome. The palette is a ground, a text colour, a half-strength 
 - **The accent is for attention, not state.** The whole budget is three things: a value that needs the reader's eye (`.flag`), the text they have selected (`::selection`), and the single point under the pointer on a chart. That's it.
 - **A selected tab, a current nav item, a pressed segment are state** — they take `--color-fill-subtle`. Selection is structure; the accent is emphasis. Painting every active control with it is the mistake, and it's an easy one: the controls are the things you notice building a page, so they're the first place the colour lands.
 - Always a *fill* under black text. Never a text colour on the ground (yellow on white is unreadable), never a data series, never decoration. Anything sitting on it takes `--color-accent-ink`.
+- **The one exception is the expressive hero** (`patterns/expressive-hero/`): there the accent is the ink, on the hero's grey and its wash (`--color-hero`) and nowhere else. It is the page's decoration, not an emphasis, so it sits outside the accent's budget; the rest of the page still spends it as usual.
 - **One grey ink, solid.** `--color-text-secondary` is `#808080`: 50% black on white, made opaque, and the same value in dark. Text and marks share it. It is solid so an icon's crossing strokes never stack darker; never draw a grey mark in black at an opacity.
 - **Media is content, so an empty media slot is the surface**: white, the hairline, the card radius, with a glyph in the grey ink while it waits. Never stage grey, which disappears when the slot sits on a stage.
 - **Quiet data takes a solid grey.** The background series in a chart are `--color-series`, never black at an opacity: translucent lines stack darker where they cross. The one in focus is full ink.
@@ -171,6 +172,7 @@ When two pieces of text need a hierarchy, take a pairing from `patterns/type-pai
 - **Tracking is negative only where the size earns it.** Everything 16px and under sits at `-0.1px` — Label, Interactive, Body and Caption alike. Display takes `-1px` at 56px, Title `-0.6px` at 32px. Positive `0.3px` on uppercase mono.
 - Don't give a label tighter tracking than the body text beside it. At interface sizes the source's `-0.25px` reads cramped, and a mismatch between a title and its own paragraph is just a defect.
 - **Line-heights are px, and tight**: `16/19` (≈1.19), `14/18`, `56/64`. Not 1.5, not 1.6. Only mono uses a ratio (1.5).
+- **Display type stops at 56px — except in an expressive hero**, where the type is a drawing sized from its stage: the title in the display family at 500, its values smaller or the same size (`patterns/expressive-hero/`). It never sets the size of anything else.
 - **Flat hierarchy on purpose.** The intro paragraph and the career-timeline company names are the *same* 56px — there is no size step between them. Prefer flattening to adding a tier.
 - **Controls take the display family, never mono.** Two steps: **Label** (16/19, 600) for a primary action, **Interactive** (14/18, 600) for compact controls — segments, tabs, card actions. Two deliberate exceptions: a control panel's title and field labels, and stage navigation's links (`components/stage-nav/`). Both use the mono label style, so they read as quiet names and what they control carries the weight.
 - **Mono is for values and identifiers, and nothing else**: a figure in a table, a tick on an axis, a timestamp, an ID, a hex code, a year range. Uppercase, `+0.3px`, secondary, 10.5px, weight 500. **Table content defaults to 10.5 mono** — tables do not inherit font sizes for mono; every data cell is 10.5 mono (see `components/table/`). Weight is always 500.
@@ -231,6 +233,7 @@ How a screen is arranged. Decide it before any styling.
   - **a statement** — the title is the hero, and a list or details follow;
   - **media with its text**, one block, the text `48` below the media;
   - **the main view in a card** — a chart, a week — about 60% of the screen tall, its numbers after it.
+- **No page goes without a hero.** Where a page would have none, or only a bare title or statement, add an expressive hero (`patterns/expressive-hero/`) without being asked: the title, or a title and its values, set large in slow repeated motion on a painted ground (wash or bloom, chosen at random unless set), every item in view at rest. It sits on a stage under the title, or it is the ground of the first screen with the title on it (which sets the stage rules aside for that screen). It also stands in for a hero chart or a single data point. It adds expression when a page, a figure or a tool's intro calls for it, and it can be an easter egg behind an optional action, or the stage of stage and sheet or stage and list. Its words are the page's own: never a subtitle, a summary or a description of the app. When and how: the pattern's README.
 - **Top is the default composition.** The title at the top, the hero right under it at the gap. With little content, the rest is anchored to the bottom — above the bottom slot when there is one — and the room sits between; with a lot, the rest follows at the gap and the page scrolls. Centre (the hero midway) and Bottom (the hero down with its support) are only for a single object that should float.
 - **The hero is sized from the screen**, not a fixed number: a share of its width or height (a card about two-thirds of the width, media at the column's full width, a chart card about 60% of the screen tall), so it fills a phone and a desktop alike.
 - **A tool is dense from the top.** No composition and no room: the title, then everything at the gap, read from the top. Figures, charts and tables; the controls docked to the corner (`patterns/control-panel/`); two columns on a wide screen where the content allows; full width.
@@ -356,6 +359,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Bottom slot | something pinned to the bottom of the screen — the page nav, the main action, or the nav docked beside one action or one select | `patterns/bottom-slot/` |
 | Stage and sheet | a phone tool whose controls change something you need to watch — the controls split the screen instead of covering it | `patterns/stage-sheet/` |
 | Stage and list | a view and the records behind it — pick on the stage, read in a list that rises beside it, with one thumb button to open, close and go back | `patterns/stage-list/` |
+| Expressive hero | a page has no hero, or wants expression — the title and its values as large type in slow repeated motion, every item in view at rest, on a painted ground (wash or bloom, at random unless set; grey on request); in place of a missing hero, a hero chart or data point, behind a tool's intro, as an easter egg, or as the stage of stage and sheet or stage and list | `patterns/expressive-hero/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the
@@ -420,6 +424,7 @@ the values and leave the vocabulary alone.
 | slow | `800ms` | full-surface takeovers, cross-page transitions |
 | carousel | `1200ms` | the main draggable object settling (`--duration-carousel`, `patterns/carousel/`) |
 | spring | `648ms` | the spring's settle (`--duration-spring`) — only ever with `--ease-spring` |
+| drift | `40000ms` | one loop of an expressive hero's motion (`--duration-drift`): a row crossing the stage. Linear, forever, decoration only |
 
 **Duration follows density, not component.** The same motion runs at different speeds depending on how often the pointer crosses its targets. A fill gliding between two or three large options — the page nav, a segmented control — takes `deliberate`: it moves rarely, and the pause reads as care. The same fill gliding between dense, repeated targets — table rows, list items — steps down to `base`, because at 450ms it trails a pointer sweeping down a column. Step down one token; never invent a value in between.
 
@@ -430,6 +435,7 @@ the values and leave the vocabulary alone.
 - `--ease-spring` with `--duration-spring` — the system's signature. Origami's bouncy animation at speed 10, bounciness 10 (tension 299.6, friction 20.57): a pop that overshoots by about 10% and settles in 648ms. It's a `linear()` curve drawn over that duration, so the two always travel together; on another duration it is a different spring.
 - `--ease-in-out` — a closing fade that holds, then goes, so a pop is seen on the way out (a menu closing).
 - No other curve with overshoot, and no other spring.
+- **Drift is linear.** An expressive hero's loop neither arrives nor leaves, so it takes no curve: a straight line at the pace of `--duration-drift`, paused off screen and still under reduced motion. Nothing else in the system loops.
 
 **The spring — what it's for**
 
