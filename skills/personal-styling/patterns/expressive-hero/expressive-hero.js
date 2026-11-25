@@ -1,4 +1,4 @@
-/* personal-styling · expressive-hero · v0.5.0 */
+/* personal-styling · expressive-hero · v0.5.1 */
 
 // Draws a page's title, or a title and its values, as large type in slow
 // repeated motion on the hero grey. Every item, the title and each value,
@@ -299,7 +299,11 @@
         const pal = ground === 'wash' ? washPalette(g, ink) : PALETTES[d.palette] || PALETTES.Garden;
         const seed = parseInt(d.seed, 10) || hashText((d.text || '') + ground + (d.palette || ''));
         paintGround(canvas, W, H, Math.min(2, devicePixelRatio || 1), pal, FORMS.includes(d.form) ? d.form : 'heads', seed, typeHex);
-        const blur = Math.max(6, 12 * Math.min(1, Math.min(W, H) / 700));
+        // The more painterly the ground, the more it is blurred: bloom's many
+        // colours furthest, so no mark reads as a flower or a petal; the
+        // wash's two colours less. Both scale with the stage.
+        const S = Math.min(W, H);
+        const blur = ground === 'bloom' ? Math.max(12, S * 0.045) : Math.max(8, S * 0.03);
         canvas.style.filter = `blur(${blur.toFixed(1)}px)`;
       }
       const pad = canvas ? 1 + (parseFloat(canvas.style.filter.slice(5)) * 4) / W + 0.04 : 1;

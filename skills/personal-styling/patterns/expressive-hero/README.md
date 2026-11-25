@@ -52,7 +52,8 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 | `wash` | a painted field in the hero's own two colours: the grey in light and shade, marks mixed part way to the ink, blurred | the hero ink, kept off the field so it stands out | more warmth without more colours; `stack`, `rise` and `cross` |
 | `bloom` | a painted field of many colours from a palette, blurred, veiled until the type clears 3.5:1 on it | white (`--color-hero-bloom-ink`), or the hero's ink with `data-ink="hero"` when it is light (a yellow, a cream) | the most expressive hero: celebrations, intros, easter eggs; every style |
 
-- **A field, never objects.** Both painted grounds are blurred past recognition (6–12px, smaller on a small stage) and read as a background. Marks you can pick out, such as a pattern of distinct flowers, compete with the type: they were declined almost every time.
+- **A field, never objects.** Both painted grounds are blurred past recognition and read as a background. Marks you can pick out, such as a pattern of distinct flowers or petals, compete with the type: they were declined almost every time.
+- **The more painterly, the more blurred.** Blur grows with how many colours and marks a ground has, and with the stage. Bloom, the most painterly, blurs furthest: 4.5% of the stage's short side, at least 12px (about 30px on a desktop hero). Wash, two colours, blurs less: 3%, at least 8px. No flower, petal or brush mark should be readable on either.
 - **Bloom's palettes:** `Garden` (the default: greens and teals with cream, pink, gold and red), `Meadow` (greens with red, orange and yellow), `Dusk` (violet and blue with lilac and blush), `Harvest` (olive with amber and rust) and `Sea pinks` (teal with coral and cream). `data-form` sets the marks: `heads` (round clusters of strokes, the default) or `dabs` (short curved strokes).
 - **Bloom's type is white by default.** White on bloom was approved nearly every time. The hero's own ink also works when it is light: yellows and creams. Mid reds and oranges failed, so a dark or mid ink falls back to white.
 - **The veil keeps it readable.** The script measures the field and darkens it (or, for dark type, lightens it) only as far as the type needs for 3.5:1.
@@ -100,7 +101,7 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 What was tried, and what held up. Each was rated over rounds of randomly generated heroes, with varied titles and data and no steering from the ratings.
 
 - **Fields, not patterns.** A ground of distinct, recognisable flowers was tried at length: crisp and soft, sparse and dense, with depth, in tones. It was approved about 5% of the time. Blurred, painted fields were approved 75–85% of the time. The ground's job is to be a background.
-- **Blur at 6px and up.** Below about 6px, the fields read as marks and lost.
+- **Blur at 6px and up, and more as the ground gets more painterly.** Below about 6px, the fields read as marks and lost. A bloom blurred only as much as a wash still showed distinct flowers and petals, so bloom blurs furthest.
 - **White type on many colours.** Bloom with white type was approved about 87% of the time, against about 63% for type taken from a colour pair. Only light inks (yellows and creams) held.
 - **The house colours.** On the grey and the wash, pairs with high contrast (6:1 and up) and a warm colour on one side held best: yellow, orange and red against black, navy or cream. Cyan, purple and white grounds did poorly.
 - **Slow and blurred.** A tempo under 1 and a soft ground were preferred throughout.
@@ -108,9 +109,13 @@ What was tried, and what held up. Each was rated over rounds of randomly generat
 - **Tiered type.** A large title with smaller values beat equal sizes for `stack` (9 of 10 against 4 of 14) and for `data`. `cross` and `rise` hold at either scale.
 - **Data's rows.** Rows of repeated values held on the grey and on bloom, but not on the wash. On the wash, prefer `stack`, `rise` or `cross`.
 
+## Changes in v0.5.1
+
+- **The more painterly, the more blurred.** Bloom blurs furthest (4.5% of the stage's short side, at least 12px) and wash less (3%, at least 8px), so no flower, petal or mark reads on either.
+
 ## Changes in v0.5.0
 
-- **Grounds.** `data-ground`: `grey` (the default), `wash` (the hero's two colours, painted and blurred) and `bloom` (many colours, white type, veiled to 3.5:1), with `data-palette`, `data-form` and `data-ink`. Tokens v0.28 adds `--color-hero-bloom-ink`.
+- **Grounds.** Blur scales with how painterly the ground is: bloom furthest, wash less. `data-ground`: `grey` (the default), `wash` (the hero's two colours, painted and blurred) and `bloom` (many colours, white type, veiled to 3.5:1), with `data-palette`, `data-form` and `data-ink`. Tokens v0.28 adds `--color-hero-bloom-ink`.
 - **Decisions.** What the grounds and the type rules rest on.
 
 ## Changes in v0.4.0
