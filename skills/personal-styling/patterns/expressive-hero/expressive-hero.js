@@ -1,4 +1,4 @@
-/* personal-styling · expressive-hero · v0.6.0 */
+/* personal-styling · expressive-hero · v0.7.0 */
 
 // Draws a page's title, or a title and its values, as large type in slow
 // repeated motion on the hero grey. Every item, the title and each value,

@@ -90,7 +90,7 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 
 - On a stage: `<div class="expressive-hero" data-style="stack" data-text="Weekend|Sat 14|Sunny|3 plans" aria-hidden="true"></div>`, right under the page's title, at the gap.
 - As the page's ground: `<header class="expressive-hero expressive-hero--page" data-style="data" data-text="Weekend|Sat 14|Sunny"><h1 class="expressive-hero-title t-display">Weekend</h1></header>`, as the first thing on the page.
-- As a stage of stage and sheet: put the hero inside `.stage-sheet-stage`, filling it (`min-height: 0; height: 100%`). It redraws on every resize, so it re-fits as the stage shrinks.
+- Filling a box (`.expressive-hero--fill`): a carousel's frame, the stage of stage and sheet, the view of stage and list. The box gives the shape and clips; the hero fills it with no radius or shadow of its own. It redraws on every resize, so it re-fits as the stage shrinks or the list opens.
 - `data-style`, `data-text`, `data-scale`, `data-values` and `data-ratio` set it. Changing any of them redraws it, and so does a resize. `el.expressiveHero.redraw()` forces one.
 - `data-tempo` scales the speed; leave it at 1.
 - `data-ground`, `data-palette`, `data-form` and `data-ink` set the ground (see Grounds).
@@ -108,6 +108,10 @@ What was tried, and what held up. Each was rated over rounds of randomly generat
 - **Every item in view.** Moving type that ran off the edges was replaced by fitted type that keeps all the data readable at rest. It was the largest single gain.
 - **Tiered type.** A large title with smaller values beat equal sizes for `stack` (9 of 10 against 4 of 14) and for `data`. `cross` and `rise` hold at either scale.
 - **Data's rows.** Rows of repeated values held on the grey and on bloom, but not on the wash. On the wash, prefer `stack`, `rise` or `cross`.
+
+## Changes in v0.7.0
+
+- `.expressive-hero--fill`: the hero fills a box it is put in (a carousel frame, a stage). The carousel and both stage patterns now show one in their examples.
 
 ## Changes in v0.6.0
 

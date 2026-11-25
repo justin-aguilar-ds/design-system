@@ -39,6 +39,10 @@ From building a typography tool on a phone: the docked control panel covered the
 - The stage takes the page colour, so it always stands out from the ground: a white stage on black in light, a black stage on white in dark. Content that paints its own background (a poster canvas set to white, say) can match the ground in dark mode, and then the stage's edge disappears and only the sheet shows the split. Undecided: give the stage a hairline when its content matches the ground, or accept it.
 
 
+## Changes in v0.9.1
+
+- The example's stage is an expressive hero (`.expressive-hero--fill`): it re-fits as the sheet opens and the stage shrinks.
+
 ## Changes in v0.9.0
 
 - The chevron turns on the spring.

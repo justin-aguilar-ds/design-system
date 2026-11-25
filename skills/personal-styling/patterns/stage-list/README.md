@@ -51,6 +51,10 @@ If the second surface holds both, it is a stage and list, and the controls go on
 - Tune it with `--list-w` (the wide column, `320px`), `--list-h` (the phone list's height, `52cqh`) and `--list-gap` (`8px`) on `.stage-list`.
 - The pattern sizes itself from its own width, not the window's (a container query), so it also works inside a framed demo.
 
+## Changes in v0.6.1
+
+- The example's view is an expressive hero (`.expressive-hero--fill`): it re-fits as the list rises.
+
 ## Changes in v0.6.0
 
 - On a phone the stage stays edge to edge and square as the list opens: only its bottom rises and its content moves up. The list is inset on the stage's grey, so no other ground appears and nothing reads as the page scaling down.
