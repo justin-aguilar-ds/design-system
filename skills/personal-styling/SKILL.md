@@ -359,7 +359,7 @@ For a tool, reach for the patterns first, then fill them with components.
 | Bottom slot | something pinned to the bottom of the screen — the page nav, the main action, or the nav docked beside one action or one select | `patterns/bottom-slot/` |
 | Stage and sheet | a phone tool whose controls change something you need to watch — the controls split the screen instead of covering it | `patterns/stage-sheet/` |
 | Stage and list | a view and the records behind it — pick on the stage, read in a list that rises beside it, with one thumb button to open, close and go back | `patterns/stage-list/` |
-| Expressive hero | a page has no hero, or wants expression — the title and its values as large type in slow repeated motion, every item in view at rest; in place of a missing hero, a hero chart or data point, behind a tool's intro, as an easter egg, or as the stage of stage and sheet or stage and list | `patterns/expressive-hero/` |
+| Expressive hero | a page has no hero, or wants expression — the title and its values as large type in slow repeated motion, every item in view at rest, on the hero grey or a painted ground (wash, bloom); in place of a missing hero, a hero chart or data point, behind a tool's intro, as an easter egg, or as the stage of stage and sheet or stage and list | `patterns/expressive-hero/` |
 
 The sections below cover components not yet in the library. When one is
 built, its section moves into that component's `README.md` and it joins the

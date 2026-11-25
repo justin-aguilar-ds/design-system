@@ -1,6 +1,6 @@
 # Expressive hero
 
-A page's title, or a title and its values, as large type in slow repeated motion, in two colours under grain. It sits on a stage of its own, or it is the page's ground under the title. Every item keeps a whole copy in view at rest, so it reads without waiting for the motion.
+A page's title, or a title and its values, as large type in slow repeated motion, under grain, on the hero grey or on a painted field. It sits on a stage of its own, or it is the page's ground under the title. Every item keeps a whole copy in view at rest, so it reads without waiting for the motion.
 
 Requires: none
 
@@ -42,6 +42,23 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 | `rise` | the title and values stacked, centred, the column climbing slowly | a long title; a short list read top to bottom |
 | `cross` | the title and values as lines tilted 8°, each the other way to the one above (a zigzag), climbing | a title and two to four short values; the most expressive |
 
+## Grounds
+
+`data-ground` sets what the type sits on.
+
+| Ground | What it is | Type | Use it for |
+|---|---|---|---|
+| `grey` (default) | the hero grey, flat, under grain | the hero ink (the accent) | the quiet default; any style |
+| `wash` | a painted field in the hero's own two colours: the grey in light and shade, marks mixed part way to the ink, blurred | the hero ink, kept off the field so it stands out | more warmth without more colours; `stack`, `rise` and `cross` |
+| `bloom` | a painted field of many colours from a palette, blurred, veiled until the type clears 3.5:1 on it | white (`--color-hero-bloom-ink`), or the hero's ink with `data-ink="hero"` when it is light (a yellow, a cream) | the most expressive hero: celebrations, intros, easter eggs; every style |
+
+- **A field, never objects.** Both painted grounds are blurred past recognition (6–12px, smaller on a small stage) and read as a background. Marks you can pick out, such as a pattern of distinct flowers, compete with the type: they were declined almost every time.
+- **Bloom's palettes:** `Garden` (the default: greens and teals with cream, pink, gold and red), `Meadow` (greens with red, orange and yellow), `Dusk` (violet and blue with lilac and blush), `Harvest` (olive with amber and rust) and `Sea pinks` (teal with coral and cream). `data-form` sets the marks: `heads` (round clusters of strokes, the default) or `dabs` (short curved strokes).
+- **Bloom's type is white by default.** White on bloom was approved nearly every time. The hero's own ink also works when it is light: yellows and creams. Mid reds and oranges failed, so a dark or mid ink falls back to white.
+- **The veil keeps it readable.** The script measures the field and darkens it (or, for dark type, lightens it) only as far as the type needs for 3.5:1.
+- **The ground drifts** with the type, slower and smaller: a slow pan, linear, paused off screen and still under reduced motion.
+- **Wash keeps sans values,** except in `rise`: mono over the painted two-colour field read as noise.
+
 ## Type
 
 - **Tiered by default.** The title is set large and the values smaller (`data-ratio`, 0.25–0.55 of the title, 0.4 by default). This keeps the title a title and lets long data fit without shrinking everything.
@@ -57,8 +74,8 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 ## Rules
 
 - **The words are informational.** The title as it is, and values as the page shows them: `Weekend`, `06:40`, `3–1`, `Sat 14`, `$1.24M`. No adjectives, no claims, no emoji, no punctuation added for effect. In `data-text`, a `|` separates the title from each value.
-- **Two colours, no more.** The hero grey (`--color-hero`, the system's grey ink) and its ink (`--color-hero-ink`, the accent). This is the one place the accent is a text colour, and only on the hero grey, never on white, where it can't be read. It clears 3:1 on the grey, which is enough for type this large, so the values never go below the size the script gives them. A page may set its own pair through the two tokens; it is still two. Sinking the type in the page placement is opacity, not a third colour.
-- **Grain is always on.** Fractal noise over the ground and the type, blended so it textures without adding a colour. `--hero-grain` sets its strength (0.9 by default).
+- **Two colours on the grey and the wash.** The hero grey (`--color-hero`, the system's grey ink) and its ink (`--color-hero-ink`, the accent). Bloom is the one ground with many colours, and its type is white or one light ink. This is the one place the accent is a text colour, and only on the hero grey, never on white, where it can't be read. It clears 3:1 on the grey, which is enough for type this large, so the values never go below the size the script gives them. A page may set its own pair through the two tokens; it is still two. Sinking the type in the page placement is opacity, not a third colour.
+- **Grain is always on,** on every ground. Fractal noise over the ground and the type, blended so it textures without adding a colour. `--hero-grain` sets its strength (0.9 by default).
 - **Slow, repeated, linear.** Motion loops forever at the pace of `--duration-drift` (40s for a row to cross the stage), on a straight line. The drift neither arrives nor leaves, so it takes no curve and never the spring. Nothing depends on the motion: under reduced motion the hero is drawn once and holds still, and it reads the same. Off screen or in a background tab, it pauses.
 - **Nothing sits on it** except, in the page placement, the title, or a tool intro's own text and action. No buttons over the moving type, no captions, no values printed over it.
 
@@ -75,7 +92,26 @@ The page placement overrides the stage rules for that screen: the hero is the pa
 - As a stage of stage and sheet: put the hero inside `.stage-sheet-stage`, filling it (`min-height: 0; height: 100%`). It redraws on every resize, so it re-fits as the stage shrinks.
 - `data-style`, `data-text`, `data-scale`, `data-values` and `data-ratio` set it. Changing any of them redraws it, and so does a resize. `el.expressiveHero.redraw()` forces one.
 - `data-tempo` scales the speed; leave it at 1.
-- Load `expressive-hero.css` and `expressive-hero.js`. Needs `tokens.css` v0.27 (`--color-hero`, `--color-hero-ink`, `--duration-drift`).
+- `data-ground`, `data-palette`, `data-form` and `data-ink` set the ground (see Grounds).
+- Load `expressive-hero.css` and `expressive-hero.js`. Needs `tokens.css` v0.28 (`--color-hero`, `--color-hero-ink`, `--color-hero-bloom-ink`, `--duration-drift`).
+
+## Decisions
+
+What was tried, and what held up. Each was rated over rounds of randomly generated heroes, with varied titles and data and no steering from the ratings.
+
+- **Fields, not patterns.** A ground of distinct, recognisable flowers was tried at length: crisp and soft, sparse and dense, with depth, in tones. It was approved about 5% of the time. Blurred, painted fields were approved 75–85% of the time. The ground's job is to be a background.
+- **Blur at 6px and up.** Below about 6px, the fields read as marks and lost.
+- **White type on many colours.** Bloom with white type was approved about 87% of the time, against about 63% for type taken from a colour pair. Only light inks (yellows and creams) held.
+- **The house colours.** On the grey and the wash, pairs with high contrast (6:1 and up) and a warm colour on one side held best: yellow, orange and red against black, navy or cream. Cyan, purple and white grounds did poorly.
+- **Slow and blurred.** A tempo under 1 and a soft ground were preferred throughout.
+- **Every item in view.** Moving type that ran off the edges was replaced by fitted type that keeps all the data readable at rest. It was the largest single gain.
+- **Tiered type.** A large title with smaller values beat equal sizes for `stack` (9 of 10 against 4 of 14) and for `data`. `cross` and `rise` hold at either scale.
+- **Data's rows.** Rows of repeated values held on the grey and on bloom, but not on the wash. On the wash, prefer `stack`, `rise` or `cross`.
+
+## Changes in v0.5.0
+
+- **Grounds.** `data-ground`: `grey` (the default), `wash` (the hero's two colours, painted and blurred) and `bloom` (many colours, white type, veiled to 3.5:1), with `data-palette`, `data-form` and `data-ink`. Tokens v0.28 adds `--color-hero-bloom-ink`.
+- **Decisions.** What the grounds and the type rules rest on.
 
 ## Changes in v0.4.0
 

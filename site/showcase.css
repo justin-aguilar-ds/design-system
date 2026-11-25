@@ -30,6 +30,8 @@
 /* The steps: anchored to the bottom (the room sits above them). */
 .showcase-steps { margin-top: auto; display: grid; justify-items: center; gap: var(--space-16); text-align: center; }
 .showcase-steps .segmented-option { padding-inline: calc(var(--inset-control) - var(--inset-fill)); }
+/* Six steps on a phone: the options tighten so the row fits the column. */
+@media (max-width: 430px) { .showcase-steps .segmented-option { padding-inline: var(--space-8); } }
 .showcase-scale { display: grid; gap: var(--space-8); }   /* the ends sit under the control, as wide as it */
 .showcase-ends { display: flex; justify-content: space-between; padding-inline: var(--space-16); }
 

@@ -14,8 +14,10 @@ const REG = [
     things: 'Intro, docked panel, figures, chart, table', hero: 'The data itself',
     carries: [['Space', '48 between groups, like a page; the table at its tightest'], ['Layout', 'Two columns on a wide screen; the panel docked to the corner'], ['Interaction', 'The same hover, tooltip and timing as a page']] },
 ];
-// Page's three heroes: the same register, the same composition.
+// Page's heroes: the same register, the same composition.
 const PAGE_HERO = {
+  expressive: { things: 'A title, the expressive hero, the nav', hero: 'The page’s own title and values, large, in slow motion on a painted ground',
+    carries: [['Layout', 'The hero right under the title, in the place of a statement'], ['Type', 'The title large, the values smaller, every one in view'], ['Motion', 'Slow, linear, forever: decoration that still reads at rest']] },
   object: { things: 'A title, the object, a caption, the nav', hero: 'An object to look at or play with, sized from the screen',
     carries: [['Layout', 'The object right under the title; the caption at the bottom'], ['Words', 'Few: the object carries the page'], ['Motion', 'The object is picked up and carried, never tilted on hover']] },
   statement: { things: 'A statement, a list, one action', hero: 'The statement itself, in display type',
@@ -71,8 +73,9 @@ const RENDER = [
 ];
 
 
-// The five steps: four heroes of a page, then a tool.
+// The six steps: five heroes of a page, the most expressive first, then a tool.
 const STEPS = [
+  { r: 0, hero: 'expressive' },
   { r: 0, hero: 'object' },
   { r: 0, hero: 'statement' },
   { r: 0, hero: 'media' },
@@ -88,6 +91,10 @@ const spark = (seed) => {
   const pts = v.map((n, i) => [(i * 168) / (N - 1), 36 - ((n - min) / (max - min || 1)) * 30]);
   return `<svg class="m-wave" viewBox="0 0 168 40" aria-hidden="true"><path d="${lineChartPath(pts, true)}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 };
+PAGE_RENDER.expressive = () => ({ head: '',
+  title: `<h4 class="t-display">Playoffs</h4>`,
+  hero: `<div class="expressive-hero" data-style="cross" data-ground="bloom" data-text="Playoffs|Mar 14|6 teams|Round 1" aria-hidden="true" style="min-height: 52cqh"></div>`,
+  slot: nav('Bracket', 'Schedule', 0) });
 PAGE_RENDER.object = (c) => {
   const picks = [[2, 'Ben Okafor', 'Forward'], [3, 'Chloe Park', 'Centre'], [4, 'Dev Shah', 'Guard'], [5, 'Eli Moreau', 'Guard'], [6, 'Fay Lin', 'Forward']];
   const shown = c === 0 ? picks.slice(2, 3) : picks;

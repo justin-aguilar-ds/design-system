@@ -1,4 +1,4 @@
-/* personal-styling · expressive-hero · v0.4.0 */
+/* personal-styling · expressive-hero · v0.5.0 */
 
 // Draws a page's title, or a title and its values, as large type in slow
 // repeated motion on the hero grey. Every item, the title and each value,
@@ -17,6 +17,12 @@
 //                stack is always tiered
 //   data-values  sans (default) | mono — the values' face; the title is sans
 //   data-ratio   0.25–0.55, the values' size against the title's (0.4)
+//   data-ground  grey (default) | wash | bloom — the flat hero grey, or a
+//                painted field: the hero's two colours (wash), or many
+//                colours (bloom), blurred and drifting under the type
+//   data-palette bloom's palette: Garden (default) | Meadow | Dusk | Harvest | Sea pinks
+//   data-form    bloom's marks: heads (default) | dabs
+//   data-ink     bloom's type: white (default) | hero — the hero's ink, if light
 //   data-tempo   1 by default; leave it there
 // Changing any of these redraws the hero. el.expressiveHero.redraw() does
 // too; el.expressiveHero.coverage() gives the share of items whole in view.
@@ -134,6 +140,78 @@
     return sizes.map((s) => s * k);
   }
 
+  // ---- Grounds. grey: the hero grey, flat (the default). wash: a painted
+  // field in the hero's own two colours. bloom: a painted field of many
+  // colours from a palette, veiled until the type clears 3.5:1 on it.
+  // Both painted grounds are blurred well past recognition: they read as a
+  // background, never as flowers or marks to pick out.
+  const GROUNDS = ['grey', 'wash', 'bloom'];
+  // Bloom palettes: a ground, the foliage around the blooms, and the blooms
+  // with their weights. Mid values, so the type reads once the veil is on.
+  // Drawing data, like a chart's series: the pattern's own, not page colours.
+  const PALETTES = {
+    'Garden':    { ground: '#2f5e5a', foliage: ['#3c7a63', '#2f6f7a', '#4a6fa0', '#5a8a55'], blooms: [['#efe6d6', 3], ['#e9b8b4', 3], ['#d98b92', 2], ['#e3c13c', 3], ['#d99a35', 2], ['#d2492f', 2]] },
+    'Meadow':    { ground: '#2e5a46', foliage: ['#3e8a4f', '#2e6e7a', '#4f78b0', '#6f8f3a'], blooms: [['#d8452a', 4], ['#e48a2a', 3], ['#e8c83a', 3], ['#e9d9a0', 1], ['#c95a6a', 1]] },
+    'Dusk':      { ground: '#3b3f6e', foliage: ['#4b5a8f', '#5d4f86', '#3f6f8a'], blooms: [['#c9a2d6', 3], ['#e5b3c4', 3], ['#f0d9c2', 2], ['#8fa6d9', 2], ['#d97a8f', 1]] },
+    'Harvest':   { ground: '#4a4a26', foliage: ['#6b6f2f', '#7a5a2a', '#3f5f3a'], blooms: [['#e0a53a', 4], ['#d4692f', 3], ['#b8432f', 2], ['#ead38a', 2], ['#9fae4a', 1]] },
+    'Sea pinks': { ground: '#285f6e', foliage: ['#2f7f86', '#3a6aa0', '#4f8f7a'], blooms: [['#f08a8a', 3], ['#f5b7a0', 3], ['#f0e3c8', 2], ['#7cc0b8', 2], ['#e85f6a', 1]] },
+  };
+  const FORMS = ['heads', 'dabs'];
+  const rng = (seed) => { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return ((s >>> 0) % 1e6) / 1e6; }; };
+  const hashText = (t) => [...t].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7);
+  // Any CSS colour as #rrggbb, through the canvas's own parser.
+  const toHex = (c) => { ctx.fillStyle = '#000'; ctx.fillStyle = c; const v = ctx.fillStyle; if (v.startsWith('#')) return v; const n = v.match(/[\d.]+/g).map(Number); return `#${n.slice(0, 3).map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')}`; };
+  const rgb = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const lum = (h) => rgb(h).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
+  const mixHex = (a, b, k) => { const [x, y] = [rgb(a), rgb(b)]; return `#${x.map((v, i) => Math.round(v + (y[i] - v) * k).toString(16).padStart(2, '0')).join('')}`; };
+  const shade = (h, k) => `rgb(${rgb(h).map((v) => Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k))).join(',')})`;
+  const pickW = (r, list) => { let t = r() * list.reduce((s, [, w]) => s + w, 0); return list.find(([, w]) => (t -= w) <= 0)[0]; };
+  // The wash: the hero's ground in light and shade, and blooms mixed part way
+  // to the ink. The ink itself is kept for the type.
+  const washPalette = (g, i) => ({ ground: g, foliage: [mixHex(g, '#000000', 0.12), mixHex(g, '#ffffff', 0.14), mixHex(g, i, 0.12), g],
+    blooms: [[mixHex(g, i, 0.3), 3], [mixHex(g, i, 0.5), 3], [mixHex(g, '#ffffff', 0.3), 2], [mixHex(g, '#000000', 0.25), 2], [mixHex(i, g, 0.25), 1]] });
+  function stroke(c, x, y, len, width, ang, bend, colour) {
+    c.strokeStyle = colour; c.lineWidth = width; c.lineCap = 'round';
+    const dx = Math.cos(ang) * len, dy = Math.sin(ang) * len;
+    c.beginPath(); c.moveTo(x - dx / 2, y - dy / 2); c.quadraticCurveTo(x - dy * bend, y + dx * bend, x + dx / 2, y + dy / 2); c.stroke();
+  }
+  // Paint w × h CSS pixels. Returns nothing; the veil is painted in.
+  function paintGround(canvas, w, h, dpr, pal, form, seed, typeHex) {
+    const c = canvas.getContext('2d'), r = rng(seed);
+    canvas.width = Math.max(1, Math.round(w * dpr)); canvas.height = Math.max(1, Math.round(h * dpr));
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.fillStyle = pal.ground; c.fillRect(0, 0, w, h);
+    const S = Math.min(w, h), rad = S * 0.12;
+    c.globalAlpha = 0.55;
+    for (let k = 0; k < 40; k++) { c.fillStyle = pal.foliage[Math.floor(r() * pal.foliage.length)]; c.beginPath(); c.arc(r() * w, r() * h, rad * (0.8 + r() * 1.6), 0, Math.PI * 2); c.fill(); }
+    c.globalAlpha = 1;
+    for (let k = 0; k < (w * h) / (rad * rad) * 2.5; k++) stroke(c, r() * w, r() * h, rad * (0.4 + r() * 0.5), rad * 0.16, r() * Math.PI * 2, (r() - 0.5) * 0.8, shade(pal.foliage[Math.floor(r() * pal.foliage.length)], (r() - 0.5) * 0.4));
+    const step = rad * 2, cells = [];
+    for (let y = -step / 2; y < h + step; y += step * 0.86) for (let x = -step / 2; x < w + step; x += step) cells.push([x + (r() - 0.5) * step * 0.9, y + (r() - 0.5) * step * 0.9]);
+    cells.sort(() => r() - 0.5);
+    for (const [x, y] of cells) {
+      if (r() > 0.85) continue;
+      const colour = pickW(r, pal.blooms), size = rad * (0.6 + r() * 0.7);
+      if (form === 'dabs') { for (let k = 0; k < 9; k++) stroke(c, x + (r() - 0.5) * size * 1.6, y + (r() - 0.5) * size * 1.6, size * (0.35 + r() * 0.35), size * 0.22, r() * Math.PI * 2, (r() - 0.5) * 0.9, shade(colour, (r() - 0.45) * 0.5)); continue; }
+      const n = Math.round(26 + (size / rad) * 30);   // a head: short strokes from a centre, lit from above
+      for (let k = 0; k < n; k++) { const a = r() * Math.PI * 2, dd = size * Math.sqrt(r()) * 0.75; stroke(c, x + Math.cos(a) * dd, y + Math.sin(a) * dd, size * (0.35 + r() * 0.4), size * (0.13 + r() * 0.1), a + (r() - 0.5) * 0.8, (r() - 0.5) * 0.6, shade(colour, (r() - 0.45) * 0.45)); }
+      for (let k = 0; k < n / 4; k++) { const a = -Math.PI * 0.75 + (r() - 0.5) * 1.6, dd = size * r() * 0.55; stroke(c, x + Math.cos(a) * dd, y + Math.sin(a) * dd, size * 0.25, size * 0.09, a, 0.2, shade(colour, 0.35 + r() * 0.3)); }
+    }
+    // The veil: measure the field, then darken it (light type) or lighten it
+    // (dark type) just enough that the type clears 3.5:1 on its average.
+    const probe = document.createElement('canvas'); probe.width = probe.height = 32;
+    const pc = probe.getContext('2d'); pc.drawImage(canvas, 0, 0, 32, 32);
+    const px = pc.getImageData(0, 0, 32, 32).data;
+    let L = 0;
+    for (let i = 0; i < px.length; i += 4) L += lum(`#${[px[i], px[i + 1], px[i + 2]].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+    L /= px.length / 4;
+    const Lt = lum(typeHex);
+    let veil = 0, dark = true;
+    if (Lt >= L) { const target = (Lt + 0.05) / 3.5 - 0.05; veil = target <= 0 ? 0.6 : L > target ? Math.min(0.6, 1 - target / L) : 0; }
+    else { dark = false; const target = 3.5 * (Lt + 0.05) - 0.05; veil = L < target ? Math.min(0.6, (target - L) / (1 - L)) : 0; }
+    if (veil) { c.fillStyle = dark ? `rgba(0,0,0,${veil.toFixed(3)})` : `rgba(255,255,255,${veil.toFixed(3)})`; c.fillRect(0, 0, w, h); }
+  }
+
   const BUILD = {
     // Every item a lane of its own, the sequence repeated to fill the stage.
     data(svg, items, W, H, drift, o) {
@@ -188,21 +266,48 @@
       node.querySelector(':scope > svg')?.remove();
       if (!W || !H) return;
       const d = node.dataset;
+      const ground = GROUNDS.includes(d.ground) ? d.ground : 'grey';
       const style = STYLES.includes(d.style) ? d.style : 'stack';
       const parts = (d.text ?? '').split('|').map((s) => s.trim()).filter(Boolean);
       if (!parts.length) parts.push(' ');
       // Stack is always tiered; data at one size takes sans values (mono rows
       // read as texture, not data). See README.md, Type.
       const scale = style === 'stack' || d.scale !== 'even' ? 'tiered' : 'even';
-      const mono = d.values === 'mono' && !(style === 'data' && scale === 'even');
+      // Mono values don't hold on the wash, except in rise. See README.md, Grounds.
+      const mono = d.values === 'mono' && !(style === 'data' && scale === 'even') && !(ground === 'wash' && style !== 'rise');
       hero.items = parts.map((p, i) => item(p, i > 0 && mono));
       hero.tempo = Math.max(0, parseFloat(d.tempo) || 1);
       const o = { scale, ratio: Math.min(0.55, Math.max(0.25, parseFloat(d.ratio) || 0.4)) };
       const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, 'aria-hidden': 'true', focusable: 'false' });
       const type = el('g', { fill: 'currentColor' }, svg);
-      hero.frame = BUILD[style](type, hero.items, W, H, driftSeconds(), o);
-      hero.frame(hero.t);
+      const typeFrame = BUILD[style](type, hero.items, W, H, driftSeconds(), o);
       node.prepend(svg);
+      // The painted ground, under the type: painted once, blurred, drifting.
+      let canvas = node.querySelector(':scope > canvas.expressive-hero-ground');
+      if (ground === 'grey') { canvas?.remove(); canvas = null; node.style.removeProperty('color'); }
+      else {
+        if (!canvas) canvas = Object.assign(document.createElement('canvas'), { className: 'expressive-hero-ground' });
+        node.prepend(canvas);
+        const css = getComputedStyle(node);
+        const g = toHex(css.getPropertyValue('--color-hero').trim() || '#808080');
+        const ink = toHex(css.getPropertyValue('--color-hero-ink').trim() || css.color);
+        const white = css.getPropertyValue('--color-hero-bloom-ink').trim() || '#ffffff';
+        // Bloom's type is white, or the hero's ink when it asks for it and is light enough.
+        const pairInk = ground === 'bloom' && d.ink === 'hero' && lum(ink) >= 0.45;
+        node.style.color = ground === 'bloom' && !pairInk ? white : '';
+        const typeHex = toHex(getComputedStyle(node).color);
+        const pal = ground === 'wash' ? washPalette(g, ink) : PALETTES[d.palette] || PALETTES.Garden;
+        const seed = parseInt(d.seed, 10) || hashText((d.text || '') + ground + (d.palette || ''));
+        paintGround(canvas, W, H, Math.min(2, devicePixelRatio || 1), pal, FORMS.includes(d.form) ? d.form : 'heads', seed, typeHex);
+        const blur = Math.max(6, 12 * Math.min(1, Math.min(W, H) / 700));
+        canvas.style.filter = `blur(${blur.toFixed(1)}px)`;
+      }
+      const pad = canvas ? 1 + (parseFloat(canvas.style.filter.slice(5)) * 4) / W + 0.04 : 1;
+      hero.frame = (t) => {
+        typeFrame(t);
+        if (canvas) canvas.style.transform = `translate(${(Math.sin(t * 0.05) * 1.2).toFixed(2)}%, ${(Math.cos(t * 0.037) * 1).toFixed(2)}%) scale(${pad.toFixed(4)})`;
+      };
+      hero.frame(hero.t);
       wake();
     };
     // The share of items with at least one whole copy inside the stage now.
@@ -218,7 +323,7 @@
     let pending = 0;
     const redraw = () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(draw); };
     new ResizeObserver(redraw).observe(node);
-    new MutationObserver(redraw).observe(node, { attributes: true, attributeFilter: ['data-style', 'data-text', 'data-tempo', 'data-scale', 'data-values', 'data-ratio'] });
+    new MutationObserver(redraw).observe(node, { attributes: true, attributeFilter: ['data-style', 'data-text', 'data-tempo', 'data-scale', 'data-values', 'data-ratio', 'data-ground', 'data-palette', 'data-form', 'data-ink', 'data-seed'] });
     new IntersectionObserver(([e]) => { hero.visible = e.isIntersecting; wake(); }).observe(node);
     node.expressiveHero = { redraw, coverage };
     heroes.add(hero);
