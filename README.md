@@ -2,6 +2,8 @@
 
 A personal design system: the rules, the tokens, and a library of components that agents copy into projects.
 
+**[See it live →](https://justin-aguilar-ds.github.io/design-system/)** Every component and pattern in the sandbox, built from this repo on each push to `main`.
+
 ```
 skills/personal-styling/     the skill — everything an agent needs
   SKILL.md                   rules, judgment calls, pattern and component index
